@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             MarketplaceDataSeeder::class,
             ChatMessagesSeeder::class,
             PromotionsSeeder::class,
+            CertificateSeeder::class,
         ]);
     }
 }

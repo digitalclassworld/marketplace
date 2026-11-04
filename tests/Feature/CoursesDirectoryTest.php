@@ -131,5 +131,63 @@ class CoursesDirectoryTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    public function test_certificate_page_loads_successfully_with_download_pdf(): void
+    {
+        $response = $this->get('/certificate');
+
+        $response->assertStatus(200);
+        $response->assertSee('CERTIFICATE');
+        $response->assertSee('ACHIEVEMENT');
+        $response->assertSee('Meshwa Patel');
+        $response->assertSee('Full Stack Web Development');
+        $response->assertSee('Download PDF');
+        $response->assertSee('DC2026-00128');
+        $response->assertSee('Rajesh Sharma');
+        $response->assertSee('Dr. Neha Mehta');
+        $response->assertSee('BrightLearn Institute');
+    }
+
+    public function test_course_specific_certificate_loads_with_dynamic_course_title(): void
+    {
+        $user = User::factory()->create(['role' => 'seller']);
+        $seller = new Seller([
+            'user_id'             => $user->id,
+            'seller_code'         => 'DC-SELL-000004',
+            'account_type'        => Seller::ACCOUNT_TYPE_INSTITUTE,
+            'seller_status'       => Seller::STATUS_ACTIVE,
+            'verification_status' => Seller::VERIFICATION_VERIFIED,
+            'registration_date'   => now(),
+        ]);
+        $seller->save();
+
+        Course::create([
+            'seller_id'      => $seller->id,
+            'title'          => 'Python for Beginners',
+            'slug'           => 'python-for-beginners-cert-test',
+            'category'       => 'Programming',
+            'language'       => 'English',
+            'level'          => 'Beginner',
+            'price'          => 6999,
+            'discount_price' => 3499,
+            'status'         => 'approved',
+            'approved_at'    => now(),
+        ]);
+
+        $response = $this->get('/course/python-for-beginners-cert-test/certificate?name=Meshwa+Patel');
+
+        $response->assertStatus(200);
+        $response->assertSee('Python for Beginners');
+        $response->assertSee('Meshwa Patel');
+        $response->assertSee('Download PDF');
+    }
+
+    public function test_navbar_displays_official_digital_class_logo(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertStatus(200);
+        $response->assertSee('images/logo.png');
+    }
 }
 

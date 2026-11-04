@@ -358,14 +358,10 @@
     <!-- ================= SELLER SIDEBAR (Page 4 Reference) ================= -->
     <aside class="dc-sidebar" id="sellerSidebar">
         <!-- Brand -->
-        <a href="{{ route('seller.dashboard') }}" class="dc-sidebar-brand">
-            <div class="dc-brand-icon">
-                <i class="fa-solid fa-graduation-cap"></i>
-            </div>
-            <div>
-                <div class="dc-brand-text">Digital<span>Class</span></div>
-                <span class="dc-brand-sub">Seller Portal</span>
-            </div>
+        <a href="{{ route('seller.dashboard') }}" class="dc-sidebar-brand d-flex align-items-center gap-2">
+            <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 34px; width: auto; background: white; padding: 4px 8px; border-radius: 8px;">
+            <span class="badge bg-primary text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.05em;">Seller</span>
+            <span class="visually-hidden">Digital Class</span>
         </a>
 
         <!-- Logged-in Seller Mini Profile -->

@@ -465,19 +465,22 @@
             <!-- Two Promotional Mini Banners -->
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <div class="cert-promo-banner d-flex align-items-center justify-content-between h-100">
-                        <div>
-                            <div class="fw-bold text-primary mb-1" style="font-size: 0.85rem;">
-                                <i class="fa-solid fa-award me-1"></i> Get Certified & Boost Your Career
+                    <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" class="text-decoration-none d-block h-100" title="View & Download Official Course Certificate">
+                        <div class="cert-promo-banner d-flex align-items-center justify-content-between h-100" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                            <div>
+                                <div class="fw-bold text-primary mb-1 d-flex align-items-center gap-1" style="font-size: 0.85rem;">
+                                    <i class="fa-solid fa-award me-1"></i> Get Certified & Boost Your Career
+                                    <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Download PDF</span>
+                                </div>
+                                <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.35;">
+                                    Complete this course and get a verified certificate from Digital Class - Educational World.
+                                </p>
                             </div>
-                            <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.35;">
-                                Complete this course and get a verified certificate from Digital Class - Educational World.
-                            </p>
+                            <div class="ms-2 flex-shrink-0">
+                                <i class="fa-solid fa-certificate text-warning" style="font-size: 2.25rem; opacity: 0.95;"></i>
+                            </div>
                         </div>
-                        <div class="ms-2 flex-shrink-0">
-                            <i class="fa-solid fa-certificate text-primary" style="font-size: 2.25rem; opacity: 0.85;"></i>
-                        </div>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="col-md-6">
@@ -704,8 +707,13 @@
                     <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
                         <i class="fa-solid fa-circle-check text-success"></i> <span>Mobile, Tablet & Desktop Access</span>
                     </div>
-                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                        <i class="fa-solid fa-circle-check text-success"></i> <span>Certificate of Completion</span>
+                    <div class="d-flex align-items-center justify-content-between mb-2 text-dark" style="font-size: 0.75rem;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-success"></i> <span>Certificate of Completion</span>
+                        </div>
+                        <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" target="_blank" class="text-primary text-decoration-none fw-semibold" style="font-size: 0.7rem;">
+                            View PDF &rarr;
+                        </a>
                     </div>
                     <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
                         <i class="fa-solid fa-circle-check text-success"></i> <span>Live Projects & Resources</span>

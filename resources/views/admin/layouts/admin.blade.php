@@ -259,13 +259,10 @@
     <!-- ================= SUPER ADMIN SIDEBAR ================= -->
     <aside class="admin-sidebar" id="adminSidebar">
         <!-- Brand (Matching Screenshot) -->
-        <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-brand">
-            <div>
-                <div class="admin-brand-main">
-                    <span style="color: #ff6b35;">Digital</span> <span style="color: #ffffff;">Class</span>
-                </div>
-                <span class="admin-brand-sub">Educational World</span>
-            </div>
+        <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-brand d-flex align-items-center gap-2">
+            <img src="{{ asset('images/logo.png') }}" alt="Digital Class Educational World" style="height: 36px; width: auto; background: white; padding: 4px 8px; border-radius: 8px;">
+            <span class="badge bg-danger text-uppercase" style="font-size: 0.65rem;">Super Admin</span>
+            <span class="visually-hidden">Digital Class Educational World</span>
         </a>
 
         <!-- Navigation Menu -->

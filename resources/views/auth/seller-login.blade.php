@@ -62,9 +62,9 @@
                 <div class="dc-auth-card">
                     <!-- Header -->
                     <div class="text-center mb-4">
-                        <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 mb-3" style="width: 44px; height: 44px;">
-                            <i class="fa-solid fa-store fs-5"></i>
-                        </div>
+                        <a href="{{ route('home') }}" class="d-inline-block mb-2">
+                            <img src="{{ asset('images/logo.png') }}" alt="Digital Class Educational World" style="height: 46px; width: auto; object-fit: contain;">
+                        </a>
                         <h1 class="dc-auth-title">Seller Portal Login</h1>
                         <p class="text-muted small mb-0">
                             Sign in using your registered <strong>Email Address</strong> or <strong>Seller ID</strong>.

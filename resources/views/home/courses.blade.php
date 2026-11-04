@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('title', 'All Courses - Learn In-Demand Skills on Digital Class')

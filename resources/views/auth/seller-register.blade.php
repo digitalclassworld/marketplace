@@ -355,6 +355,11 @@
                  =================================================================== -->
             <div class="col-xl-4 col-lg-5">
                 <div class="pe-xl-3">
+                    <div class="mb-3">
+                        <a href="{{ route('home') }}">
+                            <img src="{{ asset('images/logo.png') }}" alt="Digital Class Educational World" style="height: 48px; width: auto; object-fit: contain;">
+                        </a>
+                    </div>
                     <span class="hero-badge-pill">Become a Seller on Digital Class</span>
 
                     <h1 class="hero-title-main">

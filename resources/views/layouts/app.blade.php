@@ -270,14 +270,9 @@
     <nav class="navbar navbar-expand-xl dc-navbar bg-white border-bottom sticky-top py-2">
         <div class="container-fluid px-lg-4">
             <!-- Brand Logo -->
-            <a class="dc-brand me-3" href="{{ route('home') }}">
-                <div class="dc-brand-icon" style="background: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%);">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
-                <div>
-                    <div style="font-size: 1.25rem; font-weight: 800; line-height: 1;">Digital<span class="dc-highlight" style="color: #0066ff;">Class</span></div>
-                    <span class="dc-brand-subtitle" style="font-size: 0.65rem; color: #64748b; letter-spacing: 0.05em; font-weight: 600;">Educational World</span>
-                </div>
+            <a class="dc-brand me-3 d-flex align-items-center" href="{{ route('home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Digital Class Educational World" class="dc-navbar-logo" style="height: 42px; width: auto; max-height: 44px; object-fit: contain;">
+                <span class="visually-hidden">Digital Class</span>
             </a>
 
             <!-- Mobile Toggle -->
@@ -457,10 +452,8 @@
             <div class="row g-4 mb-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <div class="dc-brand-icon">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </div>
-                        <h4 class="text-white fw-bold mb-0">Digital Class</h4>
+                        <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 38px; width: auto; background: white; padding: 4px 8px; border-radius: 8px;">
+                        <h4 class="visually-hidden">Digital Class</h4>
                     </div>
                     <p class="small text-secondary mb-3">
                         Digital Class Marketplace &mdash; <strong>Learn. Hire. Buy. Discover.</strong> India's multi-vendor educational and business platform connecting learners, professionals, businesses, and customers in one unified ecosystem.
