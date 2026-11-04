@@ -342,3 +342,4 @@ To see the full error stack trace on the screen:
 | **Seller 2 (Active)** | `seller23@gmail.com` | `Seller@123` | `/seller/login` &rarr; `/seller/dashboard` |
 | **Seller 3 (Institute)** | `vinayak@vcec.in` | `Seller@123` | `/seller/login` &rarr; `/seller/dashboard` |
 | **Seller 4 (Agency)** | `hello@designstudiopro.com` | `Seller@123` | `/seller/login` &rarr; `/seller/dashboard` |
+
