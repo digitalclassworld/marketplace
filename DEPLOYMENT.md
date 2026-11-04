@@ -63,7 +63,105 @@ php artisan view:cache
 
 ---
 
-## 🖥️ 3. Deployment Scenario A: Windows Local (XAMPP / Laragon / Standalone)
+## 🟣 3. Hostinger Deployment Guide (hPanel & Cloud / Shared Hosting)
+
+Hostinger is one of the most popular hosting platforms, but running modern Laravel on Hostinger requires specific settings in **hPanel**. Follow these 5 steps to get the platform running with 0 errors:
+
+### Step 1: Switch PHP Version to PHP 8.2 or 8.3 (CRITICAL)
+> [!WARNING]
+> Hostinger often defaults new websites to **PHP 8.0 or 8.1**. Since this marketplace is built with **Laravel 12**, it strictly requires **PHP 8.2+**. If PHP 8.1 is active, Hostinger will immediately show a `500 Server Error` on load!
+
+1. Log in to **Hostinger hPanel**.
+2. Go to **Websites** &rarr; click **Manage** next to your domain.
+3. In the left sidebar, go to **Advanced** &rarr; **PHP Configuration**.
+4. Select **PHP 8.2** or **PHP 8.3**.
+5. Click **Save** and wait 30 seconds for the change to apply.
+
+---
+
+### Step 2: Upload Project Files to `public_html`
+You can deploy using either Hostinger Git or File Manager:
+
+**Method A: Hostinger Git Deployment (Recommended):**
+1. In hPanel, go to **Advanced** &rarr; **Git**.
+2. Enter Repository: `https://github.com/digitalclassworld/marketplace.git`
+3. Branch: `main`
+4. Install Directory: `/public_html` (or leave blank for root of domain).
+5. Click **Create** &rarr; click **Deploy**.
+
+**Method B: File Manager (ZIP Upload):**
+1. In hPanel, open **File Manager**.
+2. Go to `public_html/`.
+3. Upload and extract the project files directly into `public_html/`.
+
+> [!NOTE]
+> The repository includes a pre-configured root [`.htaccess`](.htaccess) and fallback [`index.php`](index.php). When deployed into `public_html/`, Hostinger will automatically route all requests directly to the Laravel application in `public/` without requiring custom symlinks!
+
+---
+
+### Step 3: Import Database via Hostinger phpMyAdmin (No SSH Needed)
+If you don't have SSH or terminal access on Hostinger, you can import the entire working database in 30 seconds:
+
+1. In hPanel, go to **Databases** &rarr; **Management**.
+2. Create a new MySQL Database:
+   - Note down the full Database Name (e.g., `u123456789_market`).
+   - Note down the full Username (e.g., `u123456789_user`).
+   - Set a strong password.
+3. Click **Enter phpMyAdmin** next to the new database.
+4. Click the **Import** tab at the top.
+5. Click **Choose File** &rarr; select the included [`database/marketplace.sql`](database/marketplace.sql) file.
+6. Click **Go** at the bottom.
+   *All tables, the Super Admin account, verified sellers, courses, services, products, listings, orders, and chats are imported instantly!*
+
+---
+
+### Step 4: Configure `.env` in Hostinger File Manager
+1. In Hostinger **File Manager**, locate `.env.example` in `public_html/`.
+2. Rename or copy it to `.env`.
+3. Open `.env` and fill in your Hostinger database details:
+   ```env
+   APP_NAME="Digital Class Marketplace"
+   APP_ENV=production
+   APP_KEY=base64:Zm+Xo18BQAkDobhIjCc4xUB103aOWqO6yK5+eO76PDs=
+   APP_DEBUG=false
+   APP_URL=https://yourdomain.com
+
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=u123456789_market
+   DB_USERNAME=u123456789_user
+   DB_PASSWORD=YourHostingerPasswordHere
+   ```
+   *(Note: A valid production `APP_KEY` is already provided above so the site starts immediately even if you don't have SSH access.)*
+
+---
+
+### Step 5: If You Have Hostinger SSH Access (Optional Optimizations)
+If your Hostinger plan includes SSH:
+1. In hPanel, go to **Advanced** &rarr; **SSH Access** &rarr; Enable SSH.
+2. Connect via terminal:
+   ```bash
+   ssh -p 65002 u123456789@your-server-ip
+   cd domains/yourdomain.com/public_html
+   php artisan optimize:clear
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
+
+---
+
+### Step 6: Troubleshooting Hostinger 500 Server Error
+If your site still displays `500 Server Error` on Hostinger:
+1. **Check PHP Version:** Ensure hPanel is set to **PHP 8.2** or **8.3**, NOT 8.0/8.1.
+2. **Turn on Debug Mode:** In `public_html/.env`, change `APP_DEBUG=false` to `APP_DEBUG=true` and refresh the page to view the exact error.
+3. **Database Prefix:** Remember that Hostinger prefixes your database name and username with your account ID (e.g. `u123456789_`). Check that `DB_DATABASE` and `DB_USERNAME` in `.env` include this prefix!
+4. **Permissions:** In Hostinger File Manager, right-click `storage` and `bootstrap/cache` &rarr; click **Permissions** &rarr; set to **775** (Recursive).
+
+---
+
+## 🖥️ 4. Deployment Scenario A: Windows Local (XAMPP / Laragon / Standalone)
 
 ### Step 1: Clone into Web Directory
 Clone into `C:\xampp\htdocs\marketplace` or your working directory:
