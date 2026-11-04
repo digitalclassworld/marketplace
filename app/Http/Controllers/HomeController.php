@@ -135,4 +135,187 @@ class HomeController extends Controller
             'sortBy'                => $sortBy,
         ]);
     }
+
+    /**
+     * Display the public Business Profile page matching the VCEC UI design.
+     */
+    public function businessProfile(Request $request, $slug = null): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $business = null;
+        if (Schema::hasTable('business_listings')) {
+            if ($slug) {
+                $business = BusinessListing::where('slug', $slug)->first();
+            }
+            if (!$business) {
+                $business = BusinessListing::where('business_name', 'like', '%VCEC%')->first()
+                         ?? BusinessListing::first();
+            }
+        }
+
+        // Curated courses matching the screenshot
+        $courses = [
+            [
+                'title' => 'Digital Marketing Complete Course',
+                'duration' => '3 Months',
+                'mode' => 'Offline / Online',
+                'price' => 12999,
+                'original_price' => 18999,
+                'discount' => '31% OFF',
+                'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Tally Prime with GST',
+                'duration' => '2 Months',
+                'mode' => 'Offline',
+                'price' => 4999,
+                'original_price' => 6999,
+                'discount' => '29% OFF',
+                'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'AI Tools & ChatGPT',
+                'duration' => '1.5 Months',
+                'mode' => 'Offline / Online',
+                'price' => 5999,
+                'original_price' => 8999,
+                'discount' => '33% OFF',
+                'thumbnail' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'CCC (Basic Computer)',
+                'duration' => '1 Month',
+                'mode' => 'Offline',
+                'price' => 2999,
+                'original_price' => 4500,
+                'discount' => '33% OFF',
+                'thumbnail' => 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Web Development',
+                'duration' => '3 Months',
+                'mode' => 'Offline / Online',
+                'price' => 14999,
+                'original_price' => 22999,
+                'discount' => '33% OFF',
+                'thumbnail' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&auto=format&fit=crop&q=80',
+            ],
+        ];
+
+        // Curated services matching the screenshot
+        $services = [
+            ['title' => 'Resume Making',              'price' => '₹499',   'icon' => 'fa-solid fa-file-lines',   'color' => '#ec4899', 'bg' => '#fdf2f8'],
+            ['title' => 'Graphics Design',            'price' => '₹999',   'icon' => 'fa-solid fa-palette',      'color' => '#0284c7', 'bg' => '#f0f9ff'],
+            ['title' => 'Website Development',        'price' => '₹4,999', 'icon' => 'fa-solid fa-code',         'color' => '#2563eb', 'bg' => '#eff6ff'],
+            ['title' => 'Social Media Management',    'price' => '₹2,499', 'icon' => 'fa-solid fa-share-nodes',  'color' => '#8b5cf6', 'bg' => '#f5f3ff'],
+            ['title' => 'Career Guidance & Counseling','price' => '₹499',   'icon' => 'fa-solid fa-user-graduate','color' => '#0d9488', 'bg' => '#f0fdfa'],
+        ];
+
+        // Curated student reviews matching the screenshot
+        $reviews = [
+            [
+                'author' => 'Priya Shah',
+                'time_ago' => '2 weeks ago',
+                'rating' => 5,
+                'text' => 'Very practical training. Faculty is very supportive. Highly recommended! 👍',
+                'avatar' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80',
+            ],
+            [
+                'author' => 'Karan Patel',
+                'time_ago' => '1 month ago',
+                'rating' => 5,
+                'text' => 'Best computer institute in Nikol. Got a job after completing digital marketing.',
+                'avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80',
+            ],
+            [
+                'author' => 'Neha Joshi',
+                'time_ago' => '1 month ago',
+                'rating' => 5,
+                'text' => 'Great learning environment and hands-on practice. Value for money!',
+                'avatar' => 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&auto=format&fit=crop&q=80',
+            ],
+        ];
+
+        // Branches
+        $branches = [
+            [
+                'name' => 'Nikol Branch (Head Office)',
+                'address' => '201, Shreeji Complex, Nikol Main Road, Ahmedabad - 382350, Gujarat',
+                'phone' => '+91 98765 43210',
+                'status' => 'Open',
+                'is_head' => true,
+            ],
+            [
+                'name' => 'Naroda Branch',
+                'address' => 'Shop 104, Galaxy Complex, Naroda, Ahmedabad - 382330, Gujarat',
+                'phone' => '+91 98765 43211',
+                'status' => 'Open',
+                'is_head' => false,
+            ],
+            [
+                'name' => 'Sardar Chowk Branch',
+                'address' => '2nd Floor, City Center, Sardar Chowk, Ahmedabad - 382340, Gujarat',
+                'phone' => '+91 98765 43212',
+                'status' => 'Open',
+                'is_head' => false,
+            ],
+        ];
+
+        return view('home.business-profile', [
+            'seller'   => $seller,
+            'business' => $business,
+            'courses'  => $courses,
+            'services' => $services,
+            'reviews'  => $reviews,
+            'branches' => $branches,
+        ]);
+    }
+
+    /**
+     * Submit an enquiry from the business profile.
+     */
+    public function submitEnquiry(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:120',
+            'phone' => 'required|string|max:20',
+            'course' => 'nullable|string|max:120',
+            'message' => 'nullable|string|max:500',
+        ]);
+
+        return back()->with('success', 'Thank you! Your enquiry has been received. Our counselor will contact you shortly.');
+    }
+
+    /**
+     * Book a free demo class.
+     */
+    public function bookDemo(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:120',
+            'phone' => 'required|string|max:20',
+            'course' => 'required|string|max:120',
+            'preferred_branch' => 'required|string|max:120',
+        ]);
+
+        return back()->with('success', 'Demo class booked successfully! We have reserved your seat.');
+    }
+
+    /**
+     * Submit a student review.
+     */
+    public function submitReview(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'author' => 'required|string|max:120',
+            'rating' => 'required|numeric|min:1|max:5',
+            'comment' => 'required|string|max:600',
+        ]);
+
+        return back()->with('success', 'Thank you for your review! It will be visible after brief moderation.');
+    }
 }

@@ -980,7 +980,9 @@
                                             <img src="{{ $b->logo }}" alt="Logo" class="rounded-circle border" style="width: 22px; height: 22px; object-fit: cover; flex-shrink: 0; margin-top: 1px;">
                                         @endif
                                         <h4 class="business-card-title mb-0" title="{{ $b->business_name }}">
-                                            {{ $b->business_name }}
+                                            <a href="{{ route('business.show', $b->slug) }}" class="text-dark text-decoration-none">
+                                                {{ $b->business_name }}
+                                            </a>
                                         </h4>
                                     </div>
 
@@ -1015,9 +1017,9 @@
                                        class="btn-card-action btn-card-wa">
                                         <i class="fa-brands fa-whatsapp"></i> WhatsApp
                                     </a>
-                                    <button type="button" class="btn-card-action btn-card-view" onclick="openDetailModal({{ json_encode([
-                                        'name' => $b->business_name,
-                                        'category' => $b->category,
+                                    <a href="{{ route('business.show', $b->slug) }}" class="btn-card-action btn-card-view">
+                                        View
+                                    </a>
                                         'image' => $b->display_image,
                                         'rating' => $b->rating,
                                         'reviews' => $b->reviews_count,
