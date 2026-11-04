@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/courses', [HomeController::class, 'courses'])->name('courses');
 Route::get('/products', [HomeController::class, 'products'])->name('products');
+Route::get('/product/{slug}', [HomeController::class, 'productShow'])->name('product.show');
 Route::get('/course/{slug}', [HomeController::class, 'courseShow'])->name('course.show');
 Route::post('/course/{slug}/enroll', [HomeController::class, 'courseEnroll'])->name('course.enroll');
 Route::post('/course/{slug}/review', [HomeController::class, 'courseReview'])->name('course.review');

@@ -839,6 +839,8 @@
                             $reviewsCount = is_array($p) ? $p['reviews_count'] : '1.2K';
                             $sellerName = is_array($p) ? $p['seller_name'] : $p->seller_name;
                             $thumb = is_array($p) ? $p['thumbnail'] : $p->display_thumbnail;
+                            $slug = is_array($p) ? \Illuminate\Support\Str::slug($p['title']) : ($p->slug ?: \Illuminate\Support\Str::slug($p->title));
+                            $productUrl = route('product.show', $slug);
                         @endphp
 
                         <div class="product-card">
@@ -853,13 +855,15 @@
                             </button>
 
                             <!-- Thumbnail -->
-                            <div class="product-card-thumb-wrap">
+                            <a href="{{ $productUrl }}" class="product-card-thumb-wrap text-decoration-none d-block">
                                 <img src="{{ $thumb }}" alt="{{ $title }}" class="product-card-thumb">
-                            </div>
+                            </a>
 
                             <!-- Product Info -->
                             <div>
-                                <h3 class="product-card-title" title="{{ $title }}">{{ $title }}</h3>
+                                <a href="{{ $productUrl }}" class="text-decoration-none">
+                                    <h3 class="product-card-title" title="{{ $title }}">{{ $title }}</h3>
+                                </a>
                                 @if($specs)
                                     <div class="product-card-specs" title="{{ $specs }}">{{ $specs }}</div>
                                 @else
@@ -1043,3 +1047,4 @@
 </script>
 
 @endsection
+

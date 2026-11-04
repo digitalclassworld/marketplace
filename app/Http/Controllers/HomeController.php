@@ -956,4 +956,165 @@ class HomeController extends Controller
 
         return back()->with('success', 'Thank you! Your course review has been submitted successfully.');
     }
+
+    /**
+     * Display the dynamic Product Description page matching the HP 15s UI design.
+     */
+    public function productShow(Request $request, $slug): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $product = null;
+        try {
+            if (Schema::hasTable('products')) {
+                $product = \App\Models\Product::with(['seller.businessDetail', 'seller.user'])
+                    ->where('slug', $slug)
+                    ->first();
+
+                if (!$product) {
+                    $product = \App\Models\Product::with(['seller.businessDetail', 'seller.user'])
+                        ->where('title', 'like', "%{$slug}%")
+                        ->first();
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on productShow: ' . $e->getMessage());
+        }
+
+        // Fallback default product matching the exact HP 15s screenshot if database record is missing
+        if (!$product) {
+            $product = new \App\Models\Product([
+                'title'            => 'HP 15s Laptop (Intel Core i5 13th Gen, 16GB RAM, 512GB SSD, 15.6" FHD, Windows 11)',
+                'slug'             => 'hp-15s-laptop',
+                'category'         => 'Laptops & Computers',
+                'price'            => 42999,
+                'mrp'              => 63999,
+                'stock_quantity'   => 45,
+                'shipping_details' => 'Intel Core i5, 16GB, 512GB SSD',
+                'description'      => 'Powerful and stylish laptop for students, professionals and business users. Perfect for online classes, office work, content creation and everyday use.',
+                'thumbnail'        => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
+                'status'           => 'approved',
+            ]);
+        }
+
+        // Gallery images
+        $galleryImages = [
+            $product->display_thumbnail,
+            'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80',
+        ];
+
+        // 6 Key Spec Icons
+        $specHighlights = [
+            ['label' => 'Intel Core i5 13th Gen', 'icon' => 'fa-solid fa-microchip', 'sub' => 'Processor'],
+            ['label' => '16GB RAM', 'icon' => 'fa-solid fa-memory', 'sub' => 'RAM Memory'],
+            ['label' => '512GB SSD', 'icon' => 'fa-solid fa-hard-drive', 'sub' => 'Storage'],
+            ['label' => '15.6" FHD Display', 'icon' => 'fa-solid fa-desktop', 'sub' => 'Display'],
+            ['label' => 'Windows 11 Home', 'icon' => 'fa-brands fa-windows', 'sub' => 'Operating System'],
+            ['label' => '1.69 kg Lightweight', 'icon' => 'fa-solid fa-weight-hanging', 'sub' => 'Weight'],
+        ];
+
+        // Key Features List
+        $keyFeatures = [
+            ['title' => 'Intel Core i5 13th Gen Processor', 'sub' => '(10 Cores, 12 Threads)', 'icon' => 'fa-solid fa-microchip'],
+            ['title' => '16GB DDR4 RAM', 'sub' => '(Expandable up to 32GB)', 'icon' => 'fa-solid fa-memory'],
+            ['title' => '512GB SSD Storage', 'sub' => '(Faster Performance)', 'icon' => 'fa-solid fa-database'],
+            ['title' => '15.6-inch Full HD Display', 'sub' => '(1920 x 1080)', 'icon' => 'fa-solid fa-tv'],
+            ['title' => 'Windows 11 Home', 'sub' => '(Pre-installed)', 'icon' => 'fa-brands fa-windows'],
+            ['title' => 'Lightweight & Portable', 'sub' => '(1.69 kg)', 'icon' => 'fa-solid fa-feather-pointed'],
+        ];
+
+        // Product Highlights 2x3 Grid
+        $highlights = [
+            ['title' => 'Perfect for Students', 'img' => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop&q=80'],
+            ['title' => 'Great for Office Work', 'img' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80'],
+            ['title' => 'Ideal for Online Classes', 'img' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&auto=format&fit=crop&q=80'],
+            ['title' => 'Fast & Reliable Performance', 'img' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&auto=format&fit=crop&q=80'],
+            ['title' => 'Slim & Stylish Design', 'img' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&auto=format&fit=crop&q=80'],
+            ['title' => 'All-Day Productivity', 'img' => 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&auto=format&fit=crop&q=80'],
+        ];
+
+        // Offers & Discounts
+        $offers = [
+            ['type' => 'Bank Offer', 'desc' => 'Get up to ₹3,000 instant discount on HDFC Bank Cards', 'icon' => 'fa-solid fa-credit-card', 'color' => '#dc2626'],
+            ['type' => 'No Cost EMI', 'desc' => 'Starting from ₹3,583/month on major credit cards', 'icon' => 'fa-solid fa-receipt', 'color' => '#d97706'],
+            ['type' => 'Exchange Offer', 'desc' => 'Up to ₹8,000 off on exchange of your old laptop', 'icon' => 'fa-solid fa-rotate', 'color' => '#059669'],
+            ['type' => 'GST Invoice', 'desc' => 'Available for businesses & institutes with 18% tax credit', 'icon' => 'fa-solid fa-file-invoice-dollar', 'color' => '#2563eb'],
+            ['type' => 'Partner Offer', 'desc' => 'Free Laptop Bag + Wireless Mouse bundled together', 'icon' => 'fa-solid fa-gift', 'color' => '#e11d48'],
+        ];
+
+        // Similar Products
+        $similarProducts = collect();
+        try {
+            if (Schema::hasTable('products')) {
+                $similarProducts = \App\Models\Product::where('id', '!=', $product->id ?? 0)
+                    ->where('status', 'approved')
+                    ->take(3)
+                    ->get();
+            }
+        } catch (\Throwable $e) {
+            $similarProducts = collect();
+        }
+
+        if ($similarProducts->isEmpty()) {
+            $similarProducts = [
+                ['title' => 'Lenovo IdeaPad Slim 3', 'price' => 39999, 'rating' => 4.5, 'reviews' => '980', 'thumb' => 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=300&auto=format&fit=crop&q=80'],
+                ['title' => 'Dell Inspiron 3520', 'price' => 45999, 'rating' => 4.6, 'reviews' => '1.2K', 'thumb' => 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=300&auto=format&fit=crop&q=80'],
+                ['title' => 'ASUS Vivobook 15', 'price' => 41999, 'rating' => 4.4, 'reviews' => '860', 'thumb' => 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&auto=format&fit=crop&q=80'],
+            ];
+        }
+
+        // Frequently Bought Together Bundle
+        $bundleItems = [
+            [
+                'id' => 1,
+                'title' => $product->title,
+                'price' => (float)$product->price,
+                'thumb' => $product->display_thumbnail,
+                'checked' => true,
+                'is_main' => true,
+            ],
+            [
+                'id' => 2,
+                'title' => 'Logitech Wireless Mouse',
+                'price' => 499,
+                'thumb' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&auto=format&fit=crop&q=80',
+                'checked' => true,
+                'is_main' => false,
+            ],
+            [
+                'id' => 3,
+                'title' => 'Laptop Backpack',
+                'price' => 1299,
+                'thumb' => 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200&auto=format&fit=crop&q=80',
+                'checked' => true,
+                'is_main' => false,
+            ],
+            [
+                'id' => 4,
+                'title' => 'Laptop Cooling Pad',
+                'price' => 899,
+                'thumb' => 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=200&auto=format&fit=crop&q=80',
+                'checked' => true,
+                'is_main' => false,
+            ],
+        ];
+
+        return view('home.product-show', [
+            'seller'          => $seller,
+            'product'         => $product,
+            'galleryImages'   => $galleryImages,
+            'specHighlights'  => $specHighlights,
+            'keyFeatures'     => $keyFeatures,
+            'highlights'      => $highlights,
+            'offers'          => $offers,
+            'bundleItems'     => $bundleItems,
+            'similarProducts' => $similarProducts,
+        ]);
+    }
 }
