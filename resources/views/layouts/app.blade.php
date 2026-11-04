@@ -137,6 +137,23 @@
             background-color: var(--dc-primary-soft);
         }
 
+        .nav-link.dc-nav-link.active-marketplace-tab {
+            color: #0066ff !important;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .nav-link.dc-nav-link.active-marketplace-tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            left: 12px;
+            right: 12px;
+            height: 3px;
+            background: #0066ff;
+            border-radius: 999px;
+        }
+
         .dc-badge-soon {
             font-size: 0.65rem;
             font-weight: 600;
@@ -290,7 +307,7 @@
                         <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Digital & Physical Products">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Business Directory">Businesses</a>
+                        <a class="nav-link dc-nav-link active-marketplace-tab" href="{{ route('home') }}">Businesses</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dc-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -304,14 +321,14 @@
                 </ul>
 
                 <!-- Center Search Input with Blue Button -->
-                <div class="flex-grow-1 mx-xl-3 my-2 my-xl-0" style="max-width: 480px;">
+                <form action="{{ route('home') }}" method="GET" class="flex-grow-1 mx-xl-3 my-2 my-xl-0" style="max-width: 480px;">
                     <div class="input-group">
-                        <input type="text" class="form-control border-end-0 bg-light" placeholder="Search courses, services, products, businesses..." style="font-size: 0.85rem; border-color: #e2e8f0;">
-                        <button class="btn btn-primary px-3" type="button" style="background-color: #0066ff;">
+                        <input type="text" name="search" value="{{ request('search') }}" class="form-control border-end-0 bg-light" placeholder="Search businesses, shops, institutes, service centers..." style="font-size: 0.85rem; border-color: #e2e8f0;">
+                        <button class="btn btn-primary px-3" type="submit" style="background-color: #0066ff;">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
-                </div>
+                </form>
 
                 <!-- Right Side Elements -->
                 <div class="d-flex align-items-center gap-2 gap-xl-3 ms-xl-auto mt-2 mt-xl-0 flex-wrap">
@@ -445,7 +462,7 @@
                         <h4 class="text-white fw-bold mb-0">Digital Class</h4>
                     </div>
                     <p class="small text-secondary mb-3">
-                        Digital Class Marketplace is India's multi-vendor educational and business platform connecting learners, professionals, businesses, and customers in one unified ecosystem.
+                        Digital Class Marketplace &mdash; <strong>Learn. Hire. Buy. Discover.</strong> India's multi-vendor educational and business platform connecting learners, professionals, businesses, and customers in one unified ecosystem.
                     </p>
                     <div class="d-flex gap-2">
                         <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Phase 1: Seller Onboarding</span>
