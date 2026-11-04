@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SuperAdminSeeder::class,
+            MarketplaceDataSeeder::class,
+            ChatMessagesSeeder::class,
+            PromotionsSeeder::class,
         ]);
     }
 }

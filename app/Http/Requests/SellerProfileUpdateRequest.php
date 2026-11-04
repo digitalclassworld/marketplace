@@ -21,6 +21,8 @@ class SellerProfileUpdateRequest extends FormRequest
             'name'                 => ['required', 'string', 'max:255'],
             'email'                => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
             'phone'                => ['required', 'string', 'max:20'],
+            'avatar'               => ['nullable', 'image', 'max:5120'],
+            'avatar_url'           => ['nullable', 'string', 'max:500'],
             'business_name'        => ['nullable', 'string', 'max:255'],
             'business_email'       => ['nullable', 'email', 'max:255'],
             'business_phone'       => ['nullable', 'string', 'max:30'],

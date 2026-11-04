@@ -117,6 +117,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->group(function () {
     Route::get('/', fn() => redirect()->route('admin.dashboard'));
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/profile/avatar', [AdminDashboardController::class, 'updateAvatar'])->name('profile.avatar');
 
     // Seller Approval & Management Workflow
     Route::prefix('sellers')->name('sellers.')->group(function () {

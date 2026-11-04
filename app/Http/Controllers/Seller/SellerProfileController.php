@@ -38,11 +38,22 @@ class SellerProfileController extends Controller
 
         DB::beginTransaction();
         try {
+            // Handle Avatar Upload
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                $filename = 'avatar_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/avatars'), $filename);
+                $user->avatar = 'uploads/avatars/' . $filename;
+            } elseif (!empty($validated['avatar_url'])) {
+                $user->avatar = $validated['avatar_url'];
+            }
+
             // Update permitted User fields
             $user->update([
                 'name'  => $validated['name'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
+                'avatar'=> $user->avatar,
             ]);
 
             // Update or create permitted SellerBusinessDetail fields

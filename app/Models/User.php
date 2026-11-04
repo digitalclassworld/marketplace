@@ -22,11 +22,30 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'avatar',
         'phone',
         'password',
         'role',
         'email_verified_at',
     ];
+
+    /**
+     * Get the user's avatar URL.
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if (!empty($this->avatar)) {
+            if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
+                return $this->avatar;
+            }
+            if (file_exists(public_path($this->avatar))) {
+                return asset($this->avatar);
+            }
+            return asset('storage/' . $this->avatar);
+        }
+
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=0066ff&color=fff&size=128&bold=true';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

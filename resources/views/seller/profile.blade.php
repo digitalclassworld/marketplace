@@ -33,8 +33,8 @@
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="text-center pb-3 border-bottom mb-3">
-                    <div class="dc-user-avatar mx-auto mb-2" style="width: 72px; height: 72px; font-size: 1.85rem;">
-                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                    <div class="position-relative d-inline-block mx-auto mb-2">
+                        <img id="sellerAvatarPreviewSidebar" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm" style="width: 76px; height: 76px; object-fit: cover; border: 3px solid #0066ff;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0066ff&color=fff';">
                     </div>
                     <h5 class="fw-bold text-dark mb-0">{{ $user->name }}</h5>
                     <div class="text-primary fw-bold font-monospace small mb-2">{{ $seller->seller_code }}</div>
@@ -104,7 +104,7 @@
                     <i class="fa-regular fa-pen-to-square text-primary me-2"></i>Edit Permitted Information
                 </h5>
 
-                @if($errors->any())
+                @if(isset($errors) && $errors->any())
                     <div class="alert alert-danger rounded-3 py-2 px-3 small mb-4">
                         <ul class="mb-0 ps-3">
                             @foreach($errors->all() as $error)
@@ -114,7 +114,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('seller.profile.update') }}" method="POST">
+                <form action="{{ route('seller.profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -131,6 +131,29 @@
                                 <i class="fa-solid fa-lock me-1"></i> Seller Account Type
                             </label>
                             <input type="text" class="form-control form-control-sm bg-white" value="{{ $seller->account_type }}" disabled readonly>
+                        </div>
+                    </div>
+
+                    <!-- Profile Photo / Round Avatar Uploader -->
+                    <div class="card border-0 rounded-3 p-3 mb-4" style="background: #f8fafc; border: 1px dashed #cbd5e1 !important;">
+                        <div class="d-flex flex-column flex-sm-row align-items-center gap-3">
+                            <div class="position-relative">
+                                <img id="sellerAvatarPreviewForm" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm" style="width: 72px; height: 72px; object-fit: cover; border: 3px solid #0066ff;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0066ff&color=fff';">
+                            </div>
+                            <div class="flex-grow-1 text-center text-sm-start">
+                                <label class="form-label small fw-bold text-dark mb-1">Profile Photo (Round Avatar)</label>
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-md-6">
+                                        <input type="file" name="avatar" id="sellerAvatarInput" class="form-control form-control-sm" accept="image/*" onchange="previewSellerAvatar(this)">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="url" name="avatar_url" class="form-control form-control-sm" placeholder="Or enter image URL" value="{{ str_starts_with($user->avatar ?? '', 'http') ? $user->avatar : '' }}">
+                                    </div>
+                                </div>
+                                <div class="text-muted" style="font-size: 0.72rem; margin-top: 4px;">
+                                    Upload JPG, PNG or WebP (max 5MB). Photo displays in a circular round frame on your store & dashboard.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -220,5 +243,20 @@
         </div>
     </div>
 </div>
+
+<script>
+function previewSellerAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewForm = document.getElementById('sellerAvatarPreviewForm');
+            if (previewForm) previewForm.src = e.target.result;
+            const previewSidebar = document.getElementById('sellerAvatarPreviewSidebar');
+            if (previewSidebar) previewSidebar.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
 @endsection
 

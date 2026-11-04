@@ -370,8 +370,9 @@
 
         <!-- Logged-in Seller Mini Profile -->
         <div class="dc-sidebar-user">
-            <div class="dc-user-avatar">
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+            <div class="position-relative" style="width: 38px; height: 38px; flex-shrink: 0;">
+                <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover; border: 2px solid rgba(255,255,255,0.15);" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0066ff&color=fff';">
+                <span class="position-absolute bottom-0 end-0 rounded-circle bg-success" style="width: 10px; height: 10px; border: 2px solid var(--dc-sidebar-bg);"></span>
             </div>
             <div class="overflow-hidden">
                 <div class="text-white fw-bold text-truncate" style="font-size: 0.875rem;">
@@ -674,9 +675,7 @@
                 <!-- User Profile Dropdown -->
                 <div class="dropdown">
                     <button class="btn btn-light border d-flex align-items-center gap-2 p-1 pe-2 rounded-pill shadow-none" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="dc-user-avatar" style="width: 32px; height: 32px; font-size: 0.8rem;">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                        </div>
+                        <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0066ff&color=fff';">
                         <div class="d-none d-sm-block text-start me-1">
                             <div class="fw-bold text-dark" style="font-size: 0.8125rem; line-height: 1.1;">
                                 {{ Auth::user()->name }}
