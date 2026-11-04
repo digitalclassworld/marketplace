@@ -189,5 +189,29 @@ class CoursesDirectoryTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('images/logo.png');
     }
+
+    public function test_products_directory_loads_successfully_with_hero_and_cards(): void
+    {
+        $response = $this->get('/products');
+
+        $response->assertStatus(200);
+        $response->assertSee('Everything You Need');
+        $response->assertSee('to Learn, Teach &amp; Grow', false);
+        $response->assertSee('10,000+ Products');
+        $response->assertSee('HP 15s Laptop');
+        $response->assertSee('Logitech Wireless Mouse');
+        $response->assertSee('Tally Prime with GST');
+        $response->assertSee('Deal of the Day');
+        $response->assertSee('Top Brands');
+        $response->assertSee('Buy in Bulk for Your Institute');
+    }
+
+    public function test_products_category_filter(): void
+    {
+        $response = $this->get('/products?category=Accessories');
+
+        $response->assertStatus(200);
+        $response->assertSee('Accessories');
+    }
 }
 

@@ -300,7 +300,7 @@
                         <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Professional Services">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Digital & Physical Products">Products</a>
+                        <a class="nav-link dc-nav-link {{ request()->routeIs('products') ? 'active-marketplace-tab' : '' }}" href="{{ route('products') }}">Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link dc-nav-link {{ request()->routeIs('home') || request()->routeIs('business.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('home') }}">Businesses</a>
@@ -468,8 +468,8 @@
                     <div class="dc-footer-title">Navigation</div>
                     <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
                         <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Explore">Explore</a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Courses">Courses</a></li>
+                        <li><a href="{{ route('courses') }}">Courses</a></li>
+                        <li><a href="{{ route('products') }}">Products</a></li>
                         <li><a href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Services">Services</a></li>
                     </ul>
                 </div>

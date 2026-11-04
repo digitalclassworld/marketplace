@@ -62,5 +62,28 @@ class Product extends Model
     {
         return $this->status === 'rejected';
     }
+
+    public function getDiscountPercentageAttribute(): int
+    {
+        if ($this->mrp > $this->price && $this->mrp > 0) {
+            return (int) round((($this->mrp - $this->price) / $this->mrp) * 100);
+        }
+        return 0;
+    }
+
+    public function getDisplayThumbnailAttribute(): string
+    {
+        if (!empty($this->thumbnail)) {
+            return $this->thumbnail;
+        }
+        return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&auto=format&fit=crop&q=80';
+    }
+
+    public function getSellerNameAttribute(): string
+    {
+        return $this->seller?->businessDetail?->business_name
+            ?? $this->seller?->user?->name
+            ?? 'Digital Class Store';
+    }
 }
 

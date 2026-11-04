@@ -272,31 +272,42 @@ class MarketplaceDataSeeder extends Seeder
             }
         }
 
-        // 5. Populate Products if empty
-        if (Product::count() === 0 && $primarySeller) {
-            $products = [
-                ['title' => 'Wireless Mouse Logitech M330 Silent', 'category' => 'Electronics', 'price' => 499, 'mrp' => 899, 'thumb' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'Laptop Stand Adjustable Aluminum Ergonomic', 'category' => 'Accessories', 'price' => 1299, 'mrp' => 1999, 'thumb' => 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'USB-C Hub 7-in-1 Multiport Adapter', 'category' => 'Electronics', 'price' => 899, 'mrp' => 1499, 'thumb' => 'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'HP 15s Ryzen 5 8GB / 512GB SSD Laptop', 'category' => 'Computers', 'price' => 42999, 'mrp' => 49999, 'thumb' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&auto=format&fit=crop&q=80'],
+        // 5. Populate Products matching the screenshot design
+        if ($primarySeller) {
+            $productsList = [
+                ['title' => 'HP 15s Laptop', 'category' => 'Laptops & Computers', 'price' => 42999, 'mrp' => 52999, 'specs' => '(Intel Core i5, 16GB, 512GB SSD)', 'thumb' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Logitech Wireless Mouse', 'category' => 'Accessories', 'price' => 499, 'mrp' => 799, 'specs' => 'M331', 'thumb' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Canon G3010 All-in-One Ink Tank Printer', 'category' => 'Printers & Scanners', 'price' => 12499, 'mrp' => 14999, 'specs' => 'Ink Tank Multi-function', 'thumb' => 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Webcam Full HD 1080p with Mic', 'category' => 'Accessories', 'price' => 2499, 'mrp' => 3499, 'specs' => 'Full HD 1080p', 'thumb' => 'https://images.unsplash.com/photo-1588508065123-287b28e013da?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Tally Prime with GST', 'category' => 'Software & Licenses', 'price' => 20999, 'mrp' => 25999, 'specs' => '(Original License)', 'thumb' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Classroom LED Display', 'category' => 'Projectors & Displays', 'price' => 124999, 'mrp' => 149999, 'specs' => '65 Inch 4K', 'thumb' => 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Lenovo Tab M10', 'category' => 'Mobiles & Tablets', 'price' => 14999, 'mrp' => 18999, 'specs' => '(4GB, 64GB, WiFi)', 'thumb' => 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Study Material Combo', 'category' => 'Books & Study Material', 'price' => 1299, 'mrp' => 1799, 'specs' => '(10th & 12th)', 'thumb' => 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Classroom Projector', 'category' => 'Projectors & Displays', 'price' => 39999, 'mrp' => 49999, 'specs' => '(Epson EB-E01)', 'thumb' => 'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Office Chair Ergonomic', 'category' => 'Furniture', 'price' => 6499, 'mrp' => 8999, 'specs' => 'Adjustable Mesh Lumbar', 'thumb' => 'https://images.unsplash.com/photo-1580481077195-c22f03f7495b?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'WiFi Router TP-Link Dual Band', 'category' => 'Networking', 'price' => 2199, 'mrp' => 3499, 'specs' => 'Gigabit Dual Band', 'thumb' => 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&auto=format&fit=crop&q=80'],
+                ['title' => '32GB Pen Drive', 'category' => 'Storage Devices', 'price' => 599, 'mrp' => 999, 'specs' => 'SanDisk USB 3.0', 'thumb' => 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400&auto=format&fit=crop&q=80'],
             ];
 
-            foreach ($products as $p) {
-                Product::create([
-                    'seller_id' => $primarySeller->id,
-                    'title' => $p['title'],
-                    'slug' => Str::slug($p['title']) . '-' . rand(100, 999),
-                    'category' => $p['category'],
-                    'product_type' => 'Physical',
-                    'description' => 'Genuine high quality product with full warranty and fast shipping.',
-                    'sku' => 'SKU-' . rand(10000, 99999),
-                    'mrp' => $p['mrp'],
-                    'price' => $p['price'],
-                    'stock_quantity' => 50,
-                    'thumbnail' => $p['thumb'],
-                    'status' => 'approved',
-                    'approved_at' => now(),
-                ]);
+            foreach ($productsList as $p) {
+                Product::firstOrCreate(
+                    ['title' => $p['title']],
+                    [
+                        'seller_id' => $primarySeller->id,
+                        'slug' => Str::slug($p['title']),
+                        'category' => $p['category'],
+                        'product_type' => 'Physical',
+                        'description' => 'Genuine high quality product with full warranty and fast shipping.',
+                        'sku' => 'SKU-' . rand(10000, 99999),
+                        'mrp' => $p['mrp'],
+                        'price' => $p['price'],
+                        'stock_quantity' => 50,
+                        'shipping_details' => $p['specs'],
+                        'thumbnail' => $p['thumb'],
+                        'status' => 'approved',
+                        'approved_at' => now(),
+                    ]
+                );
             }
         }
 

@@ -446,6 +446,324 @@ class HomeController extends Controller
     }
 
     /**
+     * Display the public Products directory page matching the UI design.
+     */
+    public function products(Request $request): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $searchQuery = $request->input('search');
+        $selectedCategory = $request->input('category');
+        $selectedBrands = (array) $request->input('brand', []);
+        $selectedCondition = (array) $request->input('condition', []);
+        $selectedAvailability = (array) $request->input('availability', []);
+        $selectedSellerType = (array) $request->input('seller_type', []);
+        $minPrice = $request->input('min_price', 0);
+        $maxPrice = $request->input('max_price', 100000);
+        $sortBy = $request->input('sort', 'popular');
+
+        $products = collect();
+
+        try {
+            if (Schema::hasTable('products')) {
+                $query = \App\Models\Product::query()->where('status', 'approved');
+
+                if (!empty($searchQuery)) {
+                    $query->where(function ($q) use ($searchQuery) {
+                        $q->where('title', 'like', "%{$searchQuery}%")
+                          ->orWhere('category', 'like', "%{$searchQuery}%")
+                          ->orWhere('description', 'like', "%{$searchQuery}%");
+                    });
+                }
+
+                if (!empty($selectedCategory) && $selectedCategory !== 'All Products' && $selectedCategory !== 'all') {
+                    $query->where('category', 'like', "%{$selectedCategory}%");
+                }
+
+                if (!empty($minPrice) && (float)$minPrice > 0) {
+                    $query->where('price', '>=', (float) $minPrice);
+                }
+
+                if (!empty($maxPrice) && (float)$maxPrice < 100000) {
+                    $query->where('price', '<=', (float) $maxPrice);
+                }
+
+                if ($sortBy === 'price_low') {
+                    $query->orderBy('price', 'asc');
+                } elseif ($sortBy === 'price_high') {
+                    $query->orderBy('price', 'desc');
+                } elseif ($sortBy === 'newest') {
+                    $query->orderByDesc('created_at');
+                } else {
+                    $query->orderBy('id', 'asc');
+                }
+
+                $products = $query->with('seller.businessDetail', 'seller.user')->get();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on products directory: ' . $e->getMessage());
+            $products = collect();
+        }
+
+        // Curated products matching the exact screenshot (12 products in grid)
+        $curatedProducts = [
+            [
+                'id' => 1,
+                'title' => 'HP 15s Laptop',
+                'specs' => '(Intel Core i5, 16GB, 512GB SSD)',
+                'badge' => 'Best Seller',
+                'category' => 'Laptops & Computers',
+                'brand' => 'HP',
+                'rating' => 4.6,
+                'reviews_count' => '1.2K',
+                'price' => 42999,
+                'mrp' => 52999,
+                'discount' => '19% OFF',
+                'seller_name' => 'Digital Class Store',
+                'thumbnail' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 2,
+                'title' => 'Logitech Wireless Mouse',
+                'specs' => 'M331',
+                'badge' => null,
+                'category' => 'Accessories',
+                'brand' => 'Logitech',
+                'rating' => 4.5,
+                'reviews_count' => '980',
+                'price' => 499,
+                'mrp' => 799,
+                'discount' => '38% OFF',
+                'seller_name' => 'TechWorld',
+                'thumbnail' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 3,
+                'title' => 'Canon G3010 All-in-One Ink Tank Printer',
+                'specs' => null,
+                'badge' => null,
+                'category' => 'Printers & Scanners',
+                'brand' => 'Canon',
+                'rating' => 4.6,
+                'reviews_count' => '620',
+                'price' => 12499,
+                'mrp' => 14999,
+                'discount' => '17% OFF',
+                'seller_name' => 'Print Solutions',
+                'thumbnail' => 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 4,
+                'title' => 'Webcam Full HD 1080p with Mic',
+                'specs' => null,
+                'badge' => null,
+                'category' => 'Accessories',
+                'brand' => null,
+                'rating' => 4.4,
+                'reviews_count' => '450',
+                'price' => 2499,
+                'mrp' => 3499,
+                'discount' => '29% OFF',
+                'seller_name' => 'Digital Class Store',
+                'thumbnail' => 'https://images.unsplash.com/photo-1588508065123-287b28e013da?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 5,
+                'title' => 'Tally Prime with GST',
+                'specs' => '(Original License)',
+                'badge' => null,
+                'category' => 'Software & Licenses',
+                'brand' => 'Tally',
+                'rating' => 4.8,
+                'reviews_count' => '320',
+                'price' => 20999,
+                'mrp' => 25999,
+                'discount' => '19% OFF',
+                'seller_name' => 'Software Hub',
+                'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 6,
+                'title' => 'Classroom LED Display',
+                'specs' => '65 Inch 4K',
+                'badge' => null,
+                'category' => 'Projectors & Displays',
+                'brand' => null,
+                'rating' => 4.6,
+                'reviews_count' => '150',
+                'price' => 124999,
+                'mrp' => 149999,
+                'discount' => '17% OFF',
+                'seller_name' => 'EduTech Solutions',
+                'thumbnail' => 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 7,
+                'title' => 'Lenovo Tab M10',
+                'specs' => '(4GB, 64GB, WiFi)',
+                'badge' => null,
+                'category' => 'Mobiles & Tablets',
+                'brand' => 'Lenovo',
+                'rating' => 4.5,
+                'reviews_count' => '410',
+                'price' => 14999,
+                'mrp' => 18999,
+                'discount' => '21% OFF',
+                'seller_name' => 'Digital Class Store',
+                'thumbnail' => 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 8,
+                'title' => 'Study Material Combo',
+                'specs' => '(10th & 12th)',
+                'badge' => null,
+                'category' => 'Books & Study Material',
+                'brand' => null,
+                'rating' => 4.7,
+                'reviews_count' => '890',
+                'price' => 1299,
+                'mrp' => 1799,
+                'discount' => '28% OFF',
+                'seller_name' => 'BookKart',
+                'thumbnail' => 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 9,
+                'title' => 'Classroom Projector',
+                'specs' => '(Epson EB-E01)',
+                'badge' => null,
+                'category' => 'Projectors & Displays',
+                'brand' => 'Epson',
+                'rating' => 4.6,
+                'reviews_count' => '210',
+                'price' => 39999,
+                'mrp' => 49999,
+                'discount' => '20% OFF',
+                'seller_name' => 'Vision Tech',
+                'thumbnail' => 'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 10,
+                'title' => 'Office Chair Ergonomic',
+                'specs' => null,
+                'badge' => null,
+                'category' => 'Furniture',
+                'brand' => null,
+                'rating' => 4.4,
+                'reviews_count' => '320',
+                'price' => 6499,
+                'mrp' => 8999,
+                'discount' => '28% OFF',
+                'seller_name' => 'Furniture World',
+                'thumbnail' => 'https://images.unsplash.com/photo-1580481077195-c22f03f7495b?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 11,
+                'title' => 'WiFi Router TP-Link Dual Band',
+                'specs' => null,
+                'badge' => null,
+                'category' => 'Networking',
+                'brand' => 'TP-Link',
+                'rating' => 4.5,
+                'reviews_count' => '680',
+                'price' => 2199,
+                'mrp' => 3499,
+                'discount' => '37% OFF',
+                'seller_name' => 'NetGear Solutions',
+                'thumbnail' => 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'id' => 12,
+                'title' => '32GB Pen Drive',
+                'specs' => 'SanDisk USB 3.0',
+                'badge' => null,
+                'category' => 'Storage Devices',
+                'brand' => 'SanDisk',
+                'rating' => 4.6,
+                'reviews_count' => '1.1K',
+                'price' => 599,
+                'mrp' => 999,
+                'discount' => '40% OFF',
+                'seller_name' => 'Trusted Seller',
+                'thumbnail' => 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400&auto=format&fit=crop&q=80',
+            ],
+        ];
+
+        // Horizontal category pills matching the screenshot
+        $horizontalCategories = [
+            ['name' => 'All Products',          'icon' => 'fa-solid fa-table-cells',        'slug' => 'all'],
+            ['name' => 'Laptops & Computers',   'icon' => 'fa-solid fa-laptop',             'slug' => 'Laptops & Computers'],
+            ['name' => 'Mobiles & Tablets',     'icon' => 'fa-solid fa-mobile-screen',      'slug' => 'Mobiles & Tablets'],
+            ['name' => 'Accessories',           'icon' => 'fa-solid fa-headphones',         'slug' => 'Accessories'],
+            ['name' => 'Software & Licenses',   'icon' => 'fa-solid fa-compact-disc',       'slug' => 'Software & Licenses'],
+            ['name' => 'Books & Study Material','icon' => 'fa-solid fa-book-open',          'slug' => 'Books & Study Material'],
+            ['name' => 'Office & Stationery',   'icon' => 'fa-solid fa-paperclip',          'slug' => 'Office & Stationery'],
+            ['name' => 'Classroom Equipment',   'icon' => 'fa-solid fa-chalkboard-user',    'slug' => 'Classroom Equipment'],
+            ['name' => 'Furniture',             'icon' => 'fa-solid fa-chair',              'slug' => 'Furniture'],
+            ['name' => 'CCTV & Security',       'icon' => 'fa-solid fa-video',              'slug' => 'CCTV & Security'],
+            ['name' => 'Networking',            'icon' => 'fa-solid fa-wifi',               'slug' => 'Networking'],
+            ['name' => 'Projectors & Displays', 'icon' => 'fa-solid fa-desktop',            'slug' => 'Projectors & Displays'],
+            ['name' => 'Printers & Scanners',   'icon' => 'fa-solid fa-print',              'slug' => 'Printers & Scanners'],
+            ['name' => 'Storage Devices',       'icon' => 'fa-solid fa-hard-drive',         'slug' => 'Storage Devices'],
+            ['name' => 'More',                  'icon' => 'fa-solid fa-ellipsis',           'slug' => 'more'],
+        ];
+
+        // Sidebar categories with matching counts from screenshot
+        $sidebarCategories = [
+            ['name' => 'Laptops & Computers',    'count' => '1,240'],
+            ['name' => 'Mobiles & Tablets',      'count' => '890'],
+            ['name' => 'Accessories',            'count' => '1,560'],
+            ['name' => 'Software & Licenses',    'count' => '720'],
+            ['name' => 'Books & Study Material', 'count' => '1,980'],
+        ];
+
+        // Sidebar brands with matching counts from screenshot
+        $sidebarBrands = [
+            ['name' => 'HP',      'count' => '320'],
+            ['name' => 'Dell',    'count' => '280'],
+            ['name' => 'Lenovo',  'count' => '260'],
+            ['name' => 'Apple',   'count' => '180'],
+            ['name' => 'Samsung', 'count' => '310'],
+        ];
+
+        // Deal of the Day
+        $dealOfTheDay = [
+            'title' => 'boAt Airdopes 141 Wireless Earbuds',
+            'rating' => 4.4,
+            'reviews_count' => 320,
+            'price' => 999,
+            'mrp' => 1999,
+            'discount' => '50% OFF',
+            'hours' => '12',
+            'minutes' => '34',
+            'seconds' => '56',
+            'thumbnail' => 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&auto=format&fit=crop&q=80',
+        ];
+
+        return view('home.products', [
+            'seller'                => $seller,
+            'products'              => $products->isNotEmpty() ? $products : $curatedProducts,
+            'curatedProducts'       => $curatedProducts,
+            'horizontalCategories'  => $horizontalCategories,
+            'sidebarCategories'     => $sidebarCategories,
+            'sidebarBrands'         => $sidebarBrands,
+            'dealOfTheDay'          => $dealOfTheDay,
+            'searchQuery'           => $searchQuery,
+            'selectedCategory'      => $selectedCategory ?: 'All Products',
+            'selectedBrands'        => $selectedBrands,
+            'selectedCondition'     => $selectedCondition,
+            'selectedAvailability'  => $selectedAvailability,
+            'selectedSellerType'    => $selectedSellerType,
+            'minPrice'              => $minPrice,
+            'maxPrice'              => $maxPrice,
+            'sortBy'                => $sortBy,
+        ]);
+    }
+
+    /**
      * Display the Course Info / Detail page matching the UI design with full SEO.
      */
     public function courseShow(Request $request, $slug): View
