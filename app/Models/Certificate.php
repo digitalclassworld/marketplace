@@ -66,3 +66,4 @@ class Certificate extends Model
         return sprintf('DC%s-%05d', $year, $count);
     }
 }
+

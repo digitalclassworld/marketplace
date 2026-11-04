@@ -1,0 +1,23 @@
+# Nixpacks configuration for Coolify & Docker deployments
+[phases.setup]
+nixPkgs = ['php82', 'php82Packages.composer', 'nodejs_20']
+
+[phases.install]
+cmds = [
+    'composer install --no-interaction --prefer-dist --optimize-autoloader',
+    'npm ci || npm install',
+    'npm run build'
+]
+
+[phases.build]
+cmds = [
+    'test -f .env || cp .env.example .env',
+    'mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache',
+    'chmod -R 777 storage bootstrap/cache',
+    'php artisan storage:link || true',
+    'php artisan view:clear || true',
+    'php artisan config:clear || true'
+]
+
+[start]
+cmd = 'php artisan migrate --force || true; php-fpm -D; nginx -g "daemon off;"'

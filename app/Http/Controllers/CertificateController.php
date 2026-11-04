@@ -18,20 +18,24 @@ class CertificateController extends Controller
     {
         $certificate = null;
 
-        if (Schema::hasTable('certificates')) {
-            if ($code) {
-                $certificate = Certificate::with(['course', 'seller.businessDetail'])
-                    ->where('certificate_no', $code)
-                    ->orWhere('student_id', $code)
-                    ->first();
-            }
+        try {
+            if (Schema::hasTable('certificates')) {
+                if ($code) {
+                    $certificate = Certificate::with(['course', 'seller.businessDetail'])
+                        ->where('certificate_no', $code)
+                        ->orWhere('student_id', $code)
+                        ->first();
+                }
 
-            if (!$certificate) {
-                $certificate = Certificate::with(['course', 'seller.businessDetail'])
-                    ->where('certificate_no', 'DC2026-00128')
-                    ->first()
-                    ?? Certificate::with(['course', 'seller.businessDetail'])->first();
+                if (!$certificate) {
+                    $certificate = Certificate::with(['course', 'seller.businessDetail'])
+                        ->where('certificate_no', 'DC2026-00128')
+                        ->first()
+                        ?? Certificate::with(['course', 'seller.businessDetail'])->first();
+                }
             }
+        } catch (\Throwable $e) {
+            $certificate = null;
         }
 
         // If customized via query parameter, override for preview
@@ -76,15 +80,19 @@ class CertificateController extends Controller
             ?: (Auth::check() ? Auth::user()->name : 'Meshwa Patel');
 
         $certificate = null;
-        if (Schema::hasTable('certificates') && $course) {
-            $certificate = Certificate::where('course_id', $course->id)
-                ->where('student_name', $studentName)
-                ->first();
+        try {
+            if (Schema::hasTable('certificates') && $course) {
+                $certificate = Certificate::where('course_id', $course->id)
+                    ->where('student_name', $studentName)
+                    ->first();
 
-            if (!$certificate) {
-                // Find existing certificate for this course or create a new unique one
-                $certificate = Certificate::where('course_id', $course->id)->first();
+                if (!$certificate) {
+                    // Find existing certificate for this course or create a new unique one
+                    $certificate = Certificate::where('course_id', $course->id)->first();
+                }
             }
+        } catch (\Throwable $e) {
+            $certificate = null;
         }
 
         if (!$certificate) {
@@ -118,3 +126,4 @@ class CertificateController extends Controller
         return view('certificate.show', compact('certificate', 'course'));
     }
 }
+

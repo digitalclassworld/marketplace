@@ -161,6 +161,70 @@ If your site still displays `500 Server Error` on Hostinger:
 
 ---
 
+## 🐳 4. Coolify Deployment Guide (Fixing 500 Server Error on Coolify)
+
+If you are deploying using **Coolify** (as shown on VPS `187.127.141.217:8000` with domain `web.digitalclassworld.in`), follow these exact steps to resolve the `500 | SERVER ERROR`:
+
+### Why 500 Server Error happens on a fresh Coolify deployment:
+1. **Missing Environment Variables**: Git does not track `.env`. When Coolify clones the repository, the Docker container starts with an empty `.env` unless you configure the **Environment Variables** in the Coolify dashboard.
+2. **Missing APP_KEY**: Without `APP_KEY`, Laravel throws `No application encryption key has been specified`.
+3. **Session & Cache Driver**: Laravel 12 defaults to `database` sessions. If the database is not yet connected or migrated, Laravel fails with `500 Server Error` on every request.
+4. **Database Host**: Inside a Docker container, `DB_HOST=127.0.0.1` tries to connect to the container itself, NOT your server's MySQL!
+
+---
+
+### Step-by-Step Fix in Coolify Dashboard:
+
+#### Step 1: Add Environment Variables in Coolify
+1. In **Coolify**, open your application (**Root Team / marketplace / production / average-alligator...**).
+2. On the left sidebar menu, click **Environment Variables**.
+3. Paste the following configuration:
+   ```env
+   APP_NAME="Digital Class Marketplace"
+   APP_ENV=production
+   APP_KEY=base64:Zm+Xo18BQAkDobhIjCc4xUB103aOWqO6yK5+eO76PDs=
+   APP_DEBUG=true
+   APP_URL=https://web.digitalclassworld.in
+
+   DB_CONNECTION=mysql
+   DB_HOST=host.docker.internal
+   DB_PORT=3306
+   DB_DATABASE=marketplace
+   DB_USERNAME=root
+   DB_PASSWORD=your_mysql_password_here
+
+   SESSION_DRIVER=file
+   CACHE_STORE=file
+   FILESYSTEM_DISK=local
+   ```
+   > [!TIP]
+   > * If your MySQL is running **directly on the VPS host (outside Docker)**: use `DB_HOST=host.docker.internal` or your VPS IP `187.127.141.217`.
+   > * If your MySQL is running **inside Coolify as a database service**: use the Coolify internal service name (e.g. `mysql` or the service UUID).
+   > * Setting `APP_DEBUG=true` temporarily allows you to see the exact error message instead of the generic `500 | SERVER ERROR`.
+
+4. Click **Save**.
+
+#### Step 2: Check Runtime Logs
+1. In Coolify's left sidebar menu, click **Runtime Logs**.
+2. If there are any PHP or Laravel errors, the exact stack trace will be printed here in real-time.
+
+#### Step 3: Run Database Migrations in Coolify Terminal
+1. In Coolify's left sidebar menu, click **Terminal**.
+2. Select the running container and click **Connect**.
+3. Run:
+   ```bash
+   php artisan migrate --force --seed
+   php artisan optimize:clear
+   ```
+
+#### Step 4: Click Redeploy
+1. Click the purple **Redeploy** button at the top right of Coolify.
+2. Once the rolling update completes, open `https://web.digitalclassworld.in` in your browser. The site will load immediately!
+
+---
+
+---
+
 ## 🖥️ 4. Deployment Scenario A: Windows Local (XAMPP / Laragon / Standalone)
 
 ### Step 1: Clone into Web Directory

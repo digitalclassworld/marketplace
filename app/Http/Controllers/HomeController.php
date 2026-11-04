@@ -31,65 +31,70 @@ class HomeController extends Controller
         $businesses = collect();
 
         // Safely check if database table exists
-        if (Schema::hasTable('business_listings')) {
-            $query = BusinessListing::query()->where('status', 'approved');
+        try {
+            if (Schema::hasTable('business_listings')) {
+                $query = BusinessListing::query()->where('status', 'approved');
 
-            if (!empty($searchQuery)) {
-                $query->where(function ($q) use ($searchQuery) {
-                    $q->where('business_name', 'like', "%{$searchQuery}%")
-                      ->orWhere('category', 'like', "%{$searchQuery}%")
-                      ->orWhere('sub_category', 'like', "%{$searchQuery}%")
-                      ->orWhere('city', 'like', "%{$searchQuery}%");
-                });
+                if (!empty($searchQuery)) {
+                    $query->where(function ($q) use ($searchQuery) {
+                        $q->where('business_name', 'like', "%{$searchQuery}%")
+                          ->orWhere('category', 'like', "%{$searchQuery}%")
+                          ->orWhere('sub_category', 'like', "%{$searchQuery}%")
+                          ->orWhere('city', 'like', "%{$searchQuery}%");
+                    });
+                }
+
+                if (!empty($selectedCategory) && $selectedCategory !== 'All Businesses') {
+                    $query->where(function ($q) use ($selectedCategory) {
+                        $q->where('category', 'like', "%{$selectedCategory}%")
+                          ->orWhere('sub_category', 'like', "%{$selectedCategory}%");
+                    });
+                }
+
+                if (!empty($selectedCity) && $selectedCity !== 'All Locations') {
+                    $query->where('city', $selectedCity);
+                }
+
+                // Apply sorting
+                if ($sortBy === 'rating') {
+                    $query->orderByDesc('plan_price');
+                } elseif ($sortBy === 'newest') {
+                    $query->orderByDesc('created_at');
+                } else {
+                    $query->orderByRaw("CASE WHEN listing_type = 'Featured' THEN 1 WHEN listing_type = 'Verified' THEN 2 ELSE 3 END")
+                          ->orderBy('id', 'asc');
+                }
+
+                $businesses = $query->get();
+
+                // Client-side JSON attribute filters
+                if (!empty($selectedRating)) {
+                    $minRating = (float) $selectedRating;
+                    $businesses = $businesses->filter(function ($b) use ($minRating) {
+                        return $b->rating >= $minRating;
+                    });
+                }
+
+                if (!empty($selectedFacilities)) {
+                    $businesses = $businesses->filter(function ($b) use ($selectedFacilities) {
+                        $fac = $b->features['facilities'] ?? [];
+                        foreach ($selectedFacilities as $sf) {
+                            if (in_array($sf, $fac)) return true;
+                        }
+                        return false;
+                    });
+                }
+
+                if (!empty($selectedBusinessTypes)) {
+                    $businesses = $businesses->filter(function ($b) use ($selectedBusinessTypes) {
+                        $bType = $b->features['business_type'] ?? 'Individual Business';
+                        return in_array($bType, $selectedBusinessTypes);
+                    });
+                }
             }
-
-            if (!empty($selectedCategory) && $selectedCategory !== 'All Businesses') {
-                $query->where(function ($q) use ($selectedCategory) {
-                    $q->where('category', 'like', "%{$selectedCategory}%")
-                      ->orWhere('sub_category', 'like', "%{$selectedCategory}%");
-                });
-            }
-
-            if (!empty($selectedCity) && $selectedCity !== 'All Locations') {
-                $query->where('city', $selectedCity);
-            }
-
-            // Apply sorting
-            if ($sortBy === 'rating') {
-                $query->orderByDesc('plan_price');
-            } elseif ($sortBy === 'newest') {
-                $query->orderByDesc('created_at');
-            } else {
-                $query->orderByRaw("CASE WHEN listing_type = 'Featured' THEN 1 WHEN listing_type = 'Verified' THEN 2 ELSE 3 END")
-                      ->orderBy('id', 'asc');
-            }
-
-            $businesses = $query->get();
-
-            // Client-side JSON attribute filters
-            if (!empty($selectedRating)) {
-                $minRating = (float) $selectedRating;
-                $businesses = $businesses->filter(function ($b) use ($minRating) {
-                    return $b->rating >= $minRating;
-                });
-            }
-
-            if (!empty($selectedFacilities)) {
-                $businesses = $businesses->filter(function ($b) use ($selectedFacilities) {
-                    $fac = $b->features['facilities'] ?? [];
-                    foreach ($selectedFacilities as $sf) {
-                        if (in_array($sf, $fac)) return true;
-                    }
-                    return false;
-                });
-            }
-
-            if (!empty($selectedBusinessTypes)) {
-                $businesses = $businesses->filter(function ($b) use ($selectedBusinessTypes) {
-                    $bType = $b->features['business_type'] ?? 'Individual Business';
-                    return in_array($bType, $selectedBusinessTypes);
-                });
-            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on homepage: ' . $e->getMessage());
+            $businesses = collect();
         }
 
         // Top horizontal categories with icons
@@ -147,14 +152,18 @@ class HomeController extends Controller
         }
 
         $business = null;
-        if (Schema::hasTable('business_listings')) {
-            if ($slug) {
-                $business = BusinessListing::where('slug', $slug)->first();
+        try {
+            if (Schema::hasTable('business_listings')) {
+                if ($slug) {
+                    $business = BusinessListing::where('slug', $slug)->first();
+                }
+                if (!$business) {
+                    $business = BusinessListing::where('business_name', 'like', '%VCEC%')->first()
+                             ?? BusinessListing::first();
+                }
             }
-            if (!$business) {
-                $business = BusinessListing::where('business_name', 'like', '%VCEC%')->first()
-                         ?? BusinessListing::first();
-            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on businessProfile: ' . $e->getMessage());
         }
 
         // Curated courses matching the screenshot
@@ -340,50 +349,55 @@ class HomeController extends Controller
 
         $courses = collect();
 
-        if (Schema::hasTable('courses')) {
-            $query = \App\Models\Course::query()->where('status', 'approved');
+        try {
+            if (Schema::hasTable('courses')) {
+                $query = \App\Models\Course::query()->where('status', 'approved');
 
-            if (!empty($searchQuery)) {
-                $query->where(function ($q) use ($searchQuery) {
-                    $q->where('title', 'like', "%{$searchQuery}%")
-                      ->orWhere('category', 'like', "%{$searchQuery}%")
-                      ->orWhere('short_description', 'like', "%{$searchQuery}%");
-                });
+                if (!empty($searchQuery)) {
+                    $query->where(function ($q) use ($searchQuery) {
+                        $q->where('title', 'like', "%{$searchQuery}%")
+                          ->orWhere('category', 'like', "%{$searchQuery}%")
+                          ->orWhere('short_description', 'like', "%{$searchQuery}%");
+                    });
+                }
+
+                if (!empty($selectedCategory) && $selectedCategory !== 'All Categories') {
+                    $query->where(function ($q) use ($selectedCategory) {
+                        $q->where('category', 'like', "%{$selectedCategory}%");
+                    });
+                }
+
+                if (!empty($selectedLevel)) {
+                    $query->whereIn('level', $selectedLevel);
+                }
+
+                if (!empty($selectedLanguage)) {
+                    $query->whereIn('language', $selectedLanguage);
+                }
+
+                if (!empty($minPrice) && (float)$minPrice > 0) {
+                    $query->where('price', '>=', (float) $minPrice);
+                }
+
+                if (!empty($maxPrice) && (float)$maxPrice < 50000) {
+                    $query->where('price', '<=', (float) $maxPrice);
+                }
+
+                if ($sortBy === 'price_low') {
+                    $query->orderBy('price', 'asc');
+                } elseif ($sortBy === 'price_high') {
+                    $query->orderBy('price', 'desc');
+                } elseif ($sortBy === 'newest') {
+                    $query->orderByDesc('created_at');
+                } else {
+                    $query->orderBy('id', 'asc');
+                }
+
+                $courses = $query->with('seller.businessDetail', 'seller.user')->get();
             }
-
-            if (!empty($selectedCategory) && $selectedCategory !== 'All Categories') {
-                $query->where(function ($q) use ($selectedCategory) {
-                    $q->where('category', 'like', "%{$selectedCategory}%");
-                });
-            }
-
-            if (!empty($selectedLevel)) {
-                $query->whereIn('level', $selectedLevel);
-            }
-
-            if (!empty($selectedLanguage)) {
-                $query->whereIn('language', $selectedLanguage);
-            }
-
-            if (!empty($minPrice) && (float)$minPrice > 0) {
-                $query->where('price', '>=', (float) $minPrice);
-            }
-
-            if (!empty($maxPrice) && (float)$maxPrice < 50000) {
-                $query->where('price', '<=', (float) $maxPrice);
-            }
-
-            if ($sortBy === 'price_low') {
-                $query->orderBy('price', 'asc');
-            } elseif ($sortBy === 'price_high') {
-                $query->orderBy('price', 'desc');
-            } elseif ($sortBy === 'newest') {
-                $query->orderByDesc('created_at');
-            } else {
-                $query->orderBy('id', 'asc');
-            }
-
-            $courses = $query->with('seller.businessDetail', 'seller.user')->get();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on courses directory: ' . $e->getMessage());
+            $courses = collect();
         }
 
         // Horizontal category pills matching the screenshot
@@ -442,16 +456,20 @@ class HomeController extends Controller
         }
 
         $course = null;
-        if (Schema::hasTable('courses')) {
-            $course = \App\Models\Course::with(['seller.businessDetail', 'seller.user', 'contents'])
-                ->where('slug', $slug)
-                ->first();
-
-            if (!$course) {
+        try {
+            if (Schema::hasTable('courses')) {
                 $course = \App\Models\Course::with(['seller.businessDetail', 'seller.user', 'contents'])
-                    ->where('title', 'like', "%{$slug}%")
+                    ->where('slug', $slug)
                     ->first();
+
+                if (!$course) {
+                    $course = \App\Models\Course::with(['seller.businessDetail', 'seller.user', 'contents'])
+                        ->where('title', 'like', "%{$slug}%")
+                        ->first();
+                }
             }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on courseShow: ' . $e->getMessage());
         }
 
         if (!$course) {
@@ -460,11 +478,15 @@ class HomeController extends Controller
 
         // Related courses for "You May Also Like"
         $relatedCourses = collect();
-        if (Schema::hasTable('courses')) {
-            $relatedCourses = \App\Models\Course::where('id', '!=', $course?->id ?? 0)
-                ->where('status', 'approved')
-                ->take(4)
-                ->get();
+        try {
+            if (Schema::hasTable('courses')) {
+                $relatedCourses = \App\Models\Course::where('id', '!=', $course?->id ?? 0)
+                    ->where('status', 'approved')
+                    ->take(4)
+                    ->get();
+            }
+        } catch (\Throwable $e) {
+            $relatedCourses = collect();
         }
 
         // Default curriculum modules matching the screenshot
