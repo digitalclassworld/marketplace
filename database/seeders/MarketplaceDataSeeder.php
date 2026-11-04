@@ -127,31 +127,122 @@ class MarketplaceDataSeeder extends Seeder
 
         $primarySeller = $createdSellers[0] ?? Seller::first();
 
-        // 3. Populate Courses if empty
-        if (Course::count() === 0 && $primarySeller) {
-            $courses = [
-                ['title' => 'Digital Marketing Mastery', 'category' => 'Marketing', 'price' => 4999, 'thumb' => 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'Tally Prime Complete Course', 'category' => 'Finance & Accounting', 'price' => 2999, 'thumb' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'Python for Beginners & Data Science', 'category' => 'Programming', 'price' => 3499, 'thumb' => 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'AI Tools & ChatGPT for Business', 'category' => 'Artificial Intelligence', 'price' => 1999, 'thumb' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'Full Stack Web Development (MERN)', 'category' => 'Web Development', 'price' => 7999, 'thumb' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&auto=format&fit=crop&q=80'],
-            ];
+        // 3. Populate Courses (Matching the Courses Directory Screenshot)
+        $targetCourses = [
+            [
+                'title' => 'Digital Marketing Complete Course 2026',
+                'category' => 'Digital Marketing',
+                'language' => 'Hindi',
+                'level' => 'Beginner',
+                'price' => 5999,
+                'discount_price' => 2999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Python for Beginners',
+                'category' => 'Programming',
+                'language' => 'English',
+                'level' => 'Beginner',
+                'price' => 6999,
+                'discount_price' => 3499,
+                'thumbnail' => 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Tally Prime with GST',
+                'category' => 'Business & Finance',
+                'language' => 'Hindi',
+                'level' => 'Beginner',
+                'price' => 3999,
+                'discount_price' => 1999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Web Development Bootcamp',
+                'category' => 'Programming',
+                'language' => 'English',
+                'level' => 'Intermediate',
+                'price' => 9999,
+                'discount_price' => 4999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Graphic Design Mastery',
+                'category' => 'Design & Creative',
+                'language' => 'Hindi',
+                'level' => 'Beginner',
+                'price' => 4999,
+                'discount_price' => 2499,
+                'thumbnail' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Spoken English for Beginners',
+                'category' => 'Spoken English',
+                'language' => 'English',
+                'level' => 'Beginner',
+                'price' => 2999,
+                'discount_price' => 1499,
+                'thumbnail' => 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'MS Office Complete Course',
+                'category' => 'Office Productivity',
+                'language' => 'Hindi',
+                'level' => 'Beginner',
+                'price' => 3999,
+                'discount_price' => 1999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'AI Tools for Beginners',
+                'category' => 'AI & Tools',
+                'language' => 'Hindi',
+                'level' => 'All Levels',
+                'price' => 4999,
+                'discount_price' => 2499,
+                'thumbnail' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Website Development with WordPress',
+                'category' => 'Programming',
+                'language' => 'English',
+                'level' => 'Beginner',
+                'price' => 5999,
+                'discount_price' => 2999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Personal Finance & Investment',
+                'category' => 'Business & Finance',
+                'language' => 'Hindi',
+                'level' => 'Intermediate',
+                'price' => 3999,
+                'discount_price' => 1999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=500&auto=format&fit=crop&q=80',
+            ],
+        ];
 
-            foreach ($courses as $c) {
-                Course::create([
-                    'seller_id' => $primarySeller->id,
-                    'title' => $c['title'],
-                    'slug' => Str::slug($c['title']) . '-' . rand(100, 999),
-                    'category' => $c['category'],
-                    'language' => 'English / Hindi',
-                    'level' => 'All Levels',
-                    'short_description' => 'Comprehensive masterclass with live projects, certification, and lifetime access.',
-                    'price' => $c['price'],
-                    'discount_price' => $c['price'] * 0.8,
-                    'thumbnail' => $c['thumb'],
-                    'status' => 'approved',
-                    'approved_at' => now(),
-                ]);
+        if ($primarySeller) {
+            foreach ($targetCourses as $tc) {
+                Course::updateOrCreate(
+                    ['title' => $tc['title']],
+                    [
+                        'seller_id' => $primarySeller->id,
+                        'slug' => Str::slug($tc['title']),
+                        'category' => $tc['category'],
+                        'language' => $tc['language'],
+                        'level' => $tc['level'],
+                        'short_description' => 'Comprehensive masterclass with live projects, certification, and lifetime access.',
+                        'description' => 'Master essential industry skills through structured video lessons, hands-on assignments, and dedicated instructor support.',
+                        'price' => $tc['price'],
+                        'discount_price' => $tc['discount_price'],
+                        'thumbnail' => $tc['thumbnail'],
+                        'access_type' => 'Lifetime Access',
+                        'certificate_included' => true,
+                        'qa_enabled' => true,
+                        'status' => 'approved',
+                        'approved_at' => now(),
+                    ]
+                );
             }
         }
 

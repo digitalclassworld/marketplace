@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public Marketplace Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/courses', [HomeController::class, 'courses'])->name('courses');
 Route::get('/business/{slug?}', [HomeController::class, 'businessProfile'])->name('business.show');
 Route::post('/business/{slug?}/enquiry', [HomeController::class, 'submitEnquiry'])->name('business.enquiry');
 Route::post('/business/{slug?}/demo', [HomeController::class, 'bookDemo'])->name('business.demo');

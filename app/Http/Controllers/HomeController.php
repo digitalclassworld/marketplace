@@ -318,4 +318,116 @@ class HomeController extends Controller
 
         return back()->with('success', 'Thank you for your review! It will be visible after brief moderation.');
     }
+
+    /**
+     * Display the public Courses directory page matching the UI design.
+     */
+    public function courses(Request $request): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $searchQuery = $request->input('search');
+        $selectedCategory = $request->input('category');
+        $selectedLevel = (array) $request->input('level', []);
+        $selectedLanguage = (array) $request->input('language', []);
+        $selectedMode = (array) $request->input('mode', []);
+        $minPrice = $request->input('min_price', 0);
+        $maxPrice = $request->input('max_price', 50000);
+        $sortBy = $request->input('sort', 'popular');
+
+        $courses = collect();
+
+        if (Schema::hasTable('courses')) {
+            $query = \App\Models\Course::query()->where('status', 'approved');
+
+            if (!empty($searchQuery)) {
+                $query->where(function ($q) use ($searchQuery) {
+                    $q->where('title', 'like', "%{$searchQuery}%")
+                      ->orWhere('category', 'like', "%{$searchQuery}%")
+                      ->orWhere('short_description', 'like', "%{$searchQuery}%");
+                });
+            }
+
+            if (!empty($selectedCategory) && $selectedCategory !== 'All Categories') {
+                $query->where(function ($q) use ($selectedCategory) {
+                    $q->where('category', 'like', "%{$selectedCategory}%");
+                });
+            }
+
+            if (!empty($selectedLevel)) {
+                $query->whereIn('level', $selectedLevel);
+            }
+
+            if (!empty($selectedLanguage)) {
+                $query->whereIn('language', $selectedLanguage);
+            }
+
+            if (!empty($minPrice) && (float)$minPrice > 0) {
+                $query->where('price', '>=', (float) $minPrice);
+            }
+
+            if (!empty($maxPrice) && (float)$maxPrice < 50000) {
+                $query->where('price', '<=', (float) $maxPrice);
+            }
+
+            if ($sortBy === 'price_low') {
+                $query->orderBy('price', 'asc');
+            } elseif ($sortBy === 'price_high') {
+                $query->orderBy('price', 'desc');
+            } elseif ($sortBy === 'newest') {
+                $query->orderByDesc('created_at');
+            } else {
+                $query->orderBy('id', 'asc');
+            }
+
+            $courses = $query->with('seller.businessDetail', 'seller.user')->get();
+        }
+
+        // Horizontal category pills matching the screenshot
+        $horizontalCategories = [
+            ['name' => 'All Categories',     'icon' => 'fa-solid fa-table-cells',       'slug' => 'all'],
+            ['name' => 'Computer & IT',      'icon' => 'fa-solid fa-laptop-code',        'slug' => 'Computer & IT'],
+            ['name' => 'Digital Marketing',  'icon' => 'fa-solid fa-chart-line',         'slug' => 'Digital Marketing'],
+            ['name' => 'Programming',        'icon' => 'fa-solid fa-code',               'slug' => 'Programming'],
+            ['name' => 'Design & Creative',  'icon' => 'fa-solid fa-palette',            'slug' => 'Design & Creative'],
+            ['name' => 'Business & Finance', 'icon' => 'fa-solid fa-briefcase',          'slug' => 'Business & Finance'],
+            ['name' => 'Office Productivity','icon' => 'fa-solid fa-file-excel',         'slug' => 'Office Productivity'],
+            ['name' => 'Spoken English',     'icon' => 'fa-solid fa-comments',           'slug' => 'Spoken English'],
+            ['name' => 'Academic Courses',   'icon' => 'fa-solid fa-graduation-cap',     'slug' => 'Academic Courses'],
+            ['name' => 'AI & Tools',         'icon' => 'fa-solid fa-robot',              'slug' => 'AI & Tools'],
+            ['name' => 'Tally & Accounting', 'icon' => 'fa-solid fa-calculator',         'slug' => 'Tally & Accounting'],
+            ['name' => 'Language',           'icon' => 'fa-solid fa-language',           'slug' => 'Language'],
+            ['name' => 'Personal Development','icon'=> 'fa-solid fa-user-astronaut',     'slug' => 'Personal Development'],
+            ['name' => 'School & College',   'icon' => 'fa-solid fa-building-columns',  'slug' => 'School & College'],
+            ['name' => 'Competitive Exams',  'icon' => 'fa-solid fa-trophy',            'slug' => 'Competitive Exams'],
+        ];
+
+        // Sidebar categories with matching counts from screenshot
+        $sidebarCategories = [
+            ['name' => 'Computer & IT',      'count' => '2,450'],
+            ['name' => 'Digital Marketing',  'count' => '1,820'],
+            ['name' => 'Programming',        'count' => '1,650'],
+            ['name' => 'Design & Creative',  'count' => '1,230'],
+            ['name' => 'Business & Finance', 'count' => '1,180'],
+            ['name' => 'Office Productivity','count' => '980'],
+        ];
+
+        return view('home.courses', [
+            'seller'                => $seller,
+            'courses'               => $courses,
+            'horizontalCategories'  => $horizontalCategories,
+            'sidebarCategories'     => $sidebarCategories,
+            'searchQuery'           => $searchQuery,
+            'selectedCategory'      => $selectedCategory ?: 'All Categories',
+            'selectedLevel'         => $selectedLevel,
+            'selectedLanguage'      => $selectedLanguage,
+            'selectedMode'          => $selectedMode,
+            'minPrice'              => $minPrice,
+            'maxPrice'              => $maxPrice,
+            'sortBy'                => $sortBy,
+        ]);
+    }
 }

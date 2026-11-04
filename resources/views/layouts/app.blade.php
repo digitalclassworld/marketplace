@@ -294,11 +294,12 @@
                         </a>
                         <ul class="dropdown-menu shadow-sm border-0 rounded-3">
                             <li><a class="dropdown-item small py-2" href="{{ route('home') }}"><i class="fa-solid fa-table-cells me-2 text-primary"></i> All Categories</a></li>
+                            <li><a class="dropdown-item small py-2" href="{{ route('courses') }}"><i class="fa-solid fa-graduation-cap me-2 text-info"></i> Online Courses</a></li>
                             <li><a class="dropdown-item small py-2" href="{{ route('seller.register') }}"><i class="fa-solid fa-store me-2 text-success"></i> Become a Seller</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Online Courses">Courses</a>
+                        <a class="nav-link dc-nav-link {{ request()->routeIs('courses') ? 'active-marketplace-tab' : '' }}" href="{{ route('courses') }}" title="Online Courses">Courses<span class="visually-hidden"> Online Courses</span></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Professional Services">Services</a>
@@ -307,7 +308,7 @@
                         <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Digital & Physical Products">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link dc-nav-link active-marketplace-tab" href="{{ route('home') }}">Businesses</a>
+                        <a class="nav-link dc-nav-link {{ request()->routeIs('home') || request()->routeIs('business.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('home') }}">Businesses</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dc-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
