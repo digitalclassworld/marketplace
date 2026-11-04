@@ -1,0 +1,170 @@
+<?php
+
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminCatalogController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminMessageController;
+use App\Http\Controllers\Admin\AdminPromotionController;
+use App\Http\Controllers\Admin\AdminSellerController;
+use App\Http\Controllers\Auth\SellerAuthController;
+use App\Http\Controllers\Auth\SellerRegistrationController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Seller\SellerBusinessListingController;
+use App\Http\Controllers\Seller\SellerCourseController;
+use App\Http\Controllers\Seller\SellerDashboardController;
+use App\Http\Controllers\Seller\SellerMessageController;
+use App\Http\Controllers\Seller\SellerOrderController;
+use App\Http\Controllers\Seller\SellerProductController;
+use App\Http\Controllers\Seller\SellerProfileController;
+use App\Http\Controllers\Seller\SellerPromotionController;
+use App\Http\Controllers\Seller\SellerServiceController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+// Temporary Public Homepage
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/login', fn() => redirect()->route('seller.login'))->name('login');
+
+// Seller Registration & Authentication
+Route::prefix('seller')->name('seller.')->group(function () {
+    Route::get('/register', [SellerRegistrationController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [SellerRegistrationController::class, 'register'])->name('register.submit');
+    Route::get('/register/success', [SellerRegistrationController::class, 'success'])->name('register.success');
+
+    Route::get('/login', [SellerAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [SellerAuthController::class, 'login'])->name('login.submit');
+    Route::match(['get', 'post'], '/logout', [SellerAuthController::class, 'logout'])->name('logout');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Protected Seller Portal Routes (All Registered Sellers)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('seller')->name('seller.')->middleware(['auth', 'seller'])->group(function () {
+    Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [SellerProfileController::class, 'edit'])->name('profile');
+    Route::put('/profile', [SellerProfileController::class, 'update'])->name('profile.update');
+
+    // Seller Catalog Index Pages (Accessible to see their submissions)
+    Route::get('/courses', [SellerCourseController::class, 'index'])->name('courses.index');
+    Route::get('/services', [SellerServiceController::class, 'index'])->name('services.index');
+    Route::get('/products', [SellerProductController::class, 'index'])->name('products.index');
+    Route::get('/listings', [SellerBusinessListingController::class, 'index'])->name('listings.index');
+
+    // Orders Management
+    Route::get('/orders', [SellerOrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/simulate', [SellerOrderController::class, 'simulatePurchase'])->name('orders.simulate');
+    Route::get('/orders/export', [SellerOrderController::class, 'export'])->name('orders.export');
+    Route::get('/orders/{id}', [SellerOrderController::class, 'show'])->name('orders.show');
+
+    // Customer Messages & Chat
+    Route::get('/messages', [SellerMessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages/{conversation}', [SellerMessageController::class, 'send'])->name('messages.send');
+    Route::post('/messages/{conversation}/quick-action', [SellerMessageController::class, 'quickAction'])->name('messages.quick-action');
+
+    // Promotions & Marketing Campaigns (Paid Marketing Tiers: 1000, 1500, 2000, 2500)
+    Route::get('/promotions', [SellerPromotionController::class, 'index'])->name('promotions.index');
+    Route::post('/promotions', [SellerPromotionController::class, 'store'])->name('promotions.store');
+    Route::post('/promotions/coupons', [SellerPromotionController::class, 'storeCoupon'])->name('promotions.coupons.store');
+    Route::post('/promotions/{promotion}/toggle', [SellerPromotionController::class, 'toggleStatus'])->name('promotions.toggle');
+
+    /*
+    |----------------------------------------------------------------------
+    | Strictly Protected Selling Routes (Only Approved Active Sellers)
+    |----------------------------------------------------------------------
+    */
+    Route::middleware(['seller.approved'])->group(function () {
+        // Course Management
+        Route::get('/courses/create', [SellerCourseController::class, 'create'])->name('courses.create');
+        Route::post('/courses', [SellerCourseController::class, 'store'])->name('courses.store');
+
+        // Service Management
+        Route::get('/services/create', [SellerServiceController::class, 'create'])->name('services.create');
+        Route::post('/services', [SellerServiceController::class, 'store'])->name('services.store');
+
+        // Product Management
+        Route::get('/products/create', [SellerProductController::class, 'create'])->name('products.create');
+        Route::post('/products', [SellerProductController::class, 'store'])->name('products.store');
+
+        // Business Directory Listing Management
+        Route::get('/listings/create', [SellerBusinessListingController::class, 'create'])->name('listings.create');
+        Route::post('/listings', [SellerBusinessListingController::class, 'store'])->name('listings.store');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Super Admin Authentication Routes (Guest)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
+    Route::match(['get', 'post'], '/logout', [AdminAuthController::class, 'logout'])->name('logout');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Protected Super Admin Portal Routes (Role: superadmin)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->group(function () {
+    Route::get('/', fn() => redirect()->route('admin.dashboard'));
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Seller Approval & Management Workflow
+    Route::prefix('sellers')->name('sellers.')->group(function () {
+        Route::get('/', [AdminSellerController::class, 'index'])->name('index');
+        Route::get('/pending', [AdminSellerController::class, 'pending'])->name('pending');
+        Route::get('/{id}', [AdminSellerController::class, 'show'])->name('show');
+        Route::post('/{id}/approve', [AdminSellerController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [AdminSellerController::class, 'reject'])->name('reject');
+        Route::post('/{id}/suspend', [AdminSellerController::class, 'suspend'])->name('suspend');
+        Route::post('/{id}/reactivate', [AdminSellerController::class, 'reactivate'])->name('reactivate');
+    });
+
+    // Super Admin Catalog Verification Workflow
+    Route::prefix('catalog')->name('catalog.')->group(function () {
+        // Courses
+        Route::get('/courses', [AdminCatalogController::class, 'courses'])->name('courses');
+        Route::post('/courses/{id}/approve', [AdminCatalogController::class, 'approveCourse'])->name('courses.approve');
+        Route::post('/courses/{id}/reject', [AdminCatalogController::class, 'rejectCourse'])->name('courses.reject');
+
+        // Services
+        Route::get('/services', [AdminCatalogController::class, 'services'])->name('services');
+        Route::post('/services/{id}/approve', [AdminCatalogController::class, 'approveService'])->name('services.approve');
+        Route::post('/services/{id}/reject', [AdminCatalogController::class, 'rejectService'])->name('services.reject');
+
+        // Products
+        Route::get('/products', [AdminCatalogController::class, 'products'])->name('products');
+        Route::post('/products/{id}/approve', [AdminCatalogController::class, 'approveProduct'])->name('products.approve');
+        Route::post('/products/{id}/reject', [AdminCatalogController::class, 'rejectProduct'])->name('products.reject');
+
+        // Business Listings
+        Route::get('/listings', [AdminCatalogController::class, 'listings'])->name('listings');
+        Route::post('/listings/{id}/approve', [AdminCatalogController::class, 'approveListing'])->name('listings.approve');
+        Route::post('/listings/{id}/reject', [AdminCatalogController::class, 'rejectListing'])->name('listings.reject');
+    });
+
+    // Customer-Seller Chats Monitoring (Admin Audit & Oversight)
+    Route::prefix('messages')->name('messages.')->group(function () {
+        Route::get('/', [AdminMessageController::class, 'index'])->name('index');
+        Route::get('/{conversation}', [AdminMessageController::class, 'show'])->name('show');
+        Route::post('/{conversation}/moderation-note', [AdminMessageController::class, 'postModerationNote'])->name('moderation-note');
+    });
+
+    // Marketplace Promotions & Campaigns (Admin Revenue & Placement Oversight)
+    Route::prefix('promotions')->name('promotions.')->group(function () {
+        Route::get('/', [AdminPromotionController::class, 'index'])->name('index');
+        Route::post('/{promotion}/status', [AdminPromotionController::class, 'updateStatus'])->name('status');
+    });
+
+    // Coming Soon placeholders for future admin modules
+    Route::get('/module/{module}', [AdminDashboardController::class, 'comingSoon'])->name('coming-soon');
+});
