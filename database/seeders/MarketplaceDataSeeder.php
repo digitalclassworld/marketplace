@@ -237,6 +237,127 @@ class MarketplaceDataSeeder extends Seeder
                 ]);
             }
         }
+
+        // 7. Populate Core Orders if empty
+        if (Order::count() === 0 && $primarySeller) {
+            $orders = [
+                [
+                    'seller_id' => $primarySeller->id,
+                    'order_number' => '#DC12568',
+                    'customer_name' => 'Priya Patel',
+                    'customer_city' => 'Ahmedabad, GJ',
+                    'customer_email' => 'priya.patel@email.com',
+                    'customer_phone' => '+91 98765 43210',
+                    'customer_avatar' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+                    'order_type' => 'Course',
+                    'item_title' => 'Digital Marketing Mastery',
+                    'item_subtext' => '1 Course Access',
+                    'item_thumbnail' => 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=100&auto=format&fit=crop&q=80',
+                    'amount' => 2999.00,
+                    'subtotal' => 2999.00,
+                    'discount' => 0.00,
+                    'status' => 'completed',
+                    'placed_at' => now()->subDays(3)->setTime(10, 24),
+                    'timeline' => [
+                        ['title' => 'Order Placed', 'time' => 'Oct 30, 2026, 10:24 AM', 'desc' => 'Order placed.'],
+                        ['title' => 'Payment Completed', 'time' => 'Oct 30, 2026, 10:25 AM', 'desc' => 'Payment received.'],
+                        ['title' => 'Access Granted', 'time' => 'Oct 30, 2026, 10:26 AM', 'desc' => 'Course access enabled.'],
+                        ['title' => 'Order Completed', 'time' => 'Oct 30, 2026, 10:26 AM', 'desc' => 'Successfully completed.'],
+                    ],
+                ],
+                [
+                    'seller_id' => $primarySeller->id,
+                    'order_number' => '#DC12567',
+                    'customer_name' => 'Amit Shah',
+                    'customer_city' => 'Surat, GJ',
+                    'customer_email' => 'amit.shah@email.com',
+                    'customer_phone' => '+91 98251 23456',
+                    'customer_avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+                    'order_type' => 'Service',
+                    'item_title' => 'Website Development',
+                    'item_subtext' => 'Custom Website (Business)',
+                    'item_thumbnail' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100&auto=format&fit=crop&q=80',
+                    'amount' => 15000.00,
+                    'subtotal' => 15000.00,
+                    'discount' => 0.00,
+                    'status' => 'in_progress',
+                    'placed_at' => now()->subDays(4)->setTime(16, 15),
+                    'timeline' => [
+                        ['title' => 'Order Placed', 'time' => 'Oct 29, 2026, 04:15 PM', 'desc' => 'Order placed.'],
+                        ['title' => 'Payment Completed', 'time' => 'Oct 29, 2026, 04:16 PM', 'desc' => 'Payment received.'],
+                        ['title' => 'Work in Progress', 'time' => 'Oct 29, 2026, 05:00 PM', 'desc' => 'Development ongoing.'],
+                    ],
+                ],
+                [
+                    'seller_id' => $primarySeller->id,
+                    'order_number' => '#DC12566',
+                    'customer_name' => 'Neha Desai',
+                    'customer_city' => 'Vadodara, GJ',
+                    'customer_email' => 'neha.desai@email.com',
+                    'customer_phone' => '+91 99042 87654',
+                    'customer_avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                    'order_type' => 'Product',
+                    'item_title' => 'Wireless Mouse Logitech M330',
+                    'item_subtext' => 'Logitech M330',
+                    'item_thumbnail' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=100&auto=format&fit=crop&q=80',
+                    'amount' => 499.00,
+                    'subtotal' => 499.00,
+                    'discount' => 0.00,
+                    'status' => 'shipped',
+                    'placed_at' => now()->subDays(5)->setTime(14, 30),
+                    'timeline' => [
+                        ['title' => 'Order Placed', 'time' => 'Oct 28, 2026, 02:30 PM', 'desc' => 'Order received.'],
+                        ['title' => 'Dispatched', 'time' => 'Oct 29, 2026, 10:00 AM', 'desc' => 'Shipped via BlueDart.'],
+                    ],
+                ],
+                [
+                    'seller_id' => $primarySeller->id,
+                    'order_number' => '#DC12565',
+                    'customer_name' => 'Rohit Verma',
+                    'customer_city' => 'Rajkot, GJ',
+                    'customer_email' => 'rohit.verma@email.com',
+                    'customer_phone' => '+91 97234 56789',
+                    'customer_avatar' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+                    'order_type' => 'Business',
+                    'item_title' => 'Business Listing',
+                    'item_subtext' => 'Premium Listing (1 Year)',
+                    'item_thumbnail' => 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&auto=format&fit=crop&q=80',
+                    'amount' => 1499.00,
+                    'subtotal' => 1499.00,
+                    'discount' => 0.00,
+                    'status' => 'completed',
+                    'placed_at' => now()->subDays(5)->setTime(11, 10),
+                    'timeline' => [
+                        ['title' => 'Listing Purchased', 'time' => 'Oct 28, 2026, 11:10 AM', 'desc' => 'Annual plan active.'],
+                    ],
+                ],
+                [
+                    'seller_id' => $primarySeller->id,
+                    'order_number' => '#DC12564',
+                    'customer_name' => 'Sunita Sharma',
+                    'customer_city' => 'Mumbai, MH',
+                    'customer_email' => 'sunita.sharma@email.com',
+                    'customer_phone' => '+91 98111 22334',
+                    'customer_avatar' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80',
+                    'order_type' => 'Course',
+                    'item_title' => 'Python for Beginners & Data Science',
+                    'item_subtext' => '1 Course Access',
+                    'item_thumbnail' => 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=100&auto=format&fit=crop&q=80',
+                    'amount' => 3499.00,
+                    'subtotal' => 3499.00,
+                    'discount' => 0.00,
+                    'status' => 'completed',
+                    'placed_at' => now()->subDays(6)->setTime(18, 45),
+                    'timeline' => [
+                        ['title' => 'Access Granted', 'time' => 'Oct 27, 2026, 06:45 PM', 'desc' => 'Instant access.'],
+                    ],
+                ],
+            ];
+
+            foreach ($orders as $o) {
+                Order::create($o);
+            }
+        }
     }
 }
 

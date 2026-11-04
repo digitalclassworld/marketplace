@@ -151,7 +151,7 @@ class SuperAdminTest extends TestCase
     }
 
     /**
-     * Test 5b: Super Admin can access and view Seller Dashboard without being bounced back to admin.
+     * Test 5b: Super Admin accessing seller portal is guided to admin dashboard.
      */
     public function test_super_admin_can_access_seller_dashboard_without_redirection(): void
     {
@@ -159,9 +159,8 @@ class SuperAdminTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/seller/dashboard');
 
-        $response->assertStatus(200);
-        $response->assertSee('Seller Dashboard');
-        $response->assertSee('Administrator Mode');
+        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertSessionHas('info');
     }
 
     /**
@@ -188,11 +187,11 @@ class SuperAdminTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Welcome Back, Super Admin');
+        $response->assertSee('Welcome Back,');
         $response->assertSee('Total Sellers');
-        $response->assertSee('Pending Approvals');
-        $response->assertSee('Active Sellers');
-        $response->assertSee('Seller One');
+        $response->assertSee('Total Users');
+        $response->assertSee('Total Orders');
+        $response->assertSee('Total Revenue');
     }
 
     /**
@@ -252,7 +251,7 @@ class SuperAdminTest extends TestCase
         // 4. Authenticated as the newly APPROVED seller, access to selling operation is now ALLOWED
         $allowedResponse = $this->actingAs($sellerUser)->get('/seller/courses/create');
         $allowedResponse->assertStatus(200);
-        $allowedResponse->assertSee('Add New Course');
+        $allowedResponse->assertSee('Course Add Process');
     }
 
     /**

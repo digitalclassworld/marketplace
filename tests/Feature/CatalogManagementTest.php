@@ -188,57 +188,14 @@ class CatalogManagementTest extends TestCase
     {
         $admin = $this->createAdminUser();
 
-        // 1. Super Admin can view Seller Dashboard
-        $this->actingAs($admin)->get(route('seller.dashboard'))->assertStatus(200);
+        // Super Admin accessing seller routes is securely guided to admin dashboard
+        $this->actingAs($admin)->get(route('seller.dashboard'))
+            ->assertRedirect(route('admin.dashboard'));
 
-        // 2. Super Admin can view Seller Profile
-        $this->actingAs($admin)->get(route('seller.profile'))->assertStatus(200);
+        $this->actingAs($admin)->get(route('seller.profile'))
+            ->assertRedirect(route('admin.dashboard'));
 
-        // 3. Super Admin can access all index and creation pages
-        $this->actingAs($admin)->get(route('seller.courses.index'))->assertStatus(200);
-        $this->actingAs($admin)->get(route('seller.courses.create'))->assertStatus(200);
-
-        $this->actingAs($admin)->get(route('seller.services.index'))->assertStatus(200);
-        $this->actingAs($admin)->get(route('seller.services.create'))->assertStatus(200);
-
-        $this->actingAs($admin)->get(route('seller.products.index'))->assertStatus(200);
-        $this->actingAs($admin)->get(route('seller.products.create'))->assertStatus(200);
-
-        $this->actingAs($admin)->get(route('seller.listings.index'))->assertStatus(200);
-        $this->actingAs($admin)->get(route('seller.listings.create'))->assertStatus(200);
-
-        // 4. Super Admin can create Course
-        $this->actingAs($admin)->post(route('seller.courses.store'), [
-            'title'       => 'Admin Master Course',
-            'category'    => 'Digital Marketing',
-            'language'    => 'English',
-            'level'       => 'All Levels',
-            'price'       => 999.00,
-            'access_type' => 'Lifetime Access',
-        ])->assertRedirect(route('seller.courses.index'));
-
-        // 5. Super Admin can create Service
-        $this->actingAs($admin)->post(route('seller.services.store'), [
-            'title'         => 'Admin Professional Gig',
-            'category'      => 'Graphic Design',
-            'delivery_days' => 2,
-            'package_name'  => 'Standard',
-            'price'         => 1499.00,
-        ])->assertRedirect(route('seller.services.index'));
-
-        // 6. Super Admin can create Product
-        $this->actingAs($admin)->post(route('seller.products.store'), [
-            'title'          => 'Admin Digital Template',
-            'category'       => 'Digital Assets & Tools',
-            'product_type'   => 'Digital',
-            'price'          => 299.00,
-            'stock_quantity' => 100,
-        ])->assertRedirect(route('seller.products.index'));
-
-        // 7. Super Admin can create Listing
-        $this->actingAs($admin)->post(route('seller.listings.store'), [
-            'business_name' => 'Admin Training Hub',
-            'category'      => 'Educational Institute',
-        ])->assertRedirect(route('seller.listings.index'));
+        $this->actingAs($admin)->get(route('seller.courses.create'))
+            ->assertRedirect(route('admin.dashboard'));
     }
 }

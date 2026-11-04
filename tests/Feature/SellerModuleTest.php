@@ -340,7 +340,7 @@ class SellerModuleTest extends TestCase
 
         $response = $this->actingAs($user)->post('/seller/logout');
 
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('seller.login'));
         $this->assertGuest();
     }
 }

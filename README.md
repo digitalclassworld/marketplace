@@ -64,15 +64,17 @@ A modern, multi-vendor digital education and services marketplace platform built
 4. **Run Database Migrations & Seeders**:
    ```bash
    php artisan migrate --seed
-   php artisan db:seed --class=ChatMessagesSeeder
-   php artisan db:seed --class=PromotionsSeeder
    ```
+   *(Populates Super Admin, demo sellers, catalog, orders, chat messages, and promotions in one command.)*
 
 5. **Start Local Development Server**:
    ```bash
    php artisan serve
    ```
    *Visit `http://127.0.0.1:8000` in your web browser.*
+
+> [!TIP]
+> For production deployment instructions on **Linux VPS (Ubuntu/Nginx/Apache)** and **cPanel Shared Hosting**, please refer to [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 
