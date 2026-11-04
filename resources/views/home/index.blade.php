@@ -1020,16 +1020,6 @@
                                     <a href="{{ route('business.show', $b->slug) }}" class="btn-card-action btn-card-view">
                                         View
                                     </a>
-                                        'image' => $b->display_image,
-                                        'rating' => $b->rating,
-                                        'reviews' => $b->reviews_count,
-                                        'location' => $b->area_text,
-                                        'phone' => $b->phone,
-                                        'tags' => $b->tags_list,
-                                        'desc' => $b->description ?? 'Premier verified establishment providing top-tier professional services, training, and certified programs.',
-                                    ]) }})">
-                                        View
-                                    </button>
                                 </div>
 
                             </div>
