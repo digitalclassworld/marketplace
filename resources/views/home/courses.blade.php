@@ -768,7 +768,9 @@
                                 
                                 <!-- Thumbnail Box -->
                                 <div class="course-thumb-box">
-                                    <img src="{{ $c->thumbnail }}" alt="{{ $c->title }}" loading="lazy">
+                                    <a href="{{ route('course.show', $c->slug) }}">
+                                        <img src="{{ $c->thumbnail }}" alt="{{ $c->title }}" loading="lazy">
+                                    </a>
                                     
                                     @if($c->badge === 'Bestseller')
                                         <span class="badge-course-bestseller">Bestseller</span>
@@ -786,17 +788,7 @@
                                 <!-- Card Body -->
                                 <div class="course-card-content">
                                     <h4 class="course-card-heading" title="{{ $c->title }}">
-                                        <a href="javascript:void(0)" onclick="openCoursePreviewModal({{ json_encode([
-                                            'title' => $c->title,
-                                            'category' => $c->category,
-                                            'price' => $c->price,
-                                            'discount_price' => $c->discount_price,
-                                            'duration' => $c->duration,
-                                            'level' => $c->level,
-                                            'language' => $c->language,
-                                            'instructor' => $c->instructor_name,
-                                            'desc' => $c->description,
-                                        ]) }})">
+                                        <a href="{{ route('course.show', $c->slug) }}">
                                             {{ $c->title }}
                                         </a>
                                     </h4>
@@ -967,3 +959,4 @@
 </script>
 
 @endsection
+
