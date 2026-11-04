@@ -11,6 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust all proxies (essential for Hostinger Cloudflare / LiteSpeed reverse proxy & preview URLs)
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
             if ($request->is('admin*')) {
                 return route('admin.login');
