@@ -29,10 +29,10 @@
     'name' => $product->title,
     'image' => [$product->display_thumbnail],
     'description' => strip_tags($product->description),
-    'sku' => 'HP15S-i5-512-SL',
+    'sku' => ($productCode ?? 'DC-PROD-' . $product->id),
     'brand' => [
         '@type' => 'Brand',
-        'name' => 'HP',
+        'name' => ($brand ?? 'Digital Class'),
     ],
     'offers' => [
         '@type' => 'Offer',
@@ -1077,7 +1077,7 @@
         <span class="separator">&gt;</span>
         <a href="{{ route('products', ['category' => 'Laptops & Computers']) }}">{{ $product->category ?? 'Laptops & Computers' }}</a>
         <span class="separator">&gt;</span>
-        <a href="{{ route('products', ['brand' => 'HP']) }}">HP</a>
+        <a href="{{ route('products', ['brand' => $brand]) }}">{{ $brand }}</a>
         <span class="separator">&gt;</span>
         <span class="current">{{ Str::limit($product->title, 48) }}</span>
     </div>
@@ -1130,7 +1130,7 @@
         <div class="col-lg-4 col-md-7">
             <!-- Brand & Title -->
             <div class="d-flex align-items-center mb-2">
-                <div class="brand-logo-badge" title="Official HP Product">hp</div>
+                <div class="brand-logo-badge" title="Official {{ $brand }} Product">{{ $brandLogo }}</div>
                 <h1 class="product-headline m-0">{{ $product->title }}</h1>
             </div>
 

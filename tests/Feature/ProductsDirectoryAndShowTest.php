@@ -41,6 +41,31 @@ class ProductsDirectoryAndShowTest extends TestCase
         $response->assertSee('Similar Products');
     }
 
+    public function test_product_detail_page_loads_different_product_categories_dynamically(): void
+    {
+        // 1. Test Logitech Mouse
+        $responseMouse = $this->get('/product/logitech-wireless-mouse');
+        $responseMouse->assertStatus(200);
+        $responseMouse->assertSee('Logitech Wireless Mouse');
+        $responseMouse->assertSee('1000 DPI Optical');
+        $responseMouse->assertSee('24-Month Battery');
+        $responseMouse->assertSee('499');
+
+        // 2. Test Canon Printer
+        $responsePrinter = $this->get('/product/canon-g3010-all-in-one-ink-tank-printer');
+        $responsePrinter->assertStatus(200);
+        $responsePrinter->assertSee('Canon PIXMA G3010');
+        $responsePrinter->assertSee('Integrated Ink Tank');
+        $responsePrinter->assertSee('12,499');
+
+        // 3. Test Classroom Projector
+        $responseProjector = $this->get('/product/classroom-projector');
+        $responseProjector->assertStatus(200);
+        $responseProjector->assertSee('Epson EB-E01');
+        $responseProjector->assertSee('3,600 ANSI Lumens');
+        $responseProjector->assertSee('39,999');
+    }
+
     public function test_custom_product_detail_page_loads_from_database(): void
     {
         $user = User::factory()->create(['role' => 'seller']);
