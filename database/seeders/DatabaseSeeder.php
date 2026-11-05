@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             NotificationSeeder::class,
             AppManagementSeeder::class,
             WebsiteManagementSeeder::class,
+            SeoManagementSeeder::class,
         ]);
     }
 }

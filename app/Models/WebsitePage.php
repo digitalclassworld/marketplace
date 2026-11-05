@@ -45,3 +45,4 @@ class WebsitePage extends Model
         };
     }
 }
+

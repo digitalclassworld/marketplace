@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminSeoController;
 use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminWebsiteController;
@@ -289,6 +290,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::match(['put', 'patch', 'post'], '/{id}', [AdminWebsiteController::class, 'update'])->name('update');
         Route::post('/{id}/duplicate', [AdminWebsiteController::class, 'duplicate'])->name('duplicate');
         Route::delete('/{id}', [AdminWebsiteController::class, 'destroy'])->name('destroy');
+    });
+
+    // SEO Management & Traffic Studio
+    Route::prefix('seo')->name('seo.')->group(function () {
+        Route::get('/', [AdminSeoController::class, 'index'])->name('index');
+        Route::match(['put', 'patch', 'post'], '/', [AdminSeoController::class, 'update'])->name('update');
+        Route::post('/sitemap', [AdminSeoController::class, 'generateSitemap'])->name('sitemap');
     });
 
     // Coming Soon placeholders for future admin modules

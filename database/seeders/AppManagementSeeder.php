@@ -193,3 +193,4 @@ class AppManagementSeeder extends Seeder
         }
     }
 }
+

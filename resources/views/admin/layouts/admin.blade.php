@@ -454,6 +454,20 @@
                 </li>
             </ul>
 
+            <!-- 6.5. SEO & TRAFFIC -->
+            <div class="admin-menu-section">SEO & TRAFFIC</div>
+            <ul class="admin-nav-list">
+                <li class="admin-nav-item">
+                    <a href="{{ route('admin.seo.index') }}" class="admin-nav-link {{ request()->routeIs('admin.seo.*') ? 'active' : '' }}">
+                        <div class="nav-left">
+                            <i class="fa-solid fa-magnifying-glass-chart menu-icon"></i>
+                            <span>SEO Management</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right chevron-icon"></i>
+                    </a>
+                </li>
+            </ul>
+
             <!-- 7. APP & PLATFORM MANAGEMENT -->
             <div class="admin-menu-section">APP & PLATFORM MANAGEMENT</div>
             <ul class="admin-nav-list">

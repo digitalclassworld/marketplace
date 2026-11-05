@@ -171,3 +171,4 @@ class AdminWebsiteController extends Controller
             ->with('success', "Page '{$title}' deleted successfully!");
     }
 }
+

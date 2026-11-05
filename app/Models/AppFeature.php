@@ -28,3 +28,4 @@ class AppFeature extends Model
         'platforms'   => 'array',
     ];
 }
+

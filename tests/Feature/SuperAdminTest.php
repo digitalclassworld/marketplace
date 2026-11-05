@@ -1047,6 +1047,51 @@ class SuperAdminTest extends TestCase
         $delResp->assertRedirect();
         $this->assertDatabaseMissing('website_pages', ['id' => $page->id]);
     }
+
+    public function test_blog_is_removed_from_navbar_and_super_admin_login_is_present_in_footer(): void
+    {
+        $resp = $this->get('/');
+        $resp->assertOk();
+
+        // Ensure Blog link is NOT in the main marketplace navigation list
+        $resp->assertDontSee('dc-nav-link" href="' . route('blog.index') . '">Blog</a>', false);
+
+        // Ensure Super Admin Login is accessible in the footer
+        $resp->assertSee('Super Admin Login');
+        $resp->assertSee(route('admin.login'));
+    }
+
+    public function test_super_admin_can_manage_seo_settings(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Access SEO Management index
+        $indexResp = $this->actingAs($admin)->get('/admin/seo');
+        $indexResp->assertOk();
+        $indexResp->assertSee('SEO Management');
+        $indexResp->assertSee('Google Index Status');
+        $indexResp->assertSee('Global SEO Settings');
+        $indexResp->assertSee('SEO URL & Meta Templates', false);
+        $indexResp->assertSee('SEO Preview');
+
+        // 2. Update SEO settings
+        $updateResp = $this->actingAs($admin)->post('/admin/seo', [
+            'site_title'                  => 'Digital Class India - Learning & Services Hub',
+            'site_tagline'                => 'Learn and grow with top experts.',
+            'meta_description'            => 'All-in-one educational marketplace in India for courses and services.',
+            'default_keywords'            => 'edtech, courses, tutors, services',
+            'course_title_template'       => '{course_name} | {institute_name}',
+            'course_description_template' => 'Learn {course_name} with {institute_name} online.',
+        ]);
+        $updateResp->assertRedirect();
+        $this->assertDatabaseHas('seo_settings', [
+            'site_title' => 'Digital Class India - Learning & Services Hub',
+        ]);
+
+        // 3. Trigger XML sitemap generation
+        $sitemapResp = $this->actingAs($admin)->post('/admin/seo/sitemap');
+        $sitemapResp->assertRedirect();
+    }
 }
 
 

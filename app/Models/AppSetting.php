@@ -39,3 +39,4 @@ class AppSetting extends Model
         'crash_rate'       => 'float',
     ];
 }
+

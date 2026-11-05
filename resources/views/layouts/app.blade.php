@@ -305,9 +305,6 @@
                     <li class="nav-item">
                         <a class="nav-link dc-nav-link {{ request()->routeIs('home') || request()->routeIs('business.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('home') }}">Businesses</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link dc-nav-link {{ request()->routeIs('blog.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('blog.index') }}">Blog</a>
-                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dc-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             For Institutions
@@ -483,6 +480,7 @@
                     <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
                         <li><a href="{{ route('seller.register') }}">Become a Seller</a></li>
                         <li><a href="{{ route('seller.login') }}">Seller Login</a></li>
+                        <li><a href="{{ route('admin.login') }}" class="text-warning-emphasis"><i class="fa-solid fa-shield-halved me-1 text-warning"></i> Super Admin Login</a></li>
                         @auth
                             @if(Auth::user()->isSeller())
                                 <li><a href="{{ route('seller.dashboard') }}">Seller Dashboard</a></li>
@@ -514,7 +512,9 @@
                 <div>
                     &copy; {{ date('Y') }} Digital Class Marketplace. All rights reserved.
                 </div>
-                <div class="d-flex gap-3 mt-2 mt-md-0">
+                <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
+                    <a href="{{ route('admin.login') }}" class="text-secondary text-decoration-none hover-white small"><i class="fa-solid fa-lock me-1"></i> Super Admin Portal</a>
+                    <span>•</span>
                     <span>Designed based on Digital Class UI/UX Specifications</span>
                 </div>
             </div>
