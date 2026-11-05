@@ -187,7 +187,7 @@ If you are deploying using **Coolify** (as shown on VPS `187.127.141.217:8000` w
    APP_URL=https://web.digitalclassworld.in
 
    DB_CONNECTION=mysql
-   DB_HOST=host.docker.internal
+   DB_HOST=172.17.0.1
    DB_PORT=3306
    DB_DATABASE=marketplace
    DB_USERNAME=root
@@ -197,10 +197,13 @@ If you are deploying using **Coolify** (as shown on VPS `187.127.141.217:8000` w
    CACHE_STORE=file
    FILESYSTEM_DISK=local
    ```
-   > [!TIP]
-   > * If your MySQL is running **directly on the VPS host (outside Docker)**: use `DB_HOST=host.docker.internal` or your VPS IP `187.127.141.217`.
-   > * If your MySQL is running **inside Coolify as a database service**: use the Coolify internal service name (e.g. `mysql` or the service UUID).
-   > * Setting `APP_DEBUG=true` temporarily allows you to see the exact error message instead of the generic `500 | SERVER ERROR`.
+   > [!IMPORTANT]
+   > **Resolving `getaddrinfo for host.docker.internal failed: Name or service not known` on Linux**:
+   > * On **Linux VPS**, Docker does **NOT** resolve `host.docker.internal` by default.
+   > * Set **`DB_HOST=172.17.0.1`** (the standard Docker bridge IP that connects back to the host machine) or your VPS external IP `187.127.141.217`.
+   > * Alternatively, in Coolify under **Configuration** &rarr; **Custom Docker Options**, add `--add-host=host.docker.internal:host-gateway`.
+   > * If MySQL is running **inside Coolify as a database resource**: use the Coolify internal service name (e.g. `mysql` or the database internal hostname shown in Coolify).
+   > * Ensure MySQL allows connections from Docker: check `/etc/mysql/mysql.conf.d/mysqld.cnf` has `bind-address = 0.0.0.0` (or `bind-address = 172.17.0.1`).
 
 4. Click **Save**.
 
