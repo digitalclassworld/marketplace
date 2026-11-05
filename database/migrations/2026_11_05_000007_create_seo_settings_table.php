@@ -59,3 +59,4 @@ return new class extends Migration
         Schema::dropIfExists('seo_settings');
     }
 };
+

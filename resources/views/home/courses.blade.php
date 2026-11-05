@@ -573,8 +573,15 @@
     <div class="container-fluid px-lg-4">
         <div class="course-cat-scroll-container">
             @foreach($horizontalCategories as $hc)
-                <a href="{{ route('courses', ['category' => $hc['name'] === 'All Categories' ? '' : $hc['slug']]) }}"
-                   class="course-cat-pill {{ ($selectedCategory === $hc['name'] || ($selectedCategory === 'All Categories' && $hc['name'] === 'All Categories')) ? 'active' : '' }}">
+                @php
+                    $isHcActive = ($selectedCategory === $hc['name'] || ($selectedCategory === 'All Categories' && $hc['name'] === 'All Categories') || ($selectedCategory === $hc['slug']));
+                    $hcParam = ($hc['name'] === 'All Categories' || $hc['slug'] === 'all') ? '' : $hc['slug'];
+                    $hcQuery = array_merge(request()->query(), ['category' => $hcParam]);
+                    if (empty($hcParam)) unset($hcQuery['category']);
+                    $hcUrl = route('courses', $hcQuery);
+                @endphp
+                <a href="{{ $hcUrl }}"
+                   class="course-cat-pill {{ $isHcActive ? 'active' : '' }}">
                     <i class="{{ $hc['icon'] }}"></i>
                     <span>{{ $hc['name'] }}</span>
                 </a>
@@ -594,7 +601,11 @@
                  LEFT SIDEBAR: FILTERS
                  ========================================== -->
             <div class="col-xl-2 col-lg-3 col-md-4">
-                <div class="courses-filter-card">
+                <form id="coursesFilterForm" action="{{ route('courses') }}" method="GET" class="courses-filter-card">
+                    @if($searchQuery)
+                        <input type="hidden" name="search" value="{{ $searchQuery }}">
+                    @endif
+                    <input type="hidden" name="sort" id="coursesSortInput" value="{{ $sortBy }}">
                     
                     <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
                         <div class="fw-bold text-dark" style="font-size: 0.85rem;">
@@ -612,12 +623,22 @@
                     <div class="mb-3">
                         <div class="filter-sec-header">Category</div>
                         <div id="courseCatContainer">
+                            <div class="course-check-item">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="category" value="" id="ccat_all"
+                                           {{ ($selectedCategory === 'All Categories' || !$selectedCategory) ? 'checked' : '' }}
+                                           onchange="document.getElementById('coursesFilterForm').submit()">
+                                    <label class="form-check-label" for="ccat_all">
+                                        All Categories
+                                    </label>
+                                </div>
+                            </div>
                             @foreach($sidebarCategories as $sc)
                                 <div class="course-check-item">
                                     <div class="form-check mb-0">
-                                        <input class="form-check-input" type="checkbox" id="cat_{{ Str::slug($sc['name']) }}"
+                                        <input class="form-check-input" type="radio" name="category" value="{{ $sc['name'] }}" id="cat_{{ Str::slug($sc['name']) }}"
                                                {{ $selectedCategory === $sc['name'] ? 'checked' : '' }}
-                                               onchange="window.location.href='{{ route('courses', ['category' => $sc['name']]) }}'">
+                                               onchange="document.getElementById('coursesFilterForm').submit()">
                                         <label class="form-check-label" for="cat_{{ Str::slug($sc['name']) }}">
                                             {{ $sc['name'] }}
                                         </label>
@@ -625,8 +646,26 @@
                                     <span class="course-check-count">({{ $sc['count'] }})</span>
                                 </div>
                             @endforeach
+                            <div class="course-check-item more-course-cat d-none">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="category" value="Spoken English" id="cat_spoken"
+                                           {{ $selectedCategory === 'Spoken English' ? 'checked' : '' }}
+                                           onchange="document.getElementById('coursesFilterForm').submit()">
+                                    <label class="form-check-label" for="cat_spoken">Spoken English</label>
+                                </div>
+                                <span class="course-check-count">(890)</span>
+                            </div>
+                            <div class="course-check-item more-course-cat d-none">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="category" value="AI & Tools" id="cat_ai"
+                                           {{ $selectedCategory === 'AI & Tools' ? 'checked' : '' }}
+                                           onchange="document.getElementById('coursesFilterForm').submit()">
+                                    <label class="form-check-label" for="cat_ai">AI & Tools</label>
+                                </div>
+                                <span class="course-check-count">(740)</span>
+                            </div>
                         </div>
-                        <a href="#" class="d-inline-block small text-primary text-decoration-none mt-1">Show More ▾</a>
+                        <a href="javascript:void(0)" onclick="toggleMoreCourseCats(this)" class="d-inline-block small text-primary text-decoration-none mt-1">Show More ▾</a>
                     </div>
 
                     <!-- Learning Mode -->
@@ -634,14 +673,18 @@
                         <div class="filter-sec-header">Learning Mode</div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="mode_online" checked>
+                                <input class="form-check-input" type="checkbox" name="mode[]" value="online" id="mode_online"
+                                       {{ in_array('online', (array)$selectedMode) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="mode_online">Online</label>
                             </div>
                             <span class="course-check-count">(7,360)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="mode_offline">
+                                <input class="form-check-input" type="checkbox" name="mode[]" value="offline" id="mode_offline"
+                                       {{ in_array('offline', (array)$selectedMode) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="mode_offline">Offline</label>
                             </div>
                             <span class="course-check-count">(2,140)</span>
@@ -652,13 +695,13 @@
                     <div class="mb-3">
                         <div class="d-flex align-items-center justify-content-between filter-sec-header">
                             <span>Price Range</span>
-                            <span class="small text-muted" id="priceDisplay">₹0 - ₹50,000</span>
+                            <span class="small text-muted" id="priceDisplay">₹0 - ₹{{ number_format($maxPrice ?? 50000) }}</span>
                         </div>
-                        <input type="range" class="form-range" min="0" max="50000" step="500" value="{{ $maxPrice ?? 50000 }}" id="priceRangeInput" oninput="updatePrice(this.value)">
+                        <input type="range" class="form-range" min="0" max="50000" step="500" value="{{ $maxPrice ?? 50000 }}" id="priceRangeInput" oninput="updatePrice(this.value)" onchange="document.getElementById('coursesFilterForm').submit()">
                         <div class="d-flex align-items-center gap-1 mt-1">
                             <input type="number" class="form-control form-control-sm text-center" value="0" readonly style="font-size: 0.72rem;">
                             <span class="text-muted small">to</span>
-                            <input type="number" class="form-control form-control-sm text-center" id="priceInputMax" value="{{ $maxPrice ?? 50000 }}" style="font-size: 0.72rem;" onchange="window.location.href='{{ route('courses') }}?max_price=' + this.value">
+                            <input type="number" name="max_price" class="form-control form-control-sm text-center" id="priceInputMax" value="{{ $maxPrice ?? 50000 }}" style="font-size: 0.72rem;" onchange="document.getElementById('coursesFilterForm').submit()">
                         </div>
                     </div>
 
@@ -667,21 +710,27 @@
                         <div class="filter-sec-header">Course Level</div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="lvl_beg">
+                                <input class="form-check-input" type="checkbox" name="level[]" value="Beginner" id="lvl_beg"
+                                       {{ in_array('Beginner', (array)$selectedLevel) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lvl_beg">Beginner</label>
                             </div>
                             <span class="course-check-count">(4,120)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="lvl_int">
+                                <input class="form-check-input" type="checkbox" name="level[]" value="Intermediate" id="lvl_int"
+                                       {{ in_array('Intermediate', (array)$selectedLevel) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lvl_int">Intermediate</label>
                             </div>
                             <span class="course-check-count">(3,250)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="lvl_adv">
+                                <input class="form-check-input" type="checkbox" name="level[]" value="Advanced" id="lvl_adv"
+                                       {{ in_array('Advanced', (array)$selectedLevel) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lvl_adv">Advanced</label>
                             </div>
                             <span class="course-check-count">(1,980)</span>
@@ -693,28 +742,34 @@
                         <div class="filter-sec-header">Language</div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="lang_en">
+                                <input class="form-check-input" type="checkbox" name="language[]" value="English" id="lang_en"
+                                       {{ in_array('English', (array)$selectedLanguage) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lang_en">English</label>
                             </div>
                             <span class="course-check-count">(5,840)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="lang_hi">
+                                <input class="form-check-input" type="checkbox" name="language[]" value="Hindi" id="lang_hi"
+                                       {{ in_array('Hindi', (array)$selectedLanguage) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lang_hi">Hindi</label>
                             </div>
                             <span class="course-check-count">(2,360)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="lang_gu">
+                                <input class="form-check-input" type="checkbox" name="language[]" value="Gujarati" id="lang_gu"
+                                       {{ in_array('Gujarati', (array)$selectedLanguage) ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lang_gu">Gujarati</label>
                             </div>
                             <span class="course-check-count">(780)</span>
                         </div>
                     </div>
 
-                </div>
+                </form>
             </div>
 
             <!-- ==========================================
@@ -726,7 +781,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <div>
                         <h2 class="fw-bold text-dark mb-0" style="font-size: 1.15rem;">
-                            10,000+ Courses
+                            {{ number_format(count($courses)) }}+ Courses
                         </h2>
                     </div>
 
@@ -734,7 +789,13 @@
                         <!-- Sort by -->
                         <div class="d-flex align-items-center gap-1 small text-muted">
                             <span>Sort by:</span>
-                            <select class="form-select form-select-sm" style="font-size: 0.75rem; width: auto;" onchange="window.location.href='{{ route('courses') }}?sort=' + this.value">
+                            <select class="form-select form-select-sm" style="font-size: 0.75rem; width: auto;" onchange="submitCoursesSort(this.value)">
+                                <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
+                                <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
+                                <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                            </select>
+                        </div>
                                 <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
                                 <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
                                 <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
@@ -886,6 +947,27 @@
 
 <!-- JavaScript Logic -->
 <script>
+    function submitCoursesSort(val) {
+        const sortInput = document.getElementById('coursesSortInput');
+        if (sortInput) sortInput.value = val;
+        const form = document.getElementById('coursesFilterForm');
+        if (form) form.submit();
+    }
+
+    function toggleMoreCourseCats(btn) {
+        const moreItems = document.querySelectorAll('.more-course-cat');
+        let isOpening = false;
+        moreItems.forEach(item => {
+            if (item.classList.contains('d-none')) {
+                item.classList.remove('d-none');
+                isOpening = true;
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+        btn.innerText = isOpening ? 'Show Less ▴' : 'Show More ▾';
+    }
+
     function updatePrice(val) {
         document.getElementById('priceDisplay').innerText = '₹0 - ₹' + Number(val).toLocaleString();
         document.getElementById('priceInputMax').value = val;

@@ -26,6 +26,7 @@ class HomeController extends Controller
         $selectedRating = $request->input('rating');
         $selectedFacilities = (array) $request->input('facility', []);
         $selectedBusinessTypes = (array) $request->input('business_type', []);
+        $selectedDistance = $request->input('distance', 'all');
         $sortBy = $request->input('sort', 'popular');
 
         $businesses = collect();
@@ -40,29 +41,20 @@ class HomeController extends Controller
                         $q->where('business_name', 'like', "%{$searchQuery}%")
                           ->orWhere('category', 'like', "%{$searchQuery}%")
                           ->orWhere('sub_category', 'like', "%{$searchQuery}%")
-                          ->orWhere('city', 'like', "%{$searchQuery}%");
+                          ->orWhere('city', 'like', "%{$searchQuery}%")
+                          ->orWhere('address', 'like', "%{$searchQuery}%");
                     });
                 }
 
-                if (!empty($selectedCategory) && $selectedCategory !== 'All Businesses') {
+                if (!empty($selectedCategory) && $selectedCategory !== 'All Businesses' && $selectedCategory !== 'all') {
                     $query->where(function ($q) use ($selectedCategory) {
                         $q->where('category', 'like', "%{$selectedCategory}%")
                           ->orWhere('sub_category', 'like', "%{$selectedCategory}%");
                     });
                 }
 
-                if (!empty($selectedCity) && $selectedCity !== 'All Locations') {
+                if (!empty($selectedCity) && $selectedCity !== 'All Locations' && $selectedCity !== 'all') {
                     $query->where('city', $selectedCity);
-                }
-
-                // Apply sorting
-                if ($sortBy === 'rating') {
-                    $query->orderByDesc('plan_price');
-                } elseif ($sortBy === 'newest') {
-                    $query->orderByDesc('created_at');
-                } else {
-                    $query->orderByRaw("CASE WHEN listing_type = 'Featured' THEN 1 WHEN listing_type = 'Verified' THEN 2 ELSE 3 END")
-                          ->orderBy('id', 'asc');
                 }
 
                 $businesses = $query->get();
@@ -90,6 +82,18 @@ class HomeController extends Controller
                         $bType = $b->features['business_type'] ?? 'Individual Business';
                         return in_array($bType, $selectedBusinessTypes);
                     });
+                }
+
+                // Apply sorting
+                if ($sortBy === 'rating') {
+                    $businesses = $businesses->sortByDesc(fn($b) => (float)$b->rating)->values();
+                } elseif ($sortBy === 'newest') {
+                    $businesses = $businesses->sortByDesc(fn($b) => $b->created_at)->values();
+                } else {
+                    $businesses = $businesses->sortByDesc(function ($b) {
+                        $weight = $b->badge === 'Featured' ? 200 : ($b->badge === 'Verified' ? 100 : 0);
+                        return $weight + ((float)$b->rating * 10);
+                    })->values();
                 }
             }
         } catch (\Throwable $e) {
@@ -134,6 +138,7 @@ class HomeController extends Controller
             'searchQuery'           => $searchQuery,
             'selectedCategory'      => $selectedCategory ?: 'All Businesses',
             'selectedCity'          => $selectedCity,
+            'selectedDistance'      => $selectedDistance,
             'selectedRating'        => $selectedRating,
             'selectedFacilities'    => $selectedFacilities,
             'selectedBusinessTypes' => $selectedBusinessTypes,
@@ -424,6 +429,24 @@ class HomeController extends Controller
 
                 if (!empty($selectedLanguage)) {
                     $query->whereIn('language', $selectedLanguage);
+                }
+
+                if (!empty($selectedMode)) {
+                    $query->where(function ($q) use ($selectedMode) {
+                        $hasCondition = false;
+                        if (in_array('online', $selectedMode)) {
+                            $q->orWhere('access_type', 'like', '%Online%')
+                              ->orWhere('access_type', 'like', '%Lifetime%');
+                            $hasCondition = true;
+                        }
+                        if (in_array('offline', $selectedMode)) {
+                            $q->orWhere('access_type', 'like', '%Offline%');
+                            $hasCondition = true;
+                        }
+                        if (!$hasCondition) {
+                            $q->whereIn('access_type', $selectedMode);
+                        }
+                    });
                 }
 
                 if (!empty($minPrice) && (float)$minPrice > 0) {

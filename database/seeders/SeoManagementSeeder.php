@@ -44,3 +44,4 @@ class SeoManagementSeeder extends Seeder
         ]);
     }
 }
+

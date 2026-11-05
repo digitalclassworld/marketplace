@@ -687,8 +687,15 @@
     <div class="container-fluid px-lg-4">
         <div class="category-scroll-container">
             @foreach($horizontalCategories as $cat)
-                <a href="{{ route('home', ['category' => $cat['name'] === 'All Businesses' ? '' : $cat['slug']]) }}"
-                   class="cat-pill-btn {{ ($selectedCategory === $cat['name'] || ($selectedCategory === 'All Businesses' && $cat['name'] === 'All Businesses')) ? 'active' : '' }}">
+                @php
+                    $isCatActive = ($selectedCategory === $cat['name'] || ($selectedCategory === 'All Businesses' && $cat['name'] === 'All Businesses') || ($selectedCategory === $cat['slug']));
+                    $catParam = ($cat['name'] === 'All Businesses' || $cat['slug'] === 'all') ? '' : $cat['slug'];
+                    $catQuery = array_merge(request()->query(), ['category' => $catParam]);
+                    if (empty($catParam)) unset($catQuery['category']);
+                    $catUrl = route('home', $catQuery);
+                @endphp
+                <a href="{{ $catUrl }}"
+                   class="cat-pill-btn {{ $isCatActive ? 'active' : '' }}">
                     <i class="{{ $cat['icon'] }}"></i>
                     <span>{{ $cat['name'] }}</span>
                 </a>
@@ -708,7 +715,12 @@
                  LEFT COLUMN: FILTERS SIDEBAR
                  ========================================== -->
             <div class="col-xl-2 col-lg-3 col-md-4">
-                <div class="filter-card mb-3">
+                <form id="homeFilterForm" action="{{ route('home') }}" method="GET" class="filter-card mb-3">
+                    @if($searchQuery)
+                        <input type="hidden" name="search" value="{{ $searchQuery }}">
+                    @endif
+                    <input type="hidden" name="sort" id="filterSortInput" value="{{ $sortBy }}">
+
                     <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
                         <div class="fw-bold text-dark" style="font-size: 0.875rem;">
                             <i class="fa-solid fa-sliders me-1 text-primary"></i> Filters
@@ -719,15 +731,19 @@
                     <!-- Location Selector -->
                     <div class="mb-3">
                         <div class="filter-section-title">Location</div>
-                        <select class="form-select form-select-sm mb-2" onchange="window.location.href='{{ route('home') }}?city=' + this.value">
+                        <select name="city" class="form-select form-select-sm mb-2" onchange="document.getElementById('homeFilterForm').submit()">
                             <option value="Ahmedabad" {{ $selectedCity === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
                             <option value="Surat" {{ $selectedCity === 'Surat' ? 'selected' : '' }}>Surat</option>
                             <option value="Vadodara" {{ $selectedCity === 'Vadodara' ? 'selected' : '' }}>Vadodara</option>
+                            <option value="Rajkot" {{ $selectedCity === 'Rajkot' ? 'selected' : '' }}>Rajkot</option>
+                            <option value="Gandhinagar" {{ $selectedCity === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
+                            <option value="All Locations" {{ $selectedCity === 'All Locations' ? 'selected' : '' }}>All Locations</option>
                         </select>
-                        <select class="form-select form-select-sm text-muted">
-                            <option>Within 10 km</option>
-                            <option>Within 5 km</option>
-                            <option>Within 25 km</option>
+                        <select name="distance" class="form-select form-select-sm text-muted" onchange="document.getElementById('homeFilterForm').submit()">
+                            <option value="all" {{ ($selectedDistance ?? 'all') === 'all' ? 'selected' : '' }}>Any Distance</option>
+                            <option value="5" {{ ($selectedDistance ?? '') === '5' ? 'selected' : '' }}>Within 5 km</option>
+                            <option value="10" {{ ($selectedDistance ?? '') === '10' ? 'selected' : '' }}>Within 10 km</option>
+                            <option value="25" {{ ($selectedDistance ?? '') === '25' ? 'selected' : '' }}>Within 25 km</option>
                         </select>
                     </div>
 
@@ -738,12 +754,22 @@
                             <input type="text" id="categoryFilterSearch" class="form-control" placeholder="Search categories..." onkeyup="filterCategoryCheckboxes(this.value)">
                         </div>
                         <div id="categoryCheckboxesContainer">
+                            <div class="filter-check-item">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="category" value="" id="cat_all"
+                                           {{ ($selectedCategory === 'All Businesses' || !$selectedCategory) ? 'checked' : '' }}
+                                           onchange="document.getElementById('homeFilterForm').submit()">
+                                    <label class="form-check-label" for="cat_all">
+                                        All Businesses
+                                    </label>
+                                </div>
+                            </div>
                             @foreach($sidebarCategories as $sc)
                                 <div class="filter-check-item">
                                     <div class="form-check mb-0">
-                                        <input class="form-check-input" type="checkbox" id="cat_{{ Str::slug($sc['name']) }}"
+                                        <input class="form-check-input" type="radio" name="category" value="{{ $sc['name'] }}" id="cat_{{ Str::slug($sc['name']) }}"
                                                {{ $selectedCategory === $sc['name'] ? 'checked' : '' }}
-                                               onchange="window.location.href='{{ route('home', ['category' => $sc['name']]) }}'">
+                                               onchange="document.getElementById('homeFilterForm').submit()">
                                         <label class="form-check-label" for="cat_{{ Str::slug($sc['name']) }}">
                                             {{ $sc['name'] }}
                                         </label>
@@ -751,8 +777,35 @@
                                     <span class="filter-count">({{ $sc['count'] }})</span>
                                 </div>
                             @endforeach
+                            <div class="filter-check-item more-category-item d-none">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="category" value="Retail Shops" id="cat_retail"
+                                           {{ $selectedCategory === 'Retail Shops' ? 'checked' : '' }}
+                                           onchange="document.getElementById('homeFilterForm').submit()">
+                                    <label class="form-check-label" for="cat_retail">Retail Shops</label>
+                                </div>
+                                <span class="filter-count">(310)</span>
+                            </div>
+                            <div class="filter-check-item more-category-item d-none">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="category" value="Automotive" id="cat_auto"
+                                           {{ $selectedCategory === 'Automotive' ? 'checked' : '' }}
+                                           onchange="document.getElementById('homeFilterForm').submit()">
+                                    <label class="form-check-label" for="cat_auto">Automotive</label>
+                                </div>
+                                <span class="filter-count">(195)</span>
+                            </div>
+                            <div class="filter-check-item more-category-item d-none">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="category" value="Electronics & Repair" id="cat_elec"
+                                           {{ $selectedCategory === 'Electronics & Repair' ? 'checked' : '' }}
+                                           onchange="document.getElementById('homeFilterForm').submit()">
+                                    <label class="form-check-label" for="cat_elec">Electronics & Repair</label>
+                                </div>
+                                <span class="filter-count">(240)</span>
+                            </div>
                         </div>
-                        <a href="#" class="d-inline-block small text-primary text-decoration-none mt-1">Show More ▾</a>
+                        <a href="javascript:void(0)" onclick="toggleMoreCategories(this)" class="d-inline-block small text-primary text-decoration-none mt-1">Show More ▾</a>
                     </div>
 
                     <!-- Rating Filter -->
@@ -769,9 +822,10 @@
                         @foreach($ratingOptions as $ro)
                             <div class="filter-check-item">
                                 <div class="form-check mb-0 d-flex align-items-center">
-                                    <input class="form-check-input me-2" type="checkbox" id="rating_{{ $ro['min'] }}"
+                                    <input class="form-check-input me-2" type="radio" name="rating" id="rating_{{ $ro['min'] }}" value="{{ $ro['min'] }}"
                                            {{ $selectedRating == $ro['min'] ? 'checked' : '' }}
-                                           onchange="window.location.href='{{ route('home', array_merge(request()->all(), ['rating' => $ro['min']])) }}'">
+                                           onclick="handleRatingClick(this)"
+                                           onchange="document.getElementById('homeFilterForm').submit()">
                                     <label class="form-check-label d-flex align-items-center" for="rating_{{ $ro['min'] }}">
                                         <span class="text-warning me-1">
                                             @for($i=1; $i<=5; $i++)
@@ -791,28 +845,36 @@
                         <div class="filter-section-title">Facilities</div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="fac_parking">
+                                <input class="form-check-input" type="checkbox" name="facility[]" value="Parking Available" id="fac_parking"
+                                       {{ in_array('Parking Available', $selectedFacilities) ? 'checked' : '' }}
+                                       onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_parking">Parking Available</label>
                             </div>
                             <span class="filter-count">(1,820)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="fac_online">
+                                <input class="form-check-input" type="checkbox" name="facility[]" value="Online Classes" id="fac_online"
+                                       {{ in_array('Online Classes', $selectedFacilities) ? 'checked' : '' }}
+                                       onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_online">Online Classes</label>
                             </div>
                             <span class="filter-count">(980)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="fac_home">
+                                <input class="form-check-input" type="checkbox" name="facility[]" value="Home Visit" id="fac_home"
+                                       {{ in_array('Home Visit', $selectedFacilities) ? 'checked' : '' }}
+                                       onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_home">Home Visit</label>
                             </div>
                             <span class="filter-count">(640)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="fac_emi">
+                                <input class="form-check-input" type="checkbox" name="facility[]" value="EMI Available" id="fac_emi"
+                                       {{ in_array('EMI Available', $selectedFacilities) ? 'checked' : '' }}
+                                       onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_emi">EMI Available</label>
                             </div>
                             <span class="filter-count">(420)</span>
@@ -824,28 +886,34 @@
                         <div class="filter-section-title">Business Type</div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="type_individual">
+                                <input class="form-check-input" type="checkbox" name="business_type[]" value="Individual Business" id="type_individual"
+                                       {{ in_array('Individual Business', $selectedBusinessTypes) ? 'checked' : '' }}
+                                       onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="type_individual">Individual Business</label>
                             </div>
                             <span class="filter-count">(3,120)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="type_franchise">
+                                <input class="form-check-input" type="checkbox" name="business_type[]" value="Franchise" id="type_franchise"
+                                       {{ in_array('Franchise', $selectedBusinessTypes) ? 'checked' : '' }}
+                                       onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="type_franchise">Franchise</label>
                             </div>
                             <span class="filter-count">(680)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" id="type_partner">
+                                <input class="form-check-input" type="checkbox" name="business_type[]" value="Verified Partner" id="type_partner"
+                                       {{ in_array('Verified Partner', $selectedBusinessTypes) ? 'checked' : '' }}
+                                       onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="type_partner">Verified Partner</label>
                             </div>
                             <span class="filter-count">(1,240)</span>
                         </div>
                     </div>
 
-                </div>
+                </form>
             </div>
 
             <!-- ==========================================
@@ -925,7 +993,7 @@
                         <!-- Sort Dropdown -->
                         <div class="d-flex align-items-center gap-1 small text-muted">
                             <span>Sort by:</span>
-                            <select class="form-select form-select-sm" style="font-size: 0.75rem; width: auto;" onchange="window.location.href='{{ route('home') }}?sort=' + this.value">
+                            <select class="form-select form-select-sm" style="font-size: 0.75rem; width: auto;" onchange="submitWithSort(this.value)">
                                 <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
                                 <option value="rating" {{ $sortBy === 'rating' ? 'selected' : '' }}>Highest Rated</option>
                                 <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
@@ -1284,6 +1352,41 @@
 
         const modal = new bootstrap.Modal(document.getElementById('detailModal'));
         modal.show();
+    }
+
+    // Submit form with sort
+    function submitWithSort(val) {
+        const sortInput = document.getElementById('filterSortInput');
+        if (sortInput) sortInput.value = val;
+        const form = document.getElementById('homeFilterForm');
+        if (form) form.submit();
+    }
+
+    // Toggle more categories in sidebar
+    function toggleMoreCategories(btn) {
+        const moreItems = document.querySelectorAll('.more-category-item');
+        let isOpening = false;
+        moreItems.forEach(item => {
+            if (item.classList.contains('d-none')) {
+                item.classList.remove('d-none');
+                isOpening = true;
+            } else {
+                item.classList.add('d-none');
+            }
+        });
+        btn.innerText = isOpening ? 'Show Less ▴' : 'Show More ▾';
+    }
+
+    // Handle rating radio toggle (allow clicking again to deselect)
+    let lastCheckedRating = '{{ $selectedRating }}';
+    function handleRatingClick(radio) {
+        if (radio.value === lastCheckedRating) {
+            radio.checked = false;
+            lastCheckedRating = '';
+            document.getElementById('homeFilterForm').submit();
+        } else {
+            lastCheckedRating = radio.value;
+        }
     }
 
     // Filter category checkboxes in sidebar

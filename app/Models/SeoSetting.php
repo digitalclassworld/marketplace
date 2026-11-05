@@ -53,3 +53,4 @@ class SeoSetting extends Model
         'seo_score'              => 'integer',
     ];
 }
+
