@@ -47,7 +47,16 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => (function () {
+                $host = env('DB_HOST', '127.0.0.1');
+                if ($host === 'host.docker.internal') {
+                    $resolved = @gethostbyname('host.docker.internal');
+                    if ($resolved === 'host.docker.internal') {
+                        return env('DOCKER_HOST_GATEWAY', '172.17.0.1');
+                    }
+                }
+                return $host;
+            })(),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
