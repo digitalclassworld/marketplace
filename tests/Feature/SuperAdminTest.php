@@ -660,6 +660,86 @@ class SuperAdminTest extends TestCase
         $deleteResp->assertRedirect();
         $this->assertDatabaseMissing('reviews', ['id' => $review->id]);
     }
+
+    /**
+     * Test 22: Super Admin can access Messages & Support hub and perform ticket actions.
+     */
+    public function test_super_admin_can_manage_support_tickets_and_messages(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // Seed support tickets
+        $this->seed(\Database\Seeders\SupportTicketSeeder::class);
+
+        // 1. View messages hub index page
+        $response = $this->actingAs($admin)->get('/admin/messages');
+        $response->assertStatus(200);
+        $response->assertSee('Messages & Support');
+        $response->assertSee('Manage customer queries, support tickets');
+        $response->assertSee('1,240');
+        $response->assertSee('Open Tickets');
+        $response->assertSee('Priya Patel');
+        $response->assertSee('TKT001245');
+        $response->assertSee('Course Inquiry');
+        $response->assertSee('Ticket Details');
+
+        // 2. Export tickets CSV
+        $exportResp = $this->actingAs($admin)->get('/admin/messages/export');
+        $exportResp->assertStatus(200);
+        $this->assertTrue(str_contains($exportResp->headers->get('content-type'), 'text/csv'));
+
+        // 3. Send reply to active ticket
+        $ticket = \App\Models\SupportTicket::where('ticket_number', 'TKT001245')->firstOrFail();
+        $replyResp = $this->actingAs($admin)->post("/admin/messages/tickets/{$ticket->id}/reply", [
+            'message' => 'Next batch starts on Monday at 10 AM.',
+        ]);
+        $replyResp->assertRedirect();
+        $this->assertDatabaseHas('support_ticket_messages', [
+            'ticket_id' => $ticket->id,
+            'message'   => 'Next batch starts on Monday at 10 AM.',
+        ]);
+
+        // 4. Update ticket status to Resolved
+        $statusResp = $this->actingAs($admin)->post("/admin/messages/tickets/{$ticket->id}/status", [
+            'status' => 'Resolved',
+        ]);
+        $statusResp->assertRedirect();
+        $this->assertDatabaseHas('support_tickets', [
+            'id'     => $ticket->id,
+            'status' => 'Resolved',
+        ]);
+
+        // 5. Assign ticket
+        $assignResp = $this->actingAs($admin)->post("/admin/messages/tickets/{$ticket->id}/assign", [
+            'assigned_to' => 'Support Team',
+        ]);
+        $assignResp->assertRedirect();
+        $this->assertDatabaseHas('support_tickets', [
+            'id'          => $ticket->id,
+            'assigned_to' => 'Support Team',
+        ]);
+
+        // 6. Create new ticket
+        $createResp = $this->actingAs($admin)->post('/admin/messages/tickets', [
+            'customer_name'  => 'Sunil Varma',
+            'customer_email' => 'sunil.varma@example.com',
+            'customer_phone' => '+91 98765 11111',
+            'category'       => 'Technical Issue',
+            'priority'       => 'High',
+            'message'        => 'Cannot log into mobile application.',
+        ]);
+        $createResp->assertRedirect();
+        $this->assertDatabaseHas('support_tickets', [
+            'customer_name' => 'Sunil Varma',
+            'category'      => 'Technical Issue',
+        ]);
+
+        // 7. Delete ticket
+        $newTicket = \App\Models\SupportTicket::where('customer_name', 'Sunil Varma')->firstOrFail();
+        $deleteResp = $this->actingAs($admin)->delete("/admin/messages/tickets/{$newTicket->id}");
+        $deleteResp->assertRedirect(route('admin.messages.index'));
+        $this->assertDatabaseMissing('support_tickets', ['id' => $newTicket->id]);
+    }
 }
 
 

@@ -56,3 +56,4 @@ class Review extends Model
         return $this->belongsTo(Seller::class);
     }
 }
+

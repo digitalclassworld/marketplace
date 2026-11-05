@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             PromotionsSeeder::class,
             CertificateSeeder::class,
             ReviewSeeder::class,
+            SupportTicketSeeder::class,
         ]);
     }
 }

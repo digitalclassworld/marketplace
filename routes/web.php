@@ -186,9 +186,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/listings/{id}/toggle-featured', [AdminCatalogController::class, 'toggleFeaturedListing'])->name('listings.toggle-featured');
     });
 
-    // Customer-Seller Chats Monitoring (Admin Audit & Oversight)
+    // Customer-Seller Chats Monitoring & Support Tickets (Admin Messages & Support)
     Route::prefix('messages')->name('messages.')->group(function () {
         Route::get('/', [AdminMessageController::class, 'index'])->name('index');
+        Route::get('/export', [AdminMessageController::class, 'export'])->name('export');
+        Route::post('/tickets', [AdminMessageController::class, 'storeTicket'])->name('tickets.store');
+        Route::post('/tickets/{id}/reply', [AdminMessageController::class, 'sendMessage'])->name('tickets.reply');
+        Route::post('/tickets/{id}/status', [AdminMessageController::class, 'updateStatus'])->name('tickets.status');
+        Route::post('/tickets/{id}/assign', [AdminMessageController::class, 'assign'])->name('tickets.assign');
+        Route::delete('/tickets/{id}', [AdminMessageController::class, 'destroy'])->name('tickets.destroy');
         Route::get('/{conversation}', [AdminMessageController::class, 'show'])->name('show');
         Route::post('/{conversation}/moderation-note', [AdminMessageController::class, 'postModerationNote'])->name('moderation-note');
     });
