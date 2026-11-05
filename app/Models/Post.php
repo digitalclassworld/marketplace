@@ -46,3 +46,4 @@ class Post extends Model
         return $this->hasMany(PostComment::class, 'post_id')->where('is_approved', true)->latest();
     }
 }
+

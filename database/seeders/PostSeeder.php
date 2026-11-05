@@ -281,3 +281,4 @@ class PostSeeder extends Seeder
         }
     }
 }
+

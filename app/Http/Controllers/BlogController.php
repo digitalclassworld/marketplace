@@ -117,3 +117,4 @@ class BlogController extends Controller
         return back()->with('success', 'Thank you! Your comment has been posted successfully.');
     }
 }
+

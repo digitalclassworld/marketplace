@@ -881,6 +881,57 @@ class SuperAdminTest extends TestCase
             'email'   => 'pooja.verma@example.com',
         ]);
     }
+
+    public function test_super_admin_can_manage_notifications(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Admin can access Notifications index
+        $indexResp = $this->actingAs($admin)->get('/admin/notifications');
+        $indexResp->assertOk();
+        $indexResp->assertSee('Notifications');
+        $indexResp->assertSee('Total Sent');
+        $indexResp->assertSee('Create New Notification');
+
+        // 2. Admin can filter by status tab
+        $sentResp = $this->actingAs($admin)->get('/admin/notifications?tab=sent');
+        $sentResp->assertOk();
+
+        // 3. Admin can store a new notification
+        $storeResp = $this->actingAs($admin)->post('/admin/notifications', [
+            'title'       => 'Flash Sale 60% OFF',
+            'message'     => 'Special flash sale on all business courses today only.',
+            'channel'     => 'Push Notification',
+            'type'        => 'Promotion',
+            'audience'    => 'All Users',
+            'platforms'   => ['Website', 'Android App'],
+            'action_type' => 'send',
+        ]);
+        $storeResp->assertRedirect(route('admin.notifications.index'));
+        $this->assertDatabaseHas('platform_notifications', [
+            'title'  => 'Flash Sale 60% OFF',
+            'type'   => 'Promotion',
+            'status' => 'Sent',
+        ]);
+
+        $notif = \App\Models\PlatformNotification::where('title', 'Flash Sale 60% OFF')->firstOrFail();
+
+        // 4. Admin can resend notification
+        $resendResp = $this->actingAs($admin)->post("/admin/notifications/{$notif->id}/resend");
+        $resendResp->assertRedirect();
+        $this->assertDatabaseHas('platform_notifications', [
+            'title' => 'Flash Sale 60% OFF (Copy)',
+        ]);
+
+        // 5. Admin can export notifications to CSV
+        $exportResp = $this->actingAs($admin)->get('/admin/notifications/export');
+        $exportResp->assertOk();
+
+        // 6. Admin can delete notification
+        $deleteResp = $this->actingAs($admin)->delete("/admin/notifications/{$notif->id}");
+        $deleteResp->assertRedirect(route('admin.notifications.index'));
+        $this->assertDatabaseMissing('platform_notifications', ['id' => $notif->id]);
+    }
 }
 
 

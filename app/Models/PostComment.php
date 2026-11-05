@@ -27,3 +27,4 @@ class PostComment extends Model
         return $this->belongsTo(Post::class, 'post_id');
     }
 }
+

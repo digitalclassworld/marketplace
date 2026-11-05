@@ -445,7 +445,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'notifications') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.notifications.index') }}" class="admin-nav-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-bell menu-icon"></i>
                             <span>Notifications</span>

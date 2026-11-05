@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminLeadController;
 use App\Http\Controllers\Admin\AdminMessageController;
+use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSellerController;
@@ -260,6 +261,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/', [AdminCmsController::class, 'store'])->name('store');
         Route::get('/export', [AdminCmsController::class, 'export'])->name('export');
         Route::delete('/{id}', [AdminCmsController::class, 'destroy'])->name('destroy');
+    });
+
+    // Notifications & Broadcasts Management
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [AdminNotificationController::class, 'index'])->name('index');
+        Route::post('/', [AdminNotificationController::class, 'store'])->name('store');
+        Route::post('/{id}/resend', [AdminNotificationController::class, 'resend'])->name('resend');
+        Route::get('/export', [AdminNotificationController::class, 'export'])->name('export');
+        Route::delete('/{id}', [AdminNotificationController::class, 'destroy'])->name('destroy');
     });
 
     // Coming Soon placeholders for future admin modules
