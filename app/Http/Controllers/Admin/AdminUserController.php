@@ -33,8 +33,10 @@ class AdminUserController extends Controller
             \Illuminate\Support\Facades\Log::warning('DB error in AdminUserController: ' . $e->getMessage());
         }
 
-        // Base curated users matching screenshot pixel-for-pixel
-        $curatedUsers = [
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
+        // Base curated users matching screenshot pixel-for-pixel (only on local/testing)
+        $curatedUsers = $showDummy ? [
             [
                 'id' => 125,
                 'code' => 'UDC00125',
@@ -280,7 +282,7 @@ class AdminUserController extends Controller
                     ['title' => 'Prompt Engineering Certification', 'amount' => '₹18,450', 'status' => 'Completed', 'date' => '21 Oct 2026'],
                 ],
             ],
-        ];
+        ] : [];
 
         // Merge DB users into list
         foreach ($dbUsers as $u) {
@@ -356,16 +358,31 @@ class AdminUserController extends Controller
             $allUsers = $allUsers->filter(fn($u) => str_contains(strtolower($u['location']), strtolower($location)));
         }
 
-        // 7 Stats matching screenshot
-        $stats = [
-            'total_users'     => '1,24,560',
-            'students'        => '82,430',
-            'professionals'   => '18,920',
-            'institutes'      => '6,320',
-            'sellers'         => '1,248',
-            'active_users'    => '1,08,240',
-            'inactive_users'  => '16,320',
-        ];
+        // Stats matching screenshot (database in production, curated on local)
+        if (!$showDummy) {
+            $totalUsers = User::count();
+            $studentsCount = User::where('role', 'user')->count();
+            $sellersCount = User::where('role', 'seller')->count();
+            $stats = [
+                'total_users'     => number_format($totalUsers),
+                'students'        => number_format($studentsCount),
+                'professionals'   => '0',
+                'institutes'      => number_format(Seller::where('account_type', 'Institute')->count()),
+                'sellers'         => number_format($sellersCount),
+                'active_users'    => number_format($totalUsers),
+                'inactive_users'  => '0',
+            ];
+        } else {
+            $stats = [
+                'total_users'     => '1,24,560',
+                'students'        => '82,430',
+                'professionals'   => '18,920',
+                'institutes'      => '6,320',
+                'sellers'         => '1,248',
+                'active_users'    => '1,08,240',
+                'inactive_users'  => '16,320',
+            ];
+        }
 
         return view('admin.users.index', [
             'users'          => $allUsers->values(),

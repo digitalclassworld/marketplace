@@ -727,38 +727,17 @@
 
     <!-- RIGHT: COURSE INSPECTOR PANEL -->
     @php
-        $firstCourse = $courses[0] ?? [
-            'id' => 125,
-            'code' => 'CRS00125',
-            'title' => 'Digital Marketing Mastery',
-            'slug' => 'digital-marketing-mastery',
-            'seller_name' => 'VCEC Institute',
-            'status' => 'Active',
-            'category' => 'Marketing',
-            'sub_category' => 'Digital Marketing',
-            'level' => 'Beginner',
-            'language' => 'Hindi, English',
-            'price' => 2999,
-            'discount_price' => 7299,
-            'duration' => '3 Months',
-            'certificate' => 'Yes',
-            'mode' => 'Online (Recorded + Live)',
-            'enrollments' => 1240,
-            'total_revenue' => '₹3,71,760',
-            'rating' => 4.8,
-            'reviews_count' => 320,
-            'banner' => 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=800&auto=format&fit=crop&q=80',
-            'tags' => ['Digital Marketing', 'SEO', 'Social Media', 'Google Ads', 'Email Marketing'],
-        ];
+        $firstCourse = $courses[0] ?? null;
     @endphp
     <div class="course-inspector-panel" id="courseInspectorBox">
-        <div class="course-banner-preview">
-            <img id="inspBanner" src="{{ $firstCourse['banner'] }}" alt="{{ $firstCourse['title'] }}">
-            <span class="bestseller-ribbon">Best Seller</span>
-            <button type="button" class="btn btn-sm btn-dark position-absolute top-2 end-2 p-1 px-2 border-0 opacity-75 fs-8" onclick="alert('Edit course banner')">
-                <i class="fa-solid fa-pen"></i> Edit
-            </button>
-        </div>
+        @if($firstCourse)
+            <div class="course-banner-preview">
+                <img id="inspBanner" src="{{ $firstCourse['banner'] ?? '' }}" alt="{{ $firstCourse['title'] ?? '' }}">
+                <span class="bestseller-ribbon">Best Seller</span>
+                <button type="button" class="btn btn-sm btn-dark position-absolute top-2 end-2 p-1 px-2 border-0 opacity-75 fs-8" onclick="alert('Edit course banner')">
+                    <i class="fa-solid fa-pen"></i> Edit
+                </button>
+            </div>
 
         <div class="inspector-header-box">
             <div class="d-flex align-items-center gap-2 mb-1">
@@ -885,7 +864,13 @@
                     </button>
                 </div>
             </div>
-        </div>
+        @else
+            <div class="p-4 text-center text-muted d-flex flex-column align-items-center justify-content-center h-100" style="min-height: 400px;">
+                <i class="fa-solid fa-graduation-cap fs-1 text-muted opacity-50 mb-3"></i>
+                <h6 class="fw-bold text-dark mb-1">No Course Selected</h6>
+                <p class="small text-muted mb-0">When courses are available, click on any row to inspect details.</p>
+            </div>
+        @endif
     </div>
 
 </div>

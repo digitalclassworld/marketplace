@@ -23,7 +23,8 @@ class AdminCouponController extends Controller
         $statusFilter = $request->query('status');
         $campaignFilter = $request->query('campaign');
 
-        $allCoupons = collect($this->getCuratedCoupons());
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $allCoupons = $showDummy ? collect($this->getCuratedCoupons()) : collect();
 
         // Merge DB coupons if any exist
         $dbCoupons = DiscountCoupon::latest()->get();
@@ -103,30 +104,57 @@ class AdminCouponController extends Controller
             $allCoupons = $allCoupons->filter(fn($c) => strtolower($c['campaign']) === strtolower($campaignFilter));
         }
 
-        // 5 KPI Stat Cards matching Screenshot
-        $stats = [
-            'total_coupons'   => '86',
-            'coupons_growth'  => '+14%',
-            'coupons_sub'     => '+11 this month',
-            'active_coupons'  => '52',
-            'active_sub'      => '60% of total',
-            'scheduled'       => '12',
-            'scheduled_sub'   => '14% of total',
-            'expired'         => '18',
-            'expired_sub'     => '21% of total',
-            'total_usage'     => '8,420',
-            'usage_growth'    => '+28%',
-            'usage_sub'       => 'This month: 1,240',
-        ];
-
-        // Tab counts
-        $counts = [
-            'all'       => 86,
-            'active'    => 52,
-            'scheduled' => 12,
-            'expired'   => 18,
-            'popular'   => 20,
-        ];
+        // Stats matching Screenshot (database in production, curated on local)
+        if (!$showDummy) {
+            $totalCount = DiscountCoupon::count();
+            $activeCount = DiscountCoupon::where('status', 'Active')->count();
+            $scheduledCount = DiscountCoupon::where('status', 'Scheduled')->count();
+            $expiredCount = DiscountCoupon::where('status', 'Expired')->count();
+            $totalUsage = (int) DiscountCoupon::sum('used_count');
+            $stats = [
+                'total_coupons'   => number_format($totalCount),
+                'coupons_growth'  => '+0%',
+                'coupons_sub'     => '+' . DiscountCoupon::where('created_at', '>=', now()->startOfMonth())->count() . ' this month',
+                'active_coupons'  => number_format($activeCount),
+                'active_sub'      => $totalCount > 0 ? round(($activeCount / $totalCount) * 100) . '% of total' : '0%',
+                'scheduled'       => number_format($scheduledCount),
+                'scheduled_sub'   => $totalCount > 0 ? round(($scheduledCount / $totalCount) * 100) . '% of total' : '0%',
+                'expired'         => number_format($expiredCount),
+                'expired_sub'     => $totalCount > 0 ? round(($expiredCount / $totalCount) * 100) . '% of total' : '0%',
+                'total_usage'     => number_format($totalUsage),
+                'usage_growth'    => '+0%',
+                'usage_sub'       => 'Real usage',
+            ];
+            $counts = [
+                'all'       => $totalCount,
+                'active'    => $activeCount,
+                'scheduled' => $scheduledCount,
+                'expired'   => $expiredCount,
+                'popular'   => DiscountCoupon::where('used_count', '>=', 300)->count(),
+            ];
+        } else {
+            $stats = [
+                'total_coupons'   => '86',
+                'coupons_growth'  => '+14%',
+                'coupons_sub'     => '+11 this month',
+                'active_coupons'  => '52',
+                'active_sub'      => '60% of total',
+                'scheduled'       => '12',
+                'scheduled_sub'   => '14% of total',
+                'expired'         => '18',
+                'expired_sub'     => '21% of total',
+                'total_usage'     => '8,420',
+                'usage_growth'    => '+28%',
+                'usage_sub'       => 'This month: 1,240',
+            ];
+            $counts = [
+                'all'       => 86,
+                'active'    => 52,
+                'scheduled' => 12,
+                'expired'   => 18,
+                'popular'   => 20,
+            ];
+        }
 
         return view('admin.coupons.index', [
             'coupons'          => $allCoupons->values(),
@@ -203,6 +231,10 @@ class AdminCouponController extends Controller
                 'status'         => $dbCoupon->status,
             ];
         } else {
+            $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+            if (!$showDummy) {
+                abort(404, 'Coupon not found.');
+            }
             $curated = $this->getCuratedCoupons();
             foreach ($curated as $c) {
                 if ($c['id'] == $id || strtoupper($c['code']) === strtoupper($id)) {

@@ -62,8 +62,10 @@ class AdminSellerController extends Controller
 
         $dbSellers = $query->get();
 
-        // Curated sellers matching screenshot 2
-        $curatedSellers = [
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
+        // Curated sellers matching screenshot 2 (only on local/testing)
+        $curatedSellers = $showDummy ? [
             [
                 'id' => 101,
                 'name' => 'VCEC - Vinayak Computer Education',
@@ -314,7 +316,7 @@ class AdminSellerController extends Controller
                 'is_top' => false,
                 'is_new' => true,
             ],
-        ];
+        ] : [];
 
         // Merge DB sellers into list
         foreach ($dbSellers as $s) {
@@ -384,24 +386,44 @@ class AdminSellerController extends Controller
             $allSellers = $allSellers->filter(fn($s) => str_contains(strtolower($s['location']), strtolower($location)));
         }
 
-        // 6 Stats matching screenshot 2
-        $stats = [
-            'total'          => '1,248',
-            'active'         => '982',
-            'pending'        => '86',
-            'suspended'      => '34',
-            'total_revenue'  => '₹18,72,450',
-            'payout_due'     => '₹4,32,120',
-        ];
-
-        // Status counts for badge tabs
-        $counts = [
-            'all'       => 1248,
-            'pending'   => 86,
-            'active'    => 982,
-            'suspended' => 34,
-            'rejected'  => 12,
-        ];
+        // Stats matching screenshot 2 (database in production, curated on local)
+        if (!$showDummy) {
+            $totalCount = Seller::count();
+            $activeCount = Seller::whereIn('seller_status', ['Active', 'active'])->count();
+            $pendingCount = Seller::whereIn('seller_status', ['Pending Approval', 'pending'])->count();
+            $suspendedCount = Seller::whereIn('seller_status', ['Suspended', 'suspended'])->count();
+            $stats = [
+                'total'          => number_format($totalCount),
+                'active'         => number_format($activeCount),
+                'pending'        => number_format($pendingCount),
+                'suspended'      => number_format($suspendedCount),
+                'total_revenue'  => '₹0',
+                'payout_due'     => '₹0',
+            ];
+            $counts = [
+                'all'       => $totalCount,
+                'pending'   => $pendingCount,
+                'active'    => $activeCount,
+                'suspended' => $suspendedCount,
+                'rejected'  => 0,
+            ];
+        } else {
+            $stats = [
+                'total'          => '1,248',
+                'active'         => '982',
+                'pending'        => '86',
+                'suspended'      => '34',
+                'total_revenue'  => '₹18,72,450',
+                'payout_due'     => '₹4,32,120',
+            ];
+            $counts = [
+                'all'       => 1248,
+                'pending'   => 86,
+                'active'    => 982,
+                'suspended' => 34,
+                'rejected'  => 12,
+            ];
+        }
 
         return view('admin.sellers.index', [
             'sellers'      => $allSellers->values(),
@@ -441,6 +463,10 @@ class AdminSellerController extends Controller
         }
 
         if (!$seller) {
+            $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+            if (!$showDummy) {
+                abort(404, 'Seller profile not found.');
+            }
             $curatedList = $this->getCuratedSellers();
             $matched = null;
 

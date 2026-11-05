@@ -24,7 +24,8 @@ class AdminPromotionController extends Controller
         $statusFilter = $request->query('status');
         $platformFilter = $request->query('platform');
 
-        $allBanners = collect($this->getCuratedBanners());
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $allBanners = $showDummy ? collect($this->getCuratedBanners()) : collect();
 
         // Merge any DB promotions if exist
         $dbPromotions = Promotion::with('seller.user')->latest()->get();
@@ -101,38 +102,74 @@ class AdminPromotionController extends Controller
             $allBanners = $allBanners->filter(fn($b) => in_array($platformFilter, $b['platforms']));
         }
 
-        // 7 KPI Stat Cards matching Screenshot 1
-        $stats = [
-            'total_banners'   => '42',
-            'banners_growth'  => '+18%',
-            'banners_sub'     => '+6 this month',
-            'active_banners'  => '28',
-            'active_sub'      => '67% of total',
-            'scheduled'       => '6',
-            'scheduled_sub'   => '14% of total',
-            'inactive'        => '6',
-            'inactive_sub'    => '14% of total',
-            'total_campaigns' => '12',
-            'campaigns_growth'=> '+33%',
-            'campaigns_sub'   => '4 running now',
-            'total_views'     => '1,24,800',
-            'views_growth'    => '+28%',
-            'views_sub'       => 'This month: 38,420',
-            'total_clicks'    => '12,460',
-            'clicks_growth'   => '+22%',
-            'clicks_sub'      => 'CTR: 9.9%',
-        ];
-
-        // Tab counts
-        $counts = [
-            'all'           => 42,
-            'homepage'      => 12,
-            'category'      => 8,
-            'popup'         => 6,
-            'app_banner'    => 8,
-            'sidebar'       => 4,
-            'campaign_wise' => 12,
-        ];
+        // Stats matching Screenshot (database in production, curated on local)
+        if (!$showDummy) {
+            $totalBanners = Promotion::count();
+            $activeBanners = Promotion::where('status', 'Active')->count();
+            $scheduledBanners = Promotion::where('status', 'Scheduled')->count();
+            $inactiveBanners = Promotion::where('status', 'Inactive')->orWhere('status', 'Paused')->count();
+            $totalViews = (int) Promotion::sum('views_count');
+            $totalClicks = (int) Promotion::sum('clicks_count');
+            $stats = [
+                'total_banners'   => number_format($totalBanners),
+                'banners_growth'  => '+0%',
+                'banners_sub'     => '+' . Promotion::where('created_at', '>=', now()->startOfMonth())->count() . ' this month',
+                'active_banners'  => number_format($activeBanners),
+                'active_sub'      => $totalBanners > 0 ? round(($activeBanners / $totalBanners) * 100) . '% of total' : '0%',
+                'scheduled'       => number_format($scheduledBanners),
+                'scheduled_sub'   => $totalBanners > 0 ? round(($scheduledBanners / $totalBanners) * 100) . '% of total' : '0%',
+                'inactive'        => number_format($inactiveBanners),
+                'inactive_sub'    => $totalBanners > 0 ? round(($inactiveBanners / $totalBanners) * 100) . '% of total' : '0%',
+                'total_campaigns' => number_format($totalBanners),
+                'campaigns_growth'=> '+0%',
+                'campaigns_sub'   => $activeBanners . ' running now',
+                'total_views'     => number_format($totalViews),
+                'views_growth'    => '+0%',
+                'views_sub'       => 'Total impressions',
+                'total_clicks'    => number_format($totalClicks),
+                'clicks_growth'   => '+0%',
+                'clicks_sub'      => $totalViews > 0 ? 'CTR: ' . round(($totalClicks / $totalViews) * 100, 1) . '%' : 'CTR: 0%',
+            ];
+            $counts = [
+                'all'           => $totalBanners,
+                'homepage'      => Promotion::where('promotion_type', 'Banner Promotion')->count(),
+                'category'      => Promotion::where('promotion_type', 'Featured Listing')->count(),
+                'popup'         => 0,
+                'app_banner'    => 0,
+                'sidebar'       => 0,
+                'campaign_wise' => $totalBanners,
+            ];
+        } else {
+            $stats = [
+                'total_banners'   => '42',
+                'banners_growth'  => '+18%',
+                'banners_sub'     => '+6 this month',
+                'active_banners'  => '28',
+                'active_sub'      => '67% of total',
+                'scheduled'       => '6',
+                'scheduled_sub'   => '14% of total',
+                'inactive'        => '6',
+                'inactive_sub'    => '14% of total',
+                'total_campaigns' => '12',
+                'campaigns_growth'=> '+33%',
+                'campaigns_sub'   => '4 running now',
+                'total_views'     => '1,24,800',
+                'views_growth'    => '+28%',
+                'views_sub'       => 'This month: 38,420',
+                'total_clicks'    => '12,460',
+                'clicks_growth'   => '+22%',
+                'clicks_sub'      => 'CTR: 9.9%',
+            ];
+            $counts = [
+                'all'           => 42,
+                'homepage'      => 12,
+                'category'      => 8,
+                'popup'         => 6,
+                'app_banner'    => 8,
+                'sidebar'       => 4,
+                'campaign_wise' => 12,
+            ];
+        }
 
         return view('admin.promotions.index', [
             'banners'        => $allBanners->values(),

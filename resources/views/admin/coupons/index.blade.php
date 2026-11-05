@@ -1075,8 +1075,8 @@
 
         // Auto-select first coupon
         const firstRow = document.querySelector('.coupon-row');
-        if (firstRow && @json(isset($coupons[0]))) {
-            inspectCoupon(@json($coupons[0]), firstRow);
+        if (firstRow && @json(!empty($coupons[0]))) {
+            inspectCoupon(@json($coupons[0] ?? null), firstRow);
         }
     });
 </script>

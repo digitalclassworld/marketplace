@@ -552,6 +552,31 @@ class SuperAdminTest extends TestCase
         $updateResp->assertRedirect(route('admin.coupons.index'));
         $updateResp->assertSessionHas('success');
     }
+
+    /**
+     * Test 20: Dummy curated data is excluded when show_dummy_data is disabled (Production mode).
+     */
+    public function test_dummy_data_is_hidden_when_disabled_for_production(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Temporarily disable dummy data (simulating APP_ENV=production)
+        config(['marketplace.show_dummy_data' => false]);
+
+        $response = $this->actingAs($admin)->get('/admin/coupons');
+        $response->assertStatus(200);
+        // Curated dummy coupon should NOT appear
+        $response->assertDontSee('MEGADEAL');
+        $response->assertDontSee('DIWALI100');
+
+        // Courses page should not show curated dummy courses when DB is empty
+        $coursesResp = $this->actingAs($admin)->get('/admin/catalog/courses');
+        $coursesResp->assertStatus(200);
+        $coursesResp->assertDontSee('CRS00125');
+
+        // Restore config
+        config(['marketplace.show_dummy_data' => true]);
+    }
 }
 
 

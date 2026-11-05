@@ -37,8 +37,10 @@ class AdminCatalogController extends Controller
             \Illuminate\Support\Facades\Log::warning('DB error in AdminCatalogController@courses: ' . $e->getMessage());
         }
 
-        // Curated courses matching screenshot pixel-for-pixel
-        $curatedCourses = [
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
+        // Curated courses matching screenshot pixel-for-pixel (only on local/testing)
+        $curatedCourses = $showDummy ? [
             [
                 'id' => 125,
                 'code' => 'CRS00125',
@@ -359,7 +361,7 @@ class AdminCatalogController extends Controller
                 'is_top_selling' => false,
                 'is_new' => true,
             ],
-        ];
+        ] : [];
 
         // Merge DB courses
         foreach ($dbCourses as $c) {
@@ -442,22 +444,42 @@ class AdminCatalogController extends Controller
             $allCourses = $allCourses->filter(fn($c) => str_contains(strtolower($c['language']), strtolower($language)));
         }
 
-        // 6 Stats matching screenshot
-        $stats = [
-            'total'          => '5,842',
-            'active'         => '4,982',
-            'pending'        => '560',
-            'rejected'       => '300',
-            'featured'       => '420',
-            'top_performing' => '125',
-        ];
-
-        $counts = [
-            'all'      => 5842,
-            'pending'  => 560,
-            'approved' => 4982,
-            'rejected' => 300,
-        ];
+        // Stats & counts (database in production, curated on local)
+        if (!$showDummy) {
+            $totalCount = Course::count();
+            $approvedCount = Course::where('status', 'approved')->count();
+            $pendingCount = Course::where('status', 'pending')->count();
+            $rejectedCount = Course::where('status', 'rejected')->count();
+            $stats = [
+                'total'          => number_format($totalCount),
+                'active'         => number_format($approvedCount),
+                'pending'        => number_format($pendingCount),
+                'rejected'       => number_format($rejectedCount),
+                'featured'       => number_format(Course::where('is_featured', true)->count()),
+                'top_performing' => number_format($approvedCount),
+            ];
+            $counts = [
+                'all'      => $totalCount,
+                'pending'  => $pendingCount,
+                'approved' => $approvedCount,
+                'rejected' => $rejectedCount,
+            ];
+        } else {
+            $stats = [
+                'total'          => '5,842',
+                'active'         => '4,982',
+                'pending'        => '560',
+                'rejected'       => '300',
+                'featured'       => '420',
+                'top_performing' => '125',
+            ];
+            $counts = [
+                'all'      => 5842,
+                'pending'  => 560,
+                'approved' => 4982,
+                'rejected' => 300,
+            ];
+        }
 
         return view('admin.catalog.courses', [
             'courses'        => $allCourses->values(),
@@ -523,8 +545,10 @@ class AdminCatalogController extends Controller
         // Fetch DB Services
         $dbServices = Service::with(['seller.businessDetail', 'seller.user'])->latest()->get();
 
-        // 10 Curated Services matching Screenshot
-        $curatedServices = [
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
+        // 10 Curated Services matching Screenshot (only on local/testing)
+        $curatedServices = $showDummy ? [
             [
                 'id' => 125,
                 'code' => 'SRV00125',
@@ -845,7 +869,7 @@ class AdminCatalogController extends Controller
                 'banner_sub' => 'Industry Keywords | Modern Design | LinkedIn Profile Revamp',
                 'packages_count' => 2,
             ],
-        ];
+        ] : [];
 
         // Merge DB Services
         foreach ($dbServices as $s) {
@@ -934,26 +958,50 @@ class AdminCatalogController extends Controller
             $allServices = $allServices->filter(fn($s) => str_contains(strtolower($s['seller_name']), strtolower($seller)));
         }
 
-        // 6 Stats matching Screenshot
-        $stats = [
-            'total'          => '2,430',
-            'active'         => '1,982',
-            'pending'        => '320',
-            'rejected'       => '128',
-            'featured'       => '210',
-            'top_performing' => '50',
-            'new'            => '180',
-        ];
-
-        $counts = [
-            'all'            => 2430,
-            'active'         => 1982,
-            'pending'        => 320,
-            'rejected'       => 128,
-            'featured'       => 210,
-            'top_performing' => 50,
-            'new'            => 180,
-        ];
+        // Stats matching Screenshot (database in production, curated on local)
+        if (!$showDummy) {
+            $totalCount = Service::count();
+            $approvedCount = Service::where('status', 'approved')->count();
+            $pendingCount = Service::where('status', 'pending')->count();
+            $rejectedCount = Service::where('status', 'rejected')->count();
+            $stats = [
+                'total'          => number_format($totalCount),
+                'active'         => number_format($approvedCount),
+                'pending'        => number_format($pendingCount),
+                'rejected'       => number_format($rejectedCount),
+                'featured'       => number_format(Service::where('is_featured', true)->count()),
+                'top_performing' => number_format($approvedCount),
+                'new'            => number_format(Service::where('created_at', '>=', now()->startOfMonth())->count()),
+            ];
+            $counts = [
+                'all'            => $totalCount,
+                'active'         => $approvedCount,
+                'pending'        => $pendingCount,
+                'rejected'       => $rejectedCount,
+                'featured'       => Service::where('is_featured', true)->count(),
+                'top_performing' => $approvedCount,
+                'new'            => Service::where('created_at', '>=', now()->startOfMonth())->count(),
+            ];
+        } else {
+            $stats = [
+                'total'          => '2,430',
+                'active'         => '1,982',
+                'pending'        => '320',
+                'rejected'       => '128',
+                'featured'       => '210',
+                'top_performing' => '50',
+                'new'            => '180',
+            ];
+            $counts = [
+                'all'            => 2430,
+                'active'         => 1982,
+                'pending'        => 320,
+                'rejected'       => 128,
+                'featured'       => 210,
+                'top_performing' => 50,
+                'new'            => 180,
+            ];
+        }
 
         return view('admin.catalog.services', [
             'services'        => $allServices->values(),
@@ -1026,7 +1074,9 @@ class AdminCatalogController extends Controller
 
         $dbProducts = Product::with(['seller.businessDetail', 'seller.user'])->latest()->get();
 
-        $curatedProducts = [
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
+        $curatedProducts = $showDummy ? [
             [
                 'id' => 125,
                 'sku' => 'PRD00125',
@@ -1341,7 +1391,7 @@ class AdminCatalogController extends Controller
                 'gallery' => ['https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&auto=format&fit=crop&q=80'],
                 'created_on' => '28 Oct 2026, 11:45 AM',
             ],
-        ];
+        ] : [];
 
         // Merge DB Products
         foreach ($dbProducts as $p) {
@@ -1429,26 +1479,50 @@ class AdminCatalogController extends Controller
             $allProducts = $allProducts->filter(fn($p) => str_contains(strtolower($p['seller_location']), strtolower($location)));
         }
 
-        // 6 Stats matching Screenshot
-        $stats = [
-            'total'          => '3,980',
-            'active'         => '3,120',
-            'pending'        => '420',
-            'rejected'       => '180',
-            'featured'       => '310',
-            'top_selling'    => '56',
-            'low_stock'      => '210',
-        ];
-
-        $counts = [
-            'all'         => 3980,
-            'active'      => 3120,
-            'pending'     => 420,
-            'rejected'    => 180,
-            'featured'    => 310,
-            'top_selling' => 56,
-            'low_stock'   => 210,
-        ];
+        // Stats matching Screenshot (database in production, curated on local)
+        if (!$showDummy) {
+            $totalCount = Product::count();
+            $approvedCount = Product::where('status', 'approved')->count();
+            $pendingCount = Product::where('status', 'pending')->count();
+            $rejectedCount = Product::where('status', 'rejected')->count();
+            $stats = [
+                'total'          => number_format($totalCount),
+                'active'         => number_format($approvedCount),
+                'pending'        => number_format($pendingCount),
+                'rejected'       => number_format($rejectedCount),
+                'featured'       => number_format(Product::where('is_featured', true)->count()),
+                'top_selling'    => number_format($approvedCount),
+                'low_stock'      => number_format(Product::where('stock_quantity', '<', 10)->count()),
+            ];
+            $counts = [
+                'all'         => $totalCount,
+                'active'      => $approvedCount,
+                'pending'     => $pendingCount,
+                'rejected'    => $rejectedCount,
+                'featured'    => Product::where('is_featured', true)->count(),
+                'top_selling' => $approvedCount,
+                'low_stock'   => Product::where('stock_quantity', '<', 10)->count(),
+            ];
+        } else {
+            $stats = [
+                'total'          => '3,980',
+                'active'         => '3,120',
+                'pending'        => '420',
+                'rejected'       => '180',
+                'featured'       => '310',
+                'top_selling'    => '56',
+                'low_stock'      => '210',
+            ];
+            $counts = [
+                'all'         => 3980,
+                'active'      => 3120,
+                'pending'     => 420,
+                'rejected'    => 180,
+                'featured'    => 310,
+                'top_selling' => 56,
+                'low_stock'   => 210,
+            ];
+        }
 
         return view('admin.catalog.products', [
             'products'        => $allProducts->values(),
@@ -1522,7 +1596,9 @@ class AdminCatalogController extends Controller
 
         $dbListings = BusinessListing::with(['seller.businessDetail', 'seller.user'])->latest()->get();
 
-        $curatedListings = [
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
+        $curatedListings = $showDummy ? [
             [
                 'id' => 125,
                 'code' => 'BL00125',
@@ -1813,7 +1889,7 @@ class AdminCatalogController extends Controller
                 'cover_image' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&auto=format&fit=crop&q=80',
                 'listed_on' => '15 Oct 2024',
             ],
-        ];
+        ] : [];
 
         // Merge DB Listings
         foreach ($dbListings as $l) {
@@ -1892,27 +1968,52 @@ class AdminCatalogController extends Controller
             $allListings = $allListings->filter(fn($l) => strtolower($l['plan']) === strtolower($planType));
         }
 
-        // 6 Stats matching Screenshot
-        $stats = [
-            'total'          => '6,320',
-            'active'         => '5,120',
-            'pending'        => '720',
-            'rejected'       => '260',
-            'featured'       => '380',
-            'top_performing' => '420',
-            'popular'        => '100',
-            'new'            => '420',
-        ];
-
-        $counts = [
-            'all'            => 6320,
-            'active'         => 5120,
-            'pending'        => 720,
-            'rejected'       => 260,
-            'featured'       => 380,
-            'popular'        => 100,
-            'new'            => 420,
-        ];
+        // Stats matching Screenshot (database in production, curated on local)
+        if (!$showDummy) {
+            $totalCount = BusinessListing::count();
+            $approvedCount = BusinessListing::where('status', 'approved')->count();
+            $pendingCount = BusinessListing::where('status', 'pending')->count();
+            $rejectedCount = BusinessListing::where('status', 'rejected')->count();
+            $stats = [
+                'total'          => number_format($totalCount),
+                'active'         => number_format($approvedCount),
+                'pending'        => number_format($pendingCount),
+                'rejected'       => number_format($rejectedCount),
+                'featured'       => number_format(BusinessListing::where('is_featured', true)->count()),
+                'top_performing' => number_format($approvedCount),
+                'popular'        => number_format($approvedCount),
+                'new'            => number_format(BusinessListing::where('created_at', '>=', now()->startOfMonth())->count()),
+            ];
+            $counts = [
+                'all'            => $totalCount,
+                'active'         => $approvedCount,
+                'pending'        => $pendingCount,
+                'rejected'       => $rejectedCount,
+                'featured'       => BusinessListing::where('is_featured', true)->count(),
+                'popular'        => $approvedCount,
+                'new'            => BusinessListing::where('created_at', '>=', now()->startOfMonth())->count(),
+            ];
+        } else {
+            $stats = [
+                'total'          => '6,320',
+                'active'         => '5,120',
+                'pending'        => '720',
+                'rejected'       => '260',
+                'featured'       => '380',
+                'top_performing' => '420',
+                'popular'        => '100',
+                'new'            => '420',
+            ];
+            $counts = [
+                'all'            => 6320,
+                'active'         => 5120,
+                'pending'        => 720,
+                'rejected'       => 260,
+                'featured'       => 380,
+                'popular'        => 100,
+                'new'            => 420,
+            ];
+        }
 
         return view('admin.catalog.listings', [
             'listings'        => $allListings->values(),

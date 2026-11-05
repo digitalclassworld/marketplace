@@ -658,8 +658,10 @@ class HomeController extends Controller
             ],
         ];
 
-        // Seeded curated services matching screenshot pixel-for-pixel
-        $curatedServices = [
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
+        // Seeded curated services matching screenshot pixel-for-pixel (only on local/testing)
+        $curatedServices = $showDummy ? [
             (object) [
                 'id' => 101,
                 'title' => 'Professional Website Development for School, Institute & Business',
@@ -868,7 +870,7 @@ class HomeController extends Controller
                 'service_type' => 'Individual Freelancer',
                 'languages' => ['English', 'Hindi'],
             ],
-        ];
+        ] : [];
 
         // Fetch DB services if available and convert to unified format
         try {
@@ -2011,10 +2013,12 @@ class HomeController extends Controller
             'thumbnail' => 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&auto=format&fit=crop&q=80',
         ];
 
+        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+
         return view('home.products', [
             'seller'                => $seller,
-            'products'              => $products->isNotEmpty() ? $products : $curatedProducts,
-            'curatedProducts'       => $curatedProducts,
+            'products'              => $products->isNotEmpty() ? $products : ($showDummy ? $curatedProducts : collect()),
+            'curatedProducts'       => $showDummy ? $curatedProducts : collect(),
             'horizontalCategories'  => $horizontalCategories,
             'sidebarCategories'     => $sidebarCategories,
             'sidebarBrands'         => $sidebarBrands,
