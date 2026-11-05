@@ -169,6 +169,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::get('/services', [AdminCatalogController::class, 'services'])->name('services');
         Route::post('/services/{id}/approve', [AdminCatalogController::class, 'approveService'])->name('services.approve');
         Route::post('/services/{id}/reject', [AdminCatalogController::class, 'rejectService'])->name('services.reject');
+        Route::post('/services/{id}/toggle-featured', [AdminCatalogController::class, 'toggleFeaturedService'])->name('services.toggle-featured');
 
         // Products
         Route::get('/products', [AdminCatalogController::class, 'products'])->name('products');
