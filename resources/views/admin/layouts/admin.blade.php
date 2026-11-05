@@ -396,7 +396,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'coupons') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.coupons.index') }}" class="admin-nav-link {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-ticket menu-icon"></i>
                             <span>Coupons & Offers</span>

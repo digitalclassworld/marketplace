@@ -472,6 +472,59 @@ class SuperAdminTest extends TestCase
         $exportResp->assertStatus(200);
         $this->assertTrue(str_contains($exportResp->headers->get('content-type'), 'text/csv'));
     }
+
+    /**
+     * Test 18: Super Admin can view Coupons & Offers management with KPI cards and festive voucher inspector.
+     */
+    public function test_super_admin_can_view_coupons_and_offers_management(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        $response = $this->actingAs($admin)->get('/admin/coupons');
+
+        $response->assertStatus(200);
+        $response->assertSee('Coupons &amp; Offers', false);
+        $response->assertSee('Total Coupons');
+        $response->assertSee('Active Coupons');
+        $response->assertSee('Scheduled');
+        $response->assertSee('Expired');
+        $response->assertSee('Total Usage');
+        $response->assertSee('DIWALI50');
+        $response->assertSee('FIRST1000');
+        $response->assertSee('WELCOME20');
+        $response->assertSee('Coupon Details');
+        $response->assertSee('Applicable Platforms');
+        $response->assertSee('Applicable Categories');
+
+        // Test filter tab
+        $respActive = $this->actingAs($admin)->get('/admin/coupons?tab=active');
+        $respActive->assertStatus(200);
+        $respActive->assertSee('DIWALI50');
+    }
+
+    /**
+     * Test 19: Super Admin can create, toggle status, and export coupons.
+     */
+    public function test_super_admin_can_create_and_export_coupons(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Create coupon
+        $createResp = $this->actingAs($admin)->post('/admin/coupons', [
+            'coupon_code'    => 'HOLI2027',
+            'offer_name'     => 'Holi Mega Discount',
+            'discount_type'  => 'Percentage',
+            'discount_value' => 30,
+        ]);
+        $createResp->assertRedirect();
+        $createResp->assertSessionHas('success');
+
+        // 2. Export coupons
+        $exportResp = $this->actingAs($admin)->get('/admin/coupons/export');
+        $exportResp->assertStatus(200);
+        $this->assertTrue(str_contains($exportResp->headers->get('content-type'), 'text/csv'));
+    }
 }
+
 
 

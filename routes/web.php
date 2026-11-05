@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminCatalogController;
+use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminPromotionController;
@@ -200,6 +201,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/{id}/duplicate', [AdminPromotionController::class, 'duplicate'])->name('duplicate');
         Route::delete('/{id}', [AdminPromotionController::class, 'destroy'])->name('destroy');
         Route::post('/{promotion}/status', [AdminPromotionController::class, 'updateStatus'])->name('status');
+    });
+
+    // Coupons & Offers Management
+    Route::prefix('coupons')->name('coupons.')->group(function () {
+        Route::get('/', [AdminCouponController::class, 'index'])->name('index');
+        Route::post('/', [AdminCouponController::class, 'store'])->name('store');
+        Route::get('/export', [AdminCouponController::class, 'export'])->name('export');
+        Route::post('/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/{id}/duplicate', [AdminCouponController::class, 'duplicate'])->name('duplicate');
+        Route::delete('/{id}', [AdminCouponController::class, 'destroy'])->name('destroy');
     });
 
     // Coming Soon placeholders for future admin modules
