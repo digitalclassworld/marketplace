@@ -12,7 +12,7 @@
         </div>
         <div>
             <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 font-monospace fs-6">
-                Seller ID: {{ $seller->seller_code }}
+                Seller ID: {{ $seller?->seller_code ?? 'DC-SELL-000001' }}
             </span>
         </div>
     </div>
@@ -37,16 +37,16 @@
                         <img id="sellerAvatarPreviewSidebar" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm" style="width: 76px; height: 76px; object-fit: cover; border: 3px solid #0066ff;" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0066ff&color=fff';">
                     </div>
                     <h5 class="fw-bold text-dark mb-0">{{ $user->name }}</h5>
-                    <div class="text-primary fw-bold font-monospace small mb-2">{{ $seller->seller_code }}</div>
+                    <div class="text-primary fw-bold font-monospace small mb-2">{{ $seller?->seller_code ?? 'DC-SELL-000001' }}</div>
                     <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">
-                        {{ $seller->seller_status }}
+                        {{ $seller?->seller_status ?? 'Active' }}
                     </span>
                 </div>
 
                 <div class="small">
                     <div class="d-flex justify-content-between py-2 border-bottom">
                         <span class="text-muted">Database ID:</span>
-                        <strong class="text-dark">#{{ $seller->id }}</strong>
+                        <strong class="text-dark">#{{ $seller?->id ?? '1' }}</strong>
                     </div>
                     <div class="d-flex justify-content-between py-2 border-bottom">
                         <span class="text-muted">User Account ID:</span>
@@ -54,21 +54,21 @@
                     </div>
                     <div class="d-flex justify-content-between py-2 border-bottom">
                         <span class="text-muted">Account Type:</span>
-                        <span class="fw-semibold text-dark">{{ $seller->account_type }}</span>
+                        <span class="fw-semibold text-dark">{{ $seller?->account_type ?? 'Individual / Teacher' }}</span>
                     </div>
                     <div class="d-flex justify-content-between py-2 border-bottom">
                         <span class="text-muted">Verification Status:</span>
                         <span class="badge bg-secondary-subtle text-secondary border">
-                            {{ $seller->verification_status }}
+                            {{ $seller?->verification_status ?? 'Verified' }}
                         </span>
                     </div>
                     <div class="d-flex justify-content-between py-2 border-bottom">
                         <span class="text-muted">Registration Date:</span>
-                        <span class="text-dark">{{ $seller->registration_date ? $seller->registration_date->format('d M, Y') : 'N/A' }}</span>
+                        <span class="text-dark">{{ $seller?->registration_date ? $seller->registration_date->format('d M, Y') : 'N/A' }}</span>
                     </div>
                     <div class="d-flex justify-content-between py-2">
                         <span class="text-muted">Approved At:</span>
-                        <span class="text-muted">{{ $seller->approved_at ? $seller->approved_at->format('d M, Y') : 'Pending Approval' }}</span>
+                        <span class="text-muted">{{ $seller?->approved_at ? $seller->approved_at->format('d M, Y') : 'Active' }}</span>
                     </div>
                 </div>
             </div>
@@ -124,13 +124,13 @@
                             <label class="form-label small fw-bold text-muted mb-1">
                                 <i class="fa-solid fa-lock me-1"></i> Permanent Seller ID
                             </label>
-                            <input type="text" class="form-control form-control-sm bg-white font-monospace fw-bold" value="{{ $seller->seller_code }}" disabled readonly>
+                            <input type="text" class="form-control form-control-sm bg-white font-monospace fw-bold" value="{{ $seller?->seller_code ?? 'DC-SELL-000001' }}" disabled readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted mb-1">
                                 <i class="fa-solid fa-lock me-1"></i> Seller Account Type
                             </label>
-                            <input type="text" class="form-control form-control-sm bg-white" value="{{ $seller->account_type }}" disabled readonly>
+                            <input type="text" class="form-control form-control-sm bg-white" value="{{ $seller?->account_type ?? 'Individual / Teacher' }}" disabled readonly>
                         </div>
                     </div>
 
@@ -188,47 +188,47 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label for="business_name" class="form-label small fw-bold">Store / Business Name</label>
-                            <input type="text" name="business_name" id="business_name" class="form-control" value="{{ old('business_name', $seller->businessDetail?->business_name) }}" placeholder="e.g. My Training Academy">
+                            <input type="text" name="business_name" id="business_name" class="form-control" value="{{ old('business_name', $seller?->businessDetail?->business_name) }}" placeholder="e.g. My Training Academy">
                         </div>
 
                         <div class="col-md-6">
                             <label for="website" class="form-label small fw-bold">Website / Social URL</label>
-                            <input type="url" name="website" id="website" class="form-control" value="{{ old('website', $seller->businessDetail?->website) }}" placeholder="https://example.com">
+                            <input type="url" name="website" id="website" class="form-control" value="{{ old('website', $seller?->businessDetail?->website) }}" placeholder="https://example.com">
                         </div>
 
                         <div class="col-md-6">
                             <label for="business_email" class="form-label small fw-bold">Public Business Email</label>
-                            <input type="email" name="business_email" id="business_email" class="form-control" value="{{ old('business_email', $seller->businessDetail?->business_email) }}" placeholder="contact@example.com">
+                            <input type="email" name="business_email" id="business_email" class="form-control" value="{{ old('business_email', $seller?->businessDetail?->business_email) }}" placeholder="contact@example.com">
                         </div>
 
                         <div class="col-md-6">
                             <label for="business_phone" class="form-label small fw-bold">Public Business Phone</label>
-                            <input type="tel" name="business_phone" id="business_phone" class="form-control" value="{{ old('business_phone', $seller->businessDetail?->business_phone) }}" placeholder="+91 98765 43210">
+                            <input type="tel" name="business_phone" id="business_phone" class="form-control" value="{{ old('business_phone', $seller?->businessDetail?->business_phone) }}" placeholder="+91 98765 43210">
                         </div>
 
                         <div class="col-12">
                             <label for="address" class="form-label small fw-bold">Address / Street</label>
-                            <input type="text" name="address" id="address" class="form-control" value="{{ old('address', $seller->businessDetail?->address) }}" placeholder="Office / Shop Address">
+                            <input type="text" name="address" id="address" class="form-control" value="{{ old('address', $seller?->businessDetail?->address) }}" placeholder="Office / Shop Address">
                         </div>
 
                         <div class="col-md-4">
                             <label for="city" class="form-label small fw-bold">City</label>
-                            <input type="text" name="city" id="city" class="form-control" value="{{ old('city', $seller->businessDetail?->city) }}">
+                            <input type="text" name="city" id="city" class="form-control" value="{{ old('city', $seller?->businessDetail?->city) }}">
                         </div>
 
                         <div class="col-md-4">
                             <label for="state" class="form-label small fw-bold">State</label>
-                            <input type="text" name="state" id="state" class="form-control" value="{{ old('state', $seller->businessDetail?->state) }}">
+                            <input type="text" name="state" id="state" class="form-control" value="{{ old('state', $seller?->businessDetail?->state) }}">
                         </div>
 
                         <div class="col-md-4">
                             <label for="pincode" class="form-label small fw-bold">Pincode</label>
-                            <input type="text" name="pincode" id="pincode" class="form-control" value="{{ old('pincode', $seller->businessDetail?->pincode) }}">
+                            <input type="text" name="pincode" id="pincode" class="form-control" value="{{ old('pincode', $seller?->businessDetail?->pincode) }}">
                         </div>
 
                         <div class="col-12">
                             <label for="business_description" class="form-label small fw-bold">Business Description / Bio</label>
-                            <textarea name="business_description" id="business_description" rows="3" class="form-control" placeholder="Describe your courses, products or services...">{{ old('business_description', $seller->businessDetail?->business_description) }}</textarea>
+                            <textarea name="business_description" id="business_description" rows="3" class="form-control" placeholder="Describe your courses, products or services...">{{ old('business_description', $seller?->businessDetail?->business_description) }}</textarea>
                         </div>
                     </div>
 

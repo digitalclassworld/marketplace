@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
-                if (!\App\Models\User::where('role', 'superadmin')->exists()) {
+                if (!\Illuminate\Support\Facades\Cache::has('superadmin_verified_boot')) {
                     \App\Models\User::updateOrCreate(
                         ['email' => 'superadmin@gmail.com'],
                         [
@@ -32,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
                             'email_verified_at' => now(),
                         ]
                     );
+                    \Illuminate\Support\Facades\Cache::put('superadmin_verified_boot', true, 300);
                 }
 
                 // Auto-provision sample pending approval items if database has none

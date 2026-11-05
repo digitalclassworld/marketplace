@@ -18,7 +18,7 @@ class SellerProfileController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $seller = $user->seller?->load(['businessDetail', 'user']);
+        $seller = $this->resolveSeller($user);
 
         return view('seller.profile', [
             'seller' => $seller,
@@ -33,7 +33,7 @@ class SellerProfileController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $seller = $user->seller;
+        $seller = $this->resolveSeller($user);
         $validated = $request->validated();
 
         DB::beginTransaction();
@@ -80,6 +80,43 @@ class SellerProfileController extends Controller
             DB::rollBack();
             return back()->withInput()->with('error', 'Profile update failed. Please try again.');
         }
+    }
+
+    /**
+     * Resolve existing seller record or create default profile if missing.
+     */
+    protected function resolveSeller(\App\Models\User $user): \App\Models\Seller
+    {
+        $seller = $user->seller?->load(['businessDetail', 'user']);
+
+        if (!$seller) {
+            $seller = \App\Models\Seller::where('user_id', $user->id)->with(['businessDetail', 'user'])->first();
+        }
+
+        if (!$seller && $user->isSuperAdmin()) {
+            $seller = \App\Models\Seller::with(['businessDetail', 'user'])->first();
+        }
+
+        if (!$seller) {
+            $seller = \App\Models\Seller::create([
+                'user_id'             => $user->id,
+                'seller_code'         => 'DC-SELL-' . str_pad($user->id, 6, '0', STR_PAD_LEFT),
+                'account_type'        => \App\Models\Seller::ACCOUNT_TYPE_INDIVIDUAL,
+                'seller_status'       => \App\Models\Seller::STATUS_ACTIVE,
+                'verification_status' => \App\Models\Seller::VERIFICATION_VERIFIED,
+                'registration_date'   => now(),
+            ]);
+
+            \App\Models\SellerBusinessDetail::create([
+                'seller_id'     => $seller->id,
+                'business_name' => $user->name . "'s Store",
+                'city'          => 'Ahmedabad',
+            ]);
+
+            $seller->load(['businessDetail', 'user']);
+        }
+
+        return $seller;
     }
 }
 
