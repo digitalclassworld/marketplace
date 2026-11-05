@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminSellerController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Auth\SellerRegistrationController;
 use App\Http\Controllers\CertificateController;
@@ -138,6 +139,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
     Route::get('/', fn() => redirect()->route('admin.dashboard'));
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::post('/profile/avatar', [AdminDashboardController::class, 'updateAvatar'])->name('profile.avatar');
+
+    // Users & Members Management
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [AdminUserController::class, 'index'])->name('index');
+        Route::post('/', [AdminUserController::class, 'store'])->name('store');
+        Route::get('/export', [AdminUserController::class, 'export'])->name('export');
+    });
 
     // Seller Approval & Management Workflow
     Route::prefix('sellers')->name('sellers.')->group(function () {

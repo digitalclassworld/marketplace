@@ -331,5 +331,63 @@ class SuperAdminTest extends TestCase
         $response->assertRedirect('/admin/login');
         $this->assertGuest();
     }
+
+    /**
+     * Test 13: Super Admin can view Users & Members management module with stats and inspector.
+     */
+    public function test_super_admin_can_view_users_management(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        $response = $this->actingAs($admin)->get('/admin/users');
+
+        $response->assertStatus(200);
+        $response->assertSee('Users &amp; Members', false);
+        $response->assertSee('Total Users');
+        $response->assertSee('Students');
+        $response->assertSee('Professionals');
+        $response->assertSee('Institutes');
+        $response->assertSee('Sellers');
+        $response->assertSee('Active Users');
+        $response->assertSee('Inactive Users');
+        $response->assertSee('Rahul Sharma');
+        $response->assertSee('UDC00125');
+        $response->assertSee('Basic Information');
+        $response->assertSee('Platform Activity');
+        $response->assertSee('Recent Orders');
+    }
+
+    /**
+     * Test 14: Super Admin can create a new member.
+     */
+    public function test_super_admin_can_create_member(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        $response = $this->actingAs($admin)->post('/admin/users', [
+            'name'     => 'Anand Kumar Super Learner',
+            'email'    => 'anand.superlearner@example.com',
+            'phone'    => '9876543219',
+            'role'     => 'user',
+            'password' => 'Password@123',
+        ]);
+
+        $response->assertRedirect('/admin/users');
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('users', ['email' => 'anand.superlearner@example.com']);
+    }
+
+    /**
+     * Test 15: Super Admin can export members CSV.
+     */
+    public function test_super_admin_can_export_users(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        $response = $this->actingAs($admin)->get('/admin/users/export');
+
+        $response->assertStatus(200);
+        $this->assertTrue(str_contains($response->headers->get('content-type'), 'text/csv'));
+    }
 }
 

@@ -283,7 +283,7 @@
             <div class="admin-menu-section">USER MANAGEMENT</div>
             <ul class="admin-nav-list">
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'users') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.users.index') }}" class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-regular fa-user menu-icon"></i>
                             <span>Users & Members</span>
