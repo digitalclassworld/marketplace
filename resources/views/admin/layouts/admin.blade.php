@@ -645,7 +645,7 @@
                                 <i class="fa-solid fa-camera me-2 text-primary"></i> Change Profile Picture
                             </button>
                         </li>
-                        <li><a class="dropdown-item py-2" href="{{ route('seller.dashboard') }}"><i class="fa-solid fa-store me-2 text-primary"></i> View Seller Portal</a></li>
+                        <li><a class="dropdown-item py-2" href="{{ route('admin.sellers.index') }}"><i class="fa-solid fa-users-gear me-2 text-primary"></i> Manage Sellers</a></li>
                         <li><a class="dropdown-item py-2" href="{{ route('home') }}" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square me-2 text-success"></i> Visit Marketplace</a></li>
                         <li><hr class="dropdown-divider my-1"></li>
                         <li>

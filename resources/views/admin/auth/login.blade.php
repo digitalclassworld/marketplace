@@ -82,14 +82,19 @@
                     </div>
 
                     @if(Auth::check() && Auth::user()->isSeller())
-                        <div class="alert alert-warning py-2 px-3 small rounded-3 mb-3 d-flex align-items-center justify-content-between">
+                        <div class="alert alert-warning py-2 px-3 small rounded-3 mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div>
                                 <i class="fa-solid fa-user-tag me-1"></i>
                                 Currently signed in as Seller: <strong>{{ Auth::user()->name }}</strong>
                             </div>
-                            <a href="{{ route('seller.dashboard') }}" class="btn btn-outline-dark btn-sm py-0 px-2" style="font-size: 0.75rem;">
-                                Seller Dashboard &rarr;
-                            </a>
+                            <div class="d-flex align-items-center gap-1">
+                                <a href="{{ route('seller.dashboard') }}" class="btn btn-outline-dark btn-sm py-0 px-2" style="font-size: 0.75rem;">
+                                    Seller Dashboard &rarr;
+                                </a>
+                                <a href="{{ route('seller.logout') }}" class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                                </a>
+                            </div>
                         </div>
                     @endif
 

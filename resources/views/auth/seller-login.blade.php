@@ -79,6 +79,23 @@
                         </div>
                     @endif
 
+                    @if(Auth::check() && Auth::user()->isSuperAdmin())
+                        <div class="alert alert-dark d-flex align-items-center justify-content-between py-2 px-3 small rounded-3 mb-3" role="alert">
+                            <div>
+                                <i class="fa-solid fa-shield-halved text-warning me-2"></i>
+                                Currently signed in as: <strong>Super Admin</strong>
+                            </div>
+                            <div class="d-flex align-items-center gap-1">
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                                    Admin Dashboard &rarr;
+                                </a>
+                                <a href="{{ route('admin.logout') }}" class="btn btn-outline-light btn-sm py-0 px-2" style="font-size: 0.75rem;">
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+
                     @if(session('error'))
                         <div class="alert alert-danger d-flex align-items-center py-2 px-3 small rounded-3 mb-3" role="alert">
                             <i class="fa-solid fa-triangle-exclamation me-2 flex-shrink-0"></i>
