@@ -175,11 +175,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::get('/products', [AdminCatalogController::class, 'products'])->name('products');
         Route::post('/products/{id}/approve', [AdminCatalogController::class, 'approveProduct'])->name('products.approve');
         Route::post('/products/{id}/reject', [AdminCatalogController::class, 'rejectProduct'])->name('products.reject');
+        Route::post('/products/{id}/toggle-featured', [AdminCatalogController::class, 'toggleFeaturedProduct'])->name('products.toggle-featured');
 
         // Business Listings
         Route::get('/listings', [AdminCatalogController::class, 'listings'])->name('listings');
         Route::post('/listings/{id}/approve', [AdminCatalogController::class, 'approveListing'])->name('listings.approve');
         Route::post('/listings/{id}/reject', [AdminCatalogController::class, 'rejectListing'])->name('listings.reject');
+        Route::post('/listings/{id}/toggle-featured', [AdminCatalogController::class, 'toggleFeaturedListing'])->name('listings.toggle-featured');
     });
 
     // Customer-Seller Chats Monitoring (Admin Audit & Oversight)
