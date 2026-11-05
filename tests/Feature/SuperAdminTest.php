@@ -466,6 +466,7 @@ class SuperAdminTest extends TestCase
         ]);
         $createResp->assertRedirect();
         $createResp->assertSessionHas('success');
+        $this->assertDatabaseHas('promotions', ['listing_title' => 'New Year Special 2027']);
 
         // 2. Export banners
         $exportResp = $this->actingAs($admin)->get('/admin/promotions/export');
@@ -518,6 +519,7 @@ class SuperAdminTest extends TestCase
         ]);
         $createResp->assertRedirect();
         $createResp->assertSessionHas('success');
+        $this->assertDatabaseHas('discount_coupons', ['coupon_code' => 'HOLI2027']);
 
         // 2. Export coupons
         $exportResp = $this->actingAs($admin)->get('/admin/coupons/export');

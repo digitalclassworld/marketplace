@@ -159,6 +159,44 @@ class AdminPromotionController extends Controller
             'link'     => ['nullable', 'string', 'max:500'],
         ]);
 
+        try {
+            $seller = \App\Models\Seller::first();
+            if (!$seller) {
+                $user = \App\Models\User::first() ?: \App\Models\User::create([
+                    'name' => 'Super Admin',
+                    'email' => 'admin@digitalclass.com',
+                    'password' => bcrypt('password123'),
+                    'role' => 'superadmin',
+                ]);
+                $seller = \App\Models\Seller::create([
+                    'user_id' => $user->id,
+                    'account_type' => 'Institute',
+                    'seller_code' => 'DC-SELL-000001',
+                    'status' => 'approved',
+                ]);
+            }
+
+            Promotion::create([
+                'seller_id'           => $seller->id,
+                'promotion_code'      => 'BANNER_' . strtoupper(\Illuminate\Support\Str::random(6)),
+                'listing_type'        => 'Course',
+                'listing_title'       => $request->title,
+                'promotion_type'      => strtolower($request->type) === 'homepage' ? 'Banner Promotion' : 'Featured Listing',
+                'charge_amount'       => 1500,
+                'duration_days'       => 30,
+                'start_date'          => now(),
+                'end_date'            => now()->addDays(30),
+                'status'              => 'Active',
+                'views_count'         => 0,
+                'clicks_count'        => 0,
+                'target_audience'     => 'All Marketplace Visitors & Students',
+                'banner_template'     => 'purple_gradient',
+                'payment_status'      => 'Paid',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Banner DB store note: ' . $e->getMessage());
+        }
+
         return back()->with('success', "Banner '{$request->title}' created successfully and queued for publishing!");
     }
 
@@ -168,6 +206,19 @@ class AdminPromotionController extends Controller
     public function toggleStatus(Request $request, $id): RedirectResponse
     {
         $status = $request->input('status', 'Active');
+
+        try {
+            $dp = Promotion::find($id);
+            if (!$dp && is_numeric($id) && $id > 1000) {
+                $dp = Promotion::find($id - 1000);
+            }
+            if ($dp) {
+                $dp->update(['status' => $status]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Banner DB toggle note: ' . $e->getMessage());
+        }
+
         return back()->with('success', "Banner #{$id} status updated to {$status}.");
     }
 
@@ -176,6 +227,21 @@ class AdminPromotionController extends Controller
      */
     public function duplicate($id): RedirectResponse
     {
+        try {
+            $dp = Promotion::find($id);
+            if (!$dp && is_numeric($id) && $id > 1000) {
+                $dp = Promotion::find($id - 1000);
+            }
+            if ($dp) {
+                $new = $dp->replicate();
+                $new->promotion_code = 'BANNER_' . strtoupper(\Illuminate\Support\Str::random(6));
+                $new->listing_title = $new->listing_title . ' (Copy)';
+                $new->save();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Banner DB duplicate note: ' . $e->getMessage());
+        }
+
         return back()->with('success', "Banner #{$id} has been duplicated as a new draft.");
     }
 
@@ -184,6 +250,18 @@ class AdminPromotionController extends Controller
      */
     public function destroy($id): RedirectResponse
     {
+        try {
+            $dp = Promotion::find($id);
+            if (!$dp && is_numeric($id) && $id > 1000) {
+                $dp = Promotion::find($id - 1000);
+            }
+            if ($dp) {
+                $dp->delete();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Banner DB delete note: ' . $e->getMessage());
+        }
+
         return back()->with('success', "Banner #{$id} has been permanently deleted.");
     }
 

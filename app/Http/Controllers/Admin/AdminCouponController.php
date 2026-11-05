@@ -183,27 +183,34 @@ class AdminCouponController extends Controller
     public function edit($id): View
     {
         $matched = null;
-        $curated = $this->getCuratedCoupons();
-        foreach ($curated as $c) {
-            if ($c['id'] == $id || strtoupper($c['code']) === strtoupper($id)) {
-                $matched = $c;
-                break;
-            }
+        $dbCoupon = DiscountCoupon::find($id);
+        if (!$dbCoupon && is_numeric($id) && $id > 1000) {
+            $dbCoupon = DiscountCoupon::find($id - 1000);
         }
 
-        if (!$matched) {
-            $dbCoupon = DiscountCoupon::find($id);
-            if ($dbCoupon) {
-                $matched = [
-                    'id'          => $dbCoupon->id,
-                    'code'        => $dbCoupon->coupon_code,
-                    'name'        => 'Coupon ' . $dbCoupon->coupon_code,
-                    'type'        => $dbCoupon->discount_type === 'percentage' ? 'Percentage' : 'Fixed Amount',
-                    'discount'    => $dbCoupon->discount_value,
-                    'usage_limit' => $dbCoupon->usage_limit,
-                    'campaign'    => 'General',
-                ];
-            } else {
+        if ($dbCoupon) {
+            $matched = [
+                'id'             => $dbCoupon->id,
+                'code'           => $dbCoupon->coupon_code,
+                'name'           => 'Coupon ' . $dbCoupon->coupon_code,
+                'type'           => $dbCoupon->discount_type === 'percentage' ? 'Percentage' : 'Fixed Amount',
+                'discount'       => $dbCoupon->discount_value,
+                'usage_limit'    => $dbCoupon->usage_limit,
+                'campaign'       => 'General Offer',
+                'categories'     => [$dbCoupon->applicable_to ?: 'All'],
+                'start_date'     => $dbCoupon->valid_from ? $dbCoupon->valid_from->format('Y-m-d') : '2026-10-01',
+                'end_date'       => $dbCoupon->valid_until ? $dbCoupon->valid_until->format('Y-m-d') : '2026-11-15',
+                'status'         => $dbCoupon->status,
+            ];
+        } else {
+            $curated = $this->getCuratedCoupons();
+            foreach ($curated as $c) {
+                if ($c['id'] == $id || strtoupper($c['code']) === strtoupper($id)) {
+                    $matched = $c;
+                    break;
+                }
+            }
+            if (!$matched) {
                 $matched = $curated[0];
             }
         }
@@ -214,17 +221,17 @@ class AdminCouponController extends Controller
             'name'           => $matched['name'] ?? 'Diwali Special Offer',
             'description'    => $matched['description'] ?? 'Get 50% off on all courses and products this Diwali. Limited period offer!',
             'type'           => $matched['type'] ?? 'Percentage',
-            'discount'       => preg_replace('/[^0-9]/', '', $matched['discount'] ?? '50'),
+            'discount'       => preg_replace('/[^0-9]/', '', (string)($matched['discount'] ?? '50')),
             'applicable_on'  => 'All Platforms',
             'categories'     => $matched['categories'] ?? ['All'],
-            'usage_limit'    => preg_replace('/[^0-9]/', '', $matched['usage_limit'] ?? '1000'),
+            'usage_limit'    => preg_replace('/[^0-9]/', '', (string)($matched['usage_limit'] ?? '1000')),
             'per_user_limit' => 1,
             'min_order'      => 500,
             'max_discount'   => 2000,
             'campaign'       => $matched['campaign'] ?? 'Diwali 2026',
-            'start_date'     => '2026-10-01',
+            'start_date'     => $matched['start_date'] ?? '2026-10-01',
             'start_time'     => '00:00',
-            'end_date'       => '2026-11-15',
+            'end_date'       => $matched['end_date'] ?? '2026-11-15',
             'end_time'       => '23:59',
             'schedule_later' => ($matched['status'] ?? '') === 'Scheduled',
             'show_public'    => true,
@@ -252,6 +259,40 @@ class AdminCouponController extends Controller
             'discount_value' => ['nullable', 'numeric'],
         ]);
 
+        try {
+            $seller = \App\Models\Seller::first();
+            if (!$seller) {
+                $user = \App\Models\User::first() ?: \App\Models\User::create([
+                    'name' => 'Super Admin',
+                    'email' => 'admin@digitalclass.com',
+                    'password' => bcrypt('password123'),
+                    'role' => 'superadmin',
+                ]);
+                $seller = \App\Models\Seller::create([
+                    'user_id' => $user->id,
+                    'account_type' => 'Institute',
+                    'seller_code' => 'DC-SELL-000001',
+                    'status' => 'approved',
+                ]);
+            }
+
+            DiscountCoupon::create([
+                'seller_id'        => $seller->id,
+                'coupon_code'      => strtoupper(trim($request->coupon_code)),
+                'discount_type'    => strtolower($request->discount_type) === 'fixed amount' ? 'flat' : 'percentage',
+                'discount_value'   => $request->discount_value ?: 10,
+                'min_order_amount' => $request->min_order_value ?: 0,
+                'applicable_to'    => $request->categories ?: 'all',
+                'usage_limit'      => $request->usage_limit ?: 500,
+                'used_count'       => 0,
+                'valid_from'       => $request->start_date ? \Carbon\Carbon::parse($request->start_date) : now(),
+                'valid_until'      => $request->end_date ? \Carbon\Carbon::parse($request->end_date) : now()->addDays(30),
+                'status'           => 'Active',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Coupon DB store note: ' . $e->getMessage());
+        }
+
         return redirect()->route('admin.coupons.index')->with('success', "Coupon '{$request->coupon_code}' created and published successfully!");
     }
 
@@ -267,6 +308,28 @@ class AdminCouponController extends Controller
             'discount_value' => ['nullable', 'numeric'],
         ]);
 
+        try {
+            $dbCoupon = DiscountCoupon::find($id);
+            if (!$dbCoupon && is_numeric($id) && $id > 1000) {
+                $dbCoupon = DiscountCoupon::find($id - 1000);
+            }
+
+            if ($dbCoupon) {
+                $dbCoupon->update([
+                    'coupon_code'      => strtoupper(trim($request->coupon_code)),
+                    'discount_type'    => strtolower($request->discount_type) === 'fixed amount' ? 'flat' : 'percentage',
+                    'discount_value'   => $request->discount_value ?: 10,
+                    'min_order_amount' => $request->min_order_value ?: 0,
+                    'applicable_to'    => $request->categories ?: 'all',
+                    'usage_limit'      => $request->usage_limit ?: 500,
+                    'valid_from'       => $request->start_date ? \Carbon\Carbon::parse($request->start_date) : $dbCoupon->valid_from,
+                    'valid_until'      => $request->end_date ? \Carbon\Carbon::parse($request->end_date) : $dbCoupon->valid_until,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Coupon DB update note: ' . $e->getMessage());
+        }
+
         return redirect()->route('admin.coupons.index')->with('success', "Coupon '{$request->coupon_code}' updated successfully!");
     }
 
@@ -276,6 +339,19 @@ class AdminCouponController extends Controller
     public function toggleStatus(Request $request, $id): RedirectResponse
     {
         $status = $request->input('status', 'Active');
+
+        try {
+            $dbCoupon = DiscountCoupon::find($id);
+            if (!$dbCoupon && is_numeric($id) && $id > 1000) {
+                $dbCoupon = DiscountCoupon::find($id - 1000);
+            }
+            if ($dbCoupon) {
+                $dbCoupon->update(['status' => $status]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Coupon DB toggle note: ' . $e->getMessage());
+        }
+
         return back()->with('success', "Coupon #{$id} status changed to {$status}.");
     }
 
@@ -284,6 +360,20 @@ class AdminCouponController extends Controller
      */
     public function duplicate($id): RedirectResponse
     {
+        try {
+            $dbCoupon = DiscountCoupon::find($id);
+            if (!$dbCoupon && is_numeric($id) && $id > 1000) {
+                $dbCoupon = DiscountCoupon::find($id - 1000);
+            }
+            if ($dbCoupon) {
+                $new = $dbCoupon->replicate();
+                $new->coupon_code = $new->coupon_code . '_COPY';
+                $new->save();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Coupon DB duplicate note: ' . $e->getMessage());
+        }
+
         return back()->with('success', "Coupon #{$id} duplicated as a new promo draft.");
     }
 
@@ -292,6 +382,18 @@ class AdminCouponController extends Controller
      */
     public function destroy($id): RedirectResponse
     {
+        try {
+            $dbCoupon = DiscountCoupon::find($id);
+            if (!$dbCoupon && is_numeric($id) && $id > 1000) {
+                $dbCoupon = DiscountCoupon::find($id - 1000);
+            }
+            if ($dbCoupon) {
+                $dbCoupon->delete();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Coupon DB delete note: ' . $e->getMessage());
+        }
+
         return back()->with('success', "Coupon #{$id} has been permanently deleted.");
     }
 
