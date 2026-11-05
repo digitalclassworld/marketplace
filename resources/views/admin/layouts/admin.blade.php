@@ -458,7 +458,7 @@
             <div class="admin-menu-section">APP & PLATFORM MANAGEMENT</div>
             <ul class="admin-nav-list">
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'app') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.app.index') }}" class="admin-nav-link {{ request()->routeIs('admin.app.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-mobile-screen menu-icon"></i>
                             <span>App Management</span>
@@ -466,7 +466,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'website') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.website.index') }}" class="admin-nav-link {{ request()->routeIs('admin.website.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-globe menu-icon"></i>
                             <span>Website Management</span>

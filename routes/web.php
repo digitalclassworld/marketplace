@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAppController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\Admin\AdminCmsController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminWebsiteController;
 use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Auth\SellerRegistrationController;
 use App\Http\Controllers\BlogController;
@@ -270,6 +272,23 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/{id}/resend', [AdminNotificationController::class, 'resend'])->name('resend');
         Route::get('/export', [AdminNotificationController::class, 'export'])->name('export');
         Route::delete('/{id}', [AdminNotificationController::class, 'destroy'])->name('destroy');
+    });
+
+    // App Management (Android, iOS & PWA control studio)
+    Route::prefix('app')->name('app.')->group(function () {
+        Route::get('/', [AdminAppController::class, 'index'])->name('index');
+        Route::post('/info', [AdminAppController::class, 'updateInfo'])->name('update-info');
+        Route::post('/features/{id}/toggle', [AdminAppController::class, 'toggleFeature'])->name('features.toggle');
+        Route::post('/publish', [AdminAppController::class, 'publishVersion'])->name('publish');
+    });
+
+    // Website Management (Pages, navigation, settings studio)
+    Route::prefix('website')->name('website.')->group(function () {
+        Route::get('/', [AdminWebsiteController::class, 'index'])->name('index');
+        Route::post('/', [AdminWebsiteController::class, 'store'])->name('store');
+        Route::match(['put', 'patch', 'post'], '/{id}', [AdminWebsiteController::class, 'update'])->name('update');
+        Route::post('/{id}/duplicate', [AdminWebsiteController::class, 'duplicate'])->name('duplicate');
+        Route::delete('/{id}', [AdminWebsiteController::class, 'destroy'])->name('destroy');
     });
 
     // Coming Soon placeholders for future admin modules

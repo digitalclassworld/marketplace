@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             LeadSeeder::class,
             PostSeeder::class,
             NotificationSeeder::class,
+            AppManagementSeeder::class,
+            WebsiteManagementSeeder::class,
         ]);
     }
 }

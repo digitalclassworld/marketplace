@@ -276,3 +276,4 @@ class AdminNotificationController extends Controller
         ]);
     }
 }
+

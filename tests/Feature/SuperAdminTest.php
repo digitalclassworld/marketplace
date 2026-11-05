@@ -932,6 +932,121 @@ class SuperAdminTest extends TestCase
         $deleteResp->assertRedirect(route('admin.notifications.index'));
         $this->assertDatabaseMissing('platform_notifications', ['id' => $notif->id]);
     }
+
+    public function test_super_admin_can_manage_app_and_toggle_features(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Access App Management index
+        $indexResp = $this->actingAs($admin)->get('/admin/app');
+        $indexResp->assertOk();
+        $indexResp->assertSee('App Management');
+        $indexResp->assertSee('Total Downloads');
+        $indexResp->assertSee('App Feature Control');
+        $indexResp->assertSee('Live App Preview');
+
+        // 2. Update Basic App Information
+        $updateResp = $this->actingAs($admin)->post('/admin/app/info', [
+            'platform'          => 'android',
+            'app_name'          => 'Digital Class Pro',
+            'package_name'      => 'com.digitalclass.pro',
+            'bundle_id'         => 'com.digitalclass.pro',
+            'description'       => 'Educational marketplace ecosystem app.',
+            'short_description' => 'Learn and hire easily.',
+        ]);
+        $updateResp->assertRedirect();
+        $this->assertDatabaseHas('app_settings', [
+            'platform' => 'android',
+            'app_name' => 'Digital Class Pro',
+        ]);
+
+        // 3. Toggle App Feature
+        $feature = \App\Models\AppFeature::firstOrCreate([
+            'key' => 'courses',
+        ], [
+            'name'       => 'Courses',
+            'is_enabled' => true,
+        ]);
+        $initialState = $feature->is_enabled;
+
+        $toggleResp = $this->actingAs($admin)->postJson("/admin/app/features/{$feature->id}/toggle");
+        $toggleResp->assertOk();
+        $toggleResp->assertJson(['success' => true, 'is_enabled' => !$initialState]);
+        $this->assertDatabaseHas('app_features', [
+            'id'         => $feature->id,
+            'is_enabled' => !$initialState,
+        ]);
+
+        // 4. Publish New App Version
+        $publishResp = $this->actingAs($admin)->post('/admin/app/publish', [
+            'platform' => 'android',
+            'version'  => 'v2.5.0',
+        ]);
+        $publishResp->assertRedirect();
+        $this->assertDatabaseHas('app_settings', [
+            'platform'        => 'android',
+            'current_version' => 'v2.5.0',
+        ]);
+    }
+
+    public function test_super_admin_can_manage_website_pages(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Access Website Management index
+        $indexResp = $this->actingAs($admin)->get('/admin/website');
+        $indexResp->assertOk();
+        $indexResp->assertSee('Website Management');
+        $indexResp->assertSee('Total Pages');
+        $indexResp->assertSee('Website Pages');
+
+        // 2. Create New Page
+        $storeResp = $this->actingAs($admin)->post('/admin/website', [
+            'title'        => 'Scholarship Program 2027',
+            'slug'         => '/scholarship-program-2027',
+            'type'         => 'Custom',
+            'status'       => 'Published',
+            'show_in_menu' => 1,
+            'is_homepage'  => 0,
+        ]);
+        $storeResp->assertRedirect();
+        $this->assertDatabaseHas('website_pages', [
+            'title' => 'Scholarship Program 2027',
+            'slug'  => '/scholarship-program-2027',
+        ]);
+
+        $page = \App\Models\WebsitePage::where('title', 'Scholarship Program 2027')->firstOrFail();
+
+        // 3. Update Page Settings
+        $updateResp = $this->actingAs($admin)->put("/admin/website/{$page->id}", [
+            'title'            => 'Scholarship Program 2027 Updated',
+            'slug'             => '/scholarships-2027',
+            'type'             => 'Custom',
+            'status'           => 'Published',
+            'show_in_menu'     => 1,
+            'is_homepage'      => 0,
+            'meta_title'       => 'Scholarships for Students 2027',
+            'meta_description' => 'Apply for verified scholarships on Digital Class.',
+        ]);
+        $updateResp->assertRedirect();
+        $this->assertDatabaseHas('website_pages', [
+            'id'    => $page->id,
+            'title' => 'Scholarship Program 2027 Updated',
+            'slug'  => '/scholarships-2027',
+        ]);
+
+        // 4. Duplicate Page
+        $dupResp = $this->actingAs($admin)->post("/admin/website/{$page->id}/duplicate");
+        $dupResp->assertRedirect();
+        $this->assertDatabaseHas('website_pages', [
+            'title' => 'Scholarship Program 2027 Updated (Copy)',
+        ]);
+
+        // 5. Delete Page
+        $delResp = $this->actingAs($admin)->delete("/admin/website/{$page->id}");
+        $delResp->assertRedirect();
+        $this->assertDatabaseMissing('website_pages', ['id' => $page->id]);
+    }
 }
 
 
