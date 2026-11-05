@@ -201,9 +201,9 @@
         </div>
 
         <div class="d-flex align-items-center flex-wrap gap-2">
-            <button type="button" class="btn btn-primary btn-sm px-3 fw-medium" data-bs-toggle="modal" data-bs-target="#createCouponModal">
+            <a href="{{ route('admin.coupons.create') }}" class="btn btn-primary btn-sm px-3 fw-medium">
                 <i class="fa-solid fa-plus me-1"></i> Create Coupon
-            </button>
+            </a>
             <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-medium" data-bs-toggle="modal" data-bs-target="#manageCampaignsModal">
                 <i class="fa-solid fa-bullhorn me-1 text-muted"></i> Manage Campaigns
             </button>
@@ -514,7 +514,7 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item small" href="#" onclick='openEditModal(@json($c)); return false;'>
+                                                    <a class="dropdown-item small" href="{{ route('admin.coupons.edit', $c['id']) }}">
                                                         <i class="fa-regular fa-pen-to-square me-2 text-info"></i> Edit Coupon
                                                     </a>
                                                 </li>
@@ -597,9 +597,9 @@
                 <!-- Header with Title & Edit button -->
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Coupon Details</h6>
-                    <button class="btn btn-sm btn-outline-secondary py-0.5 px-2" style="font-size: 0.75rem;" onclick="openEditModal(currentCoupon)">
+                    <a id="inspEditCouponBtn" href="{{ route('admin.coupons.edit', 1) }}" class="btn btn-sm btn-outline-secondary py-0.5 px-2" style="font-size: 0.75rem;">
                         <i class="fa-regular fa-pen-to-square me-1"></i>Edit
-                    </button>
+                    </a>
                 </div>
 
                 <!-- Festive Voucher Card Graphic Preview matching Screenshot -->
@@ -960,6 +960,11 @@
             rowElement.classList.add('selected-row');
         }
 
+        const editBtn = document.getElementById('inspEditCouponBtn');
+        if (editBtn) {
+            editBtn.href = `/admin/coupons/${c.id}/edit`;
+        }
+
         // Voucher Card Graphic
         const vTagline = document.getElementById('inspVoucherTagline');
         if (vTagline) vTagline.innerText = c.campaign ? `${c.campaign.toUpperCase()} SPECIAL` : 'SPECIAL OFFER';
@@ -1076,3 +1081,4 @@
     });
 </script>
 @endsection
+

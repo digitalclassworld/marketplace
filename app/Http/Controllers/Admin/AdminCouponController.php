@@ -142,6 +142,105 @@ class AdminCouponController extends Controller
     }
 
     /**
+     * Show form to create a new coupon / offer.
+     */
+    public function create(): View
+    {
+        $defaultCoupon = [
+            'code'           => 'DIWALI50',
+            'name'           => 'Diwali Special Offer',
+            'description'    => 'Get 50% off on all courses and products this Diwali. Limited period offer!',
+            'type'           => 'Percentage',
+            'discount'       => '50',
+            'applicable_on'  => 'All Platforms',
+            'categories'     => ['All'],
+            'usage_limit'    => 1000,
+            'per_user_limit' => 1,
+            'min_order'      => 500,
+            'max_discount'   => 2000,
+            'campaign'       => 'Diwali 2026',
+            'start_date'     => '2026-10-01',
+            'start_time'     => '00:00',
+            'end_date'       => '2026-11-15',
+            'end_time'       => '23:59',
+            'schedule_later' => false,
+            'show_public'    => true,
+            'featured'       => true,
+            'for_new_users'  => true,
+            'send_notif'     => true,
+            'terms'          => "• This offer is valid from 1 Oct to 15 Nov 2026.\n• Applicable on all courses and products.\n• Minimum order value ₹500.\n• Maximum discount ₹2,000.\n• Cannot be combined with other offers.\n• Digital Class reserves the right to modify or cancel this offer at any time.",
+        ];
+
+        return view('admin.coupons.create', [
+            'coupon' => $defaultCoupon,
+            'isEdit' => false,
+        ]);
+    }
+
+    /**
+     * Show form to edit an existing coupon.
+     */
+    public function edit($id): View
+    {
+        $matched = null;
+        $curated = $this->getCuratedCoupons();
+        foreach ($curated as $c) {
+            if ($c['id'] == $id || strtoupper($c['code']) === strtoupper($id)) {
+                $matched = $c;
+                break;
+            }
+        }
+
+        if (!$matched) {
+            $dbCoupon = DiscountCoupon::find($id);
+            if ($dbCoupon) {
+                $matched = [
+                    'id'          => $dbCoupon->id,
+                    'code'        => $dbCoupon->coupon_code,
+                    'name'        => 'Coupon ' . $dbCoupon->coupon_code,
+                    'type'        => $dbCoupon->discount_type === 'percentage' ? 'Percentage' : 'Fixed Amount',
+                    'discount'    => $dbCoupon->discount_value,
+                    'usage_limit' => $dbCoupon->usage_limit,
+                    'campaign'    => 'General',
+                ];
+            } else {
+                $matched = $curated[0];
+            }
+        }
+
+        $couponData = [
+            'id'             => $matched['id'] ?? $id,
+            'code'           => $matched['code'] ?? 'DIWALI50',
+            'name'           => $matched['name'] ?? 'Diwali Special Offer',
+            'description'    => $matched['description'] ?? 'Get 50% off on all courses and products this Diwali. Limited period offer!',
+            'type'           => $matched['type'] ?? 'Percentage',
+            'discount'       => preg_replace('/[^0-9]/', '', $matched['discount'] ?? '50'),
+            'applicable_on'  => 'All Platforms',
+            'categories'     => $matched['categories'] ?? ['All'],
+            'usage_limit'    => preg_replace('/[^0-9]/', '', $matched['usage_limit'] ?? '1000'),
+            'per_user_limit' => 1,
+            'min_order'      => 500,
+            'max_discount'   => 2000,
+            'campaign'       => $matched['campaign'] ?? 'Diwali 2026',
+            'start_date'     => '2026-10-01',
+            'start_time'     => '00:00',
+            'end_date'       => '2026-11-15',
+            'end_time'       => '23:59',
+            'schedule_later' => ($matched['status'] ?? '') === 'Scheduled',
+            'show_public'    => true,
+            'featured'       => true,
+            'for_new_users'  => true,
+            'send_notif'     => true,
+            'terms'          => "• This offer is valid from 1 Oct to 15 Nov 2026.\n• Applicable on all courses and products.\n• Minimum order value ₹500.\n• Maximum discount ₹2,000.\n• Cannot be combined with other offers.\n• Digital Class reserves the right to modify or cancel this offer at any time.",
+        ];
+
+        return view('admin.coupons.create', [
+            'coupon' => $couponData,
+            'isEdit' => true,
+        ]);
+    }
+
+    /**
      * Store a newly created coupon.
      */
     public function store(Request $request): RedirectResponse
@@ -149,11 +248,26 @@ class AdminCouponController extends Controller
         $request->validate([
             'coupon_code'    => ['required', 'string', 'max:50'],
             'offer_name'     => ['nullable', 'string', 'max:255'],
-            'discount_type'  => ['required', 'in:Percentage,Fixed Amount'],
-            'discount_value' => ['required', 'numeric', 'min:1'],
+            'discount_type'  => ['required', 'in:Percentage,Fixed Amount,Free Shipping'],
+            'discount_value' => ['nullable', 'numeric'],
         ]);
 
-        return back()->with('success', "Coupon '{$request->coupon_code}' created and published successfully!");
+        return redirect()->route('admin.coupons.index')->with('success', "Coupon '{$request->coupon_code}' created and published successfully!");
+    }
+
+    /**
+     * Update an existing coupon.
+     */
+    public function update(Request $request, $id): RedirectResponse
+    {
+        $request->validate([
+            'coupon_code'    => ['required', 'string', 'max:50'],
+            'offer_name'     => ['nullable', 'string', 'max:255'],
+            'discount_type'  => ['required', 'in:Percentage,Fixed Amount,Free Shipping'],
+            'discount_value' => ['nullable', 'numeric'],
+        ]);
+
+        return redirect()->route('admin.coupons.index')->with('success', "Coupon '{$request->coupon_code}' updated successfully!");
     }
 
     /**
@@ -496,3 +610,4 @@ class AdminCouponController extends Controller
         ];
     }
 }
+

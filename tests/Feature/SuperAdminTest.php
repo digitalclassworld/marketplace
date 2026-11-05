@@ -523,6 +523,32 @@ class SuperAdminTest extends TestCase
         $exportResp = $this->actingAs($admin)->get('/admin/coupons/export');
         $exportResp->assertStatus(200);
         $this->assertTrue(str_contains($exportResp->headers->get('content-type'), 'text/csv'));
+
+        // 3. View create coupon form
+        $createPageResp = $this->actingAs($admin)->get('/admin/coupons/create');
+        $createPageResp->assertStatus(200);
+        $createPageResp->assertSee('Create Coupon / Offer');
+        $createPageResp->assertSee('Coupon Code *', false);
+        $createPageResp->assertSee('DIWALI50');
+        $createPageResp->assertSee('Coupon Preview');
+        $createPageResp->assertSee('Diwali Special Offer');
+        $createPageResp->assertSee('Discount Percentage');
+
+        // 4. View edit coupon form
+        $editPageResp = $this->actingAs($admin)->get('/admin/coupons/1/edit');
+        $editPageResp->assertStatus(200);
+        $editPageResp->assertSee('Edit Coupon / Offer');
+        $editPageResp->assertSee('Save Changes');
+
+        // 5. Update coupon
+        $updateResp = $this->actingAs($admin)->put('/admin/coupons/1', [
+            'coupon_code'    => 'DIWALI60',
+            'offer_name'     => 'Updated Diwali Offer',
+            'discount_type'  => 'Percentage',
+            'discount_value' => 60,
+        ]);
+        $updateResp->assertRedirect(route('admin.coupons.index'));
+        $updateResp->assertSessionHas('success');
     }
 }
 

@@ -206,7 +206,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
     // Coupons & Offers Management
     Route::prefix('coupons')->name('coupons.')->group(function () {
         Route::get('/', [AdminCouponController::class, 'index'])->name('index');
+        Route::get('/create', [AdminCouponController::class, 'create'])->name('create');
         Route::post('/', [AdminCouponController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AdminCouponController::class, 'edit'])->name('edit');
+        Route::match(['put', 'patch', 'post'], '/{id}', [AdminCouponController::class, 'update'])->name('update');
         Route::get('/export', [AdminCouponController::class, 'export'])->name('export');
         Route::post('/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('/{id}/duplicate', [AdminCouponController::class, 'duplicate'])->name('duplicate');
