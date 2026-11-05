@@ -405,7 +405,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'reviews') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.reviews.index') }}" class="admin-nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-star menu-icon"></i>
                             <span>Reviews & Ratings</span>

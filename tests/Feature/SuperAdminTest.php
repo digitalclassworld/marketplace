@@ -574,8 +574,91 @@ class SuperAdminTest extends TestCase
         $coursesResp->assertStatus(200);
         $coursesResp->assertDontSee('CRS00125');
 
+        // Reviews page should not show curated dummy reviews when DB is empty
+        $reviewsResp = $this->actingAs($admin)->get('/admin/reviews');
+        $reviewsResp->assertStatus(200);
+        $reviewsResp->assertDontSee('ORD001245');
+
         // Restore config
         config(['marketplace.show_dummy_data' => true]);
+    }
+
+    /**
+     * Test 21: Super Admin can access Reviews & Ratings management page and perform moderation actions.
+     */
+    public function test_super_admin_can_manage_reviews_and_ratings(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. View reviews index page
+        $response = $this->actingAs($admin)->get('/admin/reviews');
+        $response->assertStatus(200);
+        $response->assertSee('Reviews & Ratings Management');
+        $response->assertSee('Priya Patel');
+        $response->assertSee('Digital Marketing Mastery');
+        $response->assertSee('3,420');
+        $response->assertSee('4.6 / 5');
+        $response->assertSee('All Reviews (3,420)');
+        $response->assertSee('Review Details');
+        $response->assertSee('Helpful Votes');
+
+        // 2. Export reviews
+        $exportResp = $this->actingAs($admin)->get('/admin/reviews/export');
+        $exportResp->assertStatus(200);
+        $this->assertTrue(str_contains($exportResp->headers->get('content-type'), 'text/csv'));
+
+        // 3. Create a review in DB and perform actions
+        $review = \App\Models\Review::create([
+            'user_name'       => 'Test Reviewer',
+            'user_email'      => 'reviewer@example.com',
+            'user_city'       => 'Surat, Gujarat',
+            'rating'          => 5.0,
+            'review_text'     => 'Superb platform and services!',
+            'review_type'     => 'Course',
+            'item_title'      => 'Full Stack Bootcamp',
+            'seller_name'     => 'VCEC Institute',
+            'status'          => 'Pending',
+            'helpful_upvotes' => 10,
+        ]);
+
+        // 4. Save admin note
+        $noteResp = $this->actingAs($admin)->post("/admin/reviews/{$review->id}/note", [
+            'admin_notes' => 'Verified review through payment receipt.',
+        ]);
+        $noteResp->assertRedirect();
+        $this->assertDatabaseHas('reviews', [
+            'id'          => $review->id,
+            'admin_notes' => 'Verified review through payment receipt.',
+        ]);
+
+        // 5. Approve review
+        $approveResp = $this->actingAs($admin)->post("/admin/reviews/{$review->id}/approve");
+        $approveResp->assertRedirect();
+        $this->assertDatabaseHas('reviews', [
+            'id'     => $review->id,
+            'status' => 'Approved',
+        ]);
+
+        // 6. Toggle featured
+        $featureResp = $this->actingAs($admin)->post("/admin/reviews/{$review->id}/feature");
+        $featureResp->assertRedirect();
+        $this->assertDatabaseHas('reviews', [
+            'id'          => $review->id,
+            'is_featured' => true,
+        ]);
+
+        // 7. Reject review
+        $rejectResp = $this->actingAs($admin)->post("/admin/reviews/{$review->id}/reject");
+        $rejectResp->assertRedirect();
+        $this->assertDatabaseHas('reviews', [
+            'id'     => $review->id,
+            'status' => 'Rejected',
+        ]);
+
+        // 8. Delete review
+        $deleteResp = $this->actingAs($admin)->delete("/admin/reviews/{$review->id}");
+        $deleteResp->assertRedirect();
+        $this->assertDatabaseMissing('reviews', ['id' => $review->id]);
     }
 }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminPromotionController;
+use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Auth\SellerAuthController;
@@ -214,6 +215,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/{id}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('toggle-status');
         Route::post('/{id}/duplicate', [AdminCouponController::class, 'duplicate'])->name('duplicate');
         Route::delete('/{id}', [AdminCouponController::class, 'destroy'])->name('destroy');
+    });
+
+    // Reviews & Ratings Management
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::get('/', [AdminReviewController::class, 'index'])->name('index');
+        Route::get('/export', [AdminReviewController::class, 'export'])->name('export');
+        Route::post('/{id}/approve', [AdminReviewController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [AdminReviewController::class, 'reject'])->name('reject');
+        Route::post('/{id}/feature', [AdminReviewController::class, 'toggleFeatured'])->name('feature');
+        Route::post('/{id}/note', [AdminReviewController::class, 'saveNote'])->name('note');
+        Route::delete('/{id}', [AdminReviewController::class, 'destroy'])->name('destroy');
     });
 
     // Coming Soon placeholders for future admin modules

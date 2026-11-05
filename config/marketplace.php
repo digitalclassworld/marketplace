@@ -13,3 +13,4 @@ return [
     */
     'show_dummy_data' => env('SHOW_DUMMY_DATA', env('APP_ENV') === 'local' || env('APP_ENV') === 'testing'),
 ];
+
