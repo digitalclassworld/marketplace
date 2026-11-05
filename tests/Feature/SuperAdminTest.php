@@ -420,5 +420,58 @@ class SuperAdminTest extends TestCase
         $response->assertStatus(200);
         $this->assertTrue(str_contains($response->headers->get('content-type'), 'text/csv'));
     }
+
+    /**
+     * Test 16: Super Admin can view Banners & Promotions with 7 KPI metrics and device mockup.
+     */
+    public function test_super_admin_can_view_banners_and_promotions_management(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        $response = $this->actingAs($admin)->get('/admin/promotions');
+
+        $response->assertStatus(200);
+        $response->assertSee('Banners &amp; Promotions', false);
+        $response->assertSee('Total Banners');
+        $response->assertSee('Active Banners');
+        $response->assertSee('Total Campaigns');
+        $response->assertSee('Total Views');
+        $response->assertSee('Total Clicks');
+        $response->assertSee('Diwali Offer 2026');
+        $response->assertSee('Digital Marketing Course');
+        $response->assertSee('List Your Institute');
+        $response->assertSee('Banner Details');
+        $response->assertSee('Web View');
+        $response->assertSee('App View');
+
+        // Test filtering by Tab
+        $respTab = $this->actingAs($admin)->get('/admin/promotions?tab=homepage');
+        $respTab->assertStatus(200);
+        $respTab->assertSee('Diwali Offer 2026');
+    }
+
+    /**
+     * Test 17: Super Admin can create and export banners.
+     */
+    public function test_super_admin_can_create_and_export_banners(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Create banner
+        $createResp = $this->actingAs($admin)->post('/admin/promotions', [
+            'title'    => 'New Year Special 2027',
+            'type'     => 'Homepage',
+            'campaign' => 'Festival Drive',
+            'link'     => 'https://digitalclass.in/new-year',
+        ]);
+        $createResp->assertRedirect();
+        $createResp->assertSessionHas('success');
+
+        // 2. Export banners
+        $exportResp = $this->actingAs($admin)->get('/admin/promotions/export');
+        $exportResp->assertStatus(200);
+        $this->assertTrue(str_contains($exportResp->headers->get('content-type'), 'text/csv'));
+    }
 }
+
 

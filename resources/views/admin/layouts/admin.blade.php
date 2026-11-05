@@ -389,7 +389,7 @@
                 <li class="admin-nav-item">
                     <a href="{{ route('admin.promotions.index') }}" class="admin-nav-link {{ request()->routeIs('admin.promotions.*') ? 'active' : '' }}">
                         <div class="nav-left">
-                            <i class="fa-solid fa-image menu-icon"></i>
+                            <i class="fa-solid fa-bullhorn menu-icon"></i>
                             <span>Banners & Promotions</span>
                         </div>
                         <i class="fa-solid fa-chevron-right chevron-icon"></i>

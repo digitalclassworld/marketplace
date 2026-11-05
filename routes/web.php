@@ -191,9 +191,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/{conversation}/moderation-note', [AdminMessageController::class, 'postModerationNote'])->name('moderation-note');
     });
 
-    // Marketplace Promotions & Campaigns (Admin Revenue & Placement Oversight)
+    // Marketplace Promotions & Campaigns (Banners & Promotions Oversight)
     Route::prefix('promotions')->name('promotions.')->group(function () {
         Route::get('/', [AdminPromotionController::class, 'index'])->name('index');
+        Route::post('/', [AdminPromotionController::class, 'store'])->name('store');
+        Route::get('/export', [AdminPromotionController::class, 'export'])->name('export');
+        Route::post('/{id}/toggle-status', [AdminPromotionController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/{id}/duplicate', [AdminPromotionController::class, 'duplicate'])->name('duplicate');
+        Route::delete('/{id}', [AdminPromotionController::class, 'destroy'])->name('destroy');
         Route::post('/{promotion}/status', [AdminPromotionController::class, 'updateStatus'])->name('status');
     });
 
