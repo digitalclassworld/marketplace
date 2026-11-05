@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Route;
 // Public Marketplace Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/courses', [HomeController::class, 'courses'])->name('courses');
+Route::get('/services', [HomeController::class, 'services'])->name('services');
 Route::get('/products', [HomeController::class, 'products'])->name('products');
 Route::get('/product/{slug}', [HomeController::class, 'productShow'])->name('product.show');
 Route::get('/course/{slug}', [HomeController::class, 'courseShow'])->name('course.show');

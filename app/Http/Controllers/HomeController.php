@@ -497,6 +497,530 @@ class HomeController extends Controller
     }
 
     /**
+     * Display the public Services directory page matching the UI design.
+     */
+    public function services(Request $request): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $searchQuery = $request->input('search');
+        $selectedCategory = $request->input('category');
+        $selectedCity = $request->input('city', 'Ahmedabad');
+        $selectedRadius = $request->input('radius', '50');
+        $selectedServiceTypes = (array) $request->input('service_type', []);
+        $selectedDeliveryTimes = (array) $request->input('delivery_time', []);
+        $selectedRatings = (array) $request->input('rating', []);
+        $selectedLanguages = (array) $request->input('language', []);
+        $minPrice = $request->input('min_price', 0);
+        $maxPrice = $request->input('max_price', 50000);
+        $sortBy = $request->input('sort', 'popular');
+
+        // 11 Horizontal Category Cards with counts & photos matching screenshot
+        $categories = [
+            [
+                'name' => 'Website Development',
+                'slug' => 'Website Development',
+                'experts' => '240+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-code',
+            ],
+            [
+                'name' => 'Mobile App Development',
+                'slug' => 'Mobile App Development',
+                'experts' => '180+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-mobile-screen',
+            ],
+            [
+                'name' => 'Digital Marketing',
+                'slug' => 'Digital Marketing',
+                'experts' => '220+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-chart-line',
+            ],
+            [
+                'name' => 'Logo & Branding',
+                'slug' => 'Logo & Branding',
+                'experts' => '160+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-palette',
+            ],
+            [
+                'name' => 'Graphic Design',
+                'slug' => 'Graphic Design',
+                'experts' => '190+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-bezier-curve',
+            ],
+            [
+                'name' => 'SEO Services',
+                'slug' => 'SEO Services',
+                'experts' => '150+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-magnifying-glass-chart',
+            ],
+            [
+                'name' => 'Content Writing',
+                'slug' => 'Content Writing',
+                'experts' => '120+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-pen-nib',
+            ],
+            [
+                'name' => 'Video & Animation',
+                'slug' => 'Video & Animation',
+                'experts' => '110+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-video',
+            ],
+            [
+                'name' => 'Accounting & Finance',
+                'slug' => 'Accounting & Finance',
+                'experts' => '100+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-calculator',
+            ],
+            [
+                'name' => 'Business Consulting',
+                'slug' => 'Business Consulting',
+                'experts' => '90+ Experts',
+                'image' => 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=300&auto=format&fit=crop&q=80',
+                'icon' => 'fa-solid fa-briefcase',
+            ],
+            [
+                'name' => 'More Services',
+                'slug' => 'all',
+                'experts' => '500+ Experts',
+                'image' => null,
+                'icon' => 'fa-solid fa-ellipsis',
+            ],
+        ];
+
+        // Top Service Providers
+        $topProviders = [
+            [
+                'name' => 'Tech Solutions',
+                'badge' => 'Top Rated',
+                'rating' => 4.8,
+                'reviews_count' => 320,
+                'city' => 'Ahmedabad',
+                'specialty' => 'Website & App',
+                'image' => 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&auto=format&fit=crop&q=80',
+                'initials' => 'TS',
+                'bg_color' => '#1e3a8a',
+            ],
+            [
+                'name' => 'Creative Hub',
+                'badge' => 'Top Rated',
+                'rating' => 4.7,
+                'reviews_count' => 280,
+                'city' => 'Surat',
+                'specialty' => 'Design & Branding',
+                'image' => 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&auto=format&fit=crop&q=80',
+                'initials' => 'CH',
+                'bg_color' => '#f97316',
+            ],
+            [
+                'name' => 'Digital Growth',
+                'badge' => 'Top Rated',
+                'rating' => 4.8,
+                'reviews_count' => 410,
+                'city' => 'Mumbai',
+                'specialty' => 'Marketing & SEO',
+                'image' => 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&auto=format&fit=crop&q=80',
+                'initials' => 'DG',
+                'bg_color' => '#0f172a',
+            ],
+            [
+                'name' => 'Rank Experts',
+                'badge' => 'Top Rated',
+                'rating' => 4.8,
+                'reviews_count' => 190,
+                'city' => 'Delhi',
+                'specialty' => 'SEO & Content',
+                'image' => 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&auto=format&fit=crop&q=80',
+                'initials' => 'RE',
+                'bg_color' => '#0284c7',
+            ],
+            [
+                'name' => 'Web Creators',
+                'badge' => 'Top Rated',
+                'rating' => 4.7,
+                'reviews_count' => 260,
+                'city' => 'Bangalore',
+                'specialty' => 'Website & Software',
+                'image' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&auto=format&fit=crop&q=80',
+                'initials' => 'WC',
+                'bg_color' => '#10b981',
+            ],
+        ];
+
+        // Seeded curated services matching screenshot pixel-for-pixel
+        $curatedServices = [
+            (object) [
+                'id' => 101,
+                'title' => 'Professional Website Development for School, Institute & Business',
+                'slug' => 'professional-website-development',
+                'category' => 'Website Development',
+                'short_description' => 'Get a modern, responsive and SEO-friendly website with domain, hosting and admin panel.',
+                'tags' => ['Website Development', 'SEO Friendly', 'Mobile Responsive', 'Admin Panel'],
+                'price' => 5999,
+                'mrp' => 12000,
+                'discount_percent' => 50,
+                'delivery_days' => 3,
+                'delivery_text' => 'Delivery in 3 Days',
+                'revision_text' => 'Unlimited Revisions',
+                'provider_name' => 'Tech Solutions',
+                'provider_badge' => 'Top Rated',
+                'provider_badge_class' => 'badge-orange',
+                'provider_city' => 'Ahmedabad',
+                'rating' => 4.8,
+                'reviews_count' => 320,
+                'projects_count' => '120+ Projects Completed',
+                'video_badge' => '10+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Agency / Company',
+                'languages' => ['English', 'Hindi', 'Gujarati'],
+            ],
+            (object) [
+                'id' => 102,
+                'title' => 'Mobile App Development (Android & iOS)',
+                'slug' => 'mobile-app-development-android-ios',
+                'category' => 'Mobile App Development',
+                'short_description' => 'Custom mobile apps with modern UI/UX for your business, institute or startup.',
+                'tags' => ['Android App', 'iOS App', 'API Integration', 'Admin Panel'],
+                'price' => 19999,
+                'mrp' => 35000,
+                'discount_percent' => 43,
+                'delivery_days' => 7,
+                'delivery_text' => 'Delivery in 7 Days',
+                'revision_text' => 'Free 1 Month Support',
+                'provider_name' => 'App Creators',
+                'provider_badge' => 'Level 2 Seller',
+                'provider_badge_class' => 'badge-blue',
+                'provider_city' => 'Surat',
+                'rating' => 4.6,
+                'reviews_count' => 190,
+                'projects_count' => '90+ Projects Completed',
+                'video_badge' => '8+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Agency / Company',
+                'languages' => ['English', 'Hindi', 'Gujarati'],
+            ],
+            (object) [
+                'id' => 103,
+                'title' => 'Complete Digital Marketing Package',
+                'slug' => 'complete-digital-marketing-package',
+                'category' => 'Digital Marketing',
+                'short_description' => 'Grow your business with SEO, social media, Google Ads and content marketing.',
+                'tags' => ['SEO', 'Social Media', 'Google Ads', 'Lead Generation'],
+                'price' => 3999,
+                'mrp' => 8000,
+                'discount_percent' => 50,
+                'delivery_days' => 5,
+                'delivery_text' => 'Delivery in 5 Days',
+                'revision_text' => 'Monthly Retainer Option',
+                'provider_name' => 'Digital Boost Agency',
+                'provider_badge' => 'Top Rated',
+                'provider_badge_class' => 'badge-orange',
+                'provider_city' => 'Mumbai',
+                'rating' => 4.8,
+                'reviews_count' => 210,
+                'projects_count' => '150+ Projects Completed',
+                'video_badge' => '15+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Agency / Company',
+                'languages' => ['English', 'Hindi'],
+            ],
+            (object) [
+                'id' => 104,
+                'title' => 'Logo & Complete Brand Identity Design',
+                'slug' => 'logo-complete-brand-identity-design',
+                'category' => 'Logo & Branding',
+                'short_description' => 'Unique and professional logo design with brand guidelines, visiting cards and social media kit.',
+                'tags' => ['Logo Design', 'Brand Identity', 'Vector Files', 'Stationery'],
+                'price' => 1499,
+                'mrp' => 3000,
+                'discount_percent' => 50,
+                'delivery_days' => 2,
+                'delivery_text' => 'Delivery in 2 Days',
+                'revision_text' => 'Unlimited Revisions',
+                'provider_name' => 'Creative Hub',
+                'provider_badge' => 'Top Rated',
+                'provider_badge_class' => 'badge-orange',
+                'provider_city' => 'Surat',
+                'rating' => 4.7,
+                'reviews_count' => 280,
+                'projects_count' => '180+ Projects Completed',
+                'video_badge' => '25+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Individual Freelancer',
+                'languages' => ['English', 'Hindi', 'Gujarati'],
+            ],
+            (object) [
+                'id' => 105,
+                'title' => 'Rank #1 Guaranteed SEO Audit & Complete Optimization',
+                'slug' => 'rank-1-seo-audit-optimization',
+                'category' => 'SEO Services',
+                'short_description' => 'Complete on-page, off-page and technical SEO with high quality backlinks and Google ranking improvements.',
+                'tags' => ['SEO Services', 'Technical SEO', 'High Authority Backlinks', 'Google Ranking'],
+                'price' => 4499,
+                'mrp' => 9000,
+                'discount_percent' => 50,
+                'delivery_days' => 4,
+                'delivery_text' => 'Delivery in 4 Days',
+                'revision_text' => 'Weekly Keyword Reports',
+                'provider_name' => 'Rank Experts',
+                'provider_badge' => 'Top Rated',
+                'provider_badge_class' => 'badge-orange',
+                'provider_city' => 'Delhi',
+                'rating' => 4.8,
+                'reviews_count' => 190,
+                'projects_count' => '110+ Projects Completed',
+                'video_badge' => '12+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Agency / Company',
+                'languages' => ['English', 'Hindi'],
+            ],
+            (object) [
+                'id' => 106,
+                'title' => 'Explainer Video & 2D Animation for Courses & Institutes',
+                'slug' => 'explainer-video-2d-animation',
+                'category' => 'Video & Animation',
+                'short_description' => 'High-converting animated explainer videos with professional Indian English / Hindi voiceover and music.',
+                'tags' => ['Video & Animation', '2D Animation', 'Voiceover', 'Script Writing'],
+                'price' => 2999,
+                'mrp' => 6000,
+                'discount_percent' => 50,
+                'delivery_days' => 3,
+                'delivery_text' => 'Delivery in 3 Days',
+                'revision_text' => 'Full HD + Voiceover Included',
+                'provider_name' => 'Vision Animation Studio',
+                'provider_badge' => 'Verified Agency',
+                'provider_badge_class' => 'badge-blue',
+                'provider_city' => 'Ahmedabad',
+                'rating' => 4.9,
+                'reviews_count' => 140,
+                'projects_count' => '80+ Projects Completed',
+                'video_badge' => '30+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Agency / Company',
+                'languages' => ['English', 'Hindi', 'Gujarati'],
+            ],
+            (object) [
+                'id' => 107,
+                'title' => 'GST Registration, Monthly Return Filing & Accounting Setup',
+                'slug' => 'gst-registration-accounting-setup',
+                'category' => 'Accounting & Finance',
+                'short_description' => 'Complete CA-certified taxation, monthly GSTR-1 & 3B filing, and Tally/Zoho accounting setup.',
+                'tags' => ['Accounting & Finance', 'GST Filing', 'Taxation', 'Tally Prime'],
+                'price' => 1999,
+                'mrp' => 4000,
+                'discount_percent' => 50,
+                'delivery_days' => 1,
+                'delivery_text' => 'Delivery within 24 Hours',
+                'revision_text' => 'Dedicated CA Support',
+                'provider_name' => 'FinCorp Tax Advisors',
+                'provider_badge' => 'CA Verified',
+                'provider_badge_class' => 'badge-green',
+                'provider_city' => 'Ahmedabad',
+                'rating' => 4.9,
+                'reviews_count' => 310,
+                'projects_count' => '260+ Projects Completed',
+                'video_badge' => '40+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Individual Freelancer',
+                'languages' => ['English', 'Hindi', 'Gujarati'],
+            ],
+            (object) [
+                'id' => 108,
+                'title' => 'High Converting SEO Content Writing & Copywriting',
+                'slug' => 'seo-content-writing-copywriting',
+                'category' => 'Content Writing',
+                'short_description' => '100% human-written, SEO-optimized articles, landing page copy, and educational course materials.',
+                'tags' => ['Content Writing', 'Blog Posts', 'Website Copy', 'SEO Articles'],
+                'price' => 999,
+                'mrp' => 2000,
+                'discount_percent' => 50,
+                'delivery_days' => 1,
+                'delivery_text' => 'Delivery within 24 Hours',
+                'revision_text' => 'Plagiarism Free Guarantee',
+                'provider_name' => 'Wordsmith Content Lab',
+                'provider_badge' => 'Top Rated',
+                'provider_badge_class' => 'badge-orange',
+                'provider_city' => 'Bangalore',
+                'rating' => 4.8,
+                'reviews_count' => 175,
+                'projects_count' => '95+ Projects Completed',
+                'video_badge' => '18+ Projects',
+                'thumbnail' => 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop&q=80',
+                'provider_avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                'service_type' => 'Individual Freelancer',
+                'languages' => ['English', 'Hindi'],
+            ],
+        ];
+
+        // Fetch DB services if available and convert to unified format
+        try {
+            if (Schema::hasTable('services')) {
+                $dbServices = \App\Models\Service::query()
+                    ->where('status', 'approved')
+                    ->with('seller.businessDetail', 'seller.user')
+                    ->get();
+
+                foreach ($dbServices as $dbS) {
+                    $tags = is_array($dbS->tags) ? $dbS->tags : (explode(',', (string) $dbS->tags) ?: []);
+                    $tags = array_filter(array_map('trim', $tags));
+                    if (empty($tags)) {
+                        $tags = [$dbS->category ?: 'Professional Service'];
+                    }
+
+                    $curatedServices[] = (object) [
+                        'id' => $dbS->id,
+                        'title' => $dbS->title,
+                        'slug' => $dbS->slug ?: \Illuminate\Support\Str::slug($dbS->title),
+                        'category' => $dbS->category ?: 'Website Development',
+                        'short_description' => $dbS->short_description ?: 'Comprehensive professional service tailored for your business needs.',
+                        'tags' => array_values($tags),
+                        'price' => (float) $dbS->price,
+                        'mrp' => round(((float) $dbS->price) * 1.8),
+                        'discount_percent' => 45,
+                        'delivery_days' => (int) ($dbS->delivery_days ?: 3),
+                        'delivery_text' => 'Delivery in ' . ($dbS->delivery_days ?: 3) . ' Days',
+                        'revision_text' => 'Unlimited Revisions',
+                        'provider_name' => $dbS->seller->businessDetail->business_name ?? $dbS->seller->user->name ?? 'Verified Agency',
+                        'provider_badge' => 'Verified Partner',
+                        'provider_badge_class' => 'badge-blue',
+                        'provider_city' => $dbS->seller->businessDetail->city ?? 'Ahmedabad',
+                        'rating' => 4.8,
+                        'reviews_count' => 120,
+                        'projects_count' => '50+ Projects Completed',
+                        'video_badge' => '5+ Projects',
+                        'thumbnail' => $dbS->thumbnail ?: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&auto=format&fit=crop&q=80',
+                        'provider_avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+                        'service_type' => 'Agency / Company',
+                        'languages' => ['English', 'Hindi', 'Gujarati'],
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Services DB fetch note: ' . $e->getMessage());
+        }
+
+        $allServices = collect($curatedServices);
+
+        // Apply Search
+        if (!empty($searchQuery)) {
+            $q = strtolower($searchQuery);
+            $allServices = $allServices->filter(function ($s) use ($q) {
+                return str_contains(strtolower($s->title), $q)
+                    || str_contains(strtolower($s->category), $q)
+                    || str_contains(strtolower($s->short_description), $q)
+                    || str_contains(strtolower($s->provider_name), $q);
+            });
+        }
+
+        // Apply Category
+        if (!empty($selectedCategory) && $selectedCategory !== 'all' && $selectedCategory !== 'All Categories' && $selectedCategory !== 'More Services') {
+            $allServices = $allServices->filter(function ($s) use ($selectedCategory) {
+                return str_contains(strtolower($s->category), strtolower($selectedCategory));
+            });
+        }
+
+        // Apply Service Type
+        if (!empty($selectedServiceTypes) && !in_array('Both', $selectedServiceTypes)) {
+            $allServices = $allServices->filter(function ($s) use ($selectedServiceTypes) {
+                return in_array($s->service_type, $selectedServiceTypes);
+            });
+        }
+
+        // Apply Price Filter
+        if (!empty($minPrice) && (float)$minPrice > 0) {
+            $allServices = $allServices->filter(function ($s) use ($minPrice) {
+                return $s->price >= (float) $minPrice;
+            });
+        }
+        if (!empty($maxPrice) && (float)$maxPrice < 50000) {
+            $allServices = $allServices->filter(function ($s) use ($maxPrice) {
+                return $s->price <= (float) $maxPrice;
+            });
+        }
+
+        // Apply Delivery Time
+        if (!empty($selectedDeliveryTimes)) {
+            $allServices = $allServices->filter(function ($s) use ($selectedDeliveryTimes) {
+                foreach ($selectedDeliveryTimes as $dt) {
+                    if ($dt === 'Within 24 Hours' && $s->delivery_days <= 1) return true;
+                    if ($dt === '2 - 3 Days' && $s->delivery_days >= 2 && $s->delivery_days <= 3) return true;
+                    if ($dt === '4 - 7 Days' && $s->delivery_days >= 4 && $s->delivery_days <= 7) return true;
+                    if ($dt === 'More than 7 Days' && $s->delivery_days > 7) return true;
+                }
+                return false;
+            });
+        }
+
+        // Apply Rating
+        if (!empty($selectedRatings)) {
+            $minSelectedRating = min(array_map('floatval', $selectedRatings));
+            $allServices = $allServices->filter(function ($s) use ($minSelectedRating) {
+                return $s->rating >= $minSelectedRating;
+            });
+        }
+
+        // Apply Languages
+        if (!empty($selectedLanguages)) {
+            $allServices = $allServices->filter(function ($s) use ($selectedLanguages) {
+                foreach ($selectedLanguages as $lang) {
+                    if (in_array($lang, $s->languages ?? [])) return true;
+                }
+                return false;
+            });
+        }
+
+        // Apply Sorting
+        if ($sortBy === 'price_low') {
+            $allServices = $allServices->sortBy('price')->values();
+        } elseif ($sortBy === 'price_high') {
+            $allServices = $allServices->sortByDesc('price')->values();
+        } elseif ($sortBy === 'top_rated') {
+            $allServices = $allServices->sortByDesc('rating')->values();
+        } elseif ($sortBy === 'newest' || $sortBy === 'latest') {
+            $allServices = $allServices->sortByDesc('id')->values();
+        } else {
+            // popular / near_me
+            $allServices = $allServices->values();
+        }
+
+        return view('home.services', [
+            'seller'                => $seller,
+            'services'              => $allServices,
+            'categories'            => $categories,
+            'topProviders'          => $topProviders,
+            'searchQuery'           => $searchQuery,
+            'selectedCategory'      => $selectedCategory ?: 'all',
+            'selectedCity'          => $selectedCity,
+            'selectedRadius'        => $selectedRadius,
+            'selectedServiceTypes'  => $selectedServiceTypes,
+            'selectedDeliveryTimes' => $selectedDeliveryTimes,
+            'selectedRatings'       => $selectedRatings,
+            'selectedLanguages'     => $selectedLanguages,
+            'minPrice'              => $minPrice,
+            'maxPrice'              => $maxPrice,
+            'sortBy'                => $sortBy,
+        ]);
+    }
+
+    /**
      * Display the public Products directory page matching the UI design.
      */
     public function products(Request $request): View

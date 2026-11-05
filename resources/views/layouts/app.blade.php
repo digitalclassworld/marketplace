@@ -297,7 +297,7 @@
                         <a class="nav-link dc-nav-link {{ request()->routeIs('courses') ? 'active-marketplace-tab' : '' }}" href="{{ route('courses') }}" title="Online Courses">Courses<span class="visually-hidden"> Online Courses</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link dc-nav-link" href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Professional Services">Services</a>
+                        <a class="nav-link dc-nav-link {{ request()->routeIs('services') ? 'active-marketplace-tab' : '' }}" href="{{ route('services') }}" title="Professional Services" data-module="Professional Services">Services</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link dc-nav-link {{ request()->routeIs('products') ? 'active-marketplace-tab' : '' }}" href="{{ route('products') }}">Products</a>
@@ -470,7 +470,7 @@
                         <li><a href="{{ route('home') }}">Home</a></li>
                         <li><a href="{{ route('courses') }}">Courses</a></li>
                         <li><a href="{{ route('products') }}">Products</a></li>
-                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#comingSoonModal" data-module="Services">Services</a></li>
+                        <li><a href="{{ route('services') }}">Services</a></li>
                     </ul>
                 </div>
 
