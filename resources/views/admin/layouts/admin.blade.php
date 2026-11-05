@@ -562,16 +562,17 @@
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <!-- All Time Filter -->
+                <!-- All Users Filter (Matching Screenshot) -->
                 <div class="dropdown d-none d-md-block">
                     <button class="admin-top-filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <span>All Time</span>
+                        <span>All Users</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
-                        <li><a class="dropdown-item" href="#">Today</a></li>
-                        <li><a class="dropdown-item" href="#">This Week</a></li>
-                        <li><a class="dropdown-item" href="#">This Month</a></li>
-                        <li><a class="dropdown-item active" href="#">All Time</a></li>
+                        <li><a class="dropdown-item active" href="{{ route('admin.users.index') }}"><i class="fa-solid fa-users me-2 text-primary"></i> All Users</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'students']) }}"><i class="fa-solid fa-graduation-cap me-2 text-info"></i> Students</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'professionals']) }}"><i class="fa-solid fa-briefcase me-2 text-warning"></i> Professionals</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'institutes']) }}"><i class="fa-solid fa-school me-2 text-primary"></i> Institutes</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'sellers']) }}"><i class="fa-solid fa-store me-2 text-success"></i> Sellers</a></li>
                     </ul>
                 </div>
 

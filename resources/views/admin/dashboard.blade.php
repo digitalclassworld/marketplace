@@ -126,116 +126,128 @@
     <div class="row g-2 mb-2">
         <!-- 1. Total Users -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Total Users</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['total_users'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['users_growth'] }}</span>
+            <a href="{{ route('admin.users.index') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Total Users</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['total_users'] }}</span>
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['users_growth'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['users_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['users_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 2. Total Sellers -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Total Sellers</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['total_sellers'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['sellers_growth'] }}</span>
+            <a href="{{ route('admin.sellers.index') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Total Sellers</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['total_sellers'] }}</span>
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['sellers_growth'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['sellers_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['sellers_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 3. Total Courses -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Total Courses</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['total_courses'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['courses_growth'] }}</span>
+            <a href="{{ route('admin.catalog.courses') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Total Courses</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['total_courses'] }}</span>
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['courses_growth'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['courses_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['courses_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 4. Total Services -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                        <i class="fa-solid fa-briefcase"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Total Services</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['total_services'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['services_growth'] }}</span>
+            <a href="{{ route('admin.catalog.services') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Total Services</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['total_services'] }}</span>
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['services_growth'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['services_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['services_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 5. Total Products -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
-                        <i class="fa-solid fa-box-open"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Total Products</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['total_products'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['products_growth'] }}</span>
+            <a href="{{ route('admin.catalog.products') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Total Products</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['total_products'] }}</span>
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['products_growth'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['products_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['products_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 6. Business Listings -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(234, 179, 8, 0.1); color: #eab308;">
-                        <i class="fa-solid fa-building"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Business Listings</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['business_listings'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['listings_growth'] }}</span>
+            <a href="{{ route('admin.catalog.listings') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(234, 179, 8, 0.1); color: #eab308;">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Business Listings</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['business_listings'] }}</span>
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['listings_growth'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['listings_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['listings_sub'] }}</div>
-            </div>
+            </a>
         </div>
     </div>
 
