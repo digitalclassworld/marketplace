@@ -38,6 +38,8 @@ Route::post('/course/{slug}/review', [HomeController::class, 'courseReview'])->n
 Route::get('/course/{slug}/certificate', [CertificateController::class, 'forCourse'])->name('course.certificate');
 Route::get('/certificate/{code?}', [CertificateController::class, 'show'])->name('certificate.show');
 Route::get('/business/{slug?}', [HomeController::class, 'businessProfile'])->name('business.show');
+Route::get('/sellers/{slug?}', [HomeController::class, 'businessProfile'])->name('sellers.show');
+Route::get('/instructor/{slug?}', [HomeController::class, 'businessProfile'])->name('instructor.profile');
 Route::post('/business/{slug?}/enquiry', [HomeController::class, 'submitEnquiry'])->name('business.enquiry');
 Route::post('/business/{slug?}/demo', [HomeController::class, 'bookDemo'])->name('business.demo');
 Route::post('/business/{slug?}/review', [HomeController::class, 'submitReview'])->name('business.review');

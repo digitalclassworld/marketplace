@@ -166,62 +166,110 @@ class HomeController extends Controller
             \Illuminate\Support\Facades\Log::warning('Database connection failed on businessProfile: ' . $e->getMessage());
         }
 
-        // Curated courses matching the screenshot
+        // Curated courses matching the exact instructor storefront screenshot
         $courses = [
             [
+                'id' => 1,
                 'title' => 'Digital Marketing Complete Course',
-                'duration' => '3 Months',
-                'mode' => 'Offline / Online',
+                'slug' => 'digital-marketing-complete-course-2026',
+                'duration' => '2 Months',
+                'mode' => 'Online/Offline',
+                'rating' => 4.8,
+                'reviews_count' => 320,
                 'price' => 12999,
                 'original_price' => 18999,
                 'discount' => '31% OFF',
                 'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
             ],
             [
+                'id' => 2,
                 'title' => 'Tally Prime with GST',
-                'duration' => '2 Months',
+                'slug' => 'tally-prime-with-gst',
+                'duration' => '1.5 Months',
                 'mode' => 'Offline',
+                'rating' => 4.7,
+                'reviews_count' => 180,
                 'price' => 4999,
                 'original_price' => 6999,
                 'discount' => '29% OFF',
                 'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80',
             ],
             [
-                'title' => 'AI Tools & ChatGPT',
-                'duration' => '1.5 Months',
-                'mode' => 'Offline / Online',
-                'price' => 5999,
-                'original_price' => 8999,
-                'discount' => '33% OFF',
-                'thumbnail' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80',
-            ],
-            [
-                'title' => 'CCC (Basic Computer)',
-                'duration' => '1 Month',
-                'mode' => 'Offline',
-                'price' => 2999,
-                'original_price' => 4500,
-                'discount' => '33% OFF',
-                'thumbnail' => 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&auto=format&fit=crop&q=80',
-            ],
-            [
-                'title' => 'Web Development',
+                'id' => 3,
+                'title' => 'Web Development Course',
+                'slug' => 'web-development-course',
                 'duration' => '3 Months',
-                'mode' => 'Offline / Online',
+                'mode' => 'Online/Offline',
+                'rating' => 4.6,
+                'reviews_count' => 150,
                 'price' => 14999,
                 'original_price' => 22999,
                 'discount' => '33% OFF',
                 'thumbnail' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&auto=format&fit=crop&q=80',
             ],
+            [
+                'id' => 4,
+                'title' => 'AI Tools & ChatGPT',
+                'slug' => 'ai-tools-and-chatgpt',
+                'duration' => '1.5 Months',
+                'mode' => 'Online',
+                'rating' => 4.8,
+                'reviews_count' => 210,
+                'price' => 5999,
+                'original_price' => 8999,
+                'discount' => '33% OFF',
+                'thumbnail' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80',
+            ],
         ];
 
         // Curated services matching the screenshot
         $services = [
-            ['title' => 'Resume Making',              'price' => '₹499',   'icon' => 'fa-solid fa-file-lines',   'color' => '#ec4899', 'bg' => '#fdf2f8'],
-            ['title' => 'Graphics Design',            'price' => '₹999',   'icon' => 'fa-solid fa-palette',      'color' => '#0284c7', 'bg' => '#f0f9ff'],
-            ['title' => 'Website Development',        'price' => '₹4,999', 'icon' => 'fa-solid fa-code',         'color' => '#2563eb', 'bg' => '#eff6ff'],
-            ['title' => 'Social Media Management',    'price' => '₹2,499', 'icon' => 'fa-solid fa-share-nodes',  'color' => '#8b5cf6', 'bg' => '#f5f3ff'],
-            ['title' => 'Career Guidance & Counseling','price' => '₹499',   'icon' => 'fa-solid fa-user-graduate','color' => '#0d9488', 'bg' => '#f0fdfa'],
+            [
+                'title' => 'Website Development for Institute',
+                'starting_price' => 4999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Social Media Management',
+                'starting_price' => 2499,
+                'thumbnail' => 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Graphics & Banner Design',
+                'starting_price' => 999,
+                'thumbnail' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&auto=format&fit=crop&q=80',
+            ],
+            [
+                'title' => 'Resume Making',
+                'starting_price' => 499,
+                'thumbnail' => 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&auto=format&fit=crop&q=80',
+            ],
+        ];
+
+        // Sidebar categories with exact counts from screenshot
+        $sidebarCategories = [
+            ['name' => 'All',                        'count' => 24, 'active' => true],
+            ['name' => 'Computer Courses',           'count' => 24, 'active' => false],
+            ['name' => 'Digital Marketing',          'count' => 8,  'active' => false],
+            ['name' => 'Programming & Development',  'count' => 6,  'active' => false],
+            ['name' => 'Tally & Accounting',         'count' => 5,  'active' => false],
+            ['name' => 'Designing Courses',          'count' => 4,  'active' => false],
+            ['name' => 'AI Tools & Productivity',    'count' => 6,  'active' => false],
+            ['name' => 'Combo Packages',             'count' => 3,  'active' => false],
+            ['name' => 'Books & Study Material',     'count' => 5,  'active' => false],
+            ['name' => 'Services',                   'count' => 5,  'active' => false],
+        ];
+
+        // Filter type & mode counts
+        $filterTypes = [
+            ['name' => 'Courses',  'count' => 12],
+            ['name' => 'Services', 'count' => 5],
+            ['name' => 'Products', 'count' => 8],
+        ];
+
+        $filterModes = [
+            ['name' => 'Online',  'count' => 10],
+            ['name' => 'Offline', 'count' => 8],
         ];
 
         // Curated student reviews matching the screenshot
@@ -252,8 +300,8 @@ class HomeController extends Controller
         // Branches
         $branches = [
             [
-                'name' => 'Nikol Branch (Head Office)',
-                'address' => '201, Shreeji Complex, Nikol Main Road, Ahmedabad - 382350, Gujarat',
+                'name' => 'Nikol (Head Office)',
+                'address' => '201, Shreeji Complex, Nikol Main Road, Nikol, Ahmedabad - 382350, Gujarat',
                 'phone' => '+91 98765 43210',
                 'status' => 'Open',
                 'is_head' => true,
@@ -275,12 +323,15 @@ class HomeController extends Controller
         ];
 
         return view('home.business-profile', [
-            'seller'   => $seller,
-            'business' => $business,
-            'courses'  => $courses,
-            'services' => $services,
-            'reviews'  => $reviews,
-            'branches' => $branches,
+            'seller'            => $seller,
+            'business'          => $business,
+            'courses'           => $courses,
+            'services'          => $services,
+            'reviews'           => $reviews,
+            'branches'          => $branches,
+            'sidebarCategories' => $sidebarCategories,
+            'filterTypes'       => $filterTypes,
+            'filterModes'       => $filterModes,
         ]);
     }
 

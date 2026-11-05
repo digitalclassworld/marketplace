@@ -387,9 +387,11 @@
 
                 <!-- Instructor Byline -->
                 <div class="d-flex align-items-center gap-2 mb-3">
-                    <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;">
+                    <a href="{{ route('sellers.show', 'vcec') }}" class="text-decoration-none">
+                        <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;">
+                    </a>
                     <div style="font-size: 0.78rem;">
-                        <span class="fw-bold text-dark">By {{ $course->instructor_name }}</span>
+                        <a href="{{ route('sellers.show', 'vcec') }}" class="text-decoration-none text-dark fw-bold">By {{ $course->instructor_name }}</a>
                         <span class="text-muted ms-1">&bull; {{ $course->instructor_category }} Expert | 12+ Years Experience</span>
                     </div>
                 </div>
@@ -554,7 +556,9 @@
                     
                     <div>
                         <div class="d-flex align-items-center gap-2">
-                            <h4 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">{{ $course->instructor_name }}</h4>
+                            <a href="{{ route('sellers.show', 'vcec') }}" class="text-decoration-none">
+                                <h4 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">{{ $course->instructor_name }}</h4>
+                            </a>
                             <span class="badge bg-primary text-white py-1 px-2" style="font-size: 0.65rem;">Top Instructor</span>
                         </div>
                         <div class="text-primary small fw-semibold" style="font-size: 0.78rem;">Founder & CEO, Digital Class</div>
@@ -566,6 +570,12 @@
                             <span><i class="fa-solid fa-book text-success me-1"></i> <strong>15+</strong> Courses</span>
                             <span><i class="fa-solid fa-star text-warning me-1"></i> <strong>4.8</strong> Rating</span>
                             <span><i class="fa-solid fa-briefcase text-info me-1"></i> <strong>200+</strong> Live Projects</span>
+                        </div>
+
+                        <div class="mt-2">
+                            <a href="{{ route('sellers.show', 'vcec') }}" class="btn btn-sm btn-outline-primary fw-bold" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-store me-1"></i> View Instructor Storefront &rarr;
+                            </a>
                         </div>
                     </div>
                 </div>
