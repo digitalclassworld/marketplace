@@ -21,10 +21,36 @@ class EnsureSeller
 
         $user = Auth::user();
 
-        // If Super Admin tries to access the seller dashboard, direct them to the Super Admin Dashboard
+        // Super Admin has full administrative access to view and use the Seller Portal
         if ($user->isSuperAdmin()) {
-            return redirect()->route('admin.dashboard')
-                ->with('info', 'You are currently logged in as Super Admin. The Seller Portal is exclusively for registered sellers.');
+            $seller = $user->seller;
+            if (!$seller) {
+                try {
+                    $seller = \App\Models\Seller::firstOrCreate(
+                        ['user_id' => $user->id],
+                        [
+                            'seller_code'         => 'DC-ADMIN-000001',
+                            'account_type'        => \App\Models\Seller::ACCOUNT_TYPE_INSTITUTE,
+                            'seller_status'       => \App\Models\Seller::STATUS_ACTIVE,
+                            'verification_status' => \App\Models\Seller::VERIFICATION_VERIFIED,
+                            'registration_date'   => now(),
+                            'approved_at'         => now(),
+                            'approved_by'         => $user->id,
+                        ]
+                    );
+                    \App\Models\SellerBusinessDetail::firstOrCreate(
+                        ['seller_id' => $seller->id],
+                        [
+                            'business_name' => 'Digital Class Official Store',
+                            'category'      => 'Technology & Education',
+                            'city'          => 'Ahmedabad',
+                        ]
+                    );
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('Error creating seller profile for superadmin: ' . $e->getMessage());
+                }
+            }
+            return $next($request);
         }
 
         if (!$user->isSeller()) {
