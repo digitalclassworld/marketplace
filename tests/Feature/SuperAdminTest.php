@@ -255,6 +255,37 @@ class SuperAdminTest extends TestCase
     }
 
     /**
+     * Test 9b: Super Admin can open seller details for persisted and curated demo sellers.
+     */
+    public function test_super_admin_can_view_seller_details_for_persisted_and_curated_sellers(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Curated seller 101 (VCEC)
+        $resp101 = $this->actingAs($admin)->get('/admin/sellers/101');
+        $resp101->assertStatus(200);
+        $resp101->assertSee('VCEC - Vinayak Computer Education');
+        $resp101->assertSee('Seller Details');
+
+        // 2. Curated seller 102 (Tech Skills Academy matching Screenshot 9)
+        $resp102 = $this->actingAs($admin)->get('/admin/sellers/102');
+        $resp102->assertStatus(200);
+        $resp102->assertSee('Tech Skills Academy');
+        $resp102->assertSee('SELL000123');
+        $resp102->assertSee('Rahul Sharma');
+        $resp102->assertSee('Overview');
+
+        // 3. Fallback / generic ID (e.g. 1)
+        $resp1 = $this->actingAs($admin)->get('/admin/sellers/1');
+        $resp1->assertStatus(200);
+
+        // 4. Dashboard shows clickable Recent Sellers
+        $respDash = $this->actingAs($admin)->get('/admin/dashboard');
+        $respDash->assertStatus(200);
+        $respDash->assertSee('/admin/sellers/');
+    }
+
+    /**
      * Test 10: Super Admin can reject a seller and block selling.
      */
     public function test_super_admin_can_reject_seller(): void

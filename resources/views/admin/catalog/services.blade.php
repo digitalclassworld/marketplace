@@ -679,7 +679,7 @@
                         <div class="mb-3">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">Seller Information</span>
-                                <a id="inspSellerProfileLink" href="{{ url('/sellers/vcec') }}" target="_blank" class="text-primary text-decoration-none small" style="font-size: 0.75rem;">View Profile</a>
+                                <a id="inspSellerProfileLink" href="{{ route('admin.sellers.show', 104) }}" class="text-primary text-decoration-none small fw-semibold" style="font-size: 0.75rem;">View Profile</a>
                             </div>
                             <div class="border rounded-2 p-2 bg-white d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center gap-2">
@@ -897,7 +897,7 @@
         if (sBoxLoc) sBoxLoc.innerText = s.seller_location || s.location || 'Bengaluru, Karnataka';
 
         const sProfileLink = document.getElementById('inspSellerProfileLink');
-        if (sProfileLink) sProfileLink.href = `/sellers/${encodeURIComponent(s.seller_name.toLowerCase().replace(/[^a-z0-9]/g, '-'))}`;
+        if (sProfileLink) sProfileLink.href = s.seller_id ? `/admin/sellers/${s.seller_id}` : `/admin/sellers/${encodeURIComponent(s.seller_name.toLowerCase().replace(/[^a-z0-9]/g, '-'))}`;
 
         // Quick Action Forms
         const approveForm = document.getElementById('inspApproveForm');

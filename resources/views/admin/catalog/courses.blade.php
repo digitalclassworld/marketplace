@@ -629,7 +629,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <img src="{{ $c['seller_logo'] }}" class="rounded-circle" style="width: 20px; height: 20px;">
                                     <div>
-                                        <div class="fw-semibold text-dark fs-7">{{ $c['seller_name'] }}</div>
+                                        <a href="{{ route('admin.sellers.show', $c['seller_id'] ?? 101) }}" class="fw-semibold text-dark text-decoration-none hover-primary fs-7" title="View Seller Profile">{{ $c['seller_name'] }}</a>
                                         <div class="text-muted fs-8">{{ $c['seller_city'] }}</div>
                                     </div>
                                 </div>

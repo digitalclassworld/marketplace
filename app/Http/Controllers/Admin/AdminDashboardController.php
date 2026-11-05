@@ -179,6 +179,7 @@ class AdminDashboardController extends Controller
 
                 return [
                     'id'          => $index + 1,
+                    'seller_id'   => $seller->id,
                     'store_name'  => $storeName,
                     'store_thumb' => $storeThumb,
                     'type'        => $type,
@@ -187,6 +188,61 @@ class AdminDashboardController extends Controller
                     'status'      => $seller->seller_status === Seller::STATUS_ACTIVE ? 'Active' : 'Pending',
                 ];
             });
+
+        if ($recentSellers->isEmpty()) {
+            $recentSellers = collect([
+                [
+                    'id'          => 1,
+                    'seller_id'   => 101,
+                    'store_name'  => 'VCEC - Vinayak Computer Education',
+                    'store_thumb' => 'https://ui-avatars.com/api/?name=VCEC&background=0066ff&color=fff',
+                    'type'        => 'Institute',
+                    'type_color'  => 'primary',
+                    'joined_on'   => '12 Jan',
+                    'status'      => 'Active',
+                ],
+                [
+                    'id'          => 2,
+                    'seller_id'   => 102,
+                    'store_name'  => 'Tech Skills Academy',
+                    'store_thumb' => 'https://ui-avatars.com/api/?name=TS&background=10b981&color=fff',
+                    'type'        => 'Institute',
+                    'type_color'  => 'primary',
+                    'joined_on'   => '04 Mar',
+                    'status'      => 'Active',
+                ],
+                [
+                    'id'          => 3,
+                    'seller_id'   => 103,
+                    'store_name'  => 'Rahul Digital Marketing',
+                    'store_thumb' => 'https://ui-avatars.com/api/?name=RD&background=f59e0b&color=fff',
+                    'type'        => 'Individual',
+                    'type_color'  => 'secondary',
+                    'joined_on'   => '18 Jun',
+                    'status'      => 'Active',
+                ],
+                [
+                    'id'          => 4,
+                    'seller_id'   => 104,
+                    'store_name'  => 'Design Studio Pro',
+                    'store_thumb' => 'https://ui-avatars.com/api/?name=DS&background=6366f1&color=fff',
+                    'type'        => 'Agency',
+                    'type_color'  => 'info',
+                    'joined_on'   => '21 Aug',
+                    'status'      => 'Active',
+                ],
+                [
+                    'id'          => 5,
+                    'seller_id'   => 105,
+                    'store_name'  => 'EduNext Institute',
+                    'store_thumb' => 'https://ui-avatars.com/api/?name=EN&background=ef4444&color=fff',
+                    'type'        => 'Institute',
+                    'type_color'  => 'primary',
+                    'joined_on'   => '05 Oct',
+                    'status'      => 'Pending',
+                ],
+            ]);
+        }
 
         // 4. Dynamic Recent Activities from live DB events
         $recentActivities = [];

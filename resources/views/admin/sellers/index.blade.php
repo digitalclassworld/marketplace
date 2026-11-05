@@ -437,7 +437,7 @@
                                         'is_verified' => $isVerified,
                                     ];
                                 @endphp
-                                <tr class="seller-row {{ $idx === 0 ? 'selected-row' : '' }}" onclick='inspectSeller(@json($sellerPayload), this)'>
+                                <tr class="seller-row {{ $idx === 0 ? 'selected-row' : '' }}" onclick='inspectSeller(@json($sellerPayload), this)' ondblclick="window.location='{{ route('admin.sellers.show', $id) }}'" title="Click to inspect, double-click for full dossier">
                                     <td onclick="event.stopPropagation();"><input type="checkbox" class="form-check-input"></td>
                                     <td class="text-muted">{{ $idx + 1 }}</td>
                                     <td>
@@ -445,7 +445,7 @@
                                             <img src="{{ $logo }}" alt="{{ $name }}" class="rounded border" style="width: 38px; height: 38px; object-fit: contain; background: #f8fafc;">
                                             <div>
                                                 <div class="d-flex align-items-center gap-1">
-                                                    <span class="fw-semibold text-dark">{{ $name }}</span>
+                                                    <a href="{{ route('admin.sellers.show', $id) }}" class="fw-semibold text-dark text-decoration-none hover-primary" title="Open Full Seller Dossier">{{ $name }}</a>
                                                     @if($isVerified)
                                                         <i class="fa-solid fa-circle-check text-primary" style="font-size: 0.8rem;" title="Verified Seller"></i>
                                                     @endif
@@ -591,13 +591,13 @@
                     </button>
                 </div>
 
-                <!-- Action Buttons: View Store ↗ | Edit Seller -->
+                <!-- Action Buttons: View Store ↗ | View Seller Details -->
                 <div class="d-flex gap-2 mb-3">
-                    <a id="inspViewStoreBtn" href="{{ url('/sellers/vcec') }}" target="_blank" class="btn btn-primary btn-sm flex-fill fw-medium">
+                    <a id="inspViewStoreBtn" href="{{ url('/sellers/vcec') }}" target="_blank" class="btn btn-outline-secondary btn-sm flex-fill fw-medium">
                         View Store <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.75rem;"></i>
                     </a>
-                    <a id="inspEditSellerBtn" href="{{ route('admin.sellers.show', 1) }}" class="btn btn-outline-secondary btn-sm flex-fill fw-medium">
-                        Edit Seller
+                    <a id="inspDossierBtn" href="{{ route('admin.sellers.show', 101) }}" class="btn btn-primary btn-sm flex-fill fw-medium">
+                        <i class="fa-solid fa-id-card me-1"></i> Seller Details
                     </a>
                 </div>
 
@@ -826,6 +826,11 @@
         const viewStoreBtn = document.getElementById('inspViewStoreBtn');
         if (viewStoreBtn) {
             viewStoreBtn.href = `/sellers/${s.store_slug || s.id}`;
+        }
+
+        const dossierBtn = document.getElementById('inspDossierBtn');
+        if (dossierBtn) {
+            dossierBtn.href = `/admin/sellers/${s.id}`;
         }
 
         const editSellerBtn = document.getElementById('inspEditSellerBtn');

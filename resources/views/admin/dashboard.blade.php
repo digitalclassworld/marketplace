@@ -586,12 +586,15 @@
                         </thead>
                         <tbody>
                             @foreach($recentSellers as $seller)
-                                <tr style="border-bottom: 1px solid #f8fafc;">
+                                @php $sellerShowUrl = route('admin.sellers.show', $seller['seller_id'] ?? $seller['id']); @endphp
+                                <tr style="border-bottom: 1px solid #f8fafc; cursor: pointer; transition: background 0.15s ease;" onclick="window.location='{{ $sellerShowUrl }}'" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                                     <td class="text-muted fw-bold">{{ $seller['id'] }}</td>
                                     <td>
                                         <div class="d-flex align-items-center gap-1.5">
                                             <img src="{{ $seller['store_thumb'] }}" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
-                                            <span class="fw-semibold text-dark text-truncate" style="max-width: 110px;" title="{{ $seller['store_name'] }}">{{ $seller['store_name'] }}</span>
+                                            <a href="{{ $sellerShowUrl }}" class="fw-semibold text-dark text-decoration-none text-truncate" style="max-width: 110px;" title="{{ $seller['store_name'] }}">
+                                                {{ $seller['store_name'] }}
+                                            </a>
                                         </div>
                                     </td>
                                     <td>
