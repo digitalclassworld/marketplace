@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminLeadController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminReviewController;
@@ -232,6 +233,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/{id}/feature', [AdminReviewController::class, 'toggleFeatured'])->name('feature');
         Route::post('/{id}/note', [AdminReviewController::class, 'saveNote'])->name('note');
         Route::delete('/{id}', [AdminReviewController::class, 'destroy'])->name('destroy');
+    });
+
+    // Marketing & Leads Management
+    Route::prefix('leads')->name('leads.')->group(function () {
+        Route::get('/', [AdminLeadController::class, 'index'])->name('index');
+        Route::post('/', [AdminLeadController::class, 'store'])->name('store');
+        Route::get('/export', [AdminLeadController::class, 'export'])->name('export');
+        Route::post('/{id}/status', [AdminLeadController::class, 'updateStatus'])->name('status');
+        Route::post('/{id}/schedule-demo', [AdminLeadController::class, 'scheduleDemo'])->name('schedule-demo');
+        Route::post('/{id}/note', [AdminLeadController::class, 'addNote'])->name('note');
+        Route::delete('/{id}', [AdminLeadController::class, 'destroy'])->name('destroy');
     });
 
     // Coming Soon placeholders for future admin modules

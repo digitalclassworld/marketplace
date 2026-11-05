@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CertificateSeeder::class,
             ReviewSeeder::class,
             SupportTicketSeeder::class,
+            LeadSeeder::class,
         ]);
     }
 }

@@ -428,3 +428,4 @@ class SupportTicketSeeder extends Seeder
         }
     }
 }
+

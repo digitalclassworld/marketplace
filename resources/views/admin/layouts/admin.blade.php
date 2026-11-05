@@ -422,7 +422,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'leads') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.leads.index') }}" class="admin-nav-link {{ request()->routeIs('admin.leads.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-bullseye menu-icon"></i>
                             <span>Marketing & Leads</span>

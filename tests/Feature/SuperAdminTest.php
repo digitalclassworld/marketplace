@@ -740,6 +740,85 @@ class SuperAdminTest extends TestCase
         $deleteResp->assertRedirect(route('admin.messages.index'));
         $this->assertDatabaseMissing('support_tickets', ['id' => $newTicket->id]);
     }
+
+    /**
+     * Test 23: Super Admin can access Marketing & Leads dashboard and perform lead operations.
+     */
+    public function test_super_admin_can_manage_marketing_and_leads(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // Seed leads
+        $this->seed(\Database\Seeders\LeadSeeder::class);
+
+        // 1. View Marketing & Leads page
+        $response = $this->actingAs($admin)->get('/admin/leads');
+        $response->assertStatus(200);
+        $response->assertSee('Marketing & Leads');
+        $response->assertSee('Manage marketing campaigns, track leads');
+        $response->assertSee('624');
+        $response->assertSee('312');
+        $response->assertSee('Rahul Patel');
+        $response->assertSee('Meta Ads');
+        $response->assertSee('Institute ERP');
+        $response->assertSee('Lead Details');
+        $response->assertSee('Activity Timeline');
+        $response->assertSee('Notes');
+
+        // 2. Export leads CSV
+        $exportResp = $this->actingAs($admin)->get('/admin/leads/export');
+        $exportResp->assertStatus(200);
+        $this->assertTrue(str_contains($exportResp->headers->get('content-type'), 'text/csv'));
+
+        // 3. Update status of lead
+        $lead = \App\Models\Lead::where('name', 'Rahul Patel')->firstOrFail();
+        $statusResp = $this->actingAs($admin)->post("/admin/leads/{$lead->id}/status", [
+            'status' => 'Converted',
+        ]);
+        $statusResp->assertRedirect();
+        $this->assertDatabaseHas('leads', [
+            'id'     => $lead->id,
+            'status' => 'Converted',
+        ]);
+
+        // 4. Schedule demo for lead
+        $demoResp = $this->actingAs($admin)->post("/admin/leads/{$lead->id}/schedule-demo", [
+            'demo_date' => '2026-11-02',
+            'demo_time' => '02:00 PM',
+        ]);
+        $demoResp->assertRedirect();
+        $this->assertDatabaseHas('leads', [
+            'id'     => $lead->id,
+            'status' => 'Demo Scheduled',
+        ]);
+
+        // 5. Add note to lead
+        $noteResp = $this->actingAs($admin)->post("/admin/leads/{$lead->id}/note", [
+            'content' => 'Client approved the commercial proposal.',
+        ]);
+        $noteResp->assertRedirect();
+
+        // 6. Create new lead
+        $createResp = $this->actingAs($admin)->post('/admin/leads', [
+            'name'     => 'Deepak Verma',
+            'phone'    => '+91 99887 66554',
+            'email'    => 'deepak.verma@example.com',
+            'source'   => 'Meta Ads',
+            'campaign' => 'App Promotion',
+        ]);
+        $createResp->assertRedirect();
+        $this->assertDatabaseHas('leads', [
+            'name'     => 'Deepak Verma',
+            'phone'    => '+91 99887 66554',
+            'campaign' => 'App Promotion',
+        ]);
+
+        // 7. Delete lead
+        $newLead = \App\Models\Lead::where('name', 'Deepak Verma')->firstOrFail();
+        $deleteResp = $this->actingAs($admin)->delete("/admin/leads/{$newLead->id}");
+        $deleteResp->assertRedirect(route('admin.leads.index'));
+        $this->assertDatabaseMissing('leads', ['id' => $newLead->id]);
+    }
 }
 
 
