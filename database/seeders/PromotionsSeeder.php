@@ -148,7 +148,63 @@ class PromotionsSeeder extends Seeder
                 'payment_status'      => 'Paid',
             ]);
 
-            // Seed Discount Coupons
+            // Seed Discount Coupons matching screenshot
+            DiscountCoupon::create([
+                'seller_id'        => $seller->id,
+                'coupon_code'      => 'DIWALI50',
+                'discount_type'    => 'percentage',
+                'discount_value'   => 50,
+                'min_order_amount' => 500,
+                'applicable_to'    => 'all',
+                'usage_limit'      => 1000,
+                'used_count'       => 680,
+                'valid_from'       => $today->copy()->subDays(15),
+                'valid_until'      => $today->copy()->addDays(15),
+                'status'           => 'Active',
+            ]);
+
+            DiscountCoupon::create([
+                'seller_id'        => $seller->id,
+                'coupon_code'      => 'FIRST1000',
+                'discount_type'    => 'flat',
+                'discount_value'   => 1000,
+                'min_order_amount' => 2000,
+                'applicable_to'    => 'courses',
+                'usage_limit'      => 500,
+                'used_count'       => 320,
+                'valid_from'       => $today->copy()->subDays(10),
+                'valid_until'      => $today->copy()->addDays(50),
+                'status'           => 'Active',
+            ]);
+
+            DiscountCoupon::create([
+                'seller_id'        => $seller->id,
+                'coupon_code'      => 'WELCOME20',
+                'discount_type'    => 'percentage',
+                'discount_value'   => 20,
+                'min_order_amount' => 500,
+                'applicable_to'    => 'services',
+                'usage_limit'      => 2000,
+                'used_count'       => 1420,
+                'valid_from'       => $today->copy()->subDays(30),
+                'valid_until'      => $today->copy()->addDays(30),
+                'status'           => 'Active',
+            ]);
+
+            DiscountCoupon::create([
+                'seller_id'        => $seller->id,
+                'coupon_code'      => 'STUDENT30',
+                'discount_type'    => 'percentage',
+                'discount_value'   => 30,
+                'min_order_amount' => 999,
+                'applicable_to'    => 'courses',
+                'usage_limit'      => 1000,
+                'used_count'       => 240,
+                'valid_from'       => $today->copy()->addDays(5),
+                'valid_until'      => $today->copy()->addDays(30),
+                'status'           => 'Scheduled',
+            ]);
+
             DiscountCoupon::create([
                 'seller_id'        => $seller->id,
                 'coupon_code'      => 'DIGITAL20',

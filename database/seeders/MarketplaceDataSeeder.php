@@ -246,29 +246,37 @@ class MarketplaceDataSeeder extends Seeder
             }
         }
 
-        // 4. Populate Services if empty
-        if (Service::count() === 0 && $primarySeller) {
+        // 4. Populate Services matching the screenshot design
+        if ($primarySeller) {
             $services = [
-                ['title' => 'Custom Website Development', 'category' => 'Development', 'price' => 14999, 'thumb' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'Professional Logo & Brand Identity', 'category' => 'Design', 'price' => 2500, 'thumb' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'Social Media Growth Management', 'category' => 'Marketing', 'price' => 5000, 'thumb' => 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=300&auto=format&fit=crop&q=80'],
-                ['title' => 'SEO Audit & Technical Ranking', 'category' => 'SEO', 'price' => 3999, 'thumb' => 'https://images.unsplash.com/photo-1571721795195-a2ca2d3370a9?w=300&auto=format&fit=crop&q=80'],
+                ['title' => 'Website Development for School, Institute & Business', 'category' => 'Development', 'price' => 4999, 'thumb' => 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Social Media Marketing', 'category' => 'Digital Marketing', 'price' => 2999, 'thumb' => 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'GST Registration Service', 'category' => 'Legal & Finance', 'price' => 1499, 'thumb' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Graphic Design Service', 'category' => 'Design', 'price' => 999, 'thumb' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'App Development', 'category' => 'Development', 'price' => 9999, 'thumb' => 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Content Writing', 'category' => 'Content', 'price' => 799, 'thumb' => 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'AI Chatbot Integration', 'category' => 'AI & Automation', 'price' => 3999, 'thumb' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Tally Support & Training', 'category' => 'Accounting', 'price' => 1999, 'thumb' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Video Editing Service', 'category' => 'Multimedia', 'price' => 1499, 'thumb' => 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&auto=format&fit=crop&q=80'],
+                ['title' => 'Resume Making Service', 'category' => 'Career Support', 'price' => 599, 'thumb' => 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&auto=format&fit=crop&q=80'],
             ];
 
             foreach ($services as $s) {
-                Service::create([
-                    'seller_id' => $primarySeller->id,
-                    'title' => $s['title'],
-                    'slug' => Str::slug($s['title']) . '-' . rand(100, 999),
-                    'category' => $s['category'],
-                    'short_description' => 'Professional service delivered on time with revision guarantees.',
-                    'delivery_days' => 5,
-                    'package_name' => 'Standard Professional Plan',
-                    'price' => $s['price'],
-                    'thumbnail' => $s['thumb'],
-                    'status' => 'approved',
-                    'approved_at' => now(),
-                ]);
+                Service::firstOrCreate(
+                    ['title' => $s['title']],
+                    [
+                        'seller_id' => $primarySeller->id,
+                        'slug' => Str::slug($s['title']),
+                        'category' => $s['category'],
+                        'short_description' => 'Professional service delivered on time with revision guarantees and dedicated support.',
+                        'delivery_days' => 5,
+                        'package_name' => 'Standard Professional Plan',
+                        'price' => $s['price'],
+                        'thumbnail' => $s['thumb'],
+                        'status' => 'approved',
+                        'approved_at' => now(),
+                    ]
+                );
             }
         }
 
