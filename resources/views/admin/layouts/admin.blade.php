@@ -605,6 +605,12 @@
                     </ul>
                 </div>
 
+                <!-- Quick Pending Requests Shortcut Link -->
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-warning text-dark fw-bold d-flex align-items-center gap-1.5 px-2.5 py-1.5 rounded-pill shadow-xs" title="View Pending Approvals on Dashboard" style="font-size: 0.76rem; border-color: #f59e0b; background: #fffbeb;">
+                    <i class="fa-solid fa-clock-rotate-left text-warning"></i>
+                    <span class="d-none d-lg-inline">Pending Requests</span>
+                </a>
+
                 <!-- Notification Bell with Red Badge 3 -->
                 <div class="position-relative">
                     <button class="btn btn-light border-0 rounded-circle p-2" type="button" title="Notifications">

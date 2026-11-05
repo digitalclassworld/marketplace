@@ -385,6 +385,34 @@ class AdminDashboardController extends Controller
             $totalSellers,
         ];
 
+        // 5. Pending Approvals across all sections (Sellers, Courses, Services, Business Listings, Products)
+        $pendingSellers = Seller::whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending', 'pending', 'Under Review'])
+            ->with(['user', 'businessDetail'])
+            ->latest('id')
+            ->get();
+
+        $pendingCourses = Course::where('status', 'pending')
+            ->with(['seller.user', 'seller.businessDetail'])
+            ->latest('id')
+            ->get();
+
+        $pendingServices = Service::where('status', 'pending')
+            ->with(['seller.user', 'seller.businessDetail'])
+            ->latest('id')
+            ->get();
+
+        $pendingListings = BusinessListing::where('status', 'pending')
+            ->with(['seller.user', 'seller.businessDetail'])
+            ->latest('id')
+            ->get();
+
+        $pendingProducts = Product::where('status', 'pending')
+            ->with(['seller.user', 'seller.businessDetail'])
+            ->latest('id')
+            ->get();
+
+        $totalPendingCount = $pendingSellers->count() + $pendingCourses->count() + $pendingServices->count() + $pendingListings->count() + $pendingProducts->count();
+
         return view('admin.dashboard', [
             'kpis'                 => $kpis,
             'recentOrders'         => $recentOrders,
@@ -396,6 +424,12 @@ class AdminDashboardController extends Controller
             'chartCommission'      => $chartCommission,
             'usersGrowthPoints'    => $usersGrowthPoints,
             'sellersGrowthPoints'  => $sellersGrowthPoints,
+            'pendingSellers'       => $pendingSellers,
+            'pendingCourses'       => $pendingCourses,
+            'pendingServices'      => $pendingServices,
+            'pendingListings'      => $pendingListings,
+            'pendingProducts'      => $pendingProducts,
+            'totalPendingCount'    => $totalPendingCount,
         ]);
     }
 

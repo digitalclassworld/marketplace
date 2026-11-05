@@ -113,12 +113,24 @@
 @section('content')
 <div class="container-fluid px-0">
 
-    <!-- Greeting Section (Matching Screenshot) -->
-    <div class="mb-4">
-        <h2 class="fw-bold text-dark mb-1" style="font-size: 1.65rem; letter-spacing: -0.02em;">
-            Welcome Back, {{ explode(' ', Auth::user()->name ?? 'Hitesh')[0] }} 👋
-        </h2>
-        <p class="text-secondary small mb-0">Here's what's happening on Digital Class Marketplace today.</p>
+    <!-- Greeting Section with Pending Approvals CTA Button -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.65rem; letter-spacing: -0.02em;">
+                Welcome Back, {{ explode(' ', Auth::user()->name ?? 'Super Admin')[0] }} 👋
+            </h2>
+            <p class="text-secondary small mb-0">Here's what's happening on Digital Class Marketplace today.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <!-- PENDING REQUESTS BUTTON -->
+            <button type="button" class="btn btn-warning text-dark fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2 position-relative" data-bs-toggle="modal" data-bs-target="#pendingRequestsModal" style="border-radius: 10px; border: 1px solid #f59e0b; background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);">
+                <i class="fa-solid fa-clock-rotate-left fs-6 text-dark"></i>
+                <span style="font-size: 0.85rem;">Pending Requests</span>
+                <span class="badge bg-danger text-white rounded-pill px-2 py-1" style="font-size: 0.72rem;">
+                    {{ $totalPendingCount }}
+                </span>
+            </button>
+        </div>
     </div>
 
     <!-- ================= 12 KPI METRICS (2 ROWS OF 6 CARDS) ================= -->
@@ -638,6 +650,424 @@
                             <span class="text-muted small" style="font-size: 0.7rem; white-space: nowrap;">{{ $act['time'] }}</span>
                         </div>
                     @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         PENDING APPROVALS CENTRAL MODAL (Pop-Up)
+         ========================================================================= -->
+    <div class="modal fade" id="pendingRequestsModal" tabindex="-1" aria-labelledby="pendingRequestsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom py-3 px-4" style="background: #f8fafc;">
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2 mb-1" id="pendingRequestsModalLabel">
+                            <i class="fa-solid fa-clock-rotate-left text-warning"></i>
+                            Pending Approvals Central
+                            <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 0.75rem;">
+                                {{ $totalPendingCount }} Pending Requests
+                            </span>
+                        </h5>
+                        <p class="text-muted small mb-0">Review and approve or reject incoming sellers, courses, services, businesses, and products before publication.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <!-- Nav Pills Tabs -->
+                    <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3" id="pendingTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="sellers-tab" data-bs-toggle="pill" data-bs-target="#tab-sellers" type="button" role="tab">
+                                <i class="fa-solid fa-store text-primary"></i>
+                                <span>Sellers</span>
+                                <span class="badge {{ $pendingSellers->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
+                                    {{ $pendingSellers->count() }}
+                                </span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="courses-tab" data-bs-toggle="pill" data-bs-target="#tab-courses" type="button" role="tab">
+                                <i class="fa-solid fa-graduation-cap text-purple"></i>
+                                <span>Courses</span>
+                                <span class="badge {{ $pendingCourses->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
+                                    {{ $pendingCourses->count() }}
+                                </span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="services-tab" data-bs-toggle="pill" data-bs-target="#tab-services" type="button" role="tab">
+                                <i class="fa-solid fa-briefcase text-warning"></i>
+                                <span>Services</span>
+                                <span class="badge {{ $pendingServices->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
+                                    {{ $pendingServices->count() }}
+                                </span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="listings-tab" data-bs-toggle="pill" data-bs-target="#tab-listings" type="button" role="tab">
+                                <i class="fa-solid fa-building text-info"></i>
+                                <span>Business Listings</span>
+                                <span class="badge {{ $pendingListings->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
+                                    {{ $pendingListings->count() }}
+                                </span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="products-tab" data-bs-toggle="pill" data-bs-target="#tab-products" type="button" role="tab">
+                                <i class="fa-solid fa-box-open text-success"></i>
+                                <span>Products</span>
+                                <span class="badge {{ $pendingProducts->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
+                                    {{ $pendingProducts->count() }}
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Contents -->
+                    <div class="tab-content" id="pendingTabsContent">
+                        
+                        <!-- ================= 1. SELLERS ================= -->
+                        <div class="tab-pane fade show active" id="tab-sellers" role="tabpanel">
+                            @if($pendingSellers->isEmpty())
+                                <div class="text-center py-5">
+                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
+                                    <h6 class="fw-bold text-dark">No Pending Seller Applications</h6>
+                                    <p class="text-muted small">All seller registrations have been approved and activated.</p>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Seller / Applicant</th>
+                                                <th>Business Name</th>
+                                                <th>Contact Details</th>
+                                                <th>Account Type</th>
+                                                <th>Applied On</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($pendingSellers as $ps)
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <img src="{{ $ps->user?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($ps->user?->name ?? 'Seller') }}" 
+                                                                 class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;">
+                                                            <div>
+                                                                <div class="fw-bold text-dark">{{ $ps->user?->name ?? 'Seller #' . $ps->id }}</div>
+                                                                <small class="text-muted font-monospace">{{ $ps->seller_code }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fw-semibold text-dark">{{ $ps->businessDetail?->business_name ?? '—' }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-dark">{{ $ps->user?->email }}</div>
+                                                        <small class="text-muted">{{ $ps->user?->phone ?? '—' }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-light text-dark border">{{ $ps->account_type }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">{{ $ps->created_at ? $ps->created_at->format('d M Y, h:i A') : 'Recent' }}</small>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <form action="{{ route('admin.sellers.approve', $ps->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Seller">
+                                                                <i class="fa-solid fa-check me-1"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.sellers.reject', $ps->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this seller application?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Seller">
+                                                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                        <a href="{{ route('admin.sellers.show', $ps->id) }}" class="btn btn-light border btn-sm px-2 py-1 ms-1" title="View Profile">
+                                                            <i class="fa-regular fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- ================= 2. COURSES ================= -->
+                        <div class="tab-pane fade" id="tab-courses" role="tabpanel">
+                            @if($pendingCourses->isEmpty())
+                                <div class="text-center py-5">
+                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
+                                    <h6 class="fw-bold text-dark">No Pending Courses</h6>
+                                    <p class="text-muted small">All courses are currently reviewed and published.</p>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Course Title</th>
+                                                <th>Instructor / Seller</th>
+                                                <th>Category</th>
+                                                <th>Price</th>
+                                                <th>Submitted</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($pendingCourses as $pc)
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <img src="{{ $pc->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=80&auto=format&fit=crop&q=80' }}" 
+                                                                 class="rounded border" style="width: 44px; height: 32px; object-fit: cover;">
+                                                            <div>
+                                                                <div class="fw-bold text-dark">{{ $pc->title }}</div>
+                                                                <small class="text-muted">{{ $pc->level }} &bull; {{ $pc->language }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-dark fw-semibold">{{ $pc->seller?->businessDetail?->business_name ?? $pc->seller?->user?->name ?? 'Seller' }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-light text-primary border">{{ $pc->category }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fw-bold text-dark">₹{{ number_format($pc->price) }}</span>
+                                                        @if($pc->discount_price)
+                                                            <small class="text-muted text-decoration-line-through d-block">₹{{ number_format($pc->discount_price) }}</small>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">{{ $pc->created_at ? $pc->created_at->format('d M Y') : 'Recent' }}</small>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <form action="{{ route('admin.catalog.courses.approve', $pc->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve & Publish">
+                                                                <i class="fa-solid fa-check me-1"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.catalog.courses.reject', $pc->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this course?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Course">
+                                                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- ================= 3. SERVICES ================= -->
+                        <div class="tab-pane fade" id="tab-services" role="tabpanel">
+                            @if($pendingServices->isEmpty())
+                                <div class="text-center py-5">
+                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
+                                    <h6 class="fw-bold text-dark">No Pending Services</h6>
+                                    <p class="text-muted small">All services have been reviewed.</p>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Service Title</th>
+                                                <th>Provider / Seller</th>
+                                                <th>Category</th>
+                                                <th>Price</th>
+                                                <th>Delivery</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($pendingServices as $psv)
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-bold text-dark">{{ $psv->title }}</div>
+                                                        <small class="text-muted">{{ Str::limit($psv->short_description, 50) }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-dark fw-semibold">{{ $psv->seller?->businessDetail?->business_name ?? $psv->seller?->user?->name ?? 'Provider' }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-light text-warning border">{{ $psv->category }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fw-bold text-dark">₹{{ number_format($psv->price) }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">{{ $psv->delivery_days }} days</small>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <form action="{{ route('admin.catalog.services.approve', $psv->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Service">
+                                                                <i class="fa-solid fa-check me-1"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.catalog.services.reject', $psv->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this service?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Service">
+                                                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- ================= 4. BUSINESS LISTINGS ================= -->
+                        <div class="tab-pane fade" id="tab-listings" role="tabpanel">
+                            @if($pendingListings->isEmpty())
+                                <div class="text-center py-5">
+                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
+                                    <h6 class="fw-bold text-dark">No Pending Business Listings</h6>
+                                    <p class="text-muted small">All business directory listings have been approved.</p>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Business Name</th>
+                                                <th>Category</th>
+                                                <th>City & Location</th>
+                                                <th>Contact</th>
+                                                <th>Plan</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($pendingListings as $pl)
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            @if($pl->logo)
+                                                                <img src="{{ $pl->logo }}" class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;">
+                                                            @endif
+                                                            <div>
+                                                                <div class="fw-bold text-dark">{{ $pl->business_name }}</div>
+                                                                <small class="text-muted">{{ $pl->sub_category ?: $pl->category }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-light text-dark border">{{ $pl->category }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-dark">{{ $pl->city ?? 'Ahmedabad' }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-dark small">{{ $pl->phone }}</div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-primary-subtle text-primary">{{ $pl->plan_name ?: 'Free' }}</span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <form action="{{ route('admin.catalog.listings.approve', $pl->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Listing">
+                                                                <i class="fa-solid fa-check me-1"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.catalog.listings.reject', $pl->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this business listing?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Listing">
+                                                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- ================= 5. PRODUCTS ================= -->
+                        <div class="tab-pane fade" id="tab-products" role="tabpanel">
+                            @if($pendingProducts->isEmpty())
+                                <div class="text-center py-5">
+                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
+                                    <h6 class="fw-bold text-dark">No Pending Products</h6>
+                                    <p class="text-muted small">All products have been reviewed and published.</p>
+                                </div>
+                            @else
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Product Title</th>
+                                                <th>Seller</th>
+                                                <th>Category</th>
+                                                <th>Price</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($pendingProducts as $pp)
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-bold text-dark">{{ $pp->title }}</div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="text-dark">{{ $pp->seller?->businessDetail?->business_name ?? $pp->seller?->user?->name ?? 'Seller' }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-light text-success border">{{ $pp->category }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="fw-bold text-dark">₹{{ number_format($pp->price) }}</span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <form action="{{ route('admin.catalog.products.approve', $pp->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Product">
+                                                                <i class="fa-solid fa-check me-1"></i> Approve
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.catalog.products.reject', $pp->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this product?');">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Product">
+                                                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light py-2 px-4 d-flex justify-content-between">
+                    <span class="text-muted small">
+                        <i class="fa-solid fa-shield-halved text-primary me-1"></i>
+                        Approvals take effect immediately across the marketplace.
+                    </span>
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
