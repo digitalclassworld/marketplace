@@ -34,3 +34,4 @@ class Lead extends Model
         'next_follow_up' => 'date',
     ];
 }
+

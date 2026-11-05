@@ -249,3 +249,4 @@ class LeadSeeder extends Seeder
         }
     }
 }
+

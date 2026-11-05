@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminCatalogController;
+use App\Http\Controllers\Admin\AdminCmsController;
 use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminLeadController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Auth\SellerRegistrationController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Seller\SellerBusinessListingController;
@@ -51,6 +53,11 @@ Route::get('/instructor/{slug?}', [HomeController::class, 'businessProfile'])->n
 Route::post('/business/{slug?}/enquiry', [HomeController::class, 'submitEnquiry'])->name('business.enquiry');
 Route::post('/business/{slug?}/demo', [HomeController::class, 'bookDemo'])->name('business.demo');
 Route::post('/business/{slug?}/review', [HomeController::class, 'submitReview'])->name('business.review');
+
+// Public Blog Directory & Article Reader
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::post('/blog/{slug}/comment', [BlogController::class, 'comment'])->name('blog.comment');
 
 Route::get('/login', fn() => redirect()->route('seller.login'))->name('login');
 
@@ -244,6 +251,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->grou
         Route::post('/{id}/schedule-demo', [AdminLeadController::class, 'scheduleDemo'])->name('schedule-demo');
         Route::post('/{id}/note', [AdminLeadController::class, 'addNote'])->name('note');
         Route::delete('/{id}', [AdminLeadController::class, 'destroy'])->name('destroy');
+    });
+
+    // Blog & CMS Management
+    Route::prefix('cms')->name('cms.')->group(function () {
+        Route::get('/', [AdminCmsController::class, 'index'])->name('index');
+        Route::get('/create', [AdminCmsController::class, 'create'])->name('create');
+        Route::post('/', [AdminCmsController::class, 'store'])->name('store');
+        Route::get('/export', [AdminCmsController::class, 'export'])->name('export');
+        Route::delete('/{id}', [AdminCmsController::class, 'destroy'])->name('destroy');
     });
 
     // Coming Soon placeholders for future admin modules

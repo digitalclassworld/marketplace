@@ -436,7 +436,7 @@
             <div class="admin-menu-section">CONTENT MANAGEMENT</div>
             <ul class="admin-nav-list">
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'blog') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.cms.index') }}" class="admin-nav-link {{ request()->routeIs('admin.cms.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-newspaper menu-icon"></i>
                             <span>Blog & CMS</span>

@@ -819,6 +819,68 @@ class SuperAdminTest extends TestCase
         $deleteResp->assertRedirect(route('admin.leads.index'));
         $this->assertDatabaseMissing('leads', ['id' => $newLead->id]);
     }
+
+    public function test_super_admin_can_manage_cms_and_public_can_access_blog(): void
+    {
+        $admin = $this->createSuperAdmin();
+
+        // 1. Admin can access CMS index
+        $indexResp = $this->actingAs($admin)->get('/admin/cms');
+        $indexResp->assertOk();
+        $indexResp->assertSee('Blog &amp; CMS', false);
+
+        // 2. Admin can access Create Post page
+        $createResp = $this->actingAs($admin)->get('/admin/cms/create');
+        $createResp->assertOk();
+        $createResp->assertSee('Create Blog Post');
+
+        // 3. Admin can store a new post
+        $storeResp = $this->actingAs($admin)->post('/admin/cms', [
+            'title'          => 'Next-Gen Educational Technology in 2027',
+            'slug'           => 'next-gen-educational-technology-2027',
+            'excerpt'        => 'A preview of future classroom and AI technology in 2027.',
+            'content'        => 'This is a comprehensive deep dive into new learning platforms.',
+            'category'       => 'Technology',
+            'status'         => 'Published',
+            'allow_comments' => 1,
+            'is_featured'    => 1,
+            'tags'           => 'AI, EdTech, Future',
+        ]);
+        $storeResp->assertRedirect(route('admin.cms.index'));
+        $this->assertDatabaseHas('posts', [
+            'slug'     => 'next-gen-educational-technology-2027',
+            'category' => 'Technology',
+            'status'   => 'Published',
+        ]);
+
+        // 4. Admin can export posts to CSV
+        $exportResp = $this->actingAs($admin)->get('/admin/cms/export');
+        $exportResp->assertOk();
+
+        // 5. Public can view Blog directory
+        $blogIndexResp = $this->get('/blog');
+        $blogIndexResp->assertOk();
+        $blogIndexResp->assertSee('Digital Class Knowledge Hub');
+        $blogIndexResp->assertSee('Next-Gen Educational Technology in 2027');
+
+        // 6. Public can view individual article
+        $blogShowResp = $this->get('/blog/next-gen-educational-technology-2027');
+        $blogShowResp->assertOk();
+        $blogShowResp->assertSee('Next-Gen Educational Technology in 2027');
+
+        // 7. Public can post comment
+        $commentResp = $this->post('/blog/next-gen-educational-technology-2027/comment', [
+            'name'    => 'Pooja Verma',
+            'email'   => 'pooja.verma@example.com',
+            'comment' => 'Very insightful article! Looking forward to more.',
+        ]);
+        $commentResp->assertRedirect();
+        $commentResp->assertSessionHas('success');
+        $this->assertDatabaseHas('post_comments', [
+            'name'    => 'Pooja Verma',
+            'email'   => 'pooja.verma@example.com',
+        ]);
+    }
 }
 
 

@@ -382,3 +382,4 @@ class AdminLeadController extends Controller
         }, 200, $headers);
     }
 }
+

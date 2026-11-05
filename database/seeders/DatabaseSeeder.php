@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ReviewSeeder::class,
             SupportTicketSeeder::class,
             LeadSeeder::class,
+            PostSeeder::class,
         ]);
     }
 }

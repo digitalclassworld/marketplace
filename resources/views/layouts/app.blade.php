@@ -305,6 +305,9 @@
                     <li class="nav-item">
                         <a class="nav-link dc-nav-link {{ request()->routeIs('home') || request()->routeIs('business.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('home') }}">Businesses</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link dc-nav-link {{ request()->routeIs('blog.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('blog.index') }}">Blog</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dc-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             For Institutions
@@ -471,6 +474,7 @@
                         <li><a href="{{ route('courses') }}">Courses</a></li>
                         <li><a href="{{ route('products') }}">Products</a></li>
                         <li><a href="{{ route('services') }}">Services</a></li>
+                        <li><a href="{{ route('blog.index') }}">Blog & Articles</a></li>
                     </ul>
                 </div>
 
