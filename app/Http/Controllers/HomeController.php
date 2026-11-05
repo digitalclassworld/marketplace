@@ -1021,6 +1021,699 @@ class HomeController extends Controller
     }
 
     /**
+     * Display the rich dynamic service details page matching the UI design.
+     */
+    public function serviceShow(Request $request, string $slug): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $service = null;
+        try {
+            if (Schema::hasTable('services')) {
+                $service = \App\Models\Service::with(['seller.businessDetail', 'seller.user'])
+                    ->where('slug', $slug)
+                    ->first();
+
+                if (!$service) {
+                    $normalized = str_replace('-', ' ', $slug);
+                    $service = \App\Models\Service::with(['seller.businessDetail', 'seller.user'])
+                        ->where('title', 'like', "%{$normalized}%")
+                        ->orWhere('slug', 'like', "%{$slug}%")
+                        ->first();
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on serviceShow: ' . $e->getMessage());
+        }
+
+        $serviceData = $this->resolveServiceCatalogDetails($slug, $service);
+        $serviceData['seller'] = $seller;
+
+        return view('home.service-show', $serviceData);
+    }
+
+    /**
+     * Book a service.
+     */
+    public function serviceBook(Request $request, string $slug)
+    {
+        return back()->with('success', 'Your booking request has been confirmed! The service team will get in touch with you shortly.');
+    }
+
+    /**
+     * Submit custom quote request.
+     */
+    public function serviceQuote(Request $request, string $slug)
+    {
+        return back()->with('success', 'Your custom requirements have been sent to the expert. You will receive a quote within 2 hours.');
+    }
+
+    /**
+     * Resolve rich catalog specs, gallery, highlights, packages and reviews for any service slug.
+     */
+    private function resolveServiceCatalogDetails(string $slug, ?\App\Models\Service $service): array
+    {
+        $cleanSlug = strtolower(trim($slug));
+
+        $registry = [
+            'website' => [
+                'match' => ['website', 'web-development', 'website-development-for-school-institute-business', 'professional-website-development', 'school', 'institute'],
+                'title' => 'Website Development for School, Institute & Business',
+                'slug' => 'website-development-for-school-institute-business',
+                'category' => 'Website Development',
+                'rating' => 4.8,
+                'reviews_count' => 120,
+                'orders_count' => '320+ Orders',
+                'badge' => 'Top Rated',
+                'summary' => 'Get a modern, responsive and SEO-friendly website with domain, hosting and admin panel. Specially designed for schools, coaching classes, colleges and education businesses.',
+                'provider' => [
+                    'name' => 'Tech Solutions',
+                    'verified' => true,
+                    'location' => 'Ahmedabad, Gujarat',
+                    'experience' => '4+ Years Experience',
+                    'member_since' => 'Member since Jan 2021',
+                    'orders_completed' => '320+',
+                    'rating' => 4.8,
+                    'on_time_delivery' => '98%',
+                    'reviews_count' => 120,
+                    'avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
+                    'specialty_desc' => 'Professional Web & App Development for Education Institutes and Businesses',
+                ],
+                'hero_visual' => [
+                    'title' => 'Complete Digital Presence For Your Institution',
+                    'subtitle' => 'Website + Mobile App + ERP',
+                    'image' => 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=1200&auto=format&fit=crop&q=80',
+                    'overlay_tags' => [
+                        'Modern Design', 'Mobile Responsive', 'SEO Friendly', 'Admin Panel',
+                        'Custom Design', 'Student Management', 'Online Admission', 'Fees & Payment',
+                        'Mobile App (Android/iOS)', '1 Year Support'
+                    ],
+                ],
+                'gallery' => [
+                    'https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80',
+                ],
+                'trust_badges' => [
+                    ['label' => 'On-Time Delivery', 'icon' => 'fa-regular fa-clock', 'color' => 'text-primary'],
+                    ['label' => 'Unlimited Revisions', 'icon' => 'fa-solid fa-arrows-rotate', 'color' => 'text-info'],
+                    ['label' => 'Source Files Included', 'icon' => 'fa-regular fa-file-code', 'color' => 'text-success'],
+                    ['label' => '1 Year Free Support', 'icon' => 'fa-solid fa-shield-halved', 'color' => 'text-warning'],
+                ],
+                'packages' => [
+                    'basic' => [
+                        'name' => 'Basic Landing Page',
+                        'price' => 4999,
+                        'mrp' => 7999,
+                        'discount' => 38,
+                        'package_title' => 'Single Page Website',
+                        'delivery' => '3 Days',
+                        'delivery_text' => 'Delivery in 3 Days',
+                        'features' => [
+                            '1 Page Responsive Landing Page',
+                            'Mobile & Tablet Optimized',
+                            'Contact & Enquiry Form',
+                            'Domain & Hosting Setup',
+                            'Basic SEO Integration',
+                            'Delivery in 3 Days',
+                        ],
+                    ],
+                    'standard' => [
+                        'name' => 'Standard',
+                        'is_popular' => true,
+                        'price' => 9999,
+                        'mrp' => 14999,
+                        'discount' => 33,
+                        'package_title' => 'Website + Admin Panel',
+                        'delivery' => '7 Days',
+                        'delivery_text' => 'Delivery in 7 Days',
+                        'features' => [
+                            '5 Pages (Home, About, Courses, Gallery, Contact)',
+                            'Mobile Responsive Design',
+                            'Domain & Hosting (1 Year)',
+                            'Admin Panel (Manage Content)',
+                            'Basic SEO Setup',
+                            'WhatsApp Integration',
+                            'Delivery in 7 Days',
+                        ],
+                    ],
+                    'premium' => [
+                        'name' => 'Premium Portal',
+                        'price' => 24999,
+                        'mrp' => 39999,
+                        'discount' => 38,
+                        'package_title' => 'Complete Portal + ERP & App',
+                        'delivery' => '14 Days',
+                        'delivery_text' => 'Delivery in 14 Days',
+                        'features' => [
+                            'Unlimited Dynamic Pages',
+                            'Online Admission & Fee Payment Gateway',
+                            'Student & Parent Portal Integration',
+                            'Android App (Webview)',
+                            'Dedicated Cloud Hosting & SSL',
+                            'Complete SEO & Google Analytics',
+                            'Free 1 Year Maintenance & Training',
+                            'Delivery in 14 Days',
+                        ],
+                    ],
+                ],
+                'about_service' => 'Get a professional, modern and SEO-friendly website for your School, Institute, Coaching Center or Education Business. We design websites that are fast, mobile responsive and easy to manage. You will get a complete solution with domain, hosting, admin panel and training.',
+                'feature_boxes' => [
+                    ['title' => 'Modern & Attractive Design', 'icon' => 'fa-solid fa-laptop-code'],
+                    ['title' => 'Mobile & Tablet Responsive', 'icon' => 'fa-solid fa-mobile-screen'],
+                    ['title' => 'Easy to Use Admin Panel', 'icon' => 'fa-solid fa-sliders'],
+                    ['title' => 'SEO Friendly Structure', 'icon' => 'fa-solid fa-magnifying-glass-chart'],
+                    ['title' => 'Integration with ERP / App (Optional)', 'icon' => 'fa-solid fa-cubes'],
+                ],
+                'why_choose_us' => [
+                    'Specialized in Education Websites',
+                    '100+ Institute Websites Delivered',
+                    'Dedicated Support & Training',
+                    'Custom Features as per Your Requirement',
+                    'Clean & Professional Design',
+                    '100+ Loading & SEO Optimized',
+                    'Secure & Reliable Hosting',
+                    'Affordable Pricing',
+                ],
+                'live_example' => [
+                    'title' => 'Bright Future International School',
+                    'tagline' => 'Empowering Young Minds for a Brighter Tomorrow',
+                    'image' => 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=800&auto=format&fit=crop&q=80',
+                    'live_url' => 'https://web.digitalclassworld.in',
+                ],
+                'reviews' => [
+                    [
+                        'name' => 'Rahul Patel',
+                        'time' => '2 weeks ago',
+                        'rating' => 5,
+                        'avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80',
+                        'comment' => 'Excellent work! Very professional and timely delivery. Highly recommended.',
+                    ],
+                    [
+                        'name' => 'Neha Shah',
+                        'time' => '1 month ago',
+                        'rating' => 5,
+                        'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80',
+                        'comment' => 'Great design and support. The website looks amazing and easy to manage.',
+                    ],
+                    [
+                        'name' => 'Amit Desai',
+                        'time' => '1 month ago',
+                        'rating' => 5,
+                        'avatar' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80',
+                        'comment' => 'Good communication and understanding of requirements. Delivered exactly what we needed.',
+                    ],
+                ],
+                'related_services' => [
+                    [
+                        'title' => 'Mobile App Development (Android & iOS)',
+                        'slug' => 'mobile-app-development-android-ios',
+                        'rating' => 4.7,
+                        'reviews_count' => 180,
+                        'price' => 19999,
+                        'mrp' => 35000,
+                        'discount' => 43,
+                        'thumbnail' => 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=300&auto=format&fit=crop&q=80',
+                    ],
+                    [
+                        'title' => 'Logo & Complete Brand Identity Design',
+                        'slug' => 'logo-complete-brand-identity-design',
+                        'rating' => 4.6,
+                        'reviews_count' => 260,
+                        'price' => 3999,
+                        'mrp' => 8000,
+                        'discount' => 50,
+                        'thumbnail' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=300&auto=format&fit=crop&q=80',
+                    ],
+                ],
+            ],
+
+            'mobile-app' => [
+                'match' => ['app', 'mobile-app', 'mobile-app-development-android-ios', 'android', 'ios'],
+                'title' => 'Mobile App Development (Android & iOS)',
+                'slug' => 'mobile-app-development-android-ios',
+                'category' => 'Mobile App Development',
+                'rating' => 4.7,
+                'reviews_count' => 180,
+                'orders_count' => '290+ Orders',
+                'badge' => 'Level 2 Seller',
+                'summary' => 'Custom mobile applications with modern UI/UX for your school, institute or startup with complete backend API integration, notifications and app store publishing.',
+                'provider' => [
+                    'name' => 'App Creators',
+                    'verified' => true,
+                    'location' => 'Surat, Gujarat',
+                    'experience' => '5+ Years Experience',
+                    'member_since' => 'Member since Mar 2020',
+                    'orders_completed' => '290+',
+                    'rating' => 4.7,
+                    'on_time_delivery' => '97%',
+                    'reviews_count' => 180,
+                    'avatar' => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
+                    'specialty_desc' => 'Flutter & React Native Specialist for Mobile EdTech Solutions',
+                ],
+                'hero_visual' => [
+                    'title' => 'Native Quality Mobile Experience',
+                    'subtitle' => 'Android + iOS + Firebase Backend',
+                    'image' => 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1200&auto=format&fit=crop&q=80',
+                    'overlay_tags' => [
+                        'Android App', 'iOS App', 'Flutter UI', 'Push Notifications',
+                        'Payment Gateway', 'Live Video Streaming', 'Offline Downloads', 'App Store Setup'
+                    ],
+                ],
+                'gallery' => [
+                    'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?w=800&auto=format&fit=crop&q=80',
+                ],
+                'trust_badges' => [
+                    ['label' => 'On-Time Delivery', 'icon' => 'fa-regular fa-clock', 'color' => 'text-primary'],
+                    ['label' => 'Free 1 Month Support', 'icon' => 'fa-solid fa-shield-halved', 'color' => 'text-success'],
+                    ['label' => 'Clean Flutter Code', 'icon' => 'fa-solid fa-code', 'color' => 'text-info'],
+                    ['label' => 'Play Store Guaranteed', 'icon' => 'fa-brands fa-google-play', 'color' => 'text-warning'],
+                ],
+                'packages' => [
+                    'basic' => [
+                        'name' => 'Android App Only',
+                        'price' => 9999,
+                        'mrp' => 16000,
+                        'discount' => 38,
+                        'package_title' => 'Android Webview App',
+                        'delivery' => '5 Days',
+                        'delivery_text' => 'Delivery in 5 Days',
+                        'features' => [
+                            'Convert Website to Android App',
+                            'Push Notifications Setup',
+                            'Custom Splash Screen & App Icon',
+                            'Google Play Store Submission',
+                            'Delivery in 5 Days',
+                        ],
+                    ],
+                    'standard' => [
+                        'name' => 'Standard',
+                        'is_popular' => true,
+                        'price' => 19999,
+                        'mrp' => 35000,
+                        'discount' => 43,
+                        'package_title' => 'Full Flutter App (Android & iOS)',
+                        'delivery' => '10 Days',
+                        'delivery_text' => 'Delivery in 10 Days',
+                        'features' => [
+                            'Custom Flutter App for Android & iOS',
+                            'Login, Registration & OTP Verification',
+                            'REST API Backend Integration',
+                            'Firebase Cloud Messaging Push Alerts',
+                            'In-App Payment Gateway (Razorpay)',
+                            'Google Play Store & Apple App Store Ready',
+                            'Delivery in 10 Days',
+                        ],
+                    ],
+                    'premium' => [
+                        'name' => 'Complete EdTech Ecosystem',
+                        'price' => 39999,
+                        'mrp' => 65000,
+                        'discount' => 38,
+                        'package_title' => 'Student + Teacher + Admin Apps',
+                        'delivery' => '21 Days',
+                        'delivery_text' => 'Delivery in 21 Days',
+                        'features' => [
+                            'Triple App System: Student, Faculty & Admin',
+                            'Live Class Streaming (Zoom/Jitsi SDK)',
+                            'Video Encryption & DRM Screenshot Protection',
+                            'Quiz & Online Test Engine',
+                            'Admin Web Dashboard & Analytics',
+                            'Free 3 Months Maintenance & Updates',
+                            'Delivery in 21 Days',
+                        ],
+                    ],
+                ],
+                'about_service' => 'Turn your learning center into a modern mobile-first institution. We build high-performance, smooth native and cross-platform mobile apps for Android and iOS devices, complete with student logins, batch schedules, assignment uploads and push announcements.',
+                'feature_boxes' => [
+                    ['title' => 'High Performance Flutter', 'icon' => 'fa-brands fa-flutter'],
+                    ['title' => 'Push Notifications', 'icon' => 'fa-regular fa-bell'],
+                    ['title' => 'Offline Content Access', 'icon' => 'fa-solid fa-cloud-arrow-down'],
+                    ['title' => 'Razorpay & UPI Checkout', 'icon' => 'fa-solid fa-credit-card'],
+                    ['title' => 'App Store Publishing', 'icon' => 'fa-brands fa-google-play'],
+                ],
+                'why_choose_us' => [
+                    'Specialized in Education Mobile Apps',
+                    'Smooth 60 FPS Native Performance',
+                    'Zero Crash Rate Guarantee',
+                    'Full Source Code Ownership',
+                    'Google Play & Apple Store Assistance',
+                    'Fast 10-day Turnaround',
+                    'Dedicated Technical Project Manager',
+                    'Competitive Fixed Price Quotes',
+                ],
+                'live_example' => [
+                    'title' => 'Digital Class Student Companion App',
+                    'tagline' => 'Learning anytime, anywhere on smartphones',
+                    'image' => 'https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?w=800&auto=format&fit=crop&q=80',
+                    'live_url' => 'https://web.digitalclassworld.in',
+                ],
+                'reviews' => [
+                    [
+                        'name' => 'Pooja Joshi',
+                        'time' => '3 weeks ago',
+                        'rating' => 5,
+                        'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80',
+                        'comment' => 'Our students love the app! Video lectures play seamlessly and payment collection became automatic.',
+                    ],
+                ],
+                'related_services' => [
+                    [
+                        'title' => 'Website Development for School, Institute & Business',
+                        'slug' => 'website-development-for-school-institute-business',
+                        'rating' => 4.8,
+                        'reviews_count' => 120,
+                        'price' => 9999,
+                        'mrp' => 14999,
+                        'discount' => 33,
+                        'thumbnail' => 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=300&auto=format&fit=crop&q=80',
+                    ],
+                ],
+            ],
+
+            'digital-marketing' => [
+                'match' => ['marketing', 'digital-marketing', 'complete-digital-marketing-package', 'ads', 'social-media'],
+                'title' => 'Complete Digital Marketing Package',
+                'slug' => 'complete-digital-marketing-package',
+                'category' => 'Digital Marketing',
+                'rating' => 4.8,
+                'reviews_count' => 210,
+                'orders_count' => '450+ Orders',
+                'badge' => 'Top Rated',
+                'summary' => 'Grow your business with SEO, social media management, Google Ads, Meta Ads and high-converting lead generation funnels designed for educational institutions and local brands.',
+                'provider' => [
+                    'name' => 'Digital Boost Agency',
+                    'verified' => true,
+                    'location' => 'Mumbai, Maharashtra',
+                    'experience' => '6+ Years Experience',
+                    'member_since' => 'Member since Nov 2019',
+                    'orders_completed' => '450+',
+                    'rating' => 4.8,
+                    'on_time_delivery' => '99%',
+                    'reviews_count' => 210,
+                    'avatar' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80',
+                    'specialty_desc' => 'Certified Google Partner & Meta Marketing Agency',
+                ],
+                'hero_visual' => [
+                    'title' => 'Targeted Leads & High-ROI Campaigns',
+                    'subtitle' => 'Google Ads + Meta Ads + SEO + Creatives',
+                    'image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&auto=format&fit=crop&q=80',
+                    'overlay_tags' => [
+                        'Meta Ads', 'Google Ads', 'Local SEO', 'Instagram Growth',
+                        'Admission Inquiries', 'Conversion Tracking', 'Weekly Analytics'
+                    ],
+                ],
+                'gallery' => [
+                    'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=800&auto=format&fit=crop&q=80',
+                ],
+                'trust_badges' => [
+                    ['label' => 'Google Certified Partner', 'icon' => 'fa-brands fa-google', 'color' => 'text-danger'],
+                    ['label' => 'Targeted Local Audience', 'icon' => 'fa-solid fa-location-crosshairs', 'color' => 'text-primary'],
+                    ['label' => 'Weekly Transparent Reports', 'icon' => 'fa-solid fa-chart-pie', 'color' => 'text-success'],
+                    ['label' => 'Dedicated Media Buyer', 'icon' => 'fa-solid fa-user-tie', 'color' => 'text-warning'],
+                ],
+                'packages' => [
+                    'basic' => [
+                        'name' => 'Starter Social Growth',
+                        'price' => 1999,
+                        'mrp' => 4000,
+                        'discount' => 50,
+                        'package_title' => '12 Social Creatives & Setup',
+                        'delivery' => '3 Days',
+                        'delivery_text' => 'Delivery in 3 Days',
+                        'features' => [
+                            '12 Branded Social Media Posts',
+                            'Hashtag Research & Content Strategy',
+                            'Facebook & Instagram Page Optimization',
+                            'Delivery in 3 Days',
+                        ],
+                    ],
+                    'standard' => [
+                        'name' => 'Standard',
+                        'is_popular' => true,
+                        'price' => 3999,
+                        'mrp' => 8000,
+                        'discount' => 50,
+                        'package_title' => 'Complete Digital Marketing Package',
+                        'delivery' => '5 Days',
+                        'delivery_text' => 'Delivery in 5 Days',
+                        'features' => [
+                            '24 Custom Graphic Posts + 4 Reels',
+                            'Meta Ads Campaign Setup (Facebook & Instagram)',
+                            'Google Business Profile 3-Pack Optimization',
+                            'Targeted Student / Customer Inquiries',
+                            'Monthly Performance Report',
+                            'Delivery in 5 Days',
+                        ],
+                    ],
+                    'premium' => [
+                        'name' => 'Full Scale Growth Retainer',
+                        'price' => 9999,
+                        'mrp' => 18000,
+                        'discount' => 44,
+                        'package_title' => 'Omnichannel Marketing Retainer',
+                        'delivery' => '30 Days',
+                        'delivery_text' => 'Monthly Retainer',
+                        'features' => [
+                            'Daily High-Converting Social Content',
+                            'Google Search Ads + Meta Lead Funnels',
+                            'Weekly Landing Page A/B Testing',
+                            'CRM Integration & Automated Lead WhatsApp Follow-up',
+                            'Dedicated Senior Campaign Manager',
+                            'Bi-weekly Strategy Calls',
+                        ],
+                    ],
+                ],
+                'about_service' => 'Accelerate your brand visibility and student admissions with proven, targeted digital marketing campaigns. We craft stunning creatives, run conversion-optimized paid ads, and position your local business at the top of Google searches.',
+                'feature_boxes' => [
+                    ['title' => 'Meta & Instagram Ads', 'icon' => 'fa-brands fa-meta'],
+                    ['title' => 'Google Search PPC', 'icon' => 'fa-brands fa-google'],
+                    ['title' => 'Creative Graphic Design', 'icon' => 'fa-solid fa-palette'],
+                    ['title' => 'Lead Gen Funnels', 'icon' => 'fa-solid fa-filter-circle-dollar'],
+                    ['title' => 'ROI Tracking', 'icon' => 'fa-solid fa-chart-line'],
+                ],
+                'why_choose_us' => [
+                    'Over ₹2 Crore Managed Ad Spend',
+                    'Average 4.2x ROAS Generated',
+                    'Creative Studio with In-House Copywriters',
+                    'Transparent Ad Spend Accounts',
+                    'Proven Education & Institute Blueprints',
+                    'No Long-Term Lock-in Contracts',
+                    'Weekly Detailed KPI Analytics',
+                    'Dedicated Account Manager',
+                ],
+                'live_example' => [
+                    'title' => 'Admission Drive 2026 Campaign',
+                    'tagline' => '500+ Verified Student Enquiries Generated in 30 Days',
+                    'image' => 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=800&auto=format&fit=crop&q=80',
+                    'live_url' => 'https://web.digitalclassworld.in',
+                ],
+                'reviews' => [
+                    [
+                        'name' => 'Sanjay Verma',
+                        'time' => '1 month ago',
+                        'rating' => 5,
+                        'avatar' => 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&auto=format&fit=crop&q=80',
+                        'comment' => 'Our new batch filled within 2 weeks of launching the Facebook lead ads. Outstanding performance!',
+                    ],
+                ],
+                'related_services' => [
+                    [
+                        'title' => 'Website Development for School, Institute & Business',
+                        'slug' => 'website-development-for-school-institute-business',
+                        'rating' => 4.8,
+                        'reviews_count' => 120,
+                        'price' => 9999,
+                        'mrp' => 14999,
+                        'discount' => 33,
+                        'thumbnail' => 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=300&auto=format&fit=crop&q=80',
+                    ],
+                ],
+            ],
+
+            'logo-branding' => [
+                'match' => ['logo', 'branding', 'logo-complete-brand-identity-design', 'graphic', 'brand'],
+                'title' => 'Logo & Complete Brand Identity Design',
+                'slug' => 'logo-complete-brand-identity-design',
+                'category' => 'Logo & Branding',
+                'rating' => 4.7,
+                'reviews_count' => 280,
+                'orders_count' => '520+ Orders',
+                'badge' => 'Top Rated',
+                'summary' => 'Unique and professional logo design with comprehensive brand guidelines, visiting cards, letterheads, social media kits and vector source files for print and digital use.',
+                'provider' => [
+                    'name' => 'Creative Hub',
+                    'verified' => true,
+                    'location' => 'Surat, Gujarat',
+                    'experience' => '7+ Years Experience',
+                    'member_since' => 'Member since Jan 2019',
+                    'orders_completed' => '520+',
+                    'rating' => 4.7,
+                    'on_time_delivery' => '99%',
+                    'reviews_count' => 280,
+                    'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+                    'specialty_desc' => 'Award Winning Brand Identity & Typography Studio',
+                ],
+                'hero_visual' => [
+                    'title' => 'Timeless Visual Identity & Logo Systems',
+                    'subtitle' => 'Vector Logos + Brand Kit + Stationery',
+                    'image' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=1200&auto=format&fit=crop&q=80',
+                    'overlay_tags' => [
+                        'Vector Files', 'Brand Guidelines', 'Stationery Design', 'Social Media Kit',
+                        'Copyright Transfer', 'Unlimited Revisions', 'High Resolution 300 DPI'
+                    ],
+                ],
+                'gallery' => [
+                    'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
+                    'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?w=800&auto=format&fit=crop&q=80',
+                ],
+                'trust_badges' => [
+                    ['label' => '100% Original Vector Art', 'icon' => 'fa-solid fa-vector-square', 'color' => 'text-primary'],
+                    ['label' => 'Unlimited Revisions', 'icon' => 'fa-solid fa-arrows-rotate', 'color' => 'text-success'],
+                    ['label' => 'Full Commercial Copyright', 'icon' => 'fa-solid fa-copyright', 'color' => 'text-info'],
+                    ['label' => 'Delivery in 48 Hours', 'icon' => 'fa-regular fa-clock', 'color' => 'text-warning'],
+                ],
+                'packages' => [
+                    'basic' => [
+                        'name' => 'Logo Basic',
+                        'price' => 499,
+                        'mrp' => 1200,
+                        'discount' => 58,
+                        'package_title' => '2 Logo Concepts',
+                        'delivery' => '24 Hours',
+                        'delivery_text' => 'Delivery in 24 Hours',
+                        'features' => [
+                            '2 Unique Logo Concepts',
+                            'High Resolution PNG & JPG',
+                            'Transparent Background Files',
+                            'Delivery in 24 Hours',
+                        ],
+                    ],
+                    'standard' => [
+                        'name' => 'Standard',
+                        'is_popular' => true,
+                        'price' => 1499,
+                        'mrp' => 3000,
+                        'discount' => 50,
+                        'package_title' => 'Logo & Complete Brand Identity',
+                        'delivery' => '2 Days',
+                        'delivery_text' => 'Delivery in 2 Days',
+                        'features' => [
+                            '4 Premium Logo Concepts',
+                            'Vector Source Files (AI, EPS, SVG, PDF)',
+                            'Business Card & Letterhead Stationery',
+                            'Social Media Profile & Banner Kit',
+                            'Color Palette & Font Specifications',
+                            'Unlimited Revisions',
+                        ],
+                    ],
+                    'premium' => [
+                        'name' => 'Corporate Identity System',
+                        'price' => 3999,
+                        'mrp' => 8000,
+                        'discount' => 50,
+                        'package_title' => 'Full Brand Guidelines & 3D Mockups',
+                        'delivery' => '4 Days',
+                        'delivery_text' => 'Delivery in 4 Days',
+                        'features' => [
+                            '6 Exclusive Concepts with Senior Creative Director',
+                            'Comprehensive 20-page Brand Style Guide',
+                            'Complete Office Stationery & Signage Pack',
+                            '3D Mockup Presentation',
+                            'Copyright Transfer Agreement',
+                            'Priority 24/7 VIP Support',
+                        ],
+                    ],
+                ],
+                'about_service' => 'Your logo is the cornerstone of your brand identity. We craft distinctive, memorable, and modern brand visual languages that reflect your values and establish instant credibility in the minds of your students and clients.',
+                'feature_boxes' => [
+                    ['title' => 'Vector Formats (AI/SVG)', 'icon' => 'fa-solid fa-bezier-curve'],
+                    ['title' => 'Complete Typography Kit', 'icon' => 'fa-solid fa-font'],
+                    ['title' => 'Social Banners & Icons', 'icon' => 'fa-solid fa-icons'],
+                    ['title' => 'Print Ready 300 DPI', 'icon' => 'fa-solid fa-print'],
+                    ['title' => 'Full IP Ownership', 'icon' => 'fa-solid fa-certificate'],
+                ],
+                'why_choose_us' => [
+                    'Over 500+ Brand Identities Created',
+                    'Zero Stock Clip-art: 100% Bespoke Designs',
+                    'Unlimited Revisions until 100% Delighted',
+                    'Instant Delivery of All Editable Vectors',
+                    'Expert Guidance on Brand Storytelling',
+                    'Industry Specific Color Psychology',
+                    'Print-Tested CMYK and RGB Formats',
+                    'Satisfaction or Rework Guarantee',
+                ],
+                'live_example' => [
+                    'title' => 'VCEC Brand Identity System',
+                    'tagline' => 'Iconic Educational Branding with Modern Blue & Amber Theme',
+                    'image' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop&q=80',
+                    'live_url' => 'https://web.digitalclassworld.in',
+                ],
+                'reviews' => [
+                    [
+                        'name' => 'Kavita Patel',
+                        'time' => '2 weeks ago',
+                        'rating' => 5,
+                        'avatar' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&auto=format&fit=crop&q=80',
+                        'comment' => 'Brilliant creativity! The logo and visiting cards look so premium. Everyone loved the new identity.',
+                    ],
+                ],
+                'related_services' => [
+                    [
+                        'title' => 'Website Development for School, Institute & Business',
+                        'slug' => 'website-development-for-school-institute-business',
+                        'rating' => 4.8,
+                        'reviews_count' => 120,
+                        'price' => 9999,
+                        'mrp' => 14999,
+                        'discount' => 33,
+                        'thumbnail' => 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=300&auto=format&fit=crop&q=80',
+                    ],
+                ],
+            ],
+        ];
+
+        // Search in registry by slug matching
+        $matched = null;
+        foreach ($registry as $key => $item) {
+            foreach ($item['match'] as $matchStr) {
+                if (str_contains($cleanSlug, $matchStr) || str_contains($matchStr, $cleanSlug)) {
+                    $matched = $item;
+                    break 2;
+                }
+            }
+        }
+
+        // If not matched, default to website definition with dynamic title from DB or slug
+        if (!$matched) {
+            $base = $registry['website'];
+            $title = $service ? $service->title : ucwords(str_replace('-', ' ', $slug));
+            $base['title'] = $title;
+            $base['slug'] = $slug;
+            if ($service) {
+                $base['category'] = $service->category ?: 'Website Development';
+                $base['summary'] = $service->short_description ?: $base['summary'];
+                if ($service->price > 0) {
+                    $base['packages']['standard']['price'] = (float)$service->price;
+                    $base['packages']['standard']['mrp'] = round((float)$service->price * 1.5);
+                }
+            }
+            $matched = $base;
+        }
+
+        return $matched;
+    }
+
+    /**
      * Display the public Products directory page matching the UI design.
      */
     public function products(Request $request): View

@@ -1467,7 +1467,7 @@
 
                         <!-- Content Info -->
                         <div class="service-card-info-col">
-                            <a href="javascript:void(0)" class="service-title" onclick="openServiceDetailModal({{ json_encode($svc) }})">
+                            <a href="{{ route('service.show', $svc->slug) }}" class="service-title">
                                 {{ $svc->title }}
                             </a>
                             <p class="service-desc">{{ $svc->short_description }}</p>
@@ -1518,10 +1518,10 @@
                                 <span>{{ $svc->revision_text }}</span>
                             </div>
 
-                            <button type="button" class="btn-view-service" onclick="openServiceDetailModal({{ json_encode($svc) }})">
+                            <a href="{{ route('service.show', $svc->slug) }}" class="btn-view-service">
                                 <span>View Details</span>
                                 <i class="fa-solid fa-arrow-right-long"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 @empty
@@ -1820,3 +1820,4 @@
     }
 </script>
 @endsection
+
