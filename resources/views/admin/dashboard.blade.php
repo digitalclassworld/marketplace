@@ -529,6 +529,156 @@
         </div>
     </div>
 
+    <!-- =========================================================================
+         ALL PLATFORM USERS & MEMBERS (ACTIVE & NON-ACTIVE) - 100% REAL DATABASE
+         ========================================================================= -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 pb-3 border-bottom mb-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 1.15rem;">
+                        <i class="fa-solid fa-users text-primary"></i>
+                        All Platform Users &amp; Members
+                    </h5>
+                    <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;">
+                        {{ count($allPlatformUsers) }} Total Users
+                    </span>
+                </div>
+                <p class="text-muted small mb-0">
+                    Live database records of all registered accounts across all roles (Active, Inactive, Students, Sellers, Institutes, Super Admin).
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3">
+                    <i class="fa-solid fa-up-right-from-square me-1"></i> Full User Manager
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Pills & Search Bar -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-3">
+            <div class="d-flex flex-wrap gap-1.5" id="userFilterButtons">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold active user-filter-btn" data-filter="all">
+                    All ({{ count($allPlatformUsers) }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="active">
+                    <i class="fa-solid fa-circle-check text-success me-1"></i> Active ({{ $allPlatformUsers->where('status', 'Active')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="inactive">
+                    <i class="fa-solid fa-circle-xmark text-secondary me-1"></i> Inactive ({{ $allPlatformUsers->where('status', 'Inactive')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="pending">
+                    <i class="fa-solid fa-clock text-warning me-1"></i> Pending ({{ $allPlatformUsers->where('status', 'Pending Approval')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="sellers">
+                    <i class="fa-solid fa-store text-info me-1"></i> Sellers/Institutes ({{ $allPlatformUsers->whereIn('type', ['Seller', 'Institute'])->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="students">
+                    <i class="fa-solid fa-graduation-cap text-purple me-1"></i> Students ({{ $allPlatformUsers->where('type', 'Student')->count() }})
+                </button>
+            </div>
+            <div style="min-width: 260px;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0 text-muted">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="dashboardUserSearchInput" class="form-control border-start-0 ps-0" placeholder="Search by name, email, phone, ID...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="dashboardUsersTable" style="font-size: 0.825rem;">
+                <thead class="bg-light text-muted" style="border-bottom: 2px solid #e2e8f0;">
+                    <tr>
+                        <th style="width: 45px;">#</th>
+                        <th>User Identity</th>
+                        <th>Contact Phone</th>
+                        <th>Role / Account Type</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Registered Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($allPlatformUsers as $userItem)
+                        @php
+                            $searchHaystack = strtolower($userItem['name'] . ' ' . $userItem['email'] . ' ' . $userItem['phone'] . ' ' . $userItem['type'] . ' ' . $userItem['status'] . ' ' . $userItem['location'] . ' ' . ($userItem['seller_code'] ?? ''));
+                            $filterCategory = 'other';
+                            if ($userItem['status'] === 'Active') $filterCategory .= ' active';
+                            if ($userItem['status'] === 'Inactive') $filterCategory .= ' inactive';
+                            if ($userItem['status'] === 'Pending Approval') $filterCategory .= ' pending';
+                            if (in_array($userItem['type'], ['Seller', 'Institute'])) $filterCategory .= ' sellers';
+                            if ($userItem['type'] === 'Student') $filterCategory .= ' students';
+                        @endphp
+                        <tr class="dashboard-user-row" data-category="{{ $filterCategory }}" data-search="{{ $searchHaystack }}">
+                            <td class="text-muted fw-bold">#{{ $userItem['id'] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="{{ $userItem['avatar'] }}" alt="{{ $userItem['name'] }}" class="rounded-circle shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
+                                    <div class="overflow-hidden">
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 170px;">{{ $userItem['name'] }}</div>
+                                        <small class="text-muted text-truncate d-block" style="font-size: 0.725rem; max-width: 170px;">{{ $userItem['email'] }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-secondary font-monospace" style="font-size: 0.78rem;">
+                                {{ $userItem['phone'] }}
+                            </td>
+                            <td>
+                                <span class="badge {{ $userItem['badge_class'] }} px-2.5 py-1 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                    {{ $userItem['type'] }}
+                                </span>
+                                @if(!empty($userItem['seller_code']))
+                                    <small class="text-muted d-block font-monospace" style="font-size: 0.68rem;">{{ $userItem['seller_code'] }}</small>
+                                @endif
+                            </td>
+                            <td class="text-secondary">
+                                <i class="fa-solid fa-location-dot text-danger me-1 small"></i>
+                                {{ $userItem['location'] }}
+                            </td>
+                            <td>
+                                <span class="badge {{ $userItem['status_class'] }} px-2.5 py-1 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                    @if($userItem['status'] === 'Active')
+                                        <i class="fa-solid fa-circle-check me-1"></i> Active
+                                    @elseif($userItem['status'] === 'Inactive')
+                                        <i class="fa-solid fa-circle-xmark me-1"></i> Inactive
+                                    @else
+                                        <i class="fa-solid fa-clock me-1"></i> Pending
+                                    @endif
+                                </span>
+                            </td>
+                            <td class="text-muted" style="font-size: 0.75rem;">
+                                {{ $userItem['joined_on'] }}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    @if(!empty($userItem['seller_id']))
+                                        <a href="{{ route('admin.sellers.show', $userItem['seller_id']) }}" class="btn btn-sm btn-light border py-1 px-2 fw-semibold text-primary" title="View Seller Store">
+                                            <i class="fa-solid fa-store me-1"></i> Store
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('admin.users.index', ['search' => $userItem['email']]) }}" class="btn btn-sm btn-light border py-1 px-2 fw-semibold text-dark" title="Inspect User">
+                                        <i class="fa-solid fa-eye me-1"></i> View
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-users fs-3 text-secondary opacity-50 mb-2 d-block"></i>
+                                <strong>No users found in database.</strong>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- ================= BOTTOM ROW: RECENT ORDERS, RECENT SELLERS, RECENT ACTIVITIES ================= -->
     <div class="row g-3">
         <!-- 1. Recent Orders -->
@@ -652,6 +802,156 @@
                     @endforeach
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         ALL PLATFORM USERS & MEMBERS (ACTIVE & NON-ACTIVE) - 100% REAL DATABASE
+         ========================================================================= -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 pb-3 border-bottom mb-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 1.15rem;">
+                        <i class="fa-solid fa-users text-primary"></i>
+                        All Platform Users &amp; Members
+                    </h5>
+                    <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;">
+                        {{ count($allPlatformUsers) }} Total Users
+                    </span>
+                </div>
+                <p class="text-muted small mb-0">
+                    Live database records of all registered accounts across all roles (Active, Inactive, Students, Sellers, Institutes, Super Admin).
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3">
+                    <i class="fa-solid fa-up-right-from-square me-1"></i> Full User Manager
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Pills & Search Bar -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-3">
+            <div class="d-flex flex-wrap gap-1.5" id="userFilterButtons">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold active user-filter-btn" data-filter="all">
+                    All ({{ count($allPlatformUsers) }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="active">
+                    <i class="fa-solid fa-circle-check text-success me-1"></i> Active ({{ $allPlatformUsers->where('status', 'Active')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="inactive">
+                    <i class="fa-solid fa-circle-xmark text-secondary me-1"></i> Inactive ({{ $allPlatformUsers->where('status', 'Inactive')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="pending">
+                    <i class="fa-solid fa-clock text-warning me-1"></i> Pending ({{ $allPlatformUsers->where('status', 'Pending Approval')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="sellers">
+                    <i class="fa-solid fa-store text-info me-1"></i> Sellers/Institutes ({{ $allPlatformUsers->whereIn('type', ['Seller', 'Institute'])->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="students">
+                    <i class="fa-solid fa-graduation-cap text-purple me-1"></i> Students ({{ $allPlatformUsers->where('type', 'Student')->count() }})
+                </button>
+            </div>
+            <div style="min-width: 260px;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0 text-muted">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="dashboardUserSearchInput" class="form-control border-start-0 ps-0" placeholder="Search by name, email, phone, ID...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="dashboardUsersTable" style="font-size: 0.825rem;">
+                <thead class="bg-light text-muted" style="border-bottom: 2px solid #e2e8f0;">
+                    <tr>
+                        <th style="width: 45px;">#</th>
+                        <th>User Identity</th>
+                        <th>Contact Phone</th>
+                        <th>Role / Account Type</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Registered Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($allPlatformUsers as $userItem)
+                        @php
+                            $searchHaystack = strtolower($userItem['name'] . ' ' . $userItem['email'] . ' ' . $userItem['phone'] . ' ' . $userItem['type'] . ' ' . $userItem['status'] . ' ' . $userItem['location'] . ' ' . ($userItem['seller_code'] ?? ''));
+                            $filterCategory = 'other';
+                            if ($userItem['status'] === 'Active') $filterCategory .= ' active';
+                            if ($userItem['status'] === 'Inactive') $filterCategory .= ' inactive';
+                            if ($userItem['status'] === 'Pending Approval') $filterCategory .= ' pending';
+                            if (in_array($userItem['type'], ['Seller', 'Institute'])) $filterCategory .= ' sellers';
+                            if ($userItem['type'] === 'Student') $filterCategory .= ' students';
+                        @endphp
+                        <tr class="dashboard-user-row" data-category="{{ $filterCategory }}" data-search="{{ $searchHaystack }}">
+                            <td class="text-muted fw-bold">#{{ $userItem['id'] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="{{ $userItem['avatar'] }}" alt="{{ $userItem['name'] }}" class="rounded-circle shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
+                                    <div class="overflow-hidden">
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 170px;">{{ $userItem['name'] }}</div>
+                                        <small class="text-muted text-truncate d-block" style="font-size: 0.725rem; max-width: 170px;">{{ $userItem['email'] }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-secondary font-monospace" style="font-size: 0.78rem;">
+                                {{ $userItem['phone'] }}
+                            </td>
+                            <td>
+                                <span class="badge {{ $userItem['badge_class'] }} px-2.5 py-1 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                    {{ $userItem['type'] }}
+                                </span>
+                                @if(!empty($userItem['seller_code']))
+                                    <small class="text-muted d-block font-monospace" style="font-size: 0.68rem;">{{ $userItem['seller_code'] }}</small>
+                                @endif
+                            </td>
+                            <td class="text-secondary">
+                                <i class="fa-solid fa-location-dot text-danger me-1 small"></i>
+                                {{ $userItem['location'] }}
+                            </td>
+                            <td>
+                                <span class="badge {{ $userItem['status_class'] }} px-2.5 py-1 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                    @if($userItem['status'] === 'Active')
+                                        <i class="fa-solid fa-circle-check me-1"></i> Active
+                                    @elseif($userItem['status'] === 'Inactive')
+                                        <i class="fa-solid fa-circle-xmark me-1"></i> Inactive
+                                    @else
+                                        <i class="fa-solid fa-clock me-1"></i> Pending
+                                    @endif
+                                </span>
+                            </td>
+                            <td class="text-muted" style="font-size: 0.75rem;">
+                                {{ $userItem['joined_on'] }}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    @if(!empty($userItem['seller_id']))
+                                        <a href="{{ route('admin.sellers.show', $userItem['seller_id']) }}" class="btn btn-sm btn-light border py-1 px-2 fw-semibold text-primary" title="View Seller Store">
+                                            <i class="fa-solid fa-store me-1"></i> Store
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('admin.users.index', ['search' => $userItem['email']]) }}" class="btn btn-sm btn-light border py-1 px-2 fw-semibold text-dark" title="Inspect User">
+                                        <i class="fa-solid fa-eye me-1"></i> View
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-users fs-3 text-secondary opacity-50 mb-2 d-block"></i>
+                                <strong>No users found in database.</strong>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -1073,6 +1373,156 @@
         </div>
     </div>
 
+    <!-- =========================================================================
+         ALL PLATFORM USERS & MEMBERS (ACTIVE & NON-ACTIVE) - 100% REAL DATABASE
+         ========================================================================= -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 pb-3 border-bottom mb-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 1.15rem;">
+                        <i class="fa-solid fa-users text-primary"></i>
+                        All Platform Users &amp; Members
+                    </h5>
+                    <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;">
+                        {{ count($allPlatformUsers) }} Total Users
+                    </span>
+                </div>
+                <p class="text-muted small mb-0">
+                    Live database records of all registered accounts across all roles (Active, Inactive, Students, Sellers, Institutes, Super Admin).
+                </p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3">
+                    <i class="fa-solid fa-up-right-from-square me-1"></i> Full User Manager
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Pills & Search Bar -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-3">
+            <div class="d-flex flex-wrap gap-1.5" id="userFilterButtons">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold active user-filter-btn" data-filter="all">
+                    All ({{ count($allPlatformUsers) }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="active">
+                    <i class="fa-solid fa-circle-check text-success me-1"></i> Active ({{ $allPlatformUsers->where('status', 'Active')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="inactive">
+                    <i class="fa-solid fa-circle-xmark text-secondary me-1"></i> Inactive ({{ $allPlatformUsers->where('status', 'Inactive')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="pending">
+                    <i class="fa-solid fa-clock text-warning me-1"></i> Pending ({{ $allPlatformUsers->where('status', 'Pending Approval')->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="sellers">
+                    <i class="fa-solid fa-store text-info me-1"></i> Sellers/Institutes ({{ $allPlatformUsers->whereIn('type', ['Seller', 'Institute'])->count() }})
+                </button>
+                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="students">
+                    <i class="fa-solid fa-graduation-cap text-purple me-1"></i> Students ({{ $allPlatformUsers->where('type', 'Student')->count() }})
+                </button>
+            </div>
+            <div style="min-width: 260px;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0 text-muted">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="dashboardUserSearchInput" class="form-control border-start-0 ps-0" placeholder="Search by name, email, phone, ID...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="dashboardUsersTable" style="font-size: 0.825rem;">
+                <thead class="bg-light text-muted" style="border-bottom: 2px solid #e2e8f0;">
+                    <tr>
+                        <th style="width: 45px;">#</th>
+                        <th>User Identity</th>
+                        <th>Contact Phone</th>
+                        <th>Role / Account Type</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Registered Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($allPlatformUsers as $userItem)
+                        @php
+                            $searchHaystack = strtolower($userItem['name'] . ' ' . $userItem['email'] . ' ' . $userItem['phone'] . ' ' . $userItem['type'] . ' ' . $userItem['status'] . ' ' . $userItem['location'] . ' ' . ($userItem['seller_code'] ?? ''));
+                            $filterCategory = 'other';
+                            if ($userItem['status'] === 'Active') $filterCategory .= ' active';
+                            if ($userItem['status'] === 'Inactive') $filterCategory .= ' inactive';
+                            if ($userItem['status'] === 'Pending Approval') $filterCategory .= ' pending';
+                            if (in_array($userItem['type'], ['Seller', 'Institute'])) $filterCategory .= ' sellers';
+                            if ($userItem['type'] === 'Student') $filterCategory .= ' students';
+                        @endphp
+                        <tr class="dashboard-user-row" data-category="{{ $filterCategory }}" data-search="{{ $searchHaystack }}">
+                            <td class="text-muted fw-bold">#{{ $userItem['id'] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="{{ $userItem['avatar'] }}" alt="{{ $userItem['name'] }}" class="rounded-circle shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
+                                    <div class="overflow-hidden">
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 170px;">{{ $userItem['name'] }}</div>
+                                        <small class="text-muted text-truncate d-block" style="font-size: 0.725rem; max-width: 170px;">{{ $userItem['email'] }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-secondary font-monospace" style="font-size: 0.78rem;">
+                                {{ $userItem['phone'] }}
+                            </td>
+                            <td>
+                                <span class="badge {{ $userItem['badge_class'] }} px-2.5 py-1 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                    {{ $userItem['type'] }}
+                                </span>
+                                @if(!empty($userItem['seller_code']))
+                                    <small class="text-muted d-block font-monospace" style="font-size: 0.68rem;">{{ $userItem['seller_code'] }}</small>
+                                @endif
+                            </td>
+                            <td class="text-secondary">
+                                <i class="fa-solid fa-location-dot text-danger me-1 small"></i>
+                                {{ $userItem['location'] }}
+                            </td>
+                            <td>
+                                <span class="badge {{ $userItem['status_class'] }} px-2.5 py-1 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                    @if($userItem['status'] === 'Active')
+                                        <i class="fa-solid fa-circle-check me-1"></i> Active
+                                    @elseif($userItem['status'] === 'Inactive')
+                                        <i class="fa-solid fa-circle-xmark me-1"></i> Inactive
+                                    @else
+                                        <i class="fa-solid fa-clock me-1"></i> Pending
+                                    @endif
+                                </span>
+                            </td>
+                            <td class="text-muted" style="font-size: 0.75rem;">
+                                {{ $userItem['joined_on'] }}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    @if(!empty($userItem['seller_id']))
+                                        <a href="{{ route('admin.sellers.show', $userItem['seller_id']) }}" class="btn btn-sm btn-light border py-1 px-2 fw-semibold text-primary" title="View Seller Store">
+                                            <i class="fa-solid fa-store me-1"></i> Store
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('admin.users.index', ['search' => $userItem['email']]) }}" class="btn btn-sm btn-light border py-1 px-2 fw-semibold text-dark" title="Inspect User">
+                                        <i class="fa-solid fa-eye me-1"></i> View
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-users fs-3 text-secondary opacity-50 mb-2 d-block"></i>
+                                <strong>No users found in database.</strong>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 @endsection
 
@@ -1223,6 +1673,49 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 3. All Platform Users Live Filter & Search
+    const userSearchInput = document.getElementById('dashboardUserSearchInput');
+    const filterButtons = document.querySelectorAll('.user-filter-btn');
+    const userRows = document.querySelectorAll('.dashboard-user-row');
+
+    let currentFilter = 'all';
+
+    function applyUserFiltering() {
+        const query = (userSearchInput ? userSearchInput.value : '').toLowerCase().trim();
+
+        userRows.forEach(row => {
+            const categories = (row.getAttribute('data-category') || '').split(' ');
+            const searchData = (row.getAttribute('data-search') || '').toLowerCase();
+
+            const matchesCategory = (currentFilter === 'all') || categories.includes(currentFilter);
+            const matchesSearch = !query || searchData.includes(query);
+
+            if (matchesCategory && matchesSearch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    if (userSearchInput) {
+        userSearchInput.addEventListener('input', applyUserFiltering);
+    }
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterButtons.forEach(b => {
+                b.classList.remove('btn-primary', 'active');
+                b.classList.add('btn-light', 'text-secondary');
+            });
+            this.classList.remove('btn-light', 'text-secondary');
+            this.classList.add('btn-primary', 'active');
+
+            currentFilter = this.getAttribute('data-filter') || 'all';
+            applyUserFiltering();
+        });
+    });
 });
 </script>
 @endsection

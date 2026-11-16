@@ -23,5 +23,7 @@ Homestead.yaml
 Thumbs.db
 cookies.txt
 test_*.php
+*.sqlite
+*.sqlite-journal
 marketplace/
 scratch/

@@ -24,19 +24,79 @@ class AdminUserController extends Controller
         $status = $request->input('status');
         $location = $request->input('location');
 
-        // Fetch DB users
+        // Fetch DB users (latest first so newly created testing accounts appear immediately at the top)
         $dbUsers = collect();
         try {
             if (Schema::hasTable('users')) {
-                $dbUsers = User::with('seller.businessDetail')->get();
+                $dbUsers = User::with('seller.businessDetail')->latest('id')->get();
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('DB error in AdminUserController: ' . $e->getMessage());
         }
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $realUsers = [];
+        foreach ($dbUsers as $u) {
+            $sellerObj = $u->seller;
+            $type = 'Student';
 
-        // Base curated users matching screenshot pixel-for-pixel (only on local/testing)
+            if ($u->role === 'superadmin') {
+                $type = 'Super Admin';
+            } elseif ($sellerObj) {
+                $accType = strtolower($sellerObj->account_type ?? '');
+                if (str_contains($accType, 'institute') || str_contains($accType, 'company')) {
+                    $type = 'Institute';
+                } elseif (str_contains($accType, 'agency')) {
+                    $type = 'Professional';
+                } else {
+                    $type = 'Seller';
+                }
+            } elseif ($u->role === 'seller') {
+                $type = 'Seller';
+            } elseif ($u->role === 'professional') {
+                $type = 'Professional';
+            }
+
+            $orderCount = $sellerObj ? $sellerObj->orders()->count() : 0;
+            $revenueAmount = $sellerObj ? (float) $sellerObj->orders()->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
+            $city = $sellerObj?->businessDetail?->city ?: 'Ahmedabad';
+            $state = $sellerObj?->businessDetail?->state ?: 'Gujarat';
+
+            $statusStr = 'Active';
+            if ($sellerObj && in_array($sellerObj->seller_status, ['Inactive', 'Suspended'])) {
+                $statusStr = 'Inactive';
+            } elseif ($sellerObj && in_array($sellerObj->seller_status, [Seller::STATUS_PENDING_APPROVAL, 'Pending'])) {
+                $statusStr = 'Pending';
+            }
+
+            $realUsers[] = [
+                'id'             => $u->id,
+                'code'           => $sellerObj?->seller_code ?: ('UDC' . str_pad((string)$u->id, 5, '0', STR_PAD_LEFT)),
+                'name'           => $u->name,
+                'email'          => $u->email,
+                'phone'          => $u->phone ?: 'N/A',
+                'type'           => $type,
+                'location'       => "{$city}, {$state}",
+                'city'           => $city,
+                'joined_date'    => $u->created_at ? $u->created_at->format('d M Y') : now()->format('d M Y'),
+                'joined_ago'     => $u->created_at ? $u->created_at->diffForHumans() : 'Recently',
+                'status'         => $statusStr,
+                'orders_summary' => $orderCount > 0 ? "{$orderCount} Orders" : '1 Account',
+                'spent_summary'  => $revenueAmount > 0 ? '₹' . number_format($revenueAmount) : '₹0 spent',
+                'total_spent'    => $revenueAmount,
+                'total_orders'   => $orderCount,
+                'wishlist_count' => 0,
+                'dob'            => '01 Jan 2000',
+                'gender'         => 'Unspecified',
+                'avatar'         => $u->avatar_url ?: ('https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=0066ff&color=fff'),
+                'recent_orders'  => [],
+                'seller_id'      => $sellerObj?->id,
+            ];
+        }
+
+        // Only include fallback curated sample users if database has fewer than 2 users
+        $showDummy = config('marketplace.show_dummy_data', false) && count($realUsers) < 2;
+
+        // Base curated users matching screenshot pixel-for-pixel (only on local fallback if db is empty)
         $curatedUsers = $showDummy ? [
             [
                 'id' => 125,
@@ -285,58 +345,8 @@ class AdminUserController extends Controller
             ],
         ] : [];
 
-        // Merge DB users into list
-        foreach ($dbUsers as $u) {
-            $sellerObj = $u->seller;
-            $type = 'Student';
-
-            if ($u->role === 'superadmin') {
-                $type = 'Super Admin';
-            } elseif ($sellerObj) {
-                $accType = strtolower($sellerObj->account_type ?? '');
-                if (str_contains($accType, 'institute') || str_contains($accType, 'company')) {
-                    $type = 'Institute';
-                } elseif (str_contains($accType, 'agency')) {
-                    $type = 'Professional';
-                } else {
-                    $type = 'Seller';
-                }
-            } elseif ($u->role === 'seller') {
-                $type = 'Seller';
-            } elseif ($u->role === 'professional') {
-                $type = 'Professional';
-            }
-
-            $orderCount = $sellerObj ? $sellerObj->orders()->count() : 0;
-            $revenueAmount = $sellerObj ? (float) $sellerObj->orders()->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
-            $city = $sellerObj?->businessDetail?->city ?: 'Ahmedabad';
-            $state = $sellerObj?->businessDetail?->state ?: 'Gujarat';
-
-            $curatedUsers[] = [
-                'id'             => $u->id,
-                'code'           => 'UDC' . str_pad((string)$u->id, 5, '0', STR_PAD_LEFT),
-                'name'           => $u->name,
-                'email'          => $u->email,
-                'phone'          => $u->phone ?: '+91 98765 ' . rand(10000, 99999),
-                'type'           => $type,
-                'location'       => "{$city}, {$state}",
-                'city'           => $city,
-                'joined_date'    => $u->created_at ? $u->created_at->format('d M Y') : now()->format('d M Y'),
-                'joined_ago'     => $u->created_at ? $u->created_at->diffForHumans() : 'Recently',
-                'status'         => ($sellerObj && in_array($sellerObj->seller_status, ['Inactive', 'Suspended'])) ? 'Inactive' : 'Active',
-                'orders_summary' => $orderCount > 0 ? "{$orderCount} Orders" : '1 Account',
-                'spent_summary'  => $revenueAmount > 0 ? '₹' . number_format($revenueAmount) : '₹0 spent',
-                'total_spent'    => $revenueAmount,
-                'total_orders'   => $orderCount,
-                'wishlist_count' => 0,
-                'dob'            => '01 Jan 2000',
-                'gender'         => 'Unspecified',
-                'avatar'         => $u->avatar_url ?: ('https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=0066ff&color=fff'),
-                'recent_orders'  => [],
-            ];
-        }
-
-        $allUsers = collect($curatedUsers);
+        // Real DB users take priority; append fallback curated users only if showDummy is active
+        $allUsers = collect(array_merge($realUsers, $curatedUsers));
 
         // Apply Tab Filter
         if ($tab === 'students') {

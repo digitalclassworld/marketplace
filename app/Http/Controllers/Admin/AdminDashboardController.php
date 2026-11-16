@@ -413,11 +413,74 @@ class AdminDashboardController extends Controller
 
         $totalPendingCount = $pendingSellers->count() + $pendingCourses->count() + $pendingServices->count() + $pendingListings->count() + $pendingProducts->count();
 
+        // 8. All Platform Users (Active, Inactive, Sellers, Students, Institutes) from Real Backend Database
+        $allPlatformUsers = User::with(['seller.businessDetail'])
+            ->latest('id')
+            ->get()
+            ->map(function ($u, $idx) {
+                $seller = $u->seller;
+                $type = 'Student';
+                $badgeClass = 'bg-primary-subtle text-primary border border-primary-subtle';
+
+                if ($u->role === 'superadmin') {
+                    $type = 'Super Admin';
+                    $badgeClass = 'bg-danger-subtle text-danger border border-danger-subtle';
+                } elseif ($seller) {
+                    $accType = strtolower($seller->account_type ?? '');
+                    if (str_contains($accType, 'institute') || str_contains($accType, 'company')) {
+                        $type = 'Institute';
+                        $badgeClass = 'bg-info-subtle text-info border border-info-subtle';
+                    } elseif (str_contains($accType, 'agency')) {
+                        $type = 'Professional';
+                        $badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+                    } else {
+                        $type = 'Seller';
+                        $badgeClass = 'bg-success-subtle text-success border border-success-subtle';
+                    }
+                } elseif ($u->role === 'seller') {
+                    $type = 'Seller';
+                    $badgeClass = 'bg-success-subtle text-success border border-success-subtle';
+                } elseif ($u->role === 'professional') {
+                    $type = 'Professional';
+                    $badgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+                }
+
+                $status = 'Active';
+                $statusClass = 'bg-success-subtle text-success border border-success-subtle';
+                if ($seller && in_array($seller->seller_status, ['Inactive', 'Suspended'])) {
+                    $status = 'Inactive';
+                    $statusClass = 'bg-secondary-subtle text-secondary border border-secondary-subtle';
+                } elseif ($seller && in_array($seller->seller_status, [Seller::STATUS_PENDING_APPROVAL, 'Pending'])) {
+                    $status = 'Pending Approval';
+                    $statusClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+                }
+
+                $location = $seller?->businessDetail?->city ? ($seller->businessDetail->city . ', ' . ($seller->businessDetail->state ?? 'GJ')) : 'Ahmedabad, GJ';
+
+                return [
+                    'index'        => $idx + 1,
+                    'id'           => $u->id,
+                    'name'         => $u->name,
+                    'email'        => $u->email,
+                    'phone'        => $u->phone ?: 'N/A',
+                    'type'         => $type,
+                    'badge_class'  => $badgeClass,
+                    'status'       => $status,
+                    'status_class' => $statusClass,
+                    'location'     => $location,
+                    'joined_on'    => $u->created_at ? $u->created_at->format('d M Y, h:i A') : 'Recent',
+                    'avatar'       => $u->avatar_url ?: ('https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=0066ff&color=fff'),
+                    'seller_id'    => $seller?->id,
+                    'seller_code'  => $seller?->seller_code,
+                ];
+            });
+
         return view('admin.dashboard', [
             'kpis'                 => $kpis,
             'recentOrders'         => $recentOrders,
             'recentSellers'        => $recentSellers,
             'recentActivities'     => $recentActivities,
+            'allPlatformUsers'     => $allPlatformUsers,
             'chartCourses'         => $chartCourses,
             'chartServices'        => $chartServices,
             'chartProducts'        => $chartProducts,
