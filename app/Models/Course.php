@@ -78,27 +78,22 @@ class Course extends Model
 
     public function getRatingAttribute(): float
     {
-        // Deterministic rating based on ID
-        $ratings = [4.8, 4.6, 4.7, 4.6, 4.5, 4.7, 4.6, 4.8, 4.5, 4.7];
-        return $ratings[($this->id ?? 1) % count($ratings)];
+        return 0.0;
     }
 
     public function getReviewsCountAttribute(): string
     {
-        $reviews = ['1.2K', '860', '560', '430', '320', '780', '640', '920', '510', '390'];
-        return $reviews[($this->id ?? 1) % count($reviews)];
+        return '0';
     }
 
     public function getStudentsCountAttribute(): string
     {
-        $counts = ['12,450', '9,420', '6,850', '5,120', '4,680', '8,250', '7,920', '10,450', '6,120', '5,600'];
-        return $counts[($this->id ?? 1) % count($counts)] . ' students';
+        return '';
     }
 
     public function getDurationAttribute(): string
     {
-        $durations = ['12h 30m', '8h 20m', '10h 15m', '20h', '16h 30m', '6h 45m', '8h 10m', '7h 20m', '10h 30m', '6h 25m'];
-        return $durations[($this->id ?? 1) % count($durations)];
+        return 'Flexible';
     }
 
     public function getDiscountPercentageAttribute(): string
@@ -152,7 +147,7 @@ class Course extends Model
 
     public function getBadgeAttribute(): ?string
     {
-        return ($this->id == 1 || str_contains(strtolower($this->title), 'digital marketing')) ? 'Bestseller' : null;
+        return null;
     }
 
     public function getModeAttribute(): string

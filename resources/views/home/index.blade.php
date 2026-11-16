@@ -823,7 +823,9 @@
                                             {{ $sc['name'] }}
                                         </label>
                                     </div>
-                                    <span class="filter-count">({{ $sc['count'] }})</span>
+                                    @if(!empty($sc['count']) && (int)$sc['count'] > 0)
+                                        <span class="filter-count">({{ $sc['count'] }})</span>
+                                    @endif
                                 </div>
                             @endforeach
                             <div class="filter-check-item more-category-item d-none">
@@ -833,7 +835,6 @@
                                            onchange="document.getElementById('homeFilterForm').submit()">
                                     <label class="form-check-label" for="cat_retail">Retail Shops</label>
                                 </div>
-                                <span class="filter-count">(310)</span>
                             </div>
                             <div class="filter-check-item more-category-item d-none">
                                 <div class="form-check mb-0">
@@ -842,7 +843,6 @@
                                            onchange="document.getElementById('homeFilterForm').submit()">
                                     <label class="form-check-label" for="cat_auto">Automotive</label>
                                 </div>
-                                <span class="filter-count">(195)</span>
                             </div>
                             <div class="filter-check-item more-category-item d-none">
                                 <div class="form-check mb-0">
@@ -851,7 +851,6 @@
                                            onchange="document.getElementById('homeFilterForm').submit()">
                                     <label class="form-check-label" for="cat_elec">Electronics & Repair</label>
                                 </div>
-                                <span class="filter-count">(240)</span>
                             </div>
                         </div>
                         <a href="javascript:void(0)" onclick="toggleMoreCategories(this)" class="d-inline-block small text-primary text-decoration-none mt-1">Show More ▾</a>
@@ -862,10 +861,10 @@
                         <div class="filter-section-title">Rating</div>
                         @php
                             $ratingOptions = [
-                                ['min' => '4.5', 'stars' => 5, 'label' => '4.5 & Above', 'count' => '1,240'],
-                                ['min' => '4.0', 'stars' => 4, 'label' => '4.0 & Above', 'count' => '2,860'],
-                                ['min' => '3.5', 'stars' => 3, 'label' => '3.5 & Above', 'count' => '3,920'],
-                                ['min' => '3.0', 'stars' => 3, 'label' => '3.0 & Above', 'count' => '4,580'],
+                                ['min' => '4.5', 'stars' => 5, 'label' => '4.5 & Above'],
+                                ['min' => '4.0', 'stars' => 4, 'label' => '4.0 & Above'],
+                                ['min' => '3.5', 'stars' => 3, 'label' => '3.5 & Above'],
+                                ['min' => '3.0', 'stars' => 3, 'label' => '3.0 & Above'],
                             ];
                         @endphp
                         @foreach($ratingOptions as $ro)
@@ -884,7 +883,6 @@
                                         <span style="font-size: 0.72rem;">{{ $ro['label'] }}</span>
                                     </label>
                                 </div>
-                                <span class="filter-count">({{ $ro['count'] }})</span>
                             </div>
                         @endforeach
                     </div>
@@ -899,7 +897,6 @@
                                        onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_parking">Parking Available</label>
                             </div>
-                            <span class="filter-count">(1,820)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
@@ -908,7 +905,6 @@
                                        onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_online">Online Classes</label>
                             </div>
-                            <span class="filter-count">(980)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
@@ -917,7 +913,6 @@
                                        onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_home">Home Visit</label>
                             </div>
-                            <span class="filter-count">(640)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
@@ -926,7 +921,6 @@
                                        onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="fac_emi">EMI Available</label>
                             </div>
-                            <span class="filter-count">(420)</span>
                         </div>
                     </div>
 
@@ -940,7 +934,6 @@
                                        onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="type_individual">Individual Business</label>
                             </div>
-                            <span class="filter-count">(3,120)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
@@ -949,7 +942,6 @@
                                        onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="type_franchise">Franchise</label>
                             </div>
-                            <span class="filter-count">(680)</span>
                         </div>
                         <div class="filter-check-item">
                             <div class="form-check mb-0">
@@ -958,7 +950,6 @@
                                        onchange="document.getElementById('homeFilterForm').submit()">
                                 <label class="form-check-label" for="type_partner">Verified Partner</label>
                             </div>
-                            <span class="filter-count">(1,240)</span>
                         </div>
                     </div>
 
@@ -1034,7 +1025,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <div>
                         <h2 class="fw-bold text-dark mb-0" style="font-size: 1.15rem;">
-                            {{ number_format(count($businesses)) }}+ Businesses in {{ $selectedCity }}
+                            {{ count($businesses) }} {{ count($businesses) === 1 ? 'Business' : 'Businesses' }} in {{ $selectedCity }}
                         </h2>
                     </div>
 
@@ -1105,10 +1096,16 @@
 
                                     <!-- Rating -->
                                     <div class="card-rating-row">
-                                        <span class="badge bg-warning text-dark px-1 py-0 fw-bold" style="font-size: 0.65rem;">
-                                            <i class="fa-solid fa-star text-white"></i> {{ number_format($b->rating, 1) }}
-                                        </span>
-                                        <span class="text-muted" style="font-size: 0.68rem;">({{ $b->reviews_count }})</span>
+                                        @if($b->rating > 0 && (int)$b->reviews_count > 0)
+                                            <span class="badge bg-warning text-dark px-1 py-0 fw-bold" style="font-size: 0.65rem;">
+                                                <i class="fa-solid fa-star text-white"></i> {{ number_format($b->rating, 1) }}
+                                            </span>
+                                            <span class="text-muted" style="font-size: 0.68rem;">({{ $b->reviews_count }})</span>
+                                        @else
+                                            <span class="badge bg-light text-muted border px-1.5 py-0.5" style="font-size: 0.65rem;">
+                                                New Listing
+                                            </span>
+                                        @endif
                                     </div>
 
                                     <!-- Location -->
@@ -1193,12 +1190,6 @@
                         <span class="badge bg-white text-primary border shadow-sm position-absolute" style="top: 15px; font-size: 0.65rem; font-weight: 700;">
                             📍 {{ $selectedCity }}
                         </span>
-
-                        <!-- Decorative Location Pins matching Ahmedabad locations -->
-                        <i class="fa-solid fa-location-dot text-danger map-pin-indicator" style="top: 25px; left: 28px;" title="Nikol"></i>
-                        <i class="fa-solid fa-location-dot text-warning map-pin-indicator" style="top: 35px; right: 35px;" title="Naroda"></i>
-                        <i class="fa-solid fa-location-dot text-primary map-pin-indicator" style="bottom: 25px; left: 45px;" title="Sardar Chowk"></i>
-                        <i class="fa-solid fa-location-dot text-success map-pin-indicator" style="bottom: 30px; right: 30px;" title="GIDC"></i>
                     </div>
                 </div>
 

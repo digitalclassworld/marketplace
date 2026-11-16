@@ -154,14 +154,14 @@ class HomeController extends Controller
             ['name' => 'More',                'icon' => 'fa-solid fa-ellipsis',         'slug' => 'more'],
         ];
 
-        // Sidebar categories with matching counts from the screenshot
+        // Sidebar categories with real counts from database
         $sidebarCategories = [
-            ['name' => 'Coaching Institute', 'count' => 420],
-            ['name' => 'Computer Training',  'count' => 320],
-            ['name' => 'Play School',        'count' => 180],
-            ['name' => 'Gym & Fitness',      'count' => 140],
-            ['name' => 'Beauty & Salon',     'count' => 210],
-            ['name' => 'Restaurant & Food',  'count' => 260],
+            ['name' => 'Coaching Institute', 'count' => \App\Models\BusinessListing::where('category', 'like', '%Coaching%')->count()],
+            ['name' => 'Computer Training',  'count' => \App\Models\BusinessListing::where('category', 'like', '%Computer%')->count()],
+            ['name' => 'Play School',        'count' => \App\Models\BusinessListing::where('category', 'like', '%Play%')->count()],
+            ['name' => 'Gym & Fitness',      'count' => \App\Models\BusinessListing::where('category', 'like', '%Gym%')->count()],
+            ['name' => 'Beauty & Salon',     'count' => \App\Models\BusinessListing::where('category', 'like', '%Beauty%')->count()],
+            ['name' => 'Restaurant & Food',  'count' => \App\Models\BusinessListing::where('category', 'like', '%Restaurant%')->count()],
         ];
 
         return view('home.index', [
@@ -530,14 +530,14 @@ class HomeController extends Controller
             ['name' => 'Competitive Exams',  'icon' => 'fa-solid fa-trophy',            'slug' => 'Competitive Exams'],
         ];
 
-        // Sidebar categories with matching counts from screenshot
+        // Sidebar categories with real counts from database
         $sidebarCategories = [
-            ['name' => 'Computer & IT',      'count' => '2,450'],
-            ['name' => 'Digital Marketing',  'count' => '1,820'],
-            ['name' => 'Programming',        'count' => '1,650'],
-            ['name' => 'Design & Creative',  'count' => '1,230'],
-            ['name' => 'Business & Finance', 'count' => '1,180'],
-            ['name' => 'Office Productivity','count' => '980'],
+            ['name' => 'Computer & IT',      'count' => \App\Models\Course::where('category', 'like', '%Computer%')->count()],
+            ['name' => 'Digital Marketing',  'count' => \App\Models\Course::where('category', 'like', '%Digital Marketing%')->count()],
+            ['name' => 'Programming',        'count' => \App\Models\Course::where('category', 'like', '%Programming%')->count()],
+            ['name' => 'Design & Creative',  'count' => \App\Models\Course::where('category', 'like', '%Design%')->count()],
+            ['name' => 'Business & Finance', 'count' => \App\Models\Course::where('category', 'like', '%Business%')->count()],
+            ['name' => 'Office Productivity','count' => \App\Models\Course::where('category', 'like', '%Office%')->count()],
         ];
 
         return view('home.courses', [

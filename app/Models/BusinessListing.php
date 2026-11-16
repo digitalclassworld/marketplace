@@ -79,12 +79,12 @@ class BusinessListing extends Model
 
     public function getRatingAttribute(): float
     {
-        return isset($this->features['rating']) ? (float)$this->features['rating'] : 4.6;
+        return isset($this->features['rating']) ? (float)$this->features['rating'] : 0.0;
     }
 
     public function getReviewsCountAttribute(): int
     {
-        return isset($this->features['reviews_count']) ? (int)$this->features['reviews_count'] : 110;
+        return isset($this->features['reviews_count']) ? (int)$this->features['reviews_count'] : 0;
     }
 
     public function getBadgeAttribute(): ?string

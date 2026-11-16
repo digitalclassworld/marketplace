@@ -657,7 +657,9 @@
                                             {{ $sc['name'] }}
                                         </label>
                                     </div>
-                                    <span class="course-check-count">({{ $sc['count'] }})</span>
+                                    @if(!empty($sc['count']) && (int)$sc['count'] > 0)
+                                        <span class="course-check-count">({{ $sc['count'] }})</span>
+                                    @endif
                                 </div>
                             @endforeach
                             <div class="course-check-item more-course-cat d-none">
@@ -667,7 +669,6 @@
                                            onchange="document.getElementById('coursesFilterForm').submit()">
                                     <label class="form-check-label" for="cat_spoken">Spoken English</label>
                                 </div>
-                                <span class="course-check-count">(890)</span>
                             </div>
                             <div class="course-check-item more-course-cat d-none">
                                 <div class="form-check mb-0">
@@ -676,7 +677,6 @@
                                            onchange="document.getElementById('coursesFilterForm').submit()">
                                     <label class="form-check-label" for="cat_ai">AI & Tools</label>
                                 </div>
-                                <span class="course-check-count">(740)</span>
                             </div>
                         </div>
                         <a href="javascript:void(0)" onclick="toggleMoreCourseCats(this)" class="d-inline-block small text-primary text-decoration-none mt-1">Show More ▾</a>
@@ -692,7 +692,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="mode_online">Online</label>
                             </div>
-                            <span class="course-check-count">(7,360)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
@@ -701,7 +700,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="mode_offline">Offline</label>
                             </div>
-                            <span class="course-check-count">(2,140)</span>
                         </div>
                     </div>
 
@@ -729,7 +727,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lvl_beg">Beginner</label>
                             </div>
-                            <span class="course-check-count">(4,120)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
@@ -738,7 +735,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lvl_int">Intermediate</label>
                             </div>
-                            <span class="course-check-count">(3,250)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
@@ -747,7 +743,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lvl_adv">Advanced</label>
                             </div>
-                            <span class="course-check-count">(1,980)</span>
                         </div>
                     </div>
 
@@ -761,7 +756,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lang_en">English</label>
                             </div>
-                            <span class="course-check-count">(5,840)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
@@ -770,7 +764,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lang_hi">Hindi</label>
                             </div>
-                            <span class="course-check-count">(2,360)</span>
                         </div>
                         <div class="course-check-item">
                             <div class="form-check mb-0">
@@ -779,7 +772,6 @@
                                        onchange="document.getElementById('coursesFilterForm').submit()">
                                 <label class="form-check-label" for="lang_gu">Gujarati</label>
                             </div>
-                            <span class="course-check-count">(780)</span>
                         </div>
                     </div>
 
@@ -863,11 +855,19 @@
 
                                     <!-- Rating & Students -->
                                     <div class="course-rating-row">
-                                        <span class="text-warning fw-bold small">
-                                            <i class="fa-solid fa-star"></i> {{ number_format($c->rating, 1) }}
-                                        </span>
-                                        <span class="text-muted" style="font-size: 0.68rem;">({{ $c->reviews_count }})</span>
-                                        <span class="text-muted" style="font-size: 0.65rem;">&bull; {{ $c->students_count }}</span>
+                                        @if($c->rating > 0 && (int)$c->reviews_count > 0)
+                                            <span class="text-warning fw-bold small">
+                                                <i class="fa-solid fa-star"></i> {{ number_format($c->rating, 1) }}
+                                            </span>
+                                            <span class="text-muted" style="font-size: 0.68rem;">({{ $c->reviews_count }})</span>
+                                        @else
+                                            <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">
+                                                New Course
+                                            </span>
+                                        @endif
+                                        @if(!empty($c->students_count))
+                                            <span class="text-muted" style="font-size: 0.65rem;">&bull; {{ $c->students_count }}</span>
+                                        @endif
                                     </div>
 
                                     <!-- Price -->
