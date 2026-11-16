@@ -361,9 +361,14 @@
             </div>
             <div class="d-none d-md-flex align-items-center gap-3">
                 <span class="text-secondary">Are you an educator, agency, or institute?</span>
-                <a href="{{ route('seller.register') }}" class="d-inline-flex align-items-center gap-1">
+                <a href="{{ route('seller.register') }}" class="d-inline-flex align-items-center gap-1 text-decoration-none">
                     <span>Join as a Seller</span>
                     <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem;"></i>
+                </a>
+                <span class="text-secondary opacity-50">•</span>
+                <a href="{{ route('seller.login') }}" class="d-inline-flex align-items-center gap-1 text-light text-decoration-none fw-semibold">
+                    <i class="fa-solid fa-store text-warning" style="font-size: 0.75rem;"></i>
+                    <span>Seller Login</span>
                 </a>
             </div>
         </div>
@@ -431,7 +436,7 @@
                 </form>
 
                 <!-- Right Side Elements -->
-                <div class="d-flex align-items-center gap-2 gap-xl-3 ms-xl-auto mt-2 mt-xl-0 flex-wrap">
+                <div class="d-flex align-items-center gap-2 gap-xl-2.5 ms-xl-auto mt-2 mt-xl-0 flex-wrap flex-xl-nowrap">
                     <!-- Location Selector -->
                     <div class="dropdown d-none d-md-block">
                         <button class="btn btn-sm btn-light border-0 dropdown-toggle small text-muted d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
@@ -536,28 +541,24 @@
                             </div>
                         @endif
                     @else
-                        <!-- Guest Navigation: Direct Customer Sign Up & Seller Login Options -->
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <!-- Customer Sign Up Button -->
-                            <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" style="background-color: #0066ff;" onclick="openCustomerAuthModal('register')">
-                                <i class="fa-solid fa-user-plus me-1"></i> Customer Sign Up
-                            </button>
-
-                            <!-- Customer Login Button -->
-                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-2.5 fw-semibold text-dark shadow-xs" onclick="openCustomerAuthModal('login')">
-                                <i class="fa-regular fa-user me-1 text-primary"></i> Customer Login
-                            </button>
-
-                            <!-- Seller Login Button -->
-                            <a href="{{ route('seller.login') }}" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" title="Login to Instructor / Institute Seller Dashboard">
+                        <!-- Guest Navigation: Sequence = Seller Login -> Customer Login -> Customer Sign Up -->
+                        <div class="d-flex align-items-center gap-2 flex-wrap flex-xl-nowrap">
+                            <!-- 1. Seller Login -->
+                            <a href="{{ route('seller.login') }}" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem;" title="Instructor & Institute Seller Login">
                                 <i class="fa-solid fa-store"></i>
                                 <span>Seller Login</span>
                             </a>
 
-                            <!-- Become a Seller Link -->
-                            <a href="{{ route('seller.register') }}" class="small text-muted text-decoration-none d-none d-xl-inline ms-1" style="font-size: 0.75rem;" title="Start selling courses & services">
-                                Become a Seller
-                            </a>
+                            <!-- 2. Customer Login -->
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem;" onclick="openCustomerAuthModal('login')">
+                                <i class="fa-regular fa-user"></i>
+                                <span>Login</span>
+                            </button>
+
+                            <!-- 3. Customer Sign Up -->
+                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3.5 fw-bold text-nowrap shadow-sm d-inline-flex align-items-center" style="height: 36px; font-size: 0.8125rem; background-color: #0066ff;" onclick="openCustomerAuthModal('register')">
+                                <span>Sign Up</span>
+                            </button>
                         </div>
                     @endauth
                 </div>
