@@ -43,11 +43,6 @@ class SellerMessageController extends Controller
             abort(403, 'Seller profile not found.');
         }
 
-        // Auto-seed if this seller has no conversations
-        if (Conversation::where('seller_id', $seller->id)->count() === 0) {
-            (new \Database\Seeders\ChatMessagesSeeder())->run();
-        }
-
         $tab = $request->query('tab', 'all');
         $search = $request->query('search');
 

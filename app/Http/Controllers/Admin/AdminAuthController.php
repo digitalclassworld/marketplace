@@ -15,8 +15,8 @@ class AdminAuthController extends Controller
      */
     public function showLoginForm(): View|RedirectResponse
     {
-        // Only redirect if already authenticated as Super Admin
-        if (Auth::check() && Auth::user()->isSuperAdmin()) {
+        // Only redirect if already authenticated as Super Admin on admin guard or web guard
+        if (Auth::guard('admin')->check() || (Auth::guard('web')->check() && Auth::guard('web')->user()->isSuperAdmin())) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -56,20 +56,19 @@ class AdminAuthController extends Controller
 
         $remember = $request->boolean('remember', true);
 
-        if (Auth::attempt(['email' => $email, 'password' => $password], $remember)) {
-            $user = Auth::user();
+        // Authenticate via dedicated admin guard so Seller web session is never overwritten
+        if (Auth::guard('admin')->attempt(['email' => $email, 'password' => $password], $remember)) {
+            $user = Auth::guard('admin')->user();
 
             if (!$user->isSuperAdmin()) {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+                Auth::guard('admin')->logout();
 
                 return back()
                     ->withInput($request->only('email', 'remember'))
                     ->with('error', 'Unauthorized access. Only Super Administrators can log in here.');
             }
 
-            $request->session()->regenerate();
+            Auth::shouldUse('admin');
 
             return redirect()->route('admin.dashboard')
                 ->with('success', 'Welcome back, ' . $user->name . '! Logged in to Super Admin Dashboard.');
@@ -87,10 +86,7 @@ class AdminAuthController extends Controller
      */
     public function logout(Request $request): RedirectResponse
     {
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        Auth::guard('admin')->logout();
 
         return redirect()->route('admin.login')
             ->with('success', 'You have been safely logged out from the Super Admin portal.');

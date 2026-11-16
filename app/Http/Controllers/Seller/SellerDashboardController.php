@@ -25,42 +25,107 @@ class SellerDashboardController extends Controller
             $seller = Seller::with(['businessDetail', 'user'])->first();
         }
 
+        // Real Database Metric Aggregations (defaults to 0 for new sellers)
         $ordersCount = $seller ? $seller->orders()->count() : 0;
-        $totalEarnings = $seller ? (float) $seller->orders()->where('status', '!=', 'cancelled')->sum('amount') : 0;
+        $totalEarnings = $seller ? (float) $seller->orders()->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
 
-        // Auto-seed or baseline matching Page 4 UI design specs
-        if ($ordersCount === 0 && $seller) {
-            $ordersCount = 245;
-            $totalEarnings = 124560;
+        $thisMonthOrders = $seller ? $seller->orders()->where('placed_at', '>=', now()->startOfMonth())->count() : 0;
+        $thisMonthEarnings = $seller ? (float) $seller->orders()->where('placed_at', '>=', now()->startOfMonth())->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
+
+        $totalCustomers = $seller ? $seller->orders()->distinct('customer_email')->count('customer_email') : 0;
+        $thisMonthCustomers = $seller ? $seller->orders()->where('placed_at', '>=', now()->startOfMonth())->distinct('customer_email')->count('customer_email') : 0;
+
+        $coursesCount = $seller ? $seller->courses()->count() : 0;
+        $servicesCount = $seller ? $seller->services()->count() : 0;
+        $productsCount = $seller ? $seller->products()->count() : 0;
+        $listingsCount = $seller ? $seller->businessListings()->count() : 0;
+
+        // Real Category Earnings
+        $courseRevenue = $seller ? (float) $seller->orders()->where('order_type', 'Course')->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
+        $serviceRevenue = $seller ? (float) $seller->orders()->where('order_type', 'Service')->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
+        $productRevenue = $seller ? (float) $seller->orders()->where('order_type', 'Product')->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
+        $listingRevenue = $seller ? (float) $seller->orders()->where('order_type', 'Business')->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
+
+        $categoryStats = [
+            'courses' => [
+                'amount'  => $courseRevenue,
+                'percent' => $totalEarnings > 0 ? round(($courseRevenue / $totalEarnings) * 100) : 0,
+            ],
+            'services' => [
+                'amount'  => $serviceRevenue,
+                'percent' => $totalEarnings > 0 ? round(($serviceRevenue / $totalEarnings) * 100) : 0,
+            ],
+            'products' => [
+                'amount'  => $productRevenue,
+                'percent' => $totalEarnings > 0 ? round(($productRevenue / $totalEarnings) * 100) : 0,
+            ],
+            'listings' => [
+                'amount'  => $listingRevenue,
+                'percent' => $totalEarnings > 0 ? round(($listingRevenue / $totalEarnings) * 100) : 0,
+            ],
+        ];
+
+        // 7-day sales timeline for chart
+        $chartLabels = [];
+        $chartCourses = [];
+        $chartServices = [];
+        $chartProducts = [];
+        $chartListings = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $day = now()->subDays($i);
+            $chartLabels[] = $day->format('M d');
+
+            if ($seller && $ordersCount > 0) {
+                $chartCourses[]  = (float) $seller->orders()->where('order_type', 'Course')->whereDate('placed_at', $day->toDateString())->where('status', '!=', 'cancelled')->sum('amount');
+                $chartServices[] = (float) $seller->orders()->where('order_type', 'Service')->whereDate('placed_at', $day->toDateString())->where('status', '!=', 'cancelled')->sum('amount');
+                $chartProducts[] = (float) $seller->orders()->where('order_type', 'Product')->whereDate('placed_at', $day->toDateString())->where('status', '!=', 'cancelled')->sum('amount');
+                $chartListings[] = (float) $seller->orders()->where('order_type', 'Business')->whereDate('placed_at', $day->toDateString())->where('status', '!=', 'cancelled')->sum('amount');
+            } else {
+                $chartCourses[]  = 0;
+                $chartServices[] = 0;
+                $chartProducts[] = 0;
+                $chartListings[] = 0;
+            }
         }
 
+        $chartData = [
+            'labels'   => $chartLabels,
+            'courses'  => $chartCourses,
+            'services' => $chartServices,
+            'products' => $chartProducts,
+            'listings' => $chartListings,
+        ];
+
         $stats = [
-            'total_orders'     => $ordersCount ?: 245,
-            'orders_growth'    => '+18%',
-            'orders_sub'       => '18 this month',
-            'total_earnings'   => $totalEarnings ?: 124560,
-            'earnings_growth'  => '+26%',
-            'earnings_sub'     => '+₹24,560 this month',
-            'total_views'      => 12450,
-            'views_growth'     => '+68%',
-            'views_sub'        => '+4,820 this month',
-            'total_customers'  => 186,
-            'customers_growth' => '+32%',
-            'customers_sub'    => '+34 this month',
-            'courses_count'    => $seller ? $seller->courses()->count() : 0,
+            'total_orders'     => $ordersCount,
+            'orders_growth'    => $ordersCount > 0 ? '+0%' : '0%',
+            'orders_sub'       => $thisMonthOrders . ' this month',
+            'total_earnings'   => $totalEarnings,
+            'earnings_growth'  => $totalEarnings > 0 ? '+0%' : '0%',
+            'earnings_sub'     => '₹' . number_format($thisMonthEarnings) . ' this month',
+            'total_views'      => 0,
+            'views_growth'     => '0%',
+            'views_sub'        => '0 this month',
+            'total_customers'  => $totalCustomers,
+            'customers_growth' => $totalCustomers > 0 ? '+0%' : '0%',
+            'customers_sub'    => $thisMonthCustomers . ' this month',
+            'courses_count'    => $coursesCount,
             'courses_pending'  => $seller ? $seller->courses()->where('status', 'pending')->count() : 0,
-            'services_count'   => $seller ? $seller->services()->count() : 0,
+            'services_count'   => $servicesCount,
             'services_pending' => $seller ? $seller->services()->where('status', 'pending')->count() : 0,
-            'products_count'   => $seller ? $seller->products()->count() : 0,
+            'products_count'   => $productsCount,
             'products_pending' => $seller ? $seller->products()->where('status', 'pending')->count() : 0,
-            'listings_count'   => $seller ? $seller->businessListings()->count() : 0,
+            'listings_count'   => $listingsCount,
             'listings_pending' => $seller ? $seller->businessListings()->where('status', 'pending')->count() : 0,
         ];
 
         return view('seller.dashboard', [
-            'seller' => $seller,
-            'user'   => $user,
-            'stats'  => $stats,
+            'seller'        => $seller,
+            'user'          => $user,
+            'stats'         => $stats,
+            'categoryStats' => $categoryStats,
+            'chartData'     => $chartData,
         ]);
     }
 

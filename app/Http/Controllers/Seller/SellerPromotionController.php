@@ -48,27 +48,24 @@ class SellerPromotionController extends Controller
             abort(403, 'Seller profile not found.');
         }
 
-        // Auto-seed if empty
-        if (Promotion::where('seller_id', $seller->id)->count() === 0) {
-            (new \Database\Seeders\PromotionsSeeder())->run();
-        }
-
         $currentTab = $request->query('tab', 'create');
 
-        // Dynamic KPI metrics matching design
+        // Dynamic KPI metrics directly from real database
         $activeCount = Promotion::where('seller_id', $seller->id)->where('status', 'Active')->count();
-        $totalViews = Promotion::where('seller_id', $seller->id)->sum('views_count');
-        $totalRevenue = Promotion::where('seller_id', $seller->id)->sum('revenue_generated');
-        $totalSales = Promotion::where('seller_id', $seller->id)->sum('sales_count');
+        $endingThisWeek = Promotion::where('seller_id', $seller->id)->where('status', 'Active')->whereBetween('end_date', [now(), now()->addDays(7)])->count();
+        $totalViews = (int) Promotion::where('seller_id', $seller->id)->sum('views_count');
+        $totalRevenue = (float) Promotion::where('seller_id', $seller->id)->sum('revenue_generated');
+        $totalSales = (int) Promotion::where('seller_id', $seller->id)->sum('sales_count');
+        $newCustomers = $seller->orders()->distinct('customer_email')->count('customer_email');
 
         $kpis = [
-            'active_promotions' => $activeCount ?: 5,
-            'ending_this_week'  => 2,
-            'total_views'       => $totalViews ? number_format($totalViews) : '12,450',
-            'views_growth'      => '+4,820 this month',
-            'sales_amount'      => $totalRevenue ? '₹' . number_format($totalRevenue) : '₹48,320',
-            'orders_count'      => $totalSales ?: 65,
-            'new_customers'     => 186,
+            'active_promotions' => $activeCount,
+            'ending_this_week'  => $endingThisWeek,
+            'total_views'       => number_format($totalViews),
+            'views_growth'      => '0 this month',
+            'sales_amount'      => '₹' . number_format($totalRevenue),
+            'orders_count'      => $totalSales,
+            'new_customers'     => $newCustomers,
         ];
 
         // Promotion Pricing Map requested by user:

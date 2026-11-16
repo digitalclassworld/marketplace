@@ -14,18 +14,20 @@ class EnsureSuperAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check()) {
-            return redirect()->route('admin.login')
-                ->with('error', 'Please log in to access the Super Admin Portal.');
+        $admin = Auth::guard('admin')->user();
+        if ($admin && $admin->isSuperAdmin()) {
+            Auth::shouldUse('admin');
+            return $next($request);
         }
 
-        $user = Auth::user();
-
-        if (!$user->isSuperAdmin()) {
-            return redirect()->route('admin.login')
-                ->with('error', 'Unauthorized access. Super Admin credentials required.');
+        $webUser = Auth::guard('web')->user();
+        if ($webUser && $webUser->isSuperAdmin()) {
+            Auth::guard('admin')->login($webUser);
+            Auth::shouldUse('admin');
+            return $next($request);
         }
 
-        return $next($request);
+        return redirect()->route('admin.login')
+            ->with('error', 'Please log in to access the Super Admin Portal.');
     }
 }

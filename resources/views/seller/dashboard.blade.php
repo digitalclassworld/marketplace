@@ -680,8 +680,8 @@
                                 <span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%; display: inline-block;"></span> Courses
                             </span>
                             <div>
-                                <strong class="text-dark">40%</strong>
-                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹19,328</span>
+                                <strong class="text-dark">{{ $categoryStats['courses']['percent'] ?? 0 }}%</strong>
+                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹{{ number_format($categoryStats['courses']['amount'] ?? 0) }}</span>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
@@ -689,8 +689,8 @@
                                 <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block;"></span> Services
                             </span>
                             <div>
-                                <strong class="text-dark">28%</strong>
-                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹13,530</span>
+                                <strong class="text-dark">{{ $categoryStats['services']['percent'] ?? 0 }}%</strong>
+                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹{{ number_format($categoryStats['services']['amount'] ?? 0) }}</span>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
@@ -698,8 +698,8 @@
                                 <span style="width: 8px; height: 8px; background: #f97316; border-radius: 50%; display: inline-block;"></span> Products
                             </span>
                             <div>
-                                <strong class="text-dark">22%</strong>
-                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹10,630</span>
+                                <strong class="text-dark">{{ $categoryStats['products']['percent'] ?? 0 }}%</strong>
+                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹{{ number_format($categoryStats['products']['amount'] ?? 0) }}</span>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
@@ -707,8 +707,8 @@
                                 <span style="width: 8px; height: 8px; background: #a855f7; border-radius: 50%; display: inline-block;"></span> Business Listing
                             </span>
                             <div>
-                                <strong class="text-dark">10%</strong>
-                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹4,832</span>
+                                <strong class="text-dark">{{ $categoryStats['listings']['percent'] ?? 0 }}%</strong>
+                                <span class="text-muted ms-1" style="font-size: 0.7rem;">₹{{ number_format($categoryStats['listings']['amount'] ?? 0) }}</span>
                             </div>
                         </div>
                     </div>
@@ -931,32 +931,32 @@
             new Chart(ctxSales, {
                 type: 'bar',
                 data: {
-                    labels: ['Oct 1', 'Oct 5', 'Oct 10', 'Oct 15', 'Oct 20', 'Oct 25', 'Oct 31'],
+                    labels: @json($chartData['labels'] ?? ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7']),
                     datasets: [
                         {
                             label: 'Courses',
-                            data: [3200, 4800, 3600, 6200, 4500, 7400, 5900],
+                            data: @json($chartData['courses'] ?? [0, 0, 0, 0, 0, 0, 0]),
                             backgroundColor: '#3b82f6',
                             borderRadius: 4,
                             stack: 'salesStack'
                         },
                         {
                             label: 'Services',
-                            data: [2100, 2900, 2000, 3900, 3000, 4300, 3600],
+                            data: @json($chartData['services'] ?? [0, 0, 0, 0, 0, 0, 0]),
                             backgroundColor: '#10b981',
                             borderRadius: 4,
                             stack: 'salesStack'
                         },
                         {
                             label: 'Products',
-                            data: [1600, 2200, 1700, 3000, 2200, 3200, 2700],
+                            data: @json($chartData['products'] ?? [0, 0, 0, 0, 0, 0, 0]),
                             backgroundColor: '#f97316',
                             borderRadius: 4,
                             stack: 'salesStack'
                         },
                         {
-                            label: 'Others',
-                            data: [800, 1100, 900, 1500, 1200, 1600, 1400],
+                            label: 'Business Listing',
+                            data: @json($chartData['listings'] ?? [0, 0, 0, 0, 0, 0, 0]),
                             backgroundColor: '#a855f7',
                             borderRadius: 4,
                             stack: 'salesStack'
@@ -1001,16 +1001,24 @@
         const donutCanvas = document.getElementById('categoryDonutChart');
         if (donutCanvas) {
             const ctxDonut = donutCanvas.getContext('2d');
+            const donutData = [
+                {{ $categoryStats['courses']['percent'] ?? 0 }},
+                {{ $categoryStats['services']['percent'] ?? 0 }},
+                {{ $categoryStats['products']['percent'] ?? 0 }},
+                {{ $categoryStats['listings']['percent'] ?? 0 }}
+            ];
+            const hasData = donutData.some(val => val > 0);
+
             new Chart(ctxDonut, {
                 type: 'doughnut',
                 data: {
                     labels: ['Courses', 'Services', 'Products', 'Business Listing'],
                     datasets: [{
-                        data: [40, 28, 22, 10],
-                        backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#a855f7'],
+                        data: hasData ? donutData : [1],
+                        backgroundColor: hasData ? ['#3b82f6', '#10b981', '#f97316', '#a855f7'] : ['#e2e8f0'],
                         borderWidth: 2,
                         borderColor: '#ffffff',
-                        hoverOffset: 4
+                        hoverOffset: hasData ? 4 : 0
                     }]
                 },
                 options: {
@@ -1020,6 +1028,7 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
+                            enabled: hasData,
                             callbacks: {
                                 label: function(context) {
                                     return context.label + ': ' + context.raw + '%';

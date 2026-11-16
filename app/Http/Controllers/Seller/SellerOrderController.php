@@ -22,11 +22,6 @@ class SellerOrderController extends Controller
         $user = Auth::user();
         $seller = $user->seller;
 
-        // Auto-seed sample orders if seller has no orders yet
-        if ($seller && $seller->orders()->count() === 0) {
-            $this->seedSampleOrdersIfEmpty($seller);
-        }
-
         $query = $seller ? $seller->orders()->latest('placed_at') : Order::query()->latest('placed_at');
 
         // Filter by Tab / Category
@@ -63,24 +58,23 @@ class SellerOrderController extends Controller
 
         $orders = $query->paginate(10)->withQueryString();
 
-        // Calculate summary statistics
+        // Calculate real summary statistics from database
         $baseQuery = $seller ? $seller->orders() : Order::query();
         $dbCount = (clone $baseQuery)->count();
         $realRevenue = (clone $baseQuery)->where('status', '!=', 'cancelled')->sum('amount');
         $realPending = (clone $baseQuery)->whereIn('status', ['in_progress', 'processing'])->count();
         $realCompleted = (clone $baseQuery)->whereIn('status', ['completed', 'delivered'])->count();
 
-        // Authentic KPI figures matching the UI mockup design
         $stats = [
-            'total_orders'     => max($dbCount, 245),
-            'total_revenue'    => max((int) $realRevenue, 124560),
-            'pending_orders'   => max($realPending, 18),
-            'completed_orders' => max($realCompleted, 198),
-            'tab_all'          => max($dbCount, 245),
-            'tab_courses'      => max((clone $baseQuery)->where('order_type', 'Course')->count(), 72),
-            'tab_services'     => max((clone $baseQuery)->where('order_type', 'Service')->count(), 56),
-            'tab_products'     => max((clone $baseQuery)->where('order_type', 'Product')->count(), 98),
-            'tab_business'     => max((clone $baseQuery)->where('order_type', 'Business')->count(), 19),
+            'total_orders'     => $dbCount,
+            'total_revenue'    => (int) $realRevenue,
+            'pending_orders'   => $realPending,
+            'completed_orders' => $realCompleted,
+            'tab_all'          => $dbCount,
+            'tab_courses'      => (clone $baseQuery)->where('order_type', 'Course')->count(),
+            'tab_services'     => (clone $baseQuery)->where('order_type', 'Service')->count(),
+            'tab_products'     => (clone $baseQuery)->where('order_type', 'Product')->count(),
+            'tab_business'     => (clone $baseQuery)->where('order_type', 'Business')->count(),
         ];
 
         // Active selected order for drawer preview (defaults to first order in list)
