@@ -729,7 +729,7 @@
                     <i class="fa-solid fa-shield-halved text-warning me-1"></i>
                     <strong>Super Admin Mode:</strong> You are viewing the Seller Portal with full administrative access.
                 </div>
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm py-0 px-2 fw-bold text-dark" style="font-size: 0.72rem;">
+                <a href="{{ route('admin.dashboard') }}" target="_blank" rel="noopener noreferrer" class="btn btn-warning btn-sm py-0 px-2 fw-bold text-dark" style="font-size: 0.72rem;">
                     &larr; Return to Super Admin Dashboard
                 </a>
             </div>

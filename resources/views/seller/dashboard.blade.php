@@ -287,7 +287,7 @@
                         <li class="mb-1">Open <strong>Sellers &rarr; Pending Approvals</strong>.</li>
                         <li>Click <strong>Approve</strong> on seller <code>{{ $seller->seller_code }}</code>.</li>
                     </ol>
-                    <a href="{{ route('admin.login') }}" target="_blank" class="btn btn-sm btn-primary fw-semibold mt-auto" style="background-color: #0066ff;">
+                    <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary fw-semibold mt-auto" style="background-color: #0066ff;">
                         <i class="fa-solid fa-shield-halved me-1"></i> Open Super Admin Portal &rarr;
                     </a>
                 </div>

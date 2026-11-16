@@ -86,7 +86,7 @@
                                 Currently signed in as: <strong>Super Admin</strong>
                             </div>
                             <div class="d-flex align-items-center gap-1">
-                                <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                                <a href="{{ route('admin.dashboard') }}" target="_blank" rel="noopener noreferrer" class="btn btn-warning btn-sm py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
                                     Admin Dashboard &rarr;
                                 </a>
                                 <a href="{{ route('admin.logout') }}" class="btn btn-outline-light btn-sm py-0 px-2" style="font-size: 0.75rem;">

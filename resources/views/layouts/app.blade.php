@@ -480,7 +480,11 @@
                     <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
                         <li><a href="{{ route('seller.register') }}">Become a Seller</a></li>
                         <li><a href="{{ route('seller.login') }}">Seller Login</a></li>
-                        <li><a href="{{ route('admin.login') }}" class="text-warning-emphasis"><i class="fa-solid fa-shield-halved me-1 text-warning"></i> Super Admin Login</a></li>
+                        <li>
+                            <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="text-warning-emphasis">
+                                <i class="fa-solid fa-shield-halved me-1 text-warning"></i> Super Admin Login <i class="fa-solid fa-arrow-up-right-from-square ms-1 small" style="font-size: 0.68rem;"></i>
+                            </a>
+                        </li>
                         @auth
                             @if(Auth::user()->isSeller())
                                 <li><a href="{{ route('seller.dashboard') }}">Seller Dashboard</a></li>
@@ -513,7 +517,9 @@
                     &copy; {{ date('Y') }} Digital Class Marketplace. All rights reserved.
                 </div>
                 <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
-                    <a href="{{ route('admin.login') }}" class="text-secondary text-decoration-none hover-white small"><i class="fa-solid fa-lock me-1"></i> Super Admin Portal</a>
+                    <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="text-secondary text-decoration-none hover-white small">
+                        <i class="fa-solid fa-lock me-1"></i> Super Admin Portal <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.65rem;"></i>
+                    </a>
                     <span>•</span>
                     <span>Designed based on Digital Class UI/UX Specifications</span>
                 </div>

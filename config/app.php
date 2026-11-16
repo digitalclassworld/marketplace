@@ -56,6 +56,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Super Admin Portal URL
+    |--------------------------------------------------------------------------
+    |
+    | Optional custom or external URL for the Super Admin login portal.
+    | If not specified, defaults to the application's /super/admin/login route.
+    | Example: https://minipartner.digitalclassworld.com/super/admin/login
+    |
+    */
+    'super_admin_url' => env('SUPER_ADMIN_URL', null),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

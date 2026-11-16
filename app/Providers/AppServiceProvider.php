@@ -19,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Share Super Admin URL globally across all views
+        // Supports custom SUPER_ADMIN_URL from .env or defaults to /super/admin/login
+        $superAdminUrl = config('app.super_admin_url') ?: url('/super/admin/login');
+        \Illuminate\Support\Facades\View::share('superAdminUrl', $superAdminUrl);
+
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
                 if (!\Illuminate\Support\Facades\Cache::has('superadmin_verified_boot')) {

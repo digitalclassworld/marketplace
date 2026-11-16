@@ -136,12 +136,22 @@ Route::prefix('seller')->name('seller.')->middleware(['auth', 'seller'])->group(
 /*
 |--------------------------------------------------------------------------
 | Super Admin Authentication Routes (Guest)
+| Supports both /admin and /super/admin paths
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
     Route::match(['get', 'post'], '/logout', [AdminAuthController::class, 'logout'])->name('logout');
+});
+
+// Alias routes for /super/admin/... URL pattern
+Route::prefix('super/admin')->group(function () {
+    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('super.admin.login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('super.admin.login.submit');
+    Route::match(['get', 'post'], '/logout', [AdminAuthController::class, 'logout'])->name('super.admin.logout');
+    Route::get('/', fn() => redirect()->route('admin.dashboard'));
+    Route::get('/dashboard', fn() => redirect()->route('admin.dashboard'));
 });
 
 /*
