@@ -64,6 +64,7 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::post('/blog/{slug}/comment', [BlogController::class, 'comment'])->name('blog.comment');
 
 Route::get('/login', fn() => redirect()->route('seller.login'))->name('login');
+Route::get('/register', fn() => redirect()->route('seller.register'))->name('register');
 
 // Seller Registration & Authentication
 Route::prefix('seller')->name('seller.')->group(function () {
