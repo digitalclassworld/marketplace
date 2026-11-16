@@ -471,25 +471,6 @@
                         It's free and takes less than 2 minutes. Start selling your courses, services or products on Digital Class.
                     </p>
 
-                    @auth
-                        <div class="alert alert-info py-2 px-3 small rounded-3 mb-3 d-flex align-items-center justify-content-between">
-                            <div>
-                                <i class="fa-solid fa-user-circle me-1"></i>
-                                Currently signed in as <strong>{{ Auth::user()->name }}</strong>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                @if(Auth::user()->isSeller())
-                                    <a href="{{ route('seller.dashboard') }}" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
-                                        Dashboard &rarr;
-                                    </a>
-                                @endif
-                                <a href="{{ route('seller.logout') }}" class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
-                                    Log Out
-                                </a>
-                            </div>
-                        </div>
-                    @endauth
-
                     <!-- 4-Step Stepper (matching screenshot 1: Basic Details, 2: Business Info, 3: Verify, 4: Go Live) -->
                     <div class="reg-stepper-wrap">
                         <div class="step-item active">

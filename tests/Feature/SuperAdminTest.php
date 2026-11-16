@@ -101,7 +101,7 @@ class SuperAdminTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Super Admin Portal');
-        $response->assertSee('Currently signed in as Seller');
+        $response->assertSee('Administrative Login');
     }
 
     /**
