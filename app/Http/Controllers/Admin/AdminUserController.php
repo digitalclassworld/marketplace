@@ -86,11 +86,25 @@ class AdminUserController extends Controller
             try {
                 if (Schema::hasTable('orders')) {
                     $customerOrders = Order::where(function ($q) use ($u) {
+                        $hasCond = false;
                         if (!empty($u->email)) {
                             $q->where('customer_email', $u->email);
+                            $hasCond = true;
                         }
                         if (!empty($u->phone)) {
-                            $q->orWhere('customer_phone', $u->phone);
+                            if ($hasCond) {
+                                $q->orWhere('customer_phone', $u->phone);
+                            } else {
+                                $q->where('customer_phone', $u->phone);
+                                $hasCond = true;
+                            }
+                        }
+                        if (!empty($u->name)) {
+                            if ($hasCond) {
+                                $q->orWhere('customer_name', $u->name);
+                            } else {
+                                $q->where('customer_name', $u->name);
+                            }
                         }
                     })->latest('placed_at')->latest('id')->get();
                 }

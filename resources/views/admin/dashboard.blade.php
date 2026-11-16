@@ -267,123 +267,135 @@
     <div class="row g-2 mb-4">
         <!-- 7. Total Orders -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Total Orders</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['total_orders'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['orders_growth'] }}</span>
+            <a href="{{ route('admin.orders.index') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Total Orders</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['total_orders'] }}</span>
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['orders_growth'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['orders_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['orders_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 8. Total Revenue -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                        <i class="fa-solid fa-indian-rupee-sign"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Total Revenue</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['total_revenue'] }}</span>
-                            @if(!empty($kpis['revenue_growth']) && $kpis['revenue_growth'] !== '0%')
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['revenue_growth'] }}</span>
-                            @endif
+            <a href="{{ route('admin.financial.payments') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Total Revenue</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['total_revenue'] }}</span>
+                                @if(!empty($kpis['revenue_growth']) && $kpis['revenue_growth'] !== '0%')
+                                    <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['revenue_growth'] }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['revenue_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['revenue_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 9. Payout Due to Sellers -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Payout Due to Sellers</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['payout_due'] }}</span>
-                            @if(!empty($kpis['payout_growth']) && $kpis['payout_growth'] !== '0%')
-                                <span class="kpi-growth-pill {{ str_contains($kpis['payout_growth'], '↓') || str_contains($kpis['payout_growth'], '-') ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }}">{{ $kpis['payout_growth'] }}</span>
-                            @endif
+            <a href="{{ route('admin.financial.payouts') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Payout Due to Sellers</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['payout_due'] }}</span>
+                                @if(!empty($kpis['payout_growth']) && $kpis['payout_growth'] !== '0%')
+                                    <span class="kpi-growth-pill {{ str_contains($kpis['payout_growth'], '↓') || str_contains($kpis['payout_growth'], '-') ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }}">{{ $kpis['payout_growth'] }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['payout_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['payout_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 10. New Leads -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
-                        <i class="fa-regular fa-file-lines"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">New Leads</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['new_leads'] }}</span>
-                            @if(!empty($kpis['leads_growth']) && $kpis['leads_growth'] !== '0%')
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['leads_growth'] }}</span>
-                            @endif
+            <a href="{{ route('admin.leads.index') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
+                            <i class="fa-regular fa-file-lines"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">New Leads</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['new_leads'] }}</span>
+                                @if(!empty($kpis['leads_growth']) && $kpis['leads_growth'] !== '0%')
+                                    <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['leads_growth'] }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['leads_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['leads_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 11. App Downloads -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                        <i class="fa-solid fa-download"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">App Downloads</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['app_downloads'] }}</span>
-                            @if(!empty($kpis['downloads_growth']) && $kpis['downloads_growth'] !== '0%')
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['downloads_growth'] }}</span>
-                            @endif
+            <a href="{{ route('admin.app.index') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">App Downloads</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['app_downloads'] }}</span>
+                                @if(!empty($kpis['downloads_growth']) && $kpis['downloads_growth'] !== '0%')
+                                    <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['downloads_growth'] }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['downloads_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['downloads_sub'] }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- 12. Average Rating -->
         <div class="col-xl-2 col-md-4 col-6">
-            <div class="metric-grid-card">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <div>
-                        <div class="kpi-title">Average Rating</div>
-                        <div class="d-flex align-items-center">
-                            <span class="kpi-value">{{ $kpis['average_rating'] }}</span>
+            <a href="{{ route('admin.reviews.index') }}" class="text-decoration-none d-block">
+                <div class="metric-grid-card">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div>
+                            <div class="kpi-title">Average Rating</div>
+                            <div class="d-flex align-items-center">
+                                <span class="kpi-value">{{ $kpis['average_rating'] }}</span>
+                            </div>
                         </div>
                     </div>
+                    <div class="kpi-subtext">{{ $kpis['rating_sub'] }}</div>
                 </div>
-                <div class="kpi-subtext">{{ $kpis['rating_sub'] }}</div>
-            </div>
+            </a>
         </div>
     </div>
 

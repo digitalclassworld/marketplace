@@ -23,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'cart/*',
             'cart*',
             'cart/checkout',
+            'checkout',
+            '*/checkout',
             'refresh-csrf',
         ]);
 

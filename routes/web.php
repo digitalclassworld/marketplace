@@ -6,9 +6,11 @@ use App\Http\Controllers\Admin\AdminCatalogController;
 use App\Http\Controllers\Admin\AdminCmsController;
 use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminFinancialController;
 use App\Http\Controllers\Admin\AdminLeadController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminNotificationController;
+use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminSeoController;
@@ -236,6 +238,23 @@ Route::prefix('admin')->name('admin.')->middleware(['superadmin'])->group(functi
         Route::post('/listings/{id}/approve', [AdminCatalogController::class, 'approveListing'])->name('listings.approve');
         Route::post('/listings/{id}/reject', [AdminCatalogController::class, 'rejectListing'])->name('listings.reject');
         Route::post('/listings/{id}/toggle-featured', [AdminCatalogController::class, 'toggleFeaturedListing'])->name('listings.toggle-featured');
+    });
+
+    // Orders & Bookings Management
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [AdminOrderController::class, 'index'])->name('index');
+        Route::get('/export', [AdminOrderController::class, 'export'])->name('export');
+        Route::get('/{id}', [AdminOrderController::class, 'show'])->name('show');
+        Route::post('/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('status');
+        Route::post('/simulate', [AdminOrderController::class, 'simulateOrder'])->name('simulate');
+        Route::delete('/{id}', [AdminOrderController::class, 'destroy'])->name('destroy');
+    });
+
+    // Financial Management (Payments & Payouts)
+    Route::prefix('financial')->name('financial.')->group(function () {
+        Route::get('/payments', [AdminFinancialController::class, 'payments'])->name('payments');
+        Route::get('/payouts', [AdminFinancialController::class, 'payouts'])->name('payouts');
+        Route::post('/payouts/{sellerId}/release', [AdminFinancialController::class, 'releasePayout'])->name('payouts.release');
     });
 
     // Customer-Seller Chats Monitoring & Support Tickets (Admin Messages & Support)

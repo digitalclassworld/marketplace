@@ -389,7 +389,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'orders') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.orders.index') }}" class="admin-nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-cart-shopping menu-icon"></i>
                             <span>Orders & Bookings</span>
@@ -402,21 +402,19 @@
             <div class="admin-menu-section">FINANCIAL MANAGEMENT</div>
             <ul class="admin-nav-list">
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'payments') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.financial.payments') }}" class="admin-nav-link {{ request()->routeIs('admin.financial.payments*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-credit-card menu-icon"></i>
                             <span>Payments & Wallet</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right chevron-icon"></i>
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'payouts') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.financial.payouts') }}" class="admin-nav-link {{ request()->routeIs('admin.financial.payouts*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-hand-holding-dollar menu-icon"></i>
                             <span>Payouts & Commission</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right chevron-icon"></i>
                     </a>
                 </li>
                 <li class="admin-nav-item">

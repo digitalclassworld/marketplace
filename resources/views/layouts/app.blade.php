@@ -1766,7 +1766,10 @@
             }
 
             const items = getCartItems();
+            let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
             const payload = {
+                _token: csrfToken,
                 name: document.getElementById('checkoutName').value,
                 email: document.getElementById('checkoutEmail').value,
                 phone: document.getElementById('checkoutPhone').value,
@@ -1777,7 +1780,6 @@
             };
 
             try {
-                let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
                 let res = await fetch('{{ route("cart.checkout") }}', {
                     method: 'POST',
                     headers: {
@@ -1795,6 +1797,7 @@
                         const refreshData = await refreshRes.json();
                         if (refreshData && refreshData.token) {
                             csrfToken = refreshData.token;
+                            payload._token = csrfToken;
                             document.querySelectorAll('meta[name="csrf-token"]').forEach(m => m.setAttribute('content', csrfToken));
                             document.querySelectorAll('input[name="_token"]').forEach(i => i.value = csrfToken);
 
@@ -1813,7 +1816,12 @@
                     }
                 }
 
-                const data = await res.json();
+                let data = {};
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    data = { success: false, message: 'Server returned an invalid response. Please try again.' };
+                }
 
                 if (data.success) {
                     // Clear cart
