@@ -35,18 +35,13 @@ return [
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', (function () {
-                $storageDb = storage_path('database.sqlite');
-                $defaultDb = database_path('database.sqlite');
-                if (file_exists($storageDb) && filesize($storageDb) > 0) {
-                    return $storageDb;
+            'database' => (function () {
+                $custom = env('DB_DATABASE');
+                if (!empty($custom) && (str_starts_with($custom, storage_path()) || str_contains($custom, '/storage/'))) {
+                    return $custom;
                 }
-                if (file_exists($defaultDb)) {
-                    @copy($defaultDb, $storageDb);
-                    return file_exists($storageDb) ? $storageDb : $defaultDb;
-                }
-                return $storageDb;
-            })()),
+                return storage_path('database.sqlite');
+            })(),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,

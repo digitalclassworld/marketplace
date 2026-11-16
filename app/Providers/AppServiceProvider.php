@@ -83,6 +83,40 @@ class AppServiceProvider extends ServiceProvider
                     );
                     \Illuminate\Support\Facades\Cache::put('superadmin_verified_boot', true, 300);
                 }
+
+                // Restore Meshwa Patel's account if it was wiped before persistent storage was mounted
+                if (\App\Models\User::where('email', 'meshva@gmail.com')->doesntExist() && \Illuminate\Support\Facades\Schema::hasTable('sellers')) {
+                    $mUser = \App\Models\User::create([
+                        'name'              => 'Meshwa Patel',
+                        'email'             => 'meshva@gmail.com',
+                        'phone'             => '9876543210',
+                        'password'          => \Illuminate\Support\Facades\Hash::make('Seller@123'),
+                        'role'              => 'seller',
+                        'email_verified_at' => now(),
+                    ]);
+
+                    $mSeller = \App\Models\Seller::create([
+                        'user_id'             => $mUser->id,
+                        'seller_code'         => 'DC-SELL-000001',
+                        'account_type'        => \App\Models\Seller::ACCOUNT_TYPE_INDIVIDUAL,
+                        'seller_status'       => \App\Models\Seller::STATUS_ACTIVE,
+                        'verification_status' => \App\Models\Seller::VERIFICATION_VERIFIED,
+                        'registration_date'   => now()->subHours(2),
+                        'approved_at'         => now(),
+                        'approved_by'         => 1,
+                    ]);
+
+                    if (\Illuminate\Support\Facades\Schema::hasTable('seller_business_details')) {
+                        \App\Models\SellerBusinessDetail::create([
+                            'seller_id'      => $mSeller->id,
+                            'business_name'  => "Meshwa Patel's Store",
+                            'business_email' => 'meshva@gmail.com',
+                            'business_phone' => '9876543210',
+                            'city'           => 'Ahmedabad',
+                            'state'          => 'Gujarat',
+                        ]);
+                    }
+                }
             }
         } catch (\Throwable $e) {
             // Ignore during early migrations or db failures
