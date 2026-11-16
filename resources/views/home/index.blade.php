@@ -601,6 +601,14 @@
         padding: 1rem;
         font-size: 0.8rem;
     }
+
+    .hover-shadow-lg {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-shadow-lg:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+    }
 </style>
 @endsection
 
@@ -1245,6 +1253,206 @@
         </div>
     </div>
 </div>
+
+<!-- ============================================================================
+     4. SHOWCASE SECTIONS: COURSES, SERVICES & PRODUCTS FROM SELLERS
+     ============================================================================ -->
+
+<!-- FEATURED COURSES SECTION -->
+@if(isset($featuredCourses) && $featuredCourses->isNotEmpty())
+    <section class="py-5 bg-white border-top">
+        <div class="container-fluid px-lg-4">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1.5 rounded-pill mb-1">
+                        <i class="fa-solid fa-graduation-cap me-1"></i> Online & Offline Courses
+                    </span>
+                    <h2 class="fw-bold text-dark mb-1" style="font-size: 1.65rem; font-family: var(--dc-font-heading);">
+                        Featured Courses by Expert Instructors
+                    </h2>
+                    <p class="text-muted small mb-0">Learn in-demand skills from certified training institutes and verified educators.</p>
+                </div>
+                <a href="{{ route('courses') }}" class="btn btn-outline-primary btn-sm fw-bold px-3 py-2 rounded-pill">
+                    Browse All Courses &rarr;
+                </a>
+            </div>
+
+            <div class="row g-3">
+                @foreach($featuredCourses as $c)
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                        <div class="card h-100 border border-slate-200 rounded-3 shadow-sm overflow-hidden hover-shadow-lg transition-all">
+                            <div style="height: 160px; position: relative; background: #0f172a; overflow: hidden;">
+                                <a href="{{ route('course.show', $c->slug) }}">
+                                    <img src="{{ $c->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80' }}" alt="{{ $c->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </a>
+                                <span class="badge bg-dark bg-opacity-75 text-white position-absolute bottom-0 end-0 m-2" style="font-size: 0.65rem;">
+                                    <i class="fa-regular fa-clock me-1"></i> {{ $c->access_type ?? 'Lifetime' }}
+                                </span>
+                            </div>
+                            <div class="card-body p-3 d-flex flex-column">
+                                <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-0.5 rounded-pill mb-1.5 align-self-start" style="font-size: 0.65rem;">
+                                    {{ $c->category ?? 'Course' }}
+                                </span>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem; line-height: 1.35;">
+                                    <a href="{{ route('course.show', $c->slug) }}" class="text-dark text-decoration-none">
+                                        {{ Str::limit($c->title, 55) }}
+                                    </a>
+                                </h5>
+                                <div class="text-muted small mb-2" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-chalkboard-user text-primary me-1"></i>
+                                    {{ $c->seller?->businessDetail?->business_name ?? $c->seller?->user?->name ?? 'Digital Class Academy' }}
+                                </div>
+                                <div class="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
+                                    <div>
+                                        @if($c->is_free || (float)$c->price == 0)
+                                            <span class="fw-bold text-success" style="font-size: 1.05rem;">FREE</span>
+                                        @else
+                                            <span class="fw-bold text-dark" style="font-size: 1.05rem;">₹{{ number_format($c->price) }}</span>
+                                            @if($c->discount_price && $c->discount_price > $c->price)
+                                                <span class="text-muted text-decoration-line-through small ms-1" style="font-size: 0.75rem;">₹{{ number_format($c->discount_price) }}</span>
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <a href="{{ route('course.show', $c->slug) }}" class="btn btn-primary btn-sm px-3 fw-semibold rounded-pill" style="font-size: 0.775rem;">
+                                        View Course
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
+
+<!-- FEATURED SERVICES SECTION -->
+@if(isset($featuredServices) && $featuredServices->isNotEmpty())
+    <section class="py-5 border-top" style="background-color: #f8fafc;">
+        <div class="container-fluid px-lg-4">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                <div>
+                    <span class="badge bg-success-subtle text-success fw-bold px-3 py-1.5 rounded-pill mb-1">
+                        <i class="fa-solid fa-briefcase me-1"></i> Verified Experts
+                    </span>
+                    <h2 class="fw-bold text-dark mb-1" style="font-size: 1.65rem; font-family: var(--dc-font-heading);">
+                        Professional Services & Freelance Gigs
+                    </h2>
+                    <p class="text-muted small mb-0">Hire verified agencies and professionals for your business, tech and creative needs.</p>
+                </div>
+                <a href="{{ route('services') }}" class="btn btn-outline-success btn-sm fw-bold px-3 py-2 rounded-pill">
+                    Browse All Services &rarr;
+                </a>
+            </div>
+
+            <div class="row g-3">
+                @foreach($featuredServices as $s)
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                        <div class="card h-100 border border-slate-200 rounded-3 shadow-sm overflow-hidden hover-shadow-lg transition-all bg-white">
+                            <div style="height: 160px; position: relative; background: #0f172a; overflow: hidden;">
+                                <a href="{{ route('service.show', $s->slug) }}">
+                                    <img src="{{ $s->thumbnail ?: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&auto=format&fit=crop&q=80' }}" alt="{{ $s->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </a>
+                                <span class="badge bg-dark bg-opacity-75 text-white position-absolute bottom-0 end-0 m-2" style="font-size: 0.65rem;">
+                                    <i class="fa-solid fa-truck-fast me-1"></i> {{ $s->delivery_days ?? 3 }} Days
+                                </span>
+                            </div>
+                            <div class="card-body p-3 d-flex flex-column">
+                                <span class="badge bg-success-subtle text-success fw-semibold px-2 py-0.5 rounded-pill mb-1.5 align-self-start" style="font-size: 0.65rem;">
+                                    {{ $s->category ?? 'Service' }}
+                                </span>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem; line-height: 1.35;">
+                                    <a href="{{ route('service.show', $s->slug) }}" class="text-dark text-decoration-none">
+                                        {{ Str::limit($s->title, 55) }}
+                                    </a>
+                                </h5>
+                                <div class="text-muted small mb-2" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-store text-success me-1"></i>
+                                    {{ $s->seller?->businessDetail?->business_name ?? $s->seller?->user?->name ?? 'Professional Agency' }}
+                                </div>
+                                <div class="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
+                                    <div>
+                                        <span class="text-muted small" style="font-size: 0.7rem;">Starting at</span>
+                                        <div class="fw-bold text-dark" style="font-size: 1.05rem;">₹{{ number_format($s->price ?? 999) }}</div>
+                                    </div>
+                                    <a href="{{ route('service.show', $s->slug) }}" class="btn btn-success btn-sm px-3 fw-semibold rounded-pill text-white" style="font-size: 0.775rem;">
+                                        View Service
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
+
+<!-- FEATURED PRODUCTS SECTION -->
+@if(isset($featuredProducts) && $featuredProducts->isNotEmpty())
+    <section class="py-5 bg-white border-top">
+        <div class="container-fluid px-lg-4">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                <div>
+                    <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-1.5 rounded-pill mb-1">
+                        <i class="fa-solid fa-box-open me-1"></i> Marketplace Store
+                    </span>
+                    <h2 class="fw-bold text-dark mb-1" style="font-size: 1.65rem; font-family: var(--dc-font-heading);">
+                        Trending Products & Educational Equipment
+                    </h2>
+                    <p class="text-muted small mb-0">Shop physical & digital items, laptops, books, and study material from verified merchants.</p>
+                </div>
+                <a href="{{ route('products') }}" class="btn btn-outline-danger btn-sm fw-bold px-3 py-2 rounded-pill">
+                    Browse All Products &rarr;
+                </a>
+            </div>
+
+            <div class="row g-3">
+                @foreach($featuredProducts as $p)
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                        <div class="card h-100 border border-slate-200 rounded-3 shadow-sm overflow-hidden hover-shadow-lg transition-all">
+                            <div style="height: 160px; position: relative; background: #f8fafc; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                <a href="{{ route('product.show', $p->slug) }}" class="w-100 h-100 d-flex align-items-center justify-content-center p-2">
+                                    <img src="{{ $p->thumbnail ?: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=500&auto=format&fit=crop&q=80' }}" alt="{{ $p->title }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                </a>
+                                @if($p->product_type)
+                                    <span class="badge bg-secondary position-absolute top-0 start-0 m-2" style="font-size: 0.65rem;">
+                                        {{ $p->product_type }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="card-body p-3 d-flex flex-column">
+                                <span class="badge bg-danger-subtle text-danger fw-semibold px-2 py-0.5 rounded-pill mb-1.5 align-self-start" style="font-size: 0.65rem;">
+                                    {{ $p->category ?? 'Product' }}
+                                </span>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem; line-height: 1.35;">
+                                    <a href="{{ route('product.show', $p->slug) }}" class="text-dark text-decoration-none">
+                                        {{ Str::limit($p->title, 55) }}
+                                    </a>
+                                </h5>
+                                <div class="text-muted small mb-2" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-store text-danger me-1"></i>
+                                    {{ $p->seller?->businessDetail?->business_name ?? $p->seller?->user?->name ?? 'Verified Seller' }}
+                                </div>
+                                <div class="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
+                                    <div>
+                                        <span class="fw-bold text-dark" style="font-size: 1.05rem;">₹{{ number_format($p->price ?? 499) }}</span>
+                                        @if($p->mrp && $p->mrp > $p->price)
+                                            <span class="text-muted text-decoration-line-through small ms-1" style="font-size: 0.75rem;">₹{{ number_format($p->mrp) }}</span>
+                                        @endif
+                                    </div>
+                                    <a href="{{ route('product.show', $p->slug) }}" class="btn btn-outline-dark btn-sm px-3 fw-semibold rounded-pill" style="font-size: 0.775rem;">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
 
 <!-- ============================================================================
      MODALS: BUSINESS DETAIL & CONTACT MODAL

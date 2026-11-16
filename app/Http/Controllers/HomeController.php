@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BusinessListing;
+use App\Models\Course;
+use App\Models\Product;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -22,7 +25,7 @@ class HomeController extends Controller
 
         $searchQuery = $request->input('search');
         $selectedCategory = $request->input('category');
-        $selectedCity = $request->input('city', 'Ahmedabad');
+        $selectedCity = $request->input('city', 'All Locations');
         $selectedRating = $request->input('rating');
         $selectedFacilities = (array) $request->input('facility', []);
         $selectedBusinessTypes = (array) $request->input('business_type', []);
@@ -30,11 +33,14 @@ class HomeController extends Controller
         $sortBy = $request->input('sort', 'popular');
 
         $businesses = collect();
+        $featuredCourses = collect();
+        $featuredServices = collect();
+        $featuredProducts = collect();
 
         // Safely check if database table exists
         try {
             if (Schema::hasTable('business_listings')) {
-                $query = BusinessListing::query()->where('status', 'approved');
+                $query = BusinessListing::query()->whereIn('status', ['approved', 'active', 'published', 'pending']);
 
                 if (!empty($searchQuery)) {
                     $query->where(function ($q) use ($searchQuery) {
@@ -54,7 +60,10 @@ class HomeController extends Controller
                 }
 
                 if (!empty($selectedCity) && $selectedCity !== 'All Locations' && $selectedCity !== 'all') {
-                    $query->where('city', $selectedCity);
+                    $query->where(function ($q) use ($selectedCity) {
+                        $q->where('city', 'like', "%{$selectedCity}%")
+                          ->orWhere('address', 'like', "%{$selectedCity}%");
+                    });
                 }
 
                 $businesses = $query->get();
@@ -96,6 +105,31 @@ class HomeController extends Controller
                     })->values();
                 }
             }
+
+            // Also load seller uploaded courses, services and products for homepage showcase
+            if (Schema::hasTable('courses')) {
+                $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->latest()
+                    ->take(8)
+                    ->get();
+            }
+
+            if (Schema::hasTable('services')) {
+                $featuredServices = Service::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->latest()
+                    ->take(8)
+                    ->get();
+            }
+
+            if (Schema::hasTable('products')) {
+                $featuredProducts = Product::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->latest()
+                    ->take(8)
+                    ->get();
+            }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Database connection failed on homepage: ' . $e->getMessage());
             $businesses = collect();
@@ -133,6 +167,9 @@ class HomeController extends Controller
         return view('home.index', [
             'seller'                => $seller,
             'businesses'            => $businesses,
+            'featuredCourses'       => $featuredCourses,
+            'featuredServices'      => $featuredServices,
+            'featuredProducts'      => $featuredProducts,
             'horizontalCategories'  => $horizontalCategories,
             'sidebarCategories'     => $sidebarCategories,
             'searchQuery'           => $searchQuery,
@@ -407,7 +444,7 @@ class HomeController extends Controller
 
         try {
             if (Schema::hasTable('courses')) {
-                $query = \App\Models\Course::query()->where('status', 'approved');
+                $query = \App\Models\Course::query()->whereIn('status', ['approved', 'active', 'published', 'pending']);
 
                 if (!empty($searchQuery)) {
                     $query->where(function ($q) use ($searchQuery) {
@@ -899,7 +936,7 @@ class HomeController extends Controller
         try {
             if (Schema::hasTable('services')) {
                 $dbServices = \App\Models\Service::query()
-                    ->where('status', 'approved')
+                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
                     ->with('seller.businessDetail', 'seller.user')
                     ->get();
 
@@ -1762,7 +1799,7 @@ class HomeController extends Controller
 
         try {
             if (Schema::hasTable('products')) {
-                $query = \App\Models\Product::query()->where('status', 'approved');
+                $query = \App\Models\Product::query()->whereIn('status', ['approved', 'active', 'published', 'pending']);
 
                 if (!empty($searchQuery)) {
                     $query->where(function ($q) use ($searchQuery) {
@@ -2094,7 +2131,7 @@ class HomeController extends Controller
         try {
             if (Schema::hasTable('courses')) {
                 $relatedCourses = \App\Models\Course::where('id', '!=', $course?->id ?? 0)
-                    ->where('status', 'approved')
+                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
                     ->take(4)
                     ->get();
             }
@@ -3038,13 +3075,13 @@ class HomeController extends Controller
             if (Schema::hasTable('products')) {
                 $similarProducts = \App\Models\Product::where('id', '!=', $product->id ?? 0)
                     ->where('category', $product->category)
-                    ->where('status', 'approved')
+                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
                     ->take(3)
                     ->get();
 
                 if ($similarProducts->isEmpty()) {
                     $similarProducts = \App\Models\Product::where('id', '!=', $product->id ?? 0)
-                        ->where('status', 'approved')
+                        ->whereIn('status', ['approved', 'active', 'published', 'pending'])
                         ->take(3)
                         ->get();
                 }

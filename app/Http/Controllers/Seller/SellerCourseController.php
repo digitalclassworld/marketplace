@@ -81,7 +81,7 @@ class SellerCourseController extends Controller
             'access_type'          => $validated['access_type'],
             'certificate_included' => $request->boolean('certificate_included', true),
             'qa_enabled'           => $request->boolean('qa_enabled', true),
-            'status'               => 'pending',
+            'status'               => 'approved',
         ]);
 
         // Save sections / lectures if provided
@@ -101,7 +101,7 @@ class SellerCourseController extends Controller
             }
         }
 
-        return redirect()->route('seller.courses.index')->with('success', 'Course submitted successfully! It is now pending Super Admin review.');
+        return redirect()->route('seller.courses.index')->with('success', 'Course published successfully! Your listing is now live on the marketplace.');
     }
 }
 

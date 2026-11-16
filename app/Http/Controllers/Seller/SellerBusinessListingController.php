@@ -98,10 +98,10 @@ class SellerBusinessListingController extends Controller
             'plan_name'        => $validated['plan_name'] ?? 'Premium Listing',
             'plan_price'       => $validated['plan_price'] ?? 1499.00,
             'add_ons'          => $addOns,
-            'status'           => 'pending',
+            'status'           => 'approved',
         ]);
 
-        return redirect()->route('seller.listings.index')->with('success', 'Business Directory listing submitted successfully! It is now pending Super Admin review.');
+        return redirect()->route('seller.listings.index')->with('success', 'Business Directory listing published successfully! Your business is now live on the marketplace.');
     }
 }
 
