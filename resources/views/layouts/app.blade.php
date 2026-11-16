@@ -536,16 +536,29 @@
                             </div>
                         @endif
                     @else
-                        <!-- Guest: Customer Login & Sign Up -->
-                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-semibold" onclick="openCustomerAuthModal('login')">
-                            <i class="fa-regular fa-user me-1"></i> Login
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm px-3 fw-bold" style="background-color: #0066ff;" onclick="openCustomerAuthModal('register')">
-                            Sign Up
-                        </button>
-                        <a href="{{ route('seller.register') }}" class="small text-muted text-decoration-none d-none d-lg-inline ms-1" style="font-size: 0.75rem;" title="Start selling courses & services">
-                            Become a Seller
-                        </a>
+                        <!-- Guest Navigation: Direct Customer Sign Up & Seller Login Options -->
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <!-- Customer Sign Up Button -->
+                            <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" style="background-color: #0066ff;" onclick="openCustomerAuthModal('register')">
+                                <i class="fa-solid fa-user-plus me-1"></i> Customer Sign Up
+                            </button>
+
+                            <!-- Customer Login Button -->
+                            <button type="button" class="btn btn-light border btn-sm rounded-pill px-2.5 fw-semibold text-dark shadow-xs" onclick="openCustomerAuthModal('login')">
+                                <i class="fa-regular fa-user me-1 text-primary"></i> Customer Login
+                            </button>
+
+                            <!-- Seller Login Button -->
+                            <a href="{{ route('seller.login') }}" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" title="Login to Instructor / Institute Seller Dashboard">
+                                <i class="fa-solid fa-store"></i>
+                                <span>Seller Login</span>
+                            </a>
+
+                            <!-- Become a Seller Link -->
+                            <a href="{{ route('seller.register') }}" class="small text-muted text-decoration-none d-none d-xl-inline ms-1" style="font-size: 0.75rem;" title="Start selling courses & services">
+                                Become a Seller
+                            </a>
+                        </div>
                     @endauth
                 </div>
             </div>
@@ -999,8 +1012,13 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link py-1.5 fw-semibold text-white small" id="tab-cust-reg-btn" data-bs-toggle="pill" data-bs-target="#tabCustReg" type="button" role="tab">
-                                <i class="fa-solid fa-user-plus me-1"></i> Create Account
+                                <i class="fa-solid fa-user-plus me-1"></i> Customer Sign Up
                             </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a href="{{ route('seller.login') }}" class="nav-link py-1.5 fw-semibold text-white text-opacity-75 small text-nowrap" style="transition: all 0.2s;">
+                                <i class="fa-solid fa-store me-1"></i> Seller Login
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -1102,6 +1120,19 @@
                                 Already registered? 
                                 <a href="javascript:void(0)" onclick="switchCustomerAuthTab('login')" class="text-primary fw-bold text-decoration-none">Login here</a>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Switcher to Seller Login -->
+                    <div class="mt-3 pt-3 border-top text-center bg-light p-2.5 rounded-3">
+                        <span class="small text-muted d-block mb-1" style="font-size: 0.75rem;">Are you an Instructor, Institute, or Service Provider?</span>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <a href="{{ route('seller.login') }}" class="btn btn-outline-success btn-sm fw-bold rounded-pill px-3" style="font-size: 0.775rem;">
+                                <i class="fa-solid fa-store me-1"></i> Seller Login
+                            </a>
+                            <a href="{{ route('seller.register') }}" class="btn btn-link text-muted btn-sm text-decoration-none" style="font-size: 0.75rem;">
+                                Register Store &rarr;
+                            </a>
                         </div>
                     </div>
                 </div>

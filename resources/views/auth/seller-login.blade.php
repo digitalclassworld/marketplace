@@ -190,7 +190,20 @@
                         <span class="small text-muted">New seller on Digital Class?</span>
                         <div class="mt-2">
                             <a href="{{ route('seller.register') }}" class="btn btn-outline-primary btn-sm px-3 fw-semibold">
-                                <i class="fa-solid fa-user-plus me-1"></i> Register New Seller Account
+                                <i class="fa-solid fa-store me-1"></i> Register New Seller Account
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Customer Portal Switch -->
+                    <div class="text-center mt-3 pt-3 border-top">
+                        <span class="small text-muted d-block mb-1.5">Looking to learn, enroll, or buy as a student/client?</span>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <a href="{{ route('customer.register') }}" class="btn btn-primary btn-sm px-3 fw-bold rounded-pill" style="background-color: #0066ff;">
+                                <i class="fa-solid fa-user-plus me-1"></i> Customer Sign Up
+                            </a>
+                            <a href="{{ route('customer.login') }}" class="btn btn-outline-secondary btn-sm px-3 fw-semibold rounded-pill">
+                                Customer Login
                             </a>
                         </div>
                     </div>

@@ -221,3 +221,4 @@ class CustomerAuthController extends Controller
         return view('customer.orders', compact('orders', 'user'));
     }
 }
+
