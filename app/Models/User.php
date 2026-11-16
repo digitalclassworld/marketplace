@@ -78,6 +78,11 @@ class User extends Authenticatable
         return $this->hasOne(Seller::class, 'user_id');
     }
 
+    public function adminNotes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserAdminNote::class, 'user_id');
+    }
+
     /**
      * Role checking helpers
      */

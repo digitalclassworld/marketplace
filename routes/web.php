@@ -197,6 +197,8 @@ Route::prefix('admin')->name('admin.')->middleware(['superadmin'])->group(functi
         Route::get('/', [AdminUserController::class, 'index'])->name('index');
         Route::post('/', [AdminUserController::class, 'store'])->name('store');
         Route::get('/export', [AdminUserController::class, 'export'])->name('export');
+        Route::post('/{id}/note', [AdminUserController::class, 'storeNote'])->name('note.store');
+        Route::delete('/notes/{id}', [AdminUserController::class, 'deleteNote'])->name('note.delete');
     });
 
     // Seller Approval & Management Workflow

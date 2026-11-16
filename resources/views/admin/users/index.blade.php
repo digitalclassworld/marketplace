@@ -369,6 +369,67 @@
         border-radius: 8px;
     }
 
+    /* Dynamic Inspector Components */
+    .inspector-tab-pane {
+        animation: fadeIn 0.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .user-timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        padding-bottom: 1.15rem;
+    }
+    .user-timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 0.65rem;
+        top: 1.4rem;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+    .user-timeline-icon {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1.35rem;
+        height: 1.35rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+    }
+    .user-order-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.65rem 0.75rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.15s ease-in-out;
+    }
+    .user-order-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .user-review-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.65rem 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    .user-note-card {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
     @media (max-width: 1199px) {
         .metric-cards-scroll-wrap {
             grid-template-columns: repeat(4, 1fr);
@@ -736,26 +797,27 @@
     <!-- RIGHT: USER INSPECTOR DETAIL PANEL -->
     @php
         $firstUser = $users[0] ?? [
-            'name' => 'Rahul Sharma',
-            'code' => 'UDC00125',
-            'status' => 'Active',
-            'type' => 'Student',
-            'joined_date' => '30 Oct 2026',
-            'joined_ago' => '2 days ago',
-            'email' => 'rahul.sharma@mail.com',
-            'phone' => '+91 98765 43210',
-            'location' => 'Ahmedabad, Gujarat',
-            'dob' => '14 Aug 2005',
-            'gender' => 'Male',
-            'total_orders' => 3,
-            'total_spent' => 4999,
-            'wishlist_count' => 5,
-            'avatar' => 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&auto=format&fit=crop&q=80',
-            'recent_orders' => [
-                ['title' => 'Digital Marketing Course', 'amount' => '₹2,999', 'status' => 'Completed', 'date' => '30 Oct 2026'],
-                ['title' => 'AI Tools Workshop', 'amount' => '₹1,499', 'status' => 'Completed', 'date' => '12 Oct 2026'],
-                ['title' => 'Web Development Course', 'amount' => '₹499', 'status' => 'Ongoing', 'date' => '05 Oct 2026'],
-            ],
+            'id'             => 1,
+            'name'           => 'customer 1',
+            'code'           => 'UDC00008',
+            'status'         => 'Active',
+            'type'           => 'Student',
+            'joined_date'    => now()->format('d M Y'),
+            'joined_ago'     => 'Recently',
+            'email'          => 'customer123@gmail.com',
+            'phone'          => '8978451236',
+            'location'       => 'Ahmedabad, Gujarat',
+            'dob'            => '01 Jan 2000',
+            'gender'         => 'Unspecified',
+            'total_orders'   => 0,
+            'total_spent'    => 0,
+            'wishlist_count' => 0,
+            'avatar'         => 'https://ui-avatars.com/api/?name=customer+1&background=0066ff&color=fff',
+            'recent_orders'  => [],
+            'all_orders'     => [],
+            'activities'     => [],
+            'reviews'        => [],
+            'notes'          => [],
         ];
     @endphp
     <div class="user-inspector-panel" id="userInspectorBox">
@@ -776,119 +838,263 @@
             </button>
         </div>
 
-        <!-- Inspector Tabs -->
-        <div class="inspector-tabs-nav">
-            <a href="javascript:void(0)" class="inspector-tab-link active">Overview</a>
-            <a href="javascript:void(0)" class="inspector-tab-link">Activity</a>
-            <a href="javascript:void(0)" class="inspector-tab-link">Orders</a>
-            <a href="javascript:void(0)" class="inspector-tab-link">Reviews</a>
-            <a href="javascript:void(0)" class="inspector-tab-link">Notes</a>
+        <!-- Inspector Tabs: 5 Dynamic Working Tabs -->
+        <div class="inspector-tabs-nav" id="userInspectorTabsNav">
+            <a href="javascript:void(0)" class="inspector-tab-link active" data-tab="overview" onclick="switchInspectorTab('overview', this)">Overview</a>
+            <a href="javascript:void(0)" class="inspector-tab-link" data-tab="activity" onclick="switchInspectorTab('activity', this)">Activity</a>
+            <a href="javascript:void(0)" class="inspector-tab-link" data-tab="orders" onclick="switchInspectorTab('orders', this)">Orders (<span id="inspTabOrdersCount">{{ count($firstUser['all_orders'] ?? []) }}</span>)</a>
+            <a href="javascript:void(0)" class="inspector-tab-link" data-tab="reviews" onclick="switchInspectorTab('reviews', this)">Reviews (<span id="inspTabReviewsCount">{{ count($firstUser['reviews'] ?? []) }}</span>)</a>
+            <a href="javascript:void(0)" class="inspector-tab-link" data-tab="notes" onclick="switchInspectorTab('notes', this)">Notes (<span id="inspTabNotesCount">{{ count($firstUser['notes'] ?? []) }}</span>)</a>
         </div>
 
         <div class="inspector-body-content">
-            <!-- Basic Information -->
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-bold text-dark fs-7">Basic Information</span>
-                <button type="button" class="btn btn-sm btn-light border py-0 px-2 fs-8 fw-semibold" onclick="alert('Edit Basic Info')">
-                    <i class="fa-solid fa-pen fs-8 me-1"></i> Edit
-                </button>
-            </div>
+            <!-- TAB 1: OVERVIEW -->
+            <div class="inspector-tab-pane" id="inspPane_overview">
+                <!-- Basic Information -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold text-dark fs-7">Basic Information</span>
+                    <button type="button" class="btn btn-sm btn-light border py-0 px-2 fs-8 fw-semibold" onclick="alert('Member profile is in active verified status.')">
+                        <i class="fa-solid fa-pen fs-8 me-1"></i> Edit
+                    </button>
+                </div>
 
-            <div class="border rounded-3 p-2 bg-light mb-3">
-                <div class="info-field-row">
-                    <span class="lbl">Full Name</span>
-                    <span class="val" id="inspFullName">{{ $firstUser['name'] }}</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Email</span>
-                    <span class="val" id="inspEmail">{{ $firstUser['email'] }}</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Mobile</span>
-                    <span class="val d-flex align-items-center gap-1">
-                        <span id="inspPhone">{{ $firstUser['phone'] }}</span>
-                        <a href="https://wa.me/919876543210" target="_blank" class="text-success" title="Chat on WhatsApp">
-                            <i class="fa-brands fa-whatsapp fs-6"></i>
-                        </a>
-                    </span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">User Type</span>
-                    <span class="val text-primary" id="inspType">{{ $firstUser['type'] }}</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Location</span>
-                    <span class="val" id="inspLocation">{{ $firstUser['location'] }}</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Date of Birth</span>
-                    <span class="val" id="inspDob">{{ $firstUser['dob'] ?? '14 Aug 2005' }}</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Gender</span>
-                    <span class="val" id="inspGender">{{ $firstUser['gender'] ?? 'Male' }}</span>
-                </div>
-            </div>
-
-            <!-- Platform Activity -->
-            <div class="fw-bold text-dark fs-7 mb-2">Platform Activity</div>
-            <div class="border rounded-3 p-2 bg-light mb-3">
-                <div class="info-field-row">
-                    <span class="lbl">Total Orders</span>
-                    <span class="val" id="inspTotalOrders">: {{ $firstUser['total_orders'] }}</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Total Spent</span>
-                    <span class="val text-success" id="inspTotalSpent">: ₹{{ number_format($firstUser['total_spent']) }}</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Wishlist</span>
-                    <span class="val" id="inspWishlist">: {{ $firstUser['wishlist_count'] }} items</span>
-                </div>
-                <div class="info-field-row">
-                    <span class="lbl">Last Active</span>
-                    <span class="val" id="inspLastActive">: {{ $firstUser['joined_date'] }} ({{ $firstUser['joined_ago'] }})</span>
-                </div>
-            </div>
-
-            <!-- Recent Orders -->
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-bold text-dark fs-7">Recent Orders</span>
-                <a href="#" class="small text-primary text-decoration-none fw-semibold">View All &rarr;</a>
-            </div>
-
-            <div id="inspRecentOrders">
-                @foreach(($firstUser['recent_orders'] ?? []) as $ro)
-                    <div class="recent-order-pill">
-                        <div>
-                            <div class="fw-bold text-dark">{{ $ro['title'] }}</div>
-                            <div class="text-muted fs-8">{{ $ro['date'] }}</div>
-                        </div>
-                        <div class="text-end">
-                            <div class="fw-bold text-primary">{{ $ro['amount'] }}</div>
-                            <span class="badge {{ $ro['status'] === 'Completed' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} fs-8">
-                                {{ $ro['status'] }}
-                            </span>
-                        </div>
+                <div class="border rounded-3 p-2 bg-light mb-3">
+                    <div class="info-field-row">
+                        <span class="lbl">Full Name</span>
+                        <span class="val" id="inspFullName">{{ $firstUser['name'] }}</span>
                     </div>
-                @endforeach
+                    <div class="info-field-row">
+                        <span class="lbl">Email</span>
+                        <span class="val" id="inspEmail">{{ $firstUser['email'] }}</span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">Mobile</span>
+                        <span class="val d-flex align-items-center gap-1">
+                            <span id="inspPhone">{{ $firstUser['phone'] }}</span>
+                            @php
+                                $firstPhone = preg_replace('/[^0-9]/', '', $firstUser['phone'] ?? '');
+                                if (strlen($firstPhone) === 10) $firstPhone = '91' . $firstPhone;
+                            @endphp
+                            <a id="inspWhatsAppLink" href="{{ !empty($firstPhone) ? 'https://wa.me/' . $firstPhone : '#' }}" target="_blank" class="text-success" title="Chat on WhatsApp" style="{{ empty($firstPhone) ? 'display: none;' : '' }}">
+                                <i class="fa-brands fa-whatsapp fs-6"></i>
+                            </a>
+                        </span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">User Type</span>
+                        <span class="val text-primary" id="inspType">{{ $firstUser['type'] }}</span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">Location</span>
+                        <span class="val" id="inspLocation">{{ $firstUser['location'] }}</span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">Date of Birth</span>
+                        <span class="val" id="inspDob">{{ $firstUser['dob'] ?? '01 Jan 2000' }}</span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">Gender</span>
+                        <span class="val" id="inspGender">{{ $firstUser['gender'] ?? 'Unspecified' }}</span>
+                    </div>
+                </div>
+
+                <!-- Platform Activity -->
+                <div class="fw-bold text-dark fs-7 mb-2">Platform Activity</div>
+                <div class="border rounded-3 p-2 bg-light mb-3">
+                    <div class="info-field-row">
+                        <span class="lbl">Total Orders</span>
+                        <span class="val" id="inspTotalOrders">: {{ $firstUser['total_orders'] }}</span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">Total Spent</span>
+                        <span class="val text-success" id="inspTotalSpent">: ₹{{ number_format((float)$firstUser['total_spent'], 2) }}</span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">Wishlist</span>
+                        <span class="val" id="inspWishlist">: {{ $firstUser['wishlist_count'] }} items</span>
+                    </div>
+                    <div class="info-field-row">
+                        <span class="lbl">Last Active</span>
+                        <span class="val" id="inspLastActive">: {{ $firstUser['joined_date'] }} ({{ $firstUser['joined_ago'] }})</span>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold text-dark fs-7">Recent Orders</span>
+                    <a href="javascript:void(0)" onclick="switchInspectorTab('orders')" class="small text-primary text-decoration-none fw-semibold">View All &rarr;</a>
+                </div>
+
+                <div id="inspRecentOrders">
+                    @forelse(($firstUser['recent_orders'] ?? []) as $ro)
+                        <div class="recent-order-pill">
+                            <div>
+                                <div class="fw-bold text-dark">{{ $ro['title'] }}</div>
+                                <div class="text-muted fs-8">{{ $ro['date'] }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-primary">{{ $ro['amount'] }}</div>
+                                <span class="badge {{ $ro['status'] === 'Completed' || $ro['status'] === 'Confirmed' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }} fs-8">
+                                    {{ $ro['status'] }}
+                                </span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-muted small p-2 text-center bg-light rounded">No recent orders placed yet.</div>
+                    @endforelse
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="fw-bold text-dark fs-7 mt-3 mb-1">Quick Actions</div>
+                <div class="inspector-actions-grid">
+                    <button type="button" class="btn btn-outline-success" onclick="alert('Message window opened for ' + (window.currentInspectedUser?.name || 'User'))">
+                        <i class="fa-regular fa-message me-1"></i> Message
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" onclick="switchInspectorTab('orders')">
+                        <i class="fa-regular fa-file-lines me-1"></i> View Orders
+                    </button>
+                    <button type="button" class="btn btn-outline-warning text-dark" onclick="switchInspectorTab('notes')">
+                        <i class="fa-regular fa-note-sticky me-1"></i> Add Note
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" onclick="confirm('Are you sure you want to block ' + (window.currentInspectedUser?.name || 'this member') + '?')">
+                        <i class="fa-solid fa-ban me-1"></i> Block User
+                    </button>
+                </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="fw-bold text-dark fs-7 mt-3 mb-1">Quick Actions</div>
-            <div class="inspector-actions-grid">
-                <button type="button" class="btn btn-outline-success" onclick="alert('Message popup opened')">
-                    <i class="fa-regular fa-message me-1"></i> Message
-                </button>
-                <button type="button" class="btn btn-outline-primary" onclick="alert('Redirecting to user order ledger')">
-                    <i class="fa-regular fa-file-lines me-1"></i> View Orders
-                </button>
-                <button type="button" class="btn btn-outline-warning text-dark" onclick="alert('Add admin note for this user')">
-                    <i class="fa-regular fa-note-sticky me-1"></i> Add Note
-                </button>
-                <button type="button" class="btn btn-outline-danger" onclick="confirm('Are you sure you want to block this user?')">
-                    <i class="fa-solid fa-ban me-1"></i> Block User
-                </button>
+            <!-- TAB 2: ACTIVITY -->
+            <div class="inspector-tab-pane d-none" id="inspPane_activity">
+                <div class="d-flex justify-content-between align-items-center mb-2.5">
+                    <span class="fw-bold text-dark fs-7">Real-time Activity Timeline</span>
+                    <span class="badge bg-light text-secondary border fs-8">Live Feed</span>
+                </div>
+                <div id="inspActivityTimeline" class="mt-2">
+                    @forelse(($firstUser['activities'] ?? []) as $act)
+                        <div class="user-timeline-item">
+                            <div class="user-timeline-icon {{ $act['bg'] }} {{ $act['color'] }}">
+                                <i class="{{ $act['icon'] }}"></i>
+                            </div>
+                            <div class="fw-bold text-dark fs-7">{{ $act['title'] }}</div>
+                            <div class="text-muted fs-8">{{ $act['description'] }}</div>
+                            <div class="text-secondary fs-8 mt-0.5"><i class="fa-regular fa-clock me-1"></i>{{ $act['ago'] }} &bull; {{ $act['date'] }}</div>
+                        </div>
+                    @empty
+                        <div class="text-muted small p-3 text-center bg-light rounded">No recorded activity yet.</div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- TAB 3: ORDERS -->
+            <div class="inspector-tab-pane d-none" id="inspPane_orders">
+                <div class="d-flex justify-content-between align-items-center mb-2.5">
+                    <span class="fw-bold text-dark fs-7">Orders & Purchases (<span id="inspOrdersHeaderCount">{{ count($firstUser['all_orders'] ?? []) }}</span>)</span>
+                    <span class="small text-muted fs-8">Real-time Database</span>
+                </div>
+                <div id="inspAllOrdersList">
+                    @forelse(($firstUser['all_orders'] ?? []) as $ord)
+                        <div class="user-order-card">
+                            <div class="d-flex align-items-center gap-2 mb-1.5">
+                                <img src="{{ $ord['thumbnail'] }}" alt="{{ $ord['title'] }}" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px;" class="border">
+                                <div class="flex-grow-1" style="min-width: 0;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="fw-bold text-dark fs-7 text-truncate" title="{{ $ord['title'] }}">{{ $ord['title'] }}</span>
+                                        <span class="fw-bold text-primary fs-7">{{ $ord['amount'] }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between mt-0.5">
+                                        <small class="text-muted fs-8">{{ $ord['order_number'] }} &bull; {{ $ord['type'] }}</small>
+                                        <span class="badge bg-{{ $ord['status_badge'] }}-subtle text-{{ $ord['status_badge'] }} fs-8">{{ $ord['status'] }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-muted fs-8 border-top pt-1 mt-1 d-flex justify-content-between">
+                                <span><i class="fa-regular fa-calendar me-1"></i>{{ $ord['date'] }}</span>
+                                <span>{{ $ord['ago'] }}</span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-4 bg-light rounded-3 text-muted">
+                            <i class="fa-solid fa-cart-shopping fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                            <div class="fw-semibold fs-7 text-dark">No orders found</div>
+                            <div class="fs-8">This user has not placed or received any orders yet.</div>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- TAB 4: REVIEWS -->
+            <div class="inspector-tab-pane d-none" id="inspPane_reviews">
+                <div class="d-flex justify-content-between align-items-center mb-2.5">
+                    <span class="fw-bold text-dark fs-7">Ratings & Reviews (<span id="inspReviewsHeaderCount">{{ count($firstUser['reviews'] ?? []) }}</span>)</span>
+                    <span class="small text-muted fs-8">Verified Feedbacks</span>
+                </div>
+                <div id="inspAllReviewsList">
+                    @forelse(($firstUser['reviews'] ?? []) as $rev)
+                        <div class="user-review-card">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="text-warning small fs-8">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fa-solid fa-star{{ $i <= round($rev['rating']) ? '' : '-half-stroke text-muted' }}"></i>
+                                    @endfor
+                                    <span class="fw-bold text-dark ms-1">{{ number_format($rev['rating'], 1) }}</span>
+                                </div>
+                                <span class="badge bg-success-subtle text-success fs-8">{{ $rev['status'] }}</span>
+                            </div>
+                            <div class="fw-bold text-dark fs-7 mb-0.5">{{ $rev['item_title'] }}</div>
+                            <p class="text-muted fs-8 mb-1">{{ $rev['text'] }}</p>
+                            <div class="text-secondary fs-8"><i class="fa-regular fa-calendar me-1"></i>{{ $rev['date'] }} ({{ $rev['ago'] }})</div>
+                        </div>
+                    @empty
+                        <div class="text-center py-4 bg-light rounded-3 text-muted">
+                            <i class="fa-regular fa-star fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                            <div class="fw-semibold fs-7 text-dark">No reviews found</div>
+                            <div class="fs-8">No ratings or testimonials submitted by this member.</div>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- TAB 5: NOTES -->
+            <div class="inspector-tab-pane d-none" id="inspPane_notes">
+                <div class="d-flex justify-content-between align-items-center mb-2.5">
+                    <span class="fw-bold text-dark fs-7">Administrative Notes (<span id="inspNotesHeaderCount">{{ count($firstUser['notes'] ?? []) }}</span>)</span>
+                    <span class="badge bg-warning-subtle text-warning-emphasis fs-8">Internal Only</span>
+                </div>
+
+                <!-- Add Note Form -->
+                <div class="bg-light p-2.5 rounded-3 border mb-3">
+                    <label class="form-label fs-8 fw-bold text-dark mb-1">Add Note for this Member</label>
+                    <textarea id="inspNewNoteInput" class="form-control form-control-sm mb-2" rows="2" placeholder="e.g. Verified customer address, requested syllabus update..."></textarea>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-sm btn-primary px-3 fw-semibold" id="btnSaveAdminNote" onclick="saveAdminNote()">
+                            <i class="fa-solid fa-plus me-1"></i> Save Note
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notes List -->
+                <div id="inspAllNotesList">
+                    @forelse(($firstUser['notes'] ?? []) as $n)
+                        <div class="user-note-card" id="userNoteCard_{{ $n['id'] }}">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-dark fs-8"><i class="fa-solid fa-user-shield text-warning me-1"></i>{{ $n['admin_name'] }}</span>
+                                <div class="d-flex align-items-center gap-1.5">
+                                    <span class="text-muted fs-8">{{ $n['ago'] }}</span>
+                                    <button type="button" class="btn btn-sm btn-link text-danger p-0 border-0" onclick="deleteUserNote({{ $n['id'] }}, this)" title="Delete Note">
+                                        <i class="fa-solid fa-trash-can fs-8"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-dark fs-8" style="white-space: pre-line;">{{ $n['note'] }}</div>
+                            <div class="text-muted mt-1" style="font-size: 0.68rem;">{{ $n['created_at'] }}</div>
+                        </div>
+                    @empty
+                        <div class="text-center py-4 bg-light rounded-3 text-muted" id="inspNoNotesPlaceholder">
+                            <i class="fa-regular fa-note-sticky fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                            <div class="fw-semibold fs-7 text-dark">No notes added yet</div>
+                            <div class="fs-8">Use the field above to record administrative notes.</div>
+                        </div>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
@@ -951,56 +1157,338 @@
 
 @section('scripts')
 <script>
+    window.currentInspectedUser = @json($firstUser);
+
+    // Switch between the 5 Inspector Tabs
+    function switchInspectorTab(tabName, linkElem) {
+        // 1. Update navigation links
+        document.querySelectorAll('#userInspectorTabsNav .inspector-tab-link').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        if (linkElem) {
+            linkElem.classList.add('active');
+        } else {
+            const matchingLink = document.querySelector(`#userInspectorTabsNav .inspector-tab-link[data-tab="${tabName}"]`);
+            if (matchingLink) matchingLink.classList.add('active');
+        }
+
+        // 2. Hide all tab panes
+        document.querySelectorAll('#userInspectorBox .inspector-tab-pane').forEach(pane => {
+            pane.classList.add('d-none');
+        });
+
+        // 3. Show target pane
+        const target = document.getElementById('inspPane_' + tabName);
+        if (target) {
+            target.classList.remove('d-none');
+        }
+    }
+
+    // Inspect user when clicked from table or dropdown
     function inspectUser(u, rowElem) {
         if (rowElem) {
             document.querySelectorAll('.user-table-row').forEach(r => r.classList.remove('active-row'));
             rowElem.classList.add('active-row');
         }
 
+        window.currentInspectedUser = u;
+
+        // 1. Header Information
         document.getElementById('inspAvatar').src = u.avatar;
         document.getElementById('inspName').innerText = u.name;
         document.getElementById('inspFullName').innerText = u.name;
         document.getElementById('inspStatusBadge').innerText = u.status;
         document.getElementById('inspSubtitle').innerText = u.type + ' • ID: ' + u.code;
         document.getElementById('inspJoined').innerText = 'Joined ' + u.joined_date + ' (' + u.joined_ago + ')';
+
+        // 2. Overview - Basic Info
         document.getElementById('inspEmail').innerText = u.email;
         document.getElementById('inspPhone').innerText = u.phone;
+        
+        // Dynamic WhatsApp Link
+        const cleanPhone = (u.phone || '').replace(/[^0-9]/g, '');
+        const waLink = document.getElementById('inspWhatsAppLink');
+        if (waLink) {
+            if (cleanPhone && cleanPhone.length >= 10) {
+                const formatted = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+                waLink.href = 'https://wa.me/' + formatted;
+                waLink.style.display = 'inline-block';
+            } else {
+                waLink.style.display = 'none';
+            }
+        }
+
         document.getElementById('inspType').innerText = u.type;
         document.getElementById('inspLocation').innerText = u.location;
-        document.getElementById('inspDob').innerText = u.dob || '14 Aug 2005';
-        document.getElementById('inspGender').innerText = u.gender || 'Male';
+        document.getElementById('inspDob').innerText = u.dob || '01 Jan 2000';
+        document.getElementById('inspGender').innerText = u.gender || 'Unspecified';
+
+        // 3. Overview - Platform Activity
         document.getElementById('inspTotalOrders').innerText = ': ' + (u.total_orders || 0);
-        document.getElementById('inspTotalSpent').innerText = ': ₹' + (u.total_spent ? parseInt(u.total_spent).toLocaleString() : '0');
+        const spentVal = parseFloat(u.total_spent || 0);
+        document.getElementById('inspTotalSpent').innerText = ': ₹' + spentVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         document.getElementById('inspWishlist').innerText = ': ' + (u.wishlist_count || 0) + ' items';
         document.getElementById('inspLastActive').innerText = ': ' + u.joined_date + ' (' + u.joined_ago + ')';
 
-        // Render recent orders
-        const ordersBox = document.getElementById('inspRecentOrders');
-        ordersBox.innerHTML = '';
+        // 4. Overview - Recent Orders Preview
+        const recentBox = document.getElementById('inspRecentOrders');
+        recentBox.innerHTML = '';
         if (u.recent_orders && u.recent_orders.length > 0) {
             u.recent_orders.forEach(ro => {
                 const item = document.createElement('div');
                 item.className = 'recent-order-pill';
+                const badgeClass = (ro.status === 'Completed' || ro.status === 'Confirmed') ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning';
                 item.innerHTML = `
-                    <div>
-                        <div class="fw-bold text-dark">${ro.title}</div>
+                    <div class="flex-grow-1 text-truncate me-2">
+                        <div class="fw-bold text-dark text-truncate">${ro.title}</div>
                         <div class="text-muted fs-8">${ro.date}</div>
                     </div>
-                    <div class="text-end">
+                    <div class="text-end text-nowrap">
                         <div class="fw-bold text-primary">${ro.amount}</div>
-                        <span class="badge ${ro.status === 'Completed' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'} fs-8">
-                            ${ro.status}
-                        </span>
+                        <span class="badge ${badgeClass} fs-8">${ro.status}</span>
                     </div>
                 `;
-                ordersBox.appendChild(item);
+                recentBox.appendChild(item);
             });
         } else {
-            ordersBox.innerHTML = '<div class="text-muted small p-2 text-center bg-light rounded">No recent orders placed yet.</div>';
+            recentBox.innerHTML = '<div class="text-muted small p-2 text-center bg-light rounded">No recent orders placed yet.</div>';
         }
 
-        // Show inspector if hidden
+        // 5. Activity Timeline Tab
+        const activityBox = document.getElementById('inspActivityTimeline');
+        activityBox.innerHTML = '';
+        if (u.activities && u.activities.length > 0) {
+            u.activities.forEach(act => {
+                const actDiv = document.createElement('div');
+                actDiv.className = 'user-timeline-item';
+                actDiv.innerHTML = `
+                    <div class="user-timeline-icon ${act.bg || 'bg-light'} ${act.color || 'text-primary'}">
+                        <i class="${act.icon || 'fa-solid fa-clock'}"></i>
+                    </div>
+                    <div class="fw-bold text-dark fs-7">${act.title}</div>
+                    <div class="text-muted fs-8">${act.description}</div>
+                    <div class="text-secondary fs-8 mt-0.5"><i class="fa-regular fa-clock me-1"></i>${act.ago} &bull; ${act.date}</div>
+                `;
+                activityBox.appendChild(actDiv);
+            });
+        } else {
+            activityBox.innerHTML = '<div class="text-muted small p-3 text-center bg-light rounded">No recorded activity yet.</div>';
+        }
+
+        // 6. Orders History Tab
+        const ordersBox = document.getElementById('inspAllOrdersList');
+        const ordersCount = u.all_orders ? u.all_orders.length : 0;
+        document.getElementById('inspTabOrdersCount').innerText = ordersCount;
+        const ordHeader = document.getElementById('inspOrdersHeaderCount');
+        if (ordHeader) ordHeader.innerText = ordersCount;
+
+        ordersBox.innerHTML = '';
+        if (ordersCount > 0) {
+            u.all_orders.forEach(ord => {
+                const card = document.createElement('div');
+                card.className = 'user-order-card';
+                card.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 mb-1.5">
+                        <img src="${ord.thumbnail}" alt="${ord.title}" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px;" class="border" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&auto=format&fit=crop&q=80'">
+                        <div class="flex-grow-1" style="min-width: 0;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="fw-bold text-dark fs-7 text-truncate" title="${ord.title}">${ord.title}</span>
+                                <span class="fw-bold text-primary fs-7">${ord.amount}</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mt-0.5">
+                                <small class="text-muted fs-8">${ord.order_number} &bull; ${ord.type}</small>
+                                <span class="badge bg-${ord.status_badge}-subtle text-${ord.status_badge} fs-8">${ord.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-muted fs-8 border-top pt-1 mt-1 d-flex justify-content-between">
+                        <span><i class="fa-regular fa-calendar me-1"></i>${ord.date} ${ord.time ? '&bull; ' + ord.time : ''}</span>
+                        <span>${ord.ago}</span>
+                    </div>
+                `;
+                ordersBox.appendChild(card);
+            });
+        } else {
+            ordersBox.innerHTML = `
+                <div class="text-center py-4 bg-light rounded-3 text-muted">
+                    <i class="fa-solid fa-cart-shopping fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                    <div class="fw-semibold fs-7 text-dark">No orders found</div>
+                    <div class="fs-8">This user has not placed or received any orders yet.</div>
+                </div>
+            `;
+        }
+
+        // 7. Reviews Tab
+        const reviewsBox = document.getElementById('inspAllReviewsList');
+        const reviewsCount = u.reviews ? u.reviews.length : 0;
+        document.getElementById('inspTabReviewsCount').innerText = reviewsCount;
+        const revHeader = document.getElementById('inspReviewsHeaderCount');
+        if (revHeader) revHeader.innerText = reviewsCount;
+
+        reviewsBox.innerHTML = '';
+        if (reviewsCount > 0) {
+            u.reviews.forEach(rev => {
+                const card = document.createElement('div');
+                card.className = 'user-review-card';
+                let stars = '';
+                const rInt = Math.round(rev.rating || 5);
+                for (let i = 1; i <= 5; i++) {
+                    stars += `<i class="fa-solid fa-star${i <= rInt ? '' : '-half-stroke text-muted'}"></i>`;
+                }
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="text-warning small fs-8">
+                            ${stars}
+                            <span class="fw-bold text-dark ms-1">${parseFloat(rev.rating).toFixed(1)}</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success fs-8">${rev.status}</span>
+                    </div>
+                    <div class="fw-bold text-dark fs-7 mb-0.5">${rev.item_title}</div>
+                    <p class="text-muted fs-8 mb-1">${rev.text}</p>
+                    <div class="text-secondary fs-8"><i class="fa-regular fa-calendar me-1"></i>${rev.date} (${rev.ago})</div>
+                `;
+                reviewsBox.appendChild(card);
+            });
+        } else {
+            reviewsBox.innerHTML = `
+                <div class="text-center py-4 bg-light rounded-3 text-muted">
+                    <i class="fa-regular fa-star fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                    <div class="fw-semibold fs-7 text-dark">No reviews found</div>
+                    <div class="fs-8">No ratings or testimonials submitted by this member.</div>
+                </div>
+            `;
+        }
+
+        // 8. Notes Tab
+        renderUserNotesList(u.notes || []);
+
+        // Show inspector panel if closed
         document.getElementById('userInspectorBox').classList.remove('d-none');
+    }
+
+    // Helper: Render Notes List
+    function renderUserNotesList(notes) {
+        const notesBox = document.getElementById('inspAllNotesList');
+        const count = notes ? notes.length : 0;
+        document.getElementById('inspTabNotesCount').innerText = count;
+        const nHeader = document.getElementById('inspNotesHeaderCount');
+        if (nHeader) nHeader.innerText = count;
+
+        notesBox.innerHTML = '';
+        if (count > 0) {
+            notes.forEach(n => {
+                const card = document.createElement('div');
+                card.className = 'user-note-card';
+                card.id = 'userNoteCard_' + n.id;
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-dark fs-8"><i class="fa-solid fa-user-shield text-warning me-1"></i>${n.admin_name}</span>
+                        <div class="d-flex align-items-center gap-1.5">
+                            <span class="text-muted fs-8">${n.ago}</span>
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0 border-0" onclick="deleteUserNote(${n.id}, this)" title="Delete Note">
+                                <i class="fa-solid fa-trash-can fs-8"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-dark fs-8" style="white-space: pre-line;">${escapeHtml(n.note)}</div>
+                    <div class="text-muted mt-1" style="font-size: 0.68rem;">${n.created_at}</div>
+                `;
+                notesBox.appendChild(card);
+            });
+        } else {
+            notesBox.innerHTML = `
+                <div class="text-center py-4 bg-light rounded-3 text-muted" id="inspNoNotesPlaceholder">
+                    <i class="fa-regular fa-note-sticky fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                    <div class="fw-semibold fs-7 text-dark">No notes added yet</div>
+                    <div class="fs-8">Use the field above to record administrative notes.</div>
+                </div>
+            `;
+        }
+    }
+
+    // Save Admin Note dynamically via AJAX
+    async function saveAdminNote() {
+        if (!window.currentInspectedUser || !window.currentInspectedUser.id) {
+            alert('Please select a member first.');
+            return;
+        }
+
+        const input = document.getElementById('inspNewNoteInput');
+        const noteText = input.value.trim();
+        if (!noteText) {
+            input.focus();
+            return;
+        }
+
+        const btn = document.getElementById('btnSaveAdminNote');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+
+        try {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const res = await fetch(`{{ url('admin/users') }}/${window.currentInspectedUser.id}/note`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrf
+                },
+                body: JSON.stringify({ note: noteText })
+            });
+
+            const data = await res.json();
+            if (data.success && data.note) {
+                input.value = '';
+                if (!window.currentInspectedUser.notes) window.currentInspectedUser.notes = [];
+                window.currentInspectedUser.notes.unshift(data.note);
+                renderUserNotesList(window.currentInspectedUser.notes);
+            } else {
+                alert(data.message || 'Failed to save note.');
+            }
+        } catch (err) {
+            alert('Network error while saving note.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-plus me-1"></i> Save Note';
+        }
+    }
+
+    // Delete Admin Note dynamically via AJAX
+    async function deleteUserNote(noteId, btnElem) {
+        if (!confirm('Are you sure you want to delete this administrative note?')) return;
+
+        try {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const res = await fetch(`{{ url('admin/users/notes') }}/${noteId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrf
+                }
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                const card = document.getElementById('userNoteCard_' + noteId);
+                if (card) card.remove();
+
+                if (window.currentInspectedUser && window.currentInspectedUser.notes) {
+                    window.currentInspectedUser.notes = window.currentInspectedUser.notes.filter(n => n.id !== noteId);
+                    renderUserNotesList(window.currentInspectedUser.notes);
+                }
+            } else {
+                alert(data.message || 'Failed to delete note.');
+            }
+        } catch (err) {
+            alert('Error deleting note.');
+        }
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text.replace(/[&<>"']/g, m => map[m]);
     }
 </script>
 @endsection
