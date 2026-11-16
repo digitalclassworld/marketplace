@@ -191,110 +191,104 @@ class AdminSellerController extends Controller
         $seller = null;
 
         if (is_numeric($id)) {
-            $seller = Seller::with(['user', 'businessDetail', 'approvedBy', 'rejectedBy', 'suspendedBy', 'courses', 'services', 'products', 'orders'])
+            $seller = Seller::with(['user', 'businessDetail', 'approvedBy', 'rejectedBy', 'suspendedBy', 'courses', 'services', 'products', 'businessListings', 'orders'])
                 ->find($id);
         } else {
-            $seller = Seller::with(['user', 'businessDetail', 'approvedBy', 'rejectedBy', 'suspendedBy', 'courses', 'services', 'products', 'orders'])
+            $seller = Seller::with(['user', 'businessDetail', 'approvedBy', 'rejectedBy', 'suspendedBy', 'courses', 'services', 'products', 'businessListings', 'orders'])
                 ->where('seller_code', $id)
                 ->first();
         }
 
         if (!$seller) {
-            $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
-            if (!$showDummy) {
-                abort(404, 'Seller profile not found.');
-            }
-            $curatedList = $this->getCuratedSellers();
-            $matched = null;
-
-            // Search by id, store_slug, or seller_code
-            foreach ($curatedList as $c) {
-                if ($c['id'] == $id || (isset($c['store_slug']) && $c['store_slug'] === $id) || (isset($c['seller_code']) && $c['seller_code'] === $id)) {
-                    $matched = $c;
-                    break;
-                }
-            }
-
-            // Fallback: match index or default to Tech Skills Academy
-            if (!$matched) {
-                if (is_numeric($id) && isset($curatedList[$id - 1])) {
-                    $matched = $curatedList[$id - 1];
-                } elseif ($id == 101 || $id == 1) {
-                    $matched = $curatedList[0];
-                } else {
-                    $matched = $curatedList[1] ?? $curatedList[0];
-                }
-            }
-
-            $seller = new Seller([
-                'id' => is_numeric($id) ? (int)$id : ($matched['id'] ?? 102),
-                'seller_code' => $matched['seller_code'] ?? 'SELL000123',
-                'account_type' => $matched['type'] ?? 'Institute',
-                'seller_status' => (isset($matched['status']) && strtolower($matched['status']) === 'pending') ? Seller::STATUS_PENDING_APPROVAL : ((isset($matched['status']) && strtolower($matched['status']) === 'suspended') ? Seller::STATUS_SUSPENDED : Seller::STATUS_ACTIVE),
-                'verification_status' => !empty($matched['is_verified']) ? Seller::VERIFICATION_VERIFIED : Seller::VERIFICATION_UNVERIFIED,
-                'registration_date' => now()->subMonths(21),
-                'approved_at' => now()->subMonths(21),
-            ]);
-            $seller->id = is_numeric($id) ? (int)$id : ($matched['id'] ?? 102);
-
-            $seller->setRelation('user', new \App\Models\User([
-                'id' => 125,
-                'name' => $matched['owner_name'] ?? ($matched['name'] ?? 'Rahul Sharma'),
-                'email' => $matched['email'] ?? 'rahul@techskills.in',
-                'phone' => $matched['mobile'] ?? '+91 98765 43210',
-            ]));
-
-            $seller->setRelation('businessDetail', new \App\Models\SellerBusinessDetail([
-                'business_name' => $matched['name'] ?? 'Tech Skills Academy',
-                'city' => $matched['city'] ?? 'Surat',
-                'state' => 'Gujarat',
-                'address' => $matched['address'] ?? '401, Skyline Business Hub, Vesu, Surat - 395007',
-                'website' => $matched['website'] ?? 'https://techskills.in',
-                'about' => $matched['about'] ?? 'We provide industry-focused IT and digital skills training for students and professionals. Our goal is to make quality education accessible to everyone.',
-            ]));
+            abort(404, 'Seller profile not found.');
         }
 
-        // Stats matching Screenshot
+        // Real Database Metric Aggregations (matches Seller Dashboard 1:1)
+        $ordersCount = $seller->orders()->count();
+        $totalEarnings = (float) $seller->orders()->where('status', '!=', 'cancelled')->sum('amount');
+        $totalCustomers = $seller->orders()->distinct('customer_email')->count('customer_email');
+
+        $coursesCount = $seller->courses()->count();
+        $servicesCount = $seller->services()->count();
+        $productsCount = $seller->products()->count();
+        $listingsCount = $seller->businessListings()->count();
+
         $stats = [
-            'total_courses'   => $seller->courses?->count() ?: 28,
-            'total_services'  => $seller->services?->count() ?: 12,
-            'total_products'  => $seller->products?->count() ?: 5,
-            'total_orders'    => '1,240',
-            'total_students'  => '2,480',
-            'total_revenue'   => '₹3,71,760',
-            'lifetime_payout' => '₹2,96,800',
-            'rating'          => '4.8',
-            'reviews_count'   => 320,
+            'total_courses'   => $coursesCount,
+            'total_services'  => $servicesCount,
+            'total_products'  => $productsCount,
+            'total_listings'  => $listingsCount,
+            'total_orders'    => number_format($ordersCount),
+            'total_students'  => number_format($totalCustomers),
+            'total_revenue'   => '₹' . number_format($totalEarnings),
+            'lifetime_payout' => '₹0',
+            'rating'          => '5.0',
+            'reviews_count'   => 0,
         ];
 
-        // Top Performing Courses matching Screenshot
-        $topCourses = [
-            ['name' => 'Digital Marketing Mastery', 'enrollments' => 420, 'revenue' => '₹1,25,580', 'rating' => 4.8, 'img' => 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=100&auto=format&fit=crop&q=80'],
-            ['name' => 'Full Stack Web Development', 'enrollments' => 356, 'revenue' => '₹1,78,000', 'rating' => 4.7, 'img' => 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=100&auto=format&fit=crop&q=80'],
-            ['name' => 'AI Tools for Business', 'enrollments' => 280, 'revenue' => '₹69,720', 'rating' => 4.6, 'img' => 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80'],
-            ['name' => 'Graphic Design with Canva', 'enrollments' => 210, 'revenue' => '₹41,790', 'rating' => 4.8, 'img' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=100&auto=format&fit=crop&q=80'],
-            ['name' => 'Spoken English Course', 'enrollments' => 180, 'revenue' => '₹35,820', 'rating' => 4.5, 'img' => 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=100&auto=format&fit=crop&q=80'],
-        ];
+        // Real Top Performing Courses
+        $topCourses = $seller->courses()->latest()->take(5)->get()->map(function($c) {
+            return [
+                'name' => $c->title,
+                'enrollments' => $c->enrollments_count ?? 0,
+                'revenue' => '₹' . number_format($c->price ?? 0),
+                'rating' => $c->rating ?? 5.0,
+                'img' => $c->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&auto=format&fit=crop&q=80',
+            ];
+        })->toArray();
 
-        // Recent Orders matching Screenshot
-        $recentOrders = [
-            ['code' => 'ORD001245', 'type' => 'Course', 'amount' => '₹2,999', 'date' => '30 Oct 2026', 'status' => 'Completed'],
-            ['code' => 'ORD001244', 'type' => 'Service', 'amount' => '₹4,999', 'date' => '28 Oct 2026', 'status' => 'Completed'],
-            ['code' => 'ORD001243', 'type' => 'Product', 'amount' => '₹42,999', 'date' => '26 Oct 2026', 'status' => 'Processing'],
-            ['code' => 'ORD001242', 'type' => 'Course', 'amount' => '₹4,999', 'date' => '24 Oct 2026', 'status' => 'Completed'],
-            ['code' => 'ORD001241', 'type' => 'Service', 'amount' => '₹2,999', 'date' => '22 Oct 2026', 'status' => 'Cancelled'],
-        ];
+        // Real Recent Orders
+        $recentOrders = $seller->orders()->latest()->take(5)->get()->map(function($o) {
+            return [
+                'code' => $o->order_code ?? ('ORD' . str_pad($o->id, 6, '0', STR_PAD_LEFT)),
+                'type' => $o->order_type ?? 'Course',
+                'amount' => '₹' . number_format($o->amount),
+                'date' => $o->placed_at ? $o->placed_at->format('d M Y') : ($o->created_at ? $o->created_at->format('d M Y') : 'Recent'),
+                'status' => ucfirst($o->status ?? 'Completed'),
+            ];
+        })->toArray();
 
-        // Recent Activity matching Screenshot
-        $activities = [
-            ['time' => '2 hours ago', 'icon' => 'fa-cart-shopping', 'color' => 'primary', 'title' => 'New order received', 'desc' => 'ORD001245 - Web Development Course'],
-            ['time' => '5 hours ago', 'icon' => 'fa-user-plus', 'color' => 'info', 'title' => 'New student enrolled', 'desc' => 'Priya Patel - Digital Marketing'],
-            ['time' => '1 day ago', 'icon' => 'fa-credit-card', 'color' => 'success', 'title' => 'Payment received', 'desc' => '₹4,999 via Razorpay'],
-            ['time' => '2 days ago', 'icon' => 'fa-rotate', 'color' => 'primary', 'title' => 'Course updated', 'desc' => 'Full Stack Web Development'],
-            ['time' => '3 days ago', 'icon' => 'fa-star', 'color' => 'warning', 'title' => 'New review received', 'desc' => '★★★★★ "Great teaching and support!"'],
-            ['time' => '5 days ago', 'icon' => 'fa-crown', 'color' => 'primary', 'title' => 'Plan renewed', 'desc' => 'Premium Plan - ₹4,999/year'],
-            ['time' => '1 week ago', 'icon' => 'fa-building-columns', 'color' => 'secondary', 'title' => 'Payout processed', 'desc' => '₹12,450 to Bank Account (******4321)'],
-        ];
+        // Real Activities
+        $activities = [];
+        if ($seller->created_at) {
+            $activities[] = [
+                'time' => $seller->created_at->diffForHumans(),
+                'icon' => 'fa-user-plus',
+                'color' => 'primary',
+                'title' => 'Seller account created',
+                'desc' => 'Registered as ' . ucfirst($seller->account_type ?? 'Institute') . ' (' . ($seller->seller_code ?? 'ID assigned') . ')',
+            ];
+        }
+        if ($seller->approved_at) {
+            $activities[] = [
+                'time' => $seller->approved_at->diffForHumans(),
+                'icon' => 'fa-circle-check',
+                'color' => 'success',
+                'title' => 'Seller account approved',
+                'desc' => 'Selling and publishing permissions verified by Super Admin',
+            ];
+        }
+        if ($coursesCount > 0) {
+            $latestCourse = $seller->courses()->latest()->first();
+            if ($latestCourse) {
+                $activities[] = [
+                    'time' => $latestCourse->created_at ? $latestCourse->created_at->diffForHumans() : 'Recent',
+                    'icon' => 'fa-graduation-cap',
+                    'color' => 'info',
+                    'title' => 'Course published',
+                    'desc' => $latestCourse->title,
+                ];
+            }
+        }
+        if (count($activities) === 0) {
+            $activities[] = [
+                'time' => 'Recent',
+                'icon' => 'fa-clock',
+                'color' => 'secondary',
+                'title' => 'Account ready',
+                'desc' => 'Waiting for catalog listings',
+            ];
+        }
 
         return view('admin.sellers.show', compact('seller', 'stats', 'topCourses', 'recentOrders', 'activities'));
     }

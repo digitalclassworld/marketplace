@@ -1,17 +1,17 @@
 @extends('admin.layouts.admin')
 
 @php
-    $storeName = $seller->businessDetail?->business_name ?? $seller->user?->name ?? 'Tech Skills Academy';
-    $ownerName = $seller->user?->name ?? 'Rahul Sharma';
-    $ownerEmail = $seller->user?->email ?? 'rahul@techskills.in';
-    $ownerPhone = $seller->user?->phone ?? '+91 98765 43210';
-    $website = $seller->businessDetail?->website ?? 'https://techskills.in';
-    $city = $seller->businessDetail?->city ?? 'Surat';
-    $state = $seller->businessDetail?->state ?? 'Gujarat';
+    $storeName = $seller->businessDetail?->business_name ?: ($seller->user?->name ?: 'Seller Store');
+    $ownerName = $seller->user?->name ?: 'N/A';
+    $ownerEmail = $seller->user?->email ?: ($seller->businessDetail?->business_email ?: 'N/A');
+    $ownerPhone = $seller->user?->phone ?: ($seller->businessDetail?->phone ?: 'N/A');
+    $website = $seller->businessDetail?->website ?: 'Not provided';
+    $city = $seller->businessDetail?->city ?: 'Ahmedabad';
+    $state = $seller->businessDetail?->state ?: 'Gujarat';
     $location = $city . ', ' . $state;
-    $address = $seller->businessDetail?->address ?? '401, Skyline Business Hub, Vesu, Surat - 395007';
-    $about = $seller->businessDetail?->about ?? 'We provide industry-focused IT and digital skills training for students and professionals. Our goal is to make quality education accessible to everyone.';
-    $sellerCode = $seller->seller_code ?: 'SELL000123';
+    $address = $seller->businessDetail?->address ?: ($city . ', ' . $state);
+    $about = $seller->businessDetail?->about ?: 'No description provided yet by this seller.';
+    $sellerCode = $seller->seller_code ?: ('DC-SELL-' . str_pad($seller->id, 6, '0', STR_PAD_LEFT));
     $statusText = $seller->isActive() ? 'Active' : ($seller->isPendingApproval() ? 'Awaiting Approval' : ($seller->isSuspended() ? 'Suspended' : ($seller->isRejected() ? 'Rejected' : 'Awaiting Approval')));
 @endphp
 
@@ -252,8 +252,13 @@
                 <div class="d-flex align-items-start gap-3">
                     <!-- Circular Store Logo -->
                     <div class="store-logo-large">
-                        <i class="fa-solid fa-book-open mb-1" style="font-size: 1.25rem;"></i>
-                        TECH SKILLS<br>ACADEMY
+                        @if($seller->user?->avatar_url)
+                            <img src="{{ $seller->user->avatar_url }}" alt="{{ $storeName }}" class="w-100 h-100 rounded-circle object-fit-cover">
+                        @else
+                            <i class="fa-solid fa-store mb-1" style="font-size: 1.25rem;"></i>
+                            <span class="fw-bold">{{ strtoupper(substr($storeName, 0, 1)) }}</span>
+                            <span style="font-size: 0.6rem; text-transform: uppercase;">{{ \Illuminate\Support\Str::limit($storeName, 10, '') }}</span>
+                        @endif
                     </div>
 
                     <div class="flex-grow-1">
@@ -273,22 +278,18 @@
 
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-2 text-muted small">
                             <span class="font-monospace fw-semibold text-dark">ID: {{ $sellerCode }}</span>
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-0 fw-semibold" style="font-size: 0.68rem;">
-                                <i class="fa-solid fa-star me-1"></i> Featured Seller
-                            </span>
                             <span>•</span>
                             <span class="text-warning"><i class="fa-solid fa-star"></i></span>
-                            <span class="fw-bold text-dark">4.8</span>
-                            <span>(320 reviews)</span>
+                            <span class="fw-bold text-dark">{{ $stats['rating'] ?? '5.0' }}</span>
+                            <span>({{ $stats['reviews_count'] ?? 0 }} reviews)</span>
                             <span>•</span>
-                            <span>Joined: 12 Jan 2024 (1 year 9 months ago)</span>
+                            <span>Joined: {{ $seller->created_at ? $seller->created_at->format('d M Y') : 'Recent' }} ({{ $seller->created_at ? $seller->created_at->diffForHumans() : '' }})</span>
                         </div>
 
                         <!-- Tag Pills -->
                         <div class="d-flex flex-wrap gap-2 mb-2">
-                            <span class="tag-pill">Education</span>
-                            <span class="tag-pill">IT Training</span>
-                            <span class="tag-pill">Online & Offline</span>
+                            <span class="tag-pill">{{ ucfirst($seller->account_type ?? 'Institute') }}</span>
+                            <span class="tag-pill">{{ $seller->businessDetail?->business_category ?: 'Courses & Services' }}</span>
                             <span class="tag-pill">{{ $location }}</span>
                         </div>
 
@@ -313,7 +314,12 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-muted mb-1">
-                                    <i class="fa-solid fa-globe me-2 text-primary"></i> Website: <a href="{{ $website }}" target="_blank" class="text-primary text-decoration-none">{{ $website }}</a>
+                                    <i class="fa-solid fa-globe me-2 text-primary"></i> Website: 
+                                    @if($website && $website !== 'Not provided')
+                                        <a href="{{ $website }}" target="_blank" class="text-primary text-decoration-none">{{ $website }}</a>
+                                    @else
+                                        <span class="text-muted">Not provided</span>
+                                    @endif
                                 </div>
                                 <div class="text-muted mb-1">
                                     <i class="fa-solid fa-location-dot me-2 text-primary"></i> Location: <span class="text-dark">{{ $location }}</span>
@@ -405,147 +411,147 @@
         </div>
     </div>
 
-    <!-- 10 Navigation Tabs matching Screenshot -->
+    <!-- 10 Navigation Tabs with Real Live Counts and Horizontal Scroll on Mobile -->
     <div class="mb-3">
-        <nav class="nav nav-tabs-dossier">
-            <a href="#tabOverview" data-bs-toggle="pill" class="nav-link active">
+        <nav class="nav nav-tabs-dossier flex-nowrap overflow-x-auto pb-1" style="-webkit-overflow-scrolling: touch;">
+            <a href="#tabOverview" data-bs-toggle="pill" class="nav-link active text-nowrap">
                 <i class="fa-solid fa-chart-line me-1"></i> Overview
             </a>
-            <a href="#tabCourses" data-bs-toggle="pill" class="nav-link">
-                <i class="fa-solid fa-graduation-cap me-1"></i> Courses (28)
+            <a href="#tabCourses" data-bs-toggle="pill" class="nav-link text-nowrap">
+                <i class="fa-solid fa-graduation-cap me-1"></i> Courses ({{ $stats['total_courses'] ?? 0 }})
             </a>
-            <a href="#tabServices" data-bs-toggle="pill" class="nav-link">
-                <i class="fa-solid fa-briefcase me-1"></i> Services (12)
+            <a href="#tabServices" data-bs-toggle="pill" class="nav-link text-nowrap">
+                <i class="fa-solid fa-briefcase me-1"></i> Services ({{ $stats['total_services'] ?? 0 }})
             </a>
-            <a href="#tabProducts" data-bs-toggle="pill" class="nav-link">
-                <i class="fa-solid fa-box me-1"></i> Products (5)
+            <a href="#tabProducts" data-bs-toggle="pill" class="nav-link text-nowrap">
+                <i class="fa-solid fa-box me-1"></i> Products ({{ $stats['total_products'] ?? 0 }})
             </a>
-            <a href="#tabOrders" data-bs-toggle="pill" class="nav-link">
-                <i class="fa-solid fa-cart-shopping me-1"></i> Orders (1,240)
+            <a href="#tabOrders" data-bs-toggle="pill" class="nav-link text-nowrap">
+                <i class="fa-solid fa-cart-shopping me-1"></i> Orders ({{ $stats['total_orders'] ?? 0 }})
             </a>
-            <a href="#tabStudents" data-bs-toggle="pill" class="nav-link">
-                <i class="fa-solid fa-users me-1"></i> Students (2,480)
+            <a href="#tabStudents" data-bs-toggle="pill" class="nav-link text-nowrap">
+                <i class="fa-solid fa-users me-1"></i> Students ({{ $stats['total_students'] ?? 0 }})
             </a>
-            <a href="#tabPayouts" data-bs-toggle="pill" class="nav-link">
+            <a href="#tabPayouts" data-bs-toggle="pill" class="nav-link text-nowrap">
                 <i class="fa-solid fa-wallet me-1"></i> Revenue & Payouts
             </a>
-            <a href="#tabReviews" data-bs-toggle="pill" class="nav-link">
-                <i class="fa-regular fa-star me-1"></i> Reviews (320)
+            <a href="#tabReviews" data-bs-toggle="pill" class="nav-link text-nowrap">
+                <i class="fa-regular fa-star me-1"></i> Reviews ({{ $stats['reviews_count'] ?? 0 }})
             </a>
-            <a href="#tabCommunications" data-bs-toggle="pill" class="nav-link">
+            <a href="#tabCommunications" data-bs-toggle="pill" class="nav-link text-nowrap">
                 <i class="fa-regular fa-comments me-1"></i> Communications
             </a>
-            <a href="#tabDocuments" data-bs-toggle="pill" class="nav-link">
+            <a href="#tabDocuments" data-bs-toggle="pill" class="nav-link text-nowrap">
                 <i class="fa-regular fa-file-lines me-1"></i> Documents
             </a>
-            <a href="#tabNotes" data-bs-toggle="pill" class="nav-link">
+            <a href="#tabNotes" data-bs-toggle="pill" class="nav-link text-nowrap">
                 <i class="fa-regular fa-note-sticky me-1"></i> Notes & Logs
             </a>
         </nav>
     </div>
 
-    <!-- 8 KPI Stat Pills in a single row matching Screenshot -->
+    <!-- 8 KPI Stat Pills in a responsive grid -->
     <div class="row g-2 mb-4">
         <!-- 1. Total Courses -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-purple">
                     <i class="fa-solid fa-graduation-cap"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Total Courses</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_courses'] ?? 28 }}</div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_courses'] ?? 0 }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 2. Total Services -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-blue">
                     <i class="fa-solid fa-briefcase"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Total Services</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_services'] ?? 12 }}</div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_services'] ?? 0 }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 3. Total Products -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-red">
-                    <i class="fa-solid fa-ban"></i>
+                    <i class="fa-solid fa-box"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Total Products</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_products'] ?? 5 }}</div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_products'] ?? 0 }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 4. Total Orders -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-orange">
                     <i class="fa-solid fa-cart-shopping"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Total Orders</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_orders'] ?? '1,240' }}</div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_orders'] ?? '0' }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 5. Total Students -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-blue">
                     <i class="fa-solid fa-users"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Total Students</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_students'] ?? '2,480' }}</div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_students'] ?? '0' }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 6. Total Revenue -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-green">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Total Revenue</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_revenue'] ?? '₹3,71,760' }}</div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['total_revenue'] ?? '₹0' }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 7. Lifetime Payout -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-sky">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Lifetime Payout</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['lifetime_payout'] ?? '₹2,96,800' }}</div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['lifetime_payout'] ?? '₹0' }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 8. Average Rating -->
-        <div class="col-6 col-md-3 col-xl">
+        <div class="col-6 col-sm-4 col-md-3 col-xl">
             <div class="kpi-stat-box">
                 <div class="kpi-stat-icon icon-yellow">
                     <i class="fa-solid fa-star"></i>
                 </div>
                 <div>
                     <div class="text-muted" style="font-size: 0.68rem;">Average Rating</div>
-                    <div class="fs-5 fw-bold text-dark">{{ $stats['rating'] ?? '4.8' }} <span class="text-muted fs-6 fw-normal">({{ $stats['reviews_count'] ?? 320 }})</span></div>
+                    <div class="fs-5 fw-bold text-dark">{{ $stats['rating'] ?? '5.0' }} <span class="text-muted fs-6 fw-normal">({{ $stats['reviews_count'] ?? 0 }})</span></div>
                 </div>
             </div>
         </div>
@@ -559,35 +565,33 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0">Revenue & Orders</h6>
                     <select class="form-select form-select-sm text-muted" style="width: auto; font-size: 0.75rem;">
-                        <option>Last 12 Months</option>
+                        <option>All Time</option>
                     </select>
                 </div>
 
                 <div class="d-flex align-items-baseline gap-4 mb-3">
                     <div>
                         <div class="fs-4 fw-bold text-dark d-flex align-items-center gap-2">
-                            ₹3,71,760 <span class="badge bg-success-subtle text-success small fw-semibold" style="font-size: 0.72rem;">↑ 28%</span>
+                            {{ $stats['total_revenue'] ?? '₹0' }}
                         </div>
                         <div class="text-muted" style="font-size: 0.75rem;">Total Revenue</div>
                     </div>
                     <div>
                         <div class="fs-4 fw-bold text-dark d-flex align-items-center gap-2">
-                            1,240 <span class="badge bg-success-subtle text-success small fw-semibold" style="font-size: 0.72rem;">↑ 18%</span>
+                            {{ $stats['total_orders'] ?? '0' }}
                         </div>
                         <div class="text-muted" style="font-size: 0.75rem;">Total Orders</div>
                     </div>
                 </div>
 
+                @if(($stats['total_orders'] ?? '0') !== '0' && ($stats['total_orders'] ?? 0) > 0)
                 <!-- SVG Bar & Line Chart -->
                 <div style="height: 160px; position: relative;">
                     <svg viewBox="0 0 500 160" width="100%" height="100%" preserveAspectRatio="none">
-                        <!-- Grid lines -->
                         <line x1="0" y1="20" x2="500" y2="20" stroke="#f1f5f9" stroke-width="1" />
                         <line x1="0" y1="60" x2="500" y2="60" stroke="#f1f5f9" stroke-width="1" />
                         <line x1="0" y1="100" x2="500" y2="100" stroke="#f1f5f9" stroke-width="1" />
                         <line x1="0" y1="140" x2="500" y2="140" stroke="#f1f5f9" stroke-width="1" />
-
-                        <!-- Blue Revenue Bars -->
                         <rect x="25" y="110" width="16" height="30" rx="3" fill="#3b82f6" />
                         <rect x="65" y="95" width="16" height="45" rx="3" fill="#3b82f6" />
                         <rect x="105" y="90" width="16" height="50" rx="3" fill="#3b82f6" />
@@ -600,10 +604,7 @@
                         <rect x="385" y="40" width="16" height="100" rx="3" fill="#3b82f6" />
                         <rect x="425" y="30" width="16" height="110" rx="3" fill="#3b82f6" />
                         <rect x="465" y="20" width="16" height="120" rx="3" fill="#2563eb" />
-
-                        <!-- Green Orders Line Overlay -->
                         <path d="M 33 120 Q 73 100, 113 95 T 193 80 T 273 65 T 353 50 T 433 35 L 473 25" fill="none" stroke="#10b981" stroke-width="2.5" />
-                        <!-- Circles on Points -->
                         <circle cx="473" cy="25" r="4" fill="#10b981" />
                     </svg>
                 </div>
@@ -614,6 +615,13 @@
                     <span><i class="fa-solid fa-square text-primary me-1"></i> Revenue (₹)</span>
                     <span><i class="fa-solid fa-minus text-success me-1"></i> Orders</span>
                 </div>
+                @else
+                <div class="text-center py-5 text-muted bg-light bg-opacity-50 rounded-3 border border-dashed my-2">
+                    <i class="fa-solid fa-chart-line fs-2 text-secondary opacity-50 mb-2 d-block"></i>
+                    <div class="fw-semibold small text-dark">No orders or revenue recorded yet</div>
+                    <small class="text-muted">Metrics will automatically appear here once customers place orders.</small>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -623,27 +631,25 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0">Student Enrollments</h6>
                     <select class="form-select form-select-sm text-muted" style="width: auto; font-size: 0.75rem;">
-                        <option>Last 12 Months</option>
+                        <option>All Time</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <div class="fs-4 fw-bold text-dark d-flex align-items-center gap-2">
-                        2,480 <span class="badge bg-success-subtle text-success small fw-semibold" style="font-size: 0.72rem;">↑ 32%</span>
+                        {{ $stats['total_students'] ?? '0' }}
                     </div>
-                    <div class="text-muted" style="font-size: 0.75rem;">Total Students</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Total Students / Customers</div>
                 </div>
 
+                @if(($stats['total_students'] ?? '0') !== '0' && ($stats['total_students'] ?? 0) > 0)
                 <!-- Purple Bar Chart -->
                 <div style="height: 160px; position: relative;">
                     <svg viewBox="0 0 400 160" width="100%" height="100%" preserveAspectRatio="none">
-                        <!-- Grid lines -->
                         <line x1="0" y1="20" x2="400" y2="20" stroke="#f1f5f9" stroke-width="1" />
                         <line x1="0" y1="60" x2="400" y2="60" stroke="#f1f5f9" stroke-width="1" />
                         <line x1="0" y1="100" x2="400" y2="100" stroke="#f1f5f9" stroke-width="1" />
                         <line x1="0" y1="140" x2="400" y2="140" stroke="#f1f5f9" stroke-width="1" />
-
-                        <!-- Purple Bars -->
                         <rect x="15" y="115" width="16" height="25" rx="3" fill="#a855f7" />
                         <rect x="48" y="105" width="16" height="35" rx="3" fill="#a855f7" />
                         <rect x="81" y="95" width="16" height="45" rx="3" fill="#a855f7" />
@@ -661,6 +667,13 @@
                 <div class="d-flex justify-content-between text-muted mt-2" style="font-size: 0.68rem;">
                     <span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span>
                 </div>
+                @else
+                <div class="text-center py-5 text-muted bg-light bg-opacity-50 rounded-3 border border-dashed my-2">
+                    <i class="fa-solid fa-users fs-2 text-secondary opacity-50 mb-2 d-block"></i>
+                    <div class="fw-semibold small text-dark">No student enrollments yet</div>
+                    <small class="text-muted">Students who enroll in courses will be counted here.</small>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -670,7 +683,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0">Performance Metrics</h6>
                     <select class="form-select form-select-sm text-muted" style="width: auto; font-size: 0.75rem;">
-                        <option>Last 30 Days</option>
+                        <option>Status</option>
                     </select>
                 </div>
 
@@ -678,6 +691,16 @@
                     <div class="mb-2">
                         <div class="d-flex justify-content-between mb-1">
                             <span class="text-muted"><i class="fa-solid fa-circle-check text-success me-1"></i> Profile Completion</span>
+                            <span class="fw-bold text-dark">{{ $seller->businessDetail ? '100%' : '75%' }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary" style="width: {{ $seller->businessDetail ? '100%' : '75%' }};"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted"><i class="fa-regular fa-comment-dots text-info me-1"></i> Response Rate</span>
                             <span class="fw-bold text-dark">100%</span>
                         </div>
                         <div class="progress" style="height: 6px;">
@@ -687,48 +710,38 @@
 
                     <div class="mb-2">
                         <div class="d-flex justify-content-between mb-1">
-                            <span class="text-muted"><i class="fa-regular fa-comment-dots text-info me-1"></i> Response Rate</span>
-                            <span class="fw-bold text-dark">98%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 98%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between mb-1">
                             <span class="text-muted"><i class="fa-solid fa-box-open text-primary me-1"></i> Order Completion</span>
-                            <span class="fw-bold text-dark">96%</span>
+                            <span class="fw-bold text-dark">100%</span>
                         </div>
                         <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 96%;"></div>
+                            <div class="progress-bar bg-primary" style="width: 100%;"></div>
                         </div>
                     </div>
 
                     <div class="mb-2">
                         <div class="d-flex justify-content-between mb-1">
                             <span class="text-muted"><i class="fa-solid fa-user-graduate text-danger me-1"></i> Student Satisfaction</span>
-                            <span class="fw-bold text-dark">4.8/5</span>
+                            <span class="fw-bold text-dark">{{ $stats['rating'] ?? '5.0' }}/5</span>
                         </div>
                         <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 96%;"></div>
+                            <div class="progress-bar bg-primary" style="width: 100%;"></div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <div class="d-flex justify-content-between mb-1">
                             <span class="text-muted"><i class="fa-solid fa-triangle-exclamation text-warning me-1"></i> Dispute Rate</span>
-                            <span class="fw-bold text-dark">1%</span>
+                            <span class="fw-bold text-dark">0%</span>
                         </div>
                         <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-danger" style="width: 2%;"></div>
+                            <div class="progress-bar bg-success" style="width: 0%;"></div>
                         </div>
                     </div>
 
                     <div class="pt-2 border-top">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-muted"><i class="fa-solid fa-chart-simple text-success me-1"></i> Overall Performance</span>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold" style="font-size: 0.7rem;">Excellent</span>
+                            <span class="text-muted"><i class="fa-solid fa-chart-simple text-success me-1"></i> Account Health</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold" style="font-size: 0.7rem;">Good Standing</span>
                         </div>
                         <div class="progress" style="height: 6px;">
                             <div class="progress-bar bg-success" style="width: 100%;"></div>
@@ -767,9 +780,10 @@
             <div class="bg-white border rounded-3 p-3 shadow-sm h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0">Top Performing Courses</h6>
-                    <a href="{{ route('admin.catalog.courses') }}" class="text-primary text-decoration-none small" style="font-size: 0.75rem;">View All →</a>
+                    <a href="{{ route('admin.catalog.courses', ['seller' => $seller->id]) }}" class="text-primary text-decoration-none small" style="font-size: 0.75rem;">View All →</a>
                 </div>
 
+                @if(count($topCourses) > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0 small">
                         <thead class="table-light text-muted" style="font-size: 0.72rem;">
@@ -802,6 +816,13 @@
                         </tbody>
                     </table>
                 </div>
+                @else
+                <div class="text-center py-4 text-muted small bg-light bg-opacity-50 rounded-3 border border-dashed my-2">
+                    <i class="fa-solid fa-graduation-cap fs-3 text-secondary opacity-50 mb-2 d-block"></i>
+                    <div class="fw-semibold text-dark">No courses published yet</div>
+                    <small class="text-muted">Courses created by this seller will appear here.</small>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -810,9 +831,10 @@
             <div class="bg-white border rounded-3 p-3 shadow-sm h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0">Recent Orders</h6>
-                    <a href="#" class="text-primary text-decoration-none small" style="font-size: 0.75rem;">View All →</a>
+                    <a href="{{ route('admin.orders.index', ['seller' => $seller->id]) }}" class="text-primary text-decoration-none small" style="font-size: 0.75rem;">View All →</a>
                 </div>
 
+                @if(count($recentOrders) > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0 small">
                         <thead class="table-light text-muted" style="font-size: 0.72rem;">
@@ -855,6 +877,13 @@
                         </tbody>
                     </table>
                 </div>
+                @else
+                <div class="text-center py-4 text-muted small bg-light bg-opacity-50 rounded-3 border border-dashed my-2">
+                    <i class="fa-solid fa-cart-shopping fs-3 text-secondary opacity-50 mb-2 d-block"></i>
+                    <div class="fw-semibold text-dark">No orders placed yet</div>
+                    <small class="text-muted">Customer orders for this seller will be listed here.</small>
+                </div>
+                @endif
             </div>
         </div>
     </div>

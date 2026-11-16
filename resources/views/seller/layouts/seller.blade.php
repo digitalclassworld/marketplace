@@ -339,10 +339,26 @@
             flex-grow: 1;
         }
 
+        .dc-sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 20, 36, 0.65);
+            backdrop-filter: blur(2px);
+            z-index: 1035;
+        }
+        .dc-sidebar-backdrop.show {
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 991.98px) {
             .dc-sidebar {
                 transform: translateX(-100%);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             }
             .dc-sidebar.show {
                 transform: translateX(0);
@@ -352,6 +368,30 @@
             }
             .dc-header-search {
                 max-width: 250px;
+            }
+            .dc-page-body {
+                padding: 1.25rem 1rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .dc-header {
+                padding: 0.65rem 0.75rem;
+                gap: 0.5rem;
+            }
+            .dc-header-search {
+                max-width: 140px;
+            }
+            .dc-header-search input {
+                font-size: 0.78rem;
+                padding-left: 2rem;
+            }
+            .btn-visit-store {
+                padding: 0.35rem 0.55rem;
+                font-size: 0.75rem;
+            }
+            .dc-page-body {
+                padding: 0.85rem 0.5rem;
             }
         }
     </style>
@@ -363,11 +403,15 @@
     <!-- ================= SELLER SIDEBAR (Page 4 Reference) ================= -->
     <aside class="dc-sidebar" id="sellerSidebar">
         <!-- Brand -->
-        <a href="{{ route('seller.dashboard') }}" class="dc-sidebar-brand d-flex align-items-center justify-content-between">
-            <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 46px; width: auto; background: #ffffff; padding: 6px 12px; border-radius: 10px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
-            <span class="badge bg-primary text-uppercase px-2.5 py-1" style="font-size: 0.7rem; letter-spacing: 0.06em; font-weight: 700;">Seller</span>
-            <span class="visually-hidden">Digital Class</span>
-        </a>
+        <div class="dc-sidebar-brand d-flex align-items-center justify-content-between">
+            <a href="{{ route('seller.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+                <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 42px; width: auto; background: #ffffff; padding: 5px 10px; border-radius: 9px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+                <span class="badge bg-primary text-uppercase px-2 py-1" style="font-size: 0.65rem; letter-spacing: 0.06em; font-weight: 700;">Seller</span>
+            </a>
+            <button type="button" class="btn btn-sm text-secondary border-0 d-lg-none p-1" onclick="toggleSidebar()" title="Close Sidebar">
+                <i class="fa-solid fa-xmark fs-5"></i>
+            </button>
+        </div>
 
         <!-- Menu Navigation (Page 4 Design Match) -->
         <ul class="dc-sidebar-menu mt-2">
@@ -790,12 +834,17 @@
     </div>
 </div>
 
+<!-- Mobile Sidebar Backdrop Overlay -->
+<div class="dc-sidebar-backdrop" id="sellerSidebarBackdrop" onclick="toggleSidebar()"></div>
+
 <!-- Bootstrap 5.3 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function toggleSidebar() {
         const sidebar = document.getElementById('sellerSidebar');
-        sidebar.classList.toggle('show');
+        const backdrop = document.getElementById('sellerSidebarBackdrop');
+        if (sidebar) sidebar.classList.toggle('show');
+        if (backdrop) backdrop.classList.toggle('show');
     }
 
     function notifyComingSoon(moduleName) {

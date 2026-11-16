@@ -241,9 +241,25 @@
             flex-grow: 1;
         }
 
+        .admin-sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(2px);
+            z-index: 1035;
+        }
+        .admin-sidebar-backdrop.show {
+            display: block;
+        }
+
         @media (max-width: 991.98px) {
             .admin-sidebar {
                 transform: translateX(-100%);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
             }
             .admin-sidebar.show {
                 transform: translateX(0);
@@ -252,7 +268,29 @@
                 margin-left: 0;
             }
             .admin-search-input {
-                width: 200px;
+                width: 180px;
+            }
+            .admin-top-header {
+                padding: 0.65rem 0.85rem;
+            }
+            .admin-page-content {
+                padding: 1rem 0.75rem 2.5rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .admin-search-input {
+                width: 130px;
+                font-size: 0.78rem;
+                padding-left: 1.8rem;
+            }
+            .admin-top-header {
+                padding: 0.5rem 0.65rem;
+                gap: 0.5rem;
+            }
+            .admin-user-photo {
+                width: 32px;
+                height: 32px;
             }
         }
     </style>
@@ -264,11 +302,15 @@
     <!-- ================= SUPER ADMIN SIDEBAR ================= -->
     <aside class="admin-sidebar" id="adminSidebar">
         <!-- Brand (Matching Screenshot) -->
-        <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-brand d-flex align-items-center gap-2">
-            <img src="{{ asset('images/logo.png') }}" alt="Digital Class Educational World" style="height: 36px; width: auto; background: white; padding: 4px 8px; border-radius: 8px;">
-            <span class="badge bg-danger text-uppercase" style="font-size: 0.65rem;">Super Admin</span>
-            <span class="visually-hidden">Digital Class Educational World</span>
-        </a>
+        <div class="d-flex align-items-center justify-content-between border-bottom border-secondary border-opacity-25 pe-2">
+            <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-brand d-flex align-items-center gap-2 border-0 flex-grow-1">
+                <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 36px; width: auto; background: white; padding: 4px 8px; border-radius: 8px;">
+                <span class="badge bg-danger text-uppercase" style="font-size: 0.65rem;">Super Admin</span>
+            </a>
+            <button type="button" class="btn btn-sm text-secondary border-0 d-lg-none p-2" onclick="toggleAdminSidebar()" title="Close Sidebar">
+                <i class="fa-solid fa-xmark fs-5"></i>
+            </button>
+        </div>
 
         <!-- Navigation Menu -->
         <div class="flex-grow-1 pb-4 pt-2">
@@ -722,6 +764,9 @@
     </div>
 </div>
 
+<!-- Mobile Sidebar Backdrop Overlay -->
+<div class="admin-sidebar-backdrop" id="adminSidebarBackdrop" onclick="toggleAdminSidebar()"></div>
+
 <script>
 function previewAdminAvatar(input) {
     if (input.files && input.files[0]) {
@@ -739,7 +784,10 @@ function previewAdminAvatar(input) {
 
 <script>
     function toggleAdminSidebar() {
-        document.getElementById('adminSidebar').classList.toggle('show');
+        const sidebar = document.getElementById('adminSidebar');
+        const backdrop = document.getElementById('adminSidebarBackdrop');
+        if (sidebar) sidebar.classList.toggle('show');
+        if (backdrop) backdrop.classList.toggle('show');
     }
 </script>
 
