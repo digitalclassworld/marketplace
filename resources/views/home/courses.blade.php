@@ -795,7 +795,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <div>
                         <h2 class="fw-bold text-dark mb-0" style="font-size: 1.15rem;">
-                            {{ number_format(count($courses)) }}+ Courses
+                            {{ count($courses) }} {{ count($courses) === 1 ? 'Course' : 'Courses' }}
                         </h2>
                     </div>
 
@@ -810,42 +810,34 @@
                                 <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
                             </select>
                         </div>
-                                <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
-                                <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
-                                <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                                <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                            </select>
-                        </div>
 
                         <!-- Grid / List Switcher -->
                         <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-primary btn-sm px-2" title="Grid View">
                                 <i class="fa-solid fa-table-cells"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm px-2" title="List View" onclick="alert('List view toggled.')">
+                            <button type="button" class="btn btn-outline-secondary btn-sm px-2" title="List View">
                                 <i class="fa-solid fa-list"></i>
                             </button>
                         </div>
 
-                        <!-- Page Indicator & Arrows -->
-                        <span class="small text-muted" style="font-size: 0.75rem;">1 of 417 pages</span>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-light border btn-sm py-1 px-2" title="Previous"><i class="fa-solid fa-chevron-left" style="font-size: 0.7rem;"></i></button>
-                            <button class="btn btn-light border btn-sm py-1 px-2" title="Next"><i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i></button>
-                        </div>
+                        <!-- Count Indicator -->
+                        @if(count($courses) > 0)
+                            <span class="small text-muted" style="font-size: 0.75rem;">Showing {{ count($courses) }} {{ count($courses) === 1 ? 'course' : 'courses' }}</span>
+                        @endif
                     </div>
                 </div>
 
-                <!-- 5-Column Responsive Cards Grid -->
+                <!-- Responsive Cards Grid -->
                 <div class="row g-3">
                     @forelse($courses as $c)
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-6" style="flex: 0 0 20%; max-width: 20%;">
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
                             <div class="course-card-unified">
                                 
                                 <!-- Thumbnail Box -->
                                 <div class="course-thumb-box">
                                     <a href="{{ route('course.show', $c->slug) }}">
-                                        <img src="{{ $c->thumbnail }}" alt="{{ $c->title }}" loading="lazy">
+                                        <img src="{{ $c->thumbnail }}" alt="{{ $c->title }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80'">
                                     </a>
                                     
                                     @if($c->badge === 'Bestseller')

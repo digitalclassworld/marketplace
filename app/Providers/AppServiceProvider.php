@@ -119,6 +119,23 @@ class AppServiceProvider extends ServiceProvider
                     }
                 }
 
+                // Purge seeded dummy business listings so only real user-uploaded businesses appear
+                if (\Illuminate\Support\Facades\Schema::hasTable('business_listings')) {
+                    \App\Models\BusinessListing::whereIn('business_name', [
+                        'VCEC - Vinayak Computer Education Center',
+                        'VCEC Computer Education',
+                        'Shree Coaching Classes',
+                        'TechZone Coaching Institute',
+                        'Kids Planet Play School',
+                        'Little Angels Play School',
+                        'FitZone Gym & Fitness',
+                        'Digital World Laptop Repair',
+                        'Tasty Bites Restaurant',
+                        'Style Salon & Beauty Care',
+                        'AutoCare Service Center',
+                    ])->delete();
+                }
+
                 // Automatically approve all seller items so they show on the marketplace
                 if (\Illuminate\Support\Facades\Schema::hasTable('courses')) {
                     \App\Models\Course::whereIn('status', ['pending', 'draft'])->update(['status' => 'approved']);

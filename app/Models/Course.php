@@ -128,6 +128,28 @@ class Course extends Model
             ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80';
     }
 
+    public function getThumbnailAttribute(?string $value): string
+    {
+        if (empty($value)) {
+            return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';
+        }
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+        return asset($value);
+    }
+
+    public function getCoverImageAttribute(?string $value): string
+    {
+        if (empty($value)) {
+            return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80';
+        }
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+        return asset($value);
+    }
+
     public function getBadgeAttribute(): ?string
     {
         return ($this->id == 1 || str_contains(strtolower($this->title), 'digital marketing')) ? 'Bestseller' : null;

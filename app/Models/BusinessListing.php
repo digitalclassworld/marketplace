@@ -114,7 +114,22 @@ class BusinessListing extends Model
 
     public function getDisplayImageAttribute(): string
     {
-        return $this->cover_image ?: ($this->logo ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500&auto=format&fit=crop&q=80');
+        $img = $this->cover_image ?: ($this->logo ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500&auto=format&fit=crop&q=80');
+        if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
+            return $img;
+        }
+        return asset($img);
+    }
+
+    public function getLogoAttribute(?string $value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+        return asset($value);
     }
 }
 
