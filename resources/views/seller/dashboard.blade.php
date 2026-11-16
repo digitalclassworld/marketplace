@@ -931,32 +931,32 @@
             new Chart(ctxSales, {
                 type: 'bar',
                 data: {
-                    labels: @json($chartData['labels'] ?? ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7']),
+                    labels: {!! json_encode($chartData['labels'] ?? ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7']) !!},
                     datasets: [
                         {
                             label: 'Courses',
-                            data: @json($chartData['courses'] ?? [0, 0, 0, 0, 0, 0, 0]),
+                            data: {!! json_encode($chartData['courses'] ?? [0, 0, 0, 0, 0, 0, 0]) !!},
                             backgroundColor: '#3b82f6',
                             borderRadius: 4,
                             stack: 'salesStack'
                         },
                         {
                             label: 'Services',
-                            data: @json($chartData['services'] ?? [0, 0, 0, 0, 0, 0, 0]),
+                            data: {!! json_encode($chartData['services'] ?? [0, 0, 0, 0, 0, 0, 0]) !!},
                             backgroundColor: '#10b981',
                             borderRadius: 4,
                             stack: 'salesStack'
                         },
                         {
                             label: 'Products',
-                            data: @json($chartData['products'] ?? [0, 0, 0, 0, 0, 0, 0]),
+                            data: {!! json_encode($chartData['products'] ?? [0, 0, 0, 0, 0, 0, 0]) !!},
                             backgroundColor: '#f97316',
                             borderRadius: 4,
                             stack: 'salesStack'
                         },
                         {
                             label: 'Business Listing',
-                            data: @json($chartData['listings'] ?? [0, 0, 0, 0, 0, 0, 0]),
+                            data: {!! json_encode($chartData['listings'] ?? [0, 0, 0, 0, 0, 0, 0]) !!},
                             backgroundColor: '#a855f7',
                             borderRadius: 4,
                             stack: 'salesStack'
