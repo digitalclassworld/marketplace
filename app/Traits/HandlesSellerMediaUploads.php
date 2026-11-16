@@ -83,3 +83,4 @@ trait HandlesSellerMediaUploads
         return $media;
     }
 }
+

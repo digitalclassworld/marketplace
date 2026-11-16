@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Seller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -136,44 +137,30 @@ class AdminSellerController extends Controller
             $allSellers = $allSellers->filter(fn($s) => str_contains(strtolower($s['location']), strtolower($location)));
         }
 
-        // Stats matching screenshot 2 (database in production, curated on local)
-        if (!$showDummy) {
-            $totalCount = Seller::count();
-            $activeCount = Seller::whereIn('seller_status', ['Active', 'active'])->count();
-            $pendingCount = Seller::whereIn('seller_status', ['Pending Approval', 'pending'])->count();
-            $suspendedCount = Seller::whereIn('seller_status', ['Suspended', 'suspended'])->count();
-            $stats = [
-                'total'          => number_format($totalCount),
-                'active'         => number_format($activeCount),
-                'pending'        => number_format($pendingCount),
-                'suspended'      => number_format($suspendedCount),
-                'total_revenue'  => '₹0',
-                'payout_due'     => '₹0',
-            ];
-            $counts = [
-                'all'       => $totalCount,
-                'pending'   => $pendingCount,
-                'active'    => $activeCount,
-                'suspended' => $suspendedCount,
-                'rejected'  => 0,
-            ];
-        } else {
-            $stats = [
-                'total'          => '1,248',
-                'active'         => '982',
-                'pending'        => '86',
-                'suspended'      => '34',
-                'total_revenue'  => '₹18,72,450',
-                'payout_due'     => '₹4,32,120',
-            ];
-            $counts = [
-                'all'       => 1248,
-                'pending'   => 86,
-                'active'    => 982,
-                'suspended' => 34,
-                'rejected'  => 12,
-            ];
-        }
+        // Real database statistics and counts
+        $totalCount = Seller::count();
+        $activeCount = Seller::whereIn('seller_status', [Seller::STATUS_ACTIVE, 'Active', 'active'])->count();
+        $pendingCount = Seller::whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending Approval', 'Pending', 'pending'])->count();
+        $suspendedCount = Seller::whereIn('seller_status', [Seller::STATUS_SUSPENDED, 'Suspended', 'suspended'])->count();
+        $rejectedCount = Seller::whereIn('seller_status', [Seller::STATUS_REJECTED, 'Rejected', 'rejected'])->count();
+
+        $totalRevenueAmount = Order::where('status', '!=', 'cancelled')->sum('amount') ?? 0;
+
+        $stats = [
+            'total'          => number_format($totalCount),
+            'active'         => number_format($activeCount),
+            'pending'        => number_format($pendingCount),
+            'suspended'      => number_format($suspendedCount),
+            'total_revenue'  => '₹' . number_format($totalRevenueAmount),
+            'payout_due'     => '₹0',
+        ];
+        $counts = [
+            'all'       => $totalCount,
+            'pending'   => $pendingCount,
+            'active'    => $activeCount,
+            'suspended' => $suspendedCount,
+            'rejected'  => $rejectedCount,
+        ];
 
         return view('admin.sellers.index', [
             'sellers'      => $allSellers->values(),

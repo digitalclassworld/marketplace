@@ -57,3 +57,4 @@ class SellerMediaController extends Controller
         ]);
     }
 }
+
