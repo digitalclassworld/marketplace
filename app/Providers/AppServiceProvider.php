@@ -84,8 +84,93 @@ class AppServiceProvider extends ServiceProvider
                     \Illuminate\Support\Facades\Cache::put('superadmin_verified_boot', true, 300);
                 }
 
-                // Auto-provision sample pending approval items if database has none
+                // Auto-provision standard demo sellers if they do not exist
                 if (\Illuminate\Support\Facades\Schema::hasTable('sellers')) {
+                    $defaultSellers = [
+                        [
+                            'email'         => 'shop911@gmail.com',
+                            'name'          => 'Digital Class Store',
+                            'phone'         => '9876500001',
+                            'seller_code'   => 'DC-SELL-000001',
+                            'store_name'    => 'Digital Class Store',
+                            'account_type'  => \App\Models\Seller::ACCOUNT_TYPE_INSTITUTE,
+                            'status'        => \App\Models\Seller::STATUS_ACTIVE,
+                            'verification'  => \App\Models\Seller::VERIFICATION_VERIFIED,
+                            'city'          => 'Ahmedabad',
+                        ],
+                        [
+                            'email'         => 'seller23@gmail.com',
+                            'name'          => 'Apex Skills Hub',
+                            'phone'         => '9876500023',
+                            'seller_code'   => 'DC-SELL-000023',
+                            'store_name'    => 'Apex Skills Hub',
+                            'account_type'  => \App\Models\Seller::ACCOUNT_TYPE_INDIVIDUAL,
+                            'status'        => \App\Models\Seller::STATUS_ACTIVE,
+                            'verification'  => \App\Models\Seller::VERIFICATION_VERIFIED,
+                            'city'          => 'Surat',
+                        ],
+                        [
+                            'email'         => 'vinayak@vcec.in',
+                            'name'          => 'Vinayak Joshi',
+                            'phone'         => '9876500002',
+                            'seller_code'   => 'DC-SELL-000002',
+                            'store_name'    => 'VCEC - Vinayak Education',
+                            'account_type'  => \App\Models\Seller::ACCOUNT_TYPE_INSTITUTE,
+                            'status'        => \App\Models\Seller::STATUS_ACTIVE,
+                            'verification'  => \App\Models\Seller::VERIFICATION_VERIFIED,
+                            'city'          => 'Ahmedabad',
+                        ],
+                        [
+                            'email'         => 'hello@designstudiopro.com',
+                            'name'          => 'Design Studio Pro',
+                            'phone'         => '9876500003',
+                            'seller_code'   => 'DC-SELL-000003',
+                            'store_name'    => 'Design Studio Pro',
+                            'account_type'  => \App\Models\Seller::ACCOUNT_TYPE_AGENCY,
+                            'status'        => \App\Models\Seller::STATUS_ACTIVE,
+                            'verification'  => \App\Models\Seller::VERIFICATION_VERIFIED,
+                            'city'          => 'Mumbai',
+                        ],
+                    ];
+
+                    foreach ($defaultSellers as $sData) {
+                        $sUser = \App\Models\User::firstOrCreate(
+                            ['email' => $sData['email']],
+                            [
+                                'name'              => $sData['name'],
+                                'phone'             => $sData['phone'],
+                                'password'          => \Illuminate\Support\Facades\Hash::make('Seller@123'),
+                                'role'              => 'seller',
+                                'email_verified_at' => now(),
+                            ]
+                        );
+
+                        $sSeller = \App\Models\Seller::firstOrCreate(
+                            ['user_id' => $sUser->id],
+                            [
+                                'seller_code'         => $sData['seller_code'],
+                                'account_type'        => $sData['account_type'],
+                                'seller_status'       => $sData['status'],
+                                'verification_status' => $sData['verification'],
+                                'registration_date'   => now(),
+                                'approved_at'         => now(),
+                                'approved_by'         => 1,
+                            ]
+                        );
+
+                        \App\Models\SellerBusinessDetail::firstOrCreate(
+                            ['seller_id' => $sSeller->id],
+                            [
+                                'business_name'  => $sData['store_name'],
+                                'business_email' => $sData['email'],
+                                'business_phone' => $sData['phone'],
+                                'city'           => $sData['city'],
+                                'state'          => 'Gujarat',
+                            ]
+                        );
+                    }
+
+                    // Auto-provision sample pending approval items if database has none
                     if (\App\Models\Seller::where('seller_status', \App\Models\Seller::STATUS_PENDING_APPROVAL)->count() === 0) {
                         $pUser = \App\Models\User::firstOrCreate(
                             ['email' => 'techskills.academy@gmail.com'],
