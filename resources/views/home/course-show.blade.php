@@ -706,7 +706,7 @@
                     </button>
                 </form>
 
-                <button type="button" class="btn btn-outline-primary w-100 fw-semibold py-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;" onclick="showToast('Added to Cart', '{{ addslashes($course->title) }} added to cart.');">
+                <button type="button" class="btn btn-outline-primary w-100 fw-semibold py-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)($course->discount_price > 0 ? $course->discount_price : $course->price) }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
                     <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
                 </button>
 

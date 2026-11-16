@@ -906,7 +906,7 @@
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button type="button" class="btn-add-cart" onclick="showLiveToast('Added to Cart', '{{ addslashes($title) }} has been added to your cart!')">
+                            <button type="button" class="btn-add-cart" onclick="addToCart({ id: '{{ is_array($p) ? ($p['id'] ?? 1) : $p->id }}', type: 'Product', title: '{{ addslashes($title) }}', price: {{ (float)$price }}, thumbnail: '{{ $thumb }}', seller_id: {{ is_array($p) ? ($p['seller_id'] ?? 1) : ($p->seller_id ?? 1) }} })">
                                 <span>Add to Cart</span>
                                 <i class="fa-solid fa-cart-shopping"></i>
                             </button>

@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AdminWebsiteController;
 use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Auth\SellerRegistrationController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Seller\SellerBusinessListingController;
@@ -40,6 +41,14 @@ use Illuminate\Support\Facades\Route;
 
 // Public Marketplace Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Shopping Cart & Checkout API Routes
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 Route::get('/courses', [HomeController::class, 'courses'])->name('courses');
 Route::get('/services', [HomeController::class, 'services'])->name('services');
 Route::get('/service/{slug}', [HomeController::class, 'serviceShow'])->name('service.show');

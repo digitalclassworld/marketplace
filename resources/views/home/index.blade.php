@@ -50,6 +50,9 @@
         max-width: 580px;
         line-height: 1.5;
         margin-bottom: 1.45rem;
+
+
+        
     }
 
     /* Floating Hero Search Box (AirBNB / Google Style) */
@@ -1304,9 +1307,14 @@
                                             @endif
                                         @endif
                                     </div>
-                                    <a href="{{ route('course.show', $c->slug) }}" class="btn btn-primary btn-sm px-3 fw-semibold rounded-pill" style="font-size: 0.775rem;">
-                                        View Course
-                                    </a>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle p-1.5" title="Add Course to Cart" onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)$c->price }}, thumbnail: '{{ $c->thumbnail }}', seller_id: {{ $c->seller_id ?? 1 }} })" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-cart-plus" style="font-size: 0.8rem;"></i>
+                                        </button>
+                                        <a href="{{ route('course.show', $c->slug) }}" class="btn btn-primary btn-sm px-3 fw-semibold rounded-pill" style="font-size: 0.775rem;">
+                                            View Course
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1366,9 +1374,14 @@
                                         <span class="text-muted small" style="font-size: 0.7rem;">Starting at</span>
                                         <div class="fw-bold text-dark" style="font-size: 1.05rem;">₹{{ number_format($s->price ?? 999) }}</div>
                                     </div>
-                                    <a href="{{ route('service.show', $s->slug) }}" class="btn btn-success btn-sm px-3 fw-semibold rounded-pill text-white" style="font-size: 0.775rem;">
-                                        View Service
-                                    </a>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <button type="button" class="btn btn-outline-success btn-sm rounded-circle p-1.5" title="Add Service to Cart" onclick="addToCart({ id: '{{ $s->id }}', type: 'Service', title: '{{ addslashes($s->title) }}', price: {{ (float)($s->price ?? 999) }}, thumbnail: '{{ $s->thumbnail }}', seller_id: {{ $s->seller_id ?? 1 }} })" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-cart-plus" style="font-size: 0.8rem;"></i>
+                                        </button>
+                                        <a href="{{ route('service.show', $s->slug) }}" class="btn btn-success btn-sm px-3 fw-semibold rounded-pill text-white" style="font-size: 0.775rem;">
+                                            View Service
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1432,9 +1445,14 @@
                                             <span class="text-muted text-decoration-line-through small ms-1" style="font-size: 0.75rem;">₹{{ number_format($p->mrp) }}</span>
                                         @endif
                                     </div>
-                                    <a href="{{ route('product.show', $p->slug) }}" class="btn btn-outline-dark btn-sm px-3 fw-semibold rounded-pill" style="font-size: 0.775rem;">
-                                        View Details
-                                    </a>
+                                    <div class="d-flex align-items-center gap-1.5">
+                                        <button type="button" class="btn btn-outline-danger btn-sm rounded-circle p-1.5" title="Add Product to Cart" onclick="addToCart({ id: '{{ $p->id }}', type: 'Product', title: '{{ addslashes($p->title) }}', price: {{ (float)($p->price ?? 499) }}, thumbnail: '{{ $p->thumbnail }}', seller_id: {{ $p->seller_id ?? 1 }} })" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-cart-plus" style="font-size: 0.8rem;"></i>
+                                        </button>
+                                        <a href="{{ route('product.show', $p->slug) }}" class="btn btn-outline-dark btn-sm px-3 fw-semibold rounded-pill" style="font-size: 0.775rem;">
+                                            View Details
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

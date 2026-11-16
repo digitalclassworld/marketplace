@@ -880,12 +880,17 @@
                                     </div>
 
                                     <!-- Instructor Footer -->
-                                    <div class="course-instructor-footer">
-                                        <img src="{{ $c->instructor_avatar }}" alt="{{ $c->instructor_name }}" class="instructor-avatar-xs">
-                                        <div style="min-width: 0;">
-                                            <div class="instructor-name-label" title="{{ $c->instructor_name }}">{{ $c->instructor_name }}</div>
-                                            <div class="instructor-cat-label">{{ $c->instructor_category }}</div>
+                                    <div class="course-instructor-footer d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center gap-2" style="min-width: 0;">
+                                            <img src="{{ $c->instructor_avatar }}" alt="{{ $c->instructor_name }}" class="instructor-avatar-xs">
+                                            <div style="min-width: 0;">
+                                                <div class="instructor-name-label" title="{{ $c->instructor_name }}">{{ $c->instructor_name }}</div>
+                                                <div class="instructor-cat-label">{{ $c->instructor_category }}</div>
+                                            </div>
                                         </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle p-1" title="Add to Cart" onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)($c->discount_price > 0 ? $c->discount_price : $c->price) }}, thumbnail: '{{ $c->thumbnail }}', seller_id: {{ $c->seller_id ?? 1 }} })" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            <i class="fa-solid fa-cart-plus" style="font-size: 0.75rem;"></i>
+                                        </button>
                                     </div>
 
                                 </div>

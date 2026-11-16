@@ -1579,15 +1579,23 @@
     }
 
     function addToCartLive() {
-        const qty = document.getElementById('productQty').value;
-        showLiveNotification('Added to Cart', `${qty} item(s) of {{ addslashes($product->title) }} added to your cart.`);
+        const qty = parseInt(document.getElementById('productQty')?.value || 1);
+        addToCart({
+            id: '{{ $product->id }}',
+            type: 'Product',
+            title: '{{ addslashes($product->title) }}',
+            price: {{ (float)($product->price ?? 499) }},
+            thumbnail: '{{ $product->thumbnail }}',
+            seller_id: {{ $product->seller_id ?? 1 }},
+            quantity: qty
+        });
     }
 
     function proceedToBuy() {
-        showLiveNotification('Order Processing', 'Proceeding to secure checkout...');
+        addToCartLive();
         setTimeout(() => {
-            window.location.href = "{{ url('/checkout') }}";
-        }, 800);
+            openCartDrawer();
+        }, 300);
     }
 
     function calculateBundleTotal() {
