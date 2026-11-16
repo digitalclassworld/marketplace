@@ -17,14 +17,18 @@ class SellerAuthController extends Controller
     /**
      * Display the seller login page.
      */
-    public function showLoginForm(): View|RedirectResponse
+    public function showLoginForm(): \Illuminate\Http\Response|RedirectResponse
     {
         // Only redirect if already authenticated as a Seller on web guard
         if (Auth::guard('web')->check() && Auth::guard('web')->user()->isSeller()) {
             return redirect()->route('seller.dashboard');
         }
 
-        return view('auth.seller-login');
+        return response()
+            ->view('auth.seller-login')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     }
 
     /**

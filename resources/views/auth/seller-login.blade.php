@@ -86,6 +86,13 @@
                         </div>
                     @endif
 
+                    @if(session('warning'))
+                        <div class="alert alert-warning d-flex align-items-center py-2 px-3 small rounded-3 mb-3 text-dark" role="alert" style="background-color: #fef3c7; border-color: #fde68a;">
+                            <i class="fa-solid fa-triangle-exclamation me-2 text-warning flex-shrink-0"></i>
+                            <div>{{ session('warning') }}</div>
+                        </div>
+                    @endif
+
                     @if(session('info'))
                         <div class="alert alert-info d-flex align-items-center py-2 px-3 small rounded-3 mb-3" role="alert">
                             <i class="fa-solid fa-circle-info me-2 flex-shrink-0"></i>
@@ -221,5 +228,54 @@
         document.getElementById('passwordInput').value = pwd;
         document.getElementById('passwordInput').focus();
     }
+
+    // Refresh page if restored from Back-Forward Cache (bfcache) so CSRF token is fresh
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+
+    // Auto-refresh CSRF token when window gets focus or after idle period
+    let lastActive = Date.now();
+    function refreshCsrfToken() {
+        fetch('{{ route("refresh-csrf") }}', { credentials: 'same-origin' })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.token) {
+                    const tokenInputs = document.querySelectorAll('input[name="_token"]');
+                    tokenInputs.forEach(input => input.value = data.token);
+                    const meta = document.querySelector('meta[name="csrf-token"]');
+                    if (meta) meta.setAttribute('content', data.token);
+                }
+            })
+            .catch(() => {});
+    }
+
+    window.addEventListener('focus', function () {
+        if (Date.now() - lastActive > 300000) { // 5 minutes idle
+            refreshCsrfToken();
+        }
+        lastActive = Date.now();
+    });
+
+    // Refresh every 10 minutes proactively
+    setInterval(refreshCsrfToken, 600000);
+
+    // Prevent double form submission
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('sellerLoginForm');
+        if (form) {
+            form.addEventListener('submit', function () {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    setTimeout(() => {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Signing in...';
+                    }, 50);
+                }
+            });
+        }
+    });
 </script>
 @endsection

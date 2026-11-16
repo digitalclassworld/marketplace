@@ -66,6 +66,7 @@ Route::post('/blog/{slug}/comment', [BlogController::class, 'comment'])->name('b
 
 Route::get('/login', fn() => redirect()->route('seller.login'))->name('login');
 Route::get('/register', fn() => redirect()->route('seller.register'))->name('register');
+Route::get('/refresh-csrf', fn() => response()->json(['token' => csrf_token()]))->name('refresh-csrf');
 
 // Seller Registration & Authentication
 Route::prefix('seller')->name('seller.')->group(function () {

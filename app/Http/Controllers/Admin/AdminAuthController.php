@@ -13,7 +13,7 @@ class AdminAuthController extends Controller
     /**
      * Display the Super Admin login form.
      */
-    public function showLoginForm(): View|RedirectResponse
+    public function showLoginForm(): \Illuminate\Http\Response|RedirectResponse
     {
         // Only redirect if already authenticated as Super Admin on admin guard or web guard
         if ((Auth::guard('admin')->check() && Auth::guard('admin')->user()?->isSuperAdmin()) ||
@@ -21,7 +21,11 @@ class AdminAuthController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        return view('admin.auth.login');
+        return response()
+            ->view('admin.auth.login')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     }
 
     /**

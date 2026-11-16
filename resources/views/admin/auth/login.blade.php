@@ -87,6 +87,12 @@
                         </div>
                     @endif
 
+                    @if(session('warning'))
+                        <div class="alert alert-warning rounded-3 py-2 px-3 small mb-3 text-dark" style="background-color: #fef3c7; border-color: #fde68a;">
+                            <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i> {{ session('warning') }}
+                        </div>
+                    @endif
+
                     @if(session('success'))
                         <div class="alert alert-success rounded-3 py-2 px-3 small mb-3">
                             <i class="fa-solid fa-circle-check me-1"></i> {{ session('success') }}
@@ -187,6 +193,38 @@
         document.getElementById('password').value = pwd;
         document.getElementById('password').focus();
     }
+
+    // Refresh page if restored from Back-Forward Cache (bfcache) so CSRF token is fresh
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+
+    // Auto-refresh CSRF token when window gets focus or after idle period
+    let lastActiveAdmin = Date.now();
+    function refreshAdminCsrfToken() {
+        fetch('{{ route("refresh-csrf") }}', { credentials: 'same-origin' })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.token) {
+                    const tokenInputs = document.querySelectorAll('input[name="_token"]');
+                    tokenInputs.forEach(input => input.value = data.token);
+                    const meta = document.querySelector('meta[name="csrf-token"]');
+                    if (meta) meta.setAttribute('content', data.token);
+                }
+            })
+            .catch(() => {});
+    }
+
+    window.addEventListener('focus', function () {
+        if (Date.now() - lastActiveAdmin > 300000) {
+            refreshAdminCsrfToken();
+        }
+        lastActiveAdmin = Date.now();
+    });
+
+    setInterval(refreshAdminCsrfToken, 600000);
 </script>
 @endsection
 

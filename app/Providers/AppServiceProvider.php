@@ -33,8 +33,9 @@ class AppServiceProvider extends ServiceProvider
         ];
         foreach ($storageDirs as $dir) {
             if (!is_dir($dir)) {
-                @mkdir($dir, 0775, true);
+                @mkdir($dir, 0777, true);
             }
+            @chmod($dir, 0777);
         }
 
         // 2. Ensure SQLite database file exists in storage if SQLite connection is used
