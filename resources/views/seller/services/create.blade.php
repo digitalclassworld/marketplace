@@ -26,14 +26,17 @@
     .wizard-step-item {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem 0.75rem;
+        gap: 0.6rem;
+        padding: 0.5rem 0.85rem;
         border-radius: 10px;
-        color: #64748b;
+        color: #1e293b;
         cursor: pointer;
         transition: all 0.2s ease;
         text-decoration: none;
         flex-shrink: 0;
+    }
+    .wizard-step-item:hover {
+        background-color: #f1f5f9;
     }
     .wizard-step-item.active {
         background-color: #eff6ff;
@@ -41,37 +44,56 @@
         font-weight: 700;
     }
     .wizard-step-item.completed {
-        color: #10b981;
+        color: #0f766e;
     }
     .wizard-step-num {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
-        background: #f1f5f9;
+        background: #e2e8f0;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #475569;
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #0f172a;
+        flex-shrink: 0;
     }
     .wizard-step-item.active .wizard-step-num {
         background: #0066ff;
         color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 102, 255, 0.25);
     }
     .wizard-step-item.completed .wizard-step-num {
         background: #10b981;
         color: #ffffff;
     }
     .wizard-step-title {
-        font-size: 0.825rem;
-        line-height: 1.2;
+        font-size: 0.925rem;
+        font-weight: 700;
+        line-height: 1.25;
+        color: #0f172a;
+        display: block;
+    }
+    .wizard-step-item.active .wizard-step-title {
+        color: #0066ff;
+    }
+    .wizard-step-item.completed .wizard-step-title {
+        color: #0f766e;
     }
     .wizard-step-sub {
-        font-size: 0.675rem;
-        color: #94a3b8;
+        font-size: 0.775rem;
+        color: #475569;
         display: block;
-        font-weight: 400;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+    .wizard-step-item.active .wizard-step-sub {
+        color: #0284c7;
+        font-weight: 600;
+    }
+    .wizard-step-item.completed .wizard-step-sub {
+        color: #059669;
     }
 
     /* Option Selection Cards (Step 1) */
@@ -159,7 +181,7 @@
                 <span class="wizard-step-title">Choose Service Type</span>
                 <span class="wizard-step-sub">Select type of service</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-muted ms-1" style="font-size: 0.65rem;"></i>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-2" onclick="goToStep(2)">
@@ -168,7 +190,7 @@
                 <span class="wizard-step-title">Basic Information</span>
                 <span class="wizard-step-sub">Service basic details</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-muted ms-1" style="font-size: 0.65rem;"></i>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-3" onclick="goToStep(3)">
@@ -177,7 +199,7 @@
                 <span class="wizard-step-title">Service Details</span>
                 <span class="wizard-step-sub">Deliverables & highlights</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-muted ms-1" style="font-size: 0.65rem;"></i>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-4" onclick="goToStep(4)">
@@ -186,7 +208,7 @@
                 <span class="wizard-step-title">Media & Gallery</span>
                 <span class="wizard-step-sub">Images, logo & videos</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-muted ms-1" style="font-size: 0.65rem;"></i>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-5" onclick="goToStep(5)">
@@ -195,7 +217,7 @@
                 <span class="wizard-step-title">Contact & Location</span>
                 <span class="wizard-step-sub">Contact & address</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-muted ms-1" style="font-size: 0.65rem;"></i>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-6" onclick="goToStep(6)">
@@ -204,7 +226,7 @@
                 <span class="wizard-step-title">Plan & Publish</span>
                 <span class="wizard-step-sub">Pricing tier & add-ons</span>
             </div>
-            <i class="fa-solid fa-chevron-right text-muted ms-1" style="font-size: 0.65rem;"></i>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-7" onclick="goToStep(7)">
