@@ -59,13 +59,18 @@
     /* Hero Big Search Box */
     .hero-search-bar {
         background: #ffffff;
-        border: 1.5px solid #cbd5e1;
-        border-radius: 12px;
-        padding: 0.35rem 0.5rem 0.35rem 1rem;
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.08);
+        border: 1px solid rgba(203, 213, 225, 0.8);
+        border-radius: 999px;
+        padding: 0.35rem 0.45rem 0.35rem 1.25rem;
+        box-shadow: 0 16px 36px -4px rgba(37, 99, 235, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.8);
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+    .hero-search-bar:focus-within {
+        border-color: #2563eb;
+        box-shadow: 0 20px 40px -4px rgba(37, 99, 235, 0.16), 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
     .hero-search-bar input {
         border: none;
@@ -73,14 +78,15 @@
         font-size: 0.925rem;
         width: 100%;
         color: #0f172a;
+        background: transparent;
     }
     .hero-search-bar .category-select {
         border: none;
         border-left: 1px solid #e2e8f0;
-        padding: 0.35rem 0.75rem;
+        padding: 0.55rem 0.85rem;
         font-size: 0.85rem;
         color: #475569;
-        font-weight: 500;
+        font-weight: 600;
         outline: none;
         background: transparent;
         cursor: pointer;
@@ -233,69 +239,77 @@
     .product-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 0.75rem;
+        border-radius: 16px;
+        padding: 0.85rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         position: relative;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     }
     .product-card:hover {
-        border-color: #2563eb;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-        transform: translateY(-2px);
+        border-color: #93c5fd;
+        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+        transform: translateY(-5px);
     }
 
     .product-card-badge {
         position: absolute;
-        top: 8px;
-        left: 8px;
-        background: #f97316;
+        top: 10px;
+        left: 10px;
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         color: #ffffff;
         font-size: 0.65rem;
         font-weight: 700;
-        padding: 0.15rem 0.5rem;
-        border-radius: 4px;
+        padding: 0.2rem 0.55rem;
+        border-radius: 6px;
         z-index: 2;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
     .product-card-heart {
         position: absolute;
-        top: 8px;
-        right: 8px;
+        top: 10px;
+        right: 10px;
         color: #ef4444;
-        background: #ffffff;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
         border-radius: 50%;
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         cursor: pointer;
-        font-size: 0.75rem;
+        font-size: 0.85rem;
         z-index: 2;
         border: none;
+        transition: all 0.2s ease;
+    }
+    .product-card-heart:hover {
+        background: #ffffff;
+        transform: scale(1.15);
     }
 
     .product-card-thumb-wrap {
-        height: 130px;
+        height: 145px;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         background: #f8fafc;
-        border-radius: 8px;
+        border-radius: 12px;
     }
     .product-card-thumb {
         max-height: 100%;
         max-width: 100%;
         object-fit: contain;
-        transition: transform 0.3s ease;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .product-card:hover .product-card-thumb {
-        transform: scale(1.05);
+        transform: scale(1.08);
     }
 
     .product-card-title {

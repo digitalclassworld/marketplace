@@ -638,27 +638,28 @@
     .service-row-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 1.15rem;
-        margin-bottom: 1rem;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1.15rem;
         display: grid;
         grid-template-columns: 210px 1fr 200px;
         gap: 1.25rem;
         align-items: center;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         position: relative;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     }
 
     .service-row-card:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-        transform: translateY(-2px);
+        border-color: #93c5fd;
+        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+        transform: translateY(-4px);
     }
 
     .service-card-thumb-col {
         position: relative;
-        height: 140px;
-        border-radius: 10px;
+        height: 145px;
+        border-radius: 12px;
         overflow: hidden;
         background: #e2e8f0;
     }
@@ -667,6 +668,10 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .service-row-card:hover .service-card-thumb-col img {
+        transform: scale(1.06);
     }
 
     .video-projects-badge {

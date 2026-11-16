@@ -23,14 +23,21 @@
             --dc-font-mono: 'JetBrains Mono', monospace;
             --dc-primary: #0066ff;
             --dc-primary-hover: #0052cc;
-            --dc-primary-soft: #eaf2ff;
-            --dc-navy: #0e1726;
+            --dc-primary-soft: #eff6ff;
+            --dc-navy: #0b1424;
             --dc-dark: #0f172a;
             --dc-gray-bg: #f8fafc;
             --dc-border: #e2e8f0;
             --dc-text-muted: #64748b;
             --dc-success: #10b981;
             --dc-warning: #f59e0b;
+            --dc-card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+            --dc-card-hover-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.12);
+        }
+
+        ::selection {
+            background: #dbeafe;
+            color: #1d4ed8;
         }
 
         body {
@@ -55,32 +62,53 @@
             font-family: var(--dc-font-mono) !important;
             letter-spacing: 0.02em;
         }
-            flex-direction: column;
-        }
 
         /* Top Notification Bar */
         .dc-top-alert {
-            background-color: #0b1424;
+            background: linear-gradient(90deg, #070c18 0%, #0f1a30 100%);
             color: #94a3b8;
             font-size: 0.8125rem;
-            padding: 0.45rem 0;
+            padding: 0.5rem 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .dc-top-alert a {
             color: #38bdf8;
             text-decoration: none;
             font-weight: 600;
+            transition: color 0.15s ease;
+        }
+        .dc-top-alert a:hover {
+            color: #7dd3fc;
+            text-decoration: underline;
+        }
+
+        .dc-live-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+            animation: dcPulse 2s infinite;
+        }
+        @keyframes dcPulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         /* Navigation */
         .dc-navbar {
-            background: #ffffff;
-            border-bottom: 1px solid var(--dc-border);
-            padding: 0.85rem 0;
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+            padding: 0.75rem 0;
             position: sticky;
             top: 0;
             z-index: 1030;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease;
         }
 
         .dc-brand {
@@ -88,10 +116,10 @@
             align-items: center;
             gap: 0.65rem;
             text-decoration: none;
-            font-weight: 800;
-            font-size: 1.35rem;
-            color: var(--dc-navy);
-            letter-spacing: -0.02em;
+            transition: transform 0.2s ease;
+        }
+        .dc-brand:hover {
+            transform: scale(1.02);
         }
 
         .dc-brand-icon {
@@ -122,36 +150,77 @@
         }
 
         .nav-link.dc-nav-link {
-            font-weight: 500;
-            font-size: 0.925rem;
+            font-weight: 600;
+            font-size: 0.875rem;
             color: #475569;
-            padding: 0.5rem 0.85rem !important;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            padding: 0.45rem 0.9rem !important;
+            border-radius: 999px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
         }
 
-        .nav-link.dc-nav-link:hover,
-        .nav-link.dc-nav-link.active {
+        .nav-link.dc-nav-link:hover {
             color: var(--dc-primary);
             background-color: var(--dc-primary-soft);
         }
 
         .nav-link.dc-nav-link.active-marketplace-tab {
             color: #0066ff !important;
+            background-color: #eff6ff;
             font-weight: 700;
-            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 102, 255, 0.1);
         }
 
         .nav-link.dc-nav-link.active-marketplace-tab::after {
-            content: '';
-            position: absolute;
-            bottom: 0px;
-            left: 12px;
-            right: 12px;
-            height: 3px;
-            background: #0066ff;
+            display: none;
+        }
+
+        /* Navbar Search Box */
+        .dc-nav-search-wrap {
+            position: relative;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 999px;
+            transition: all 0.2s ease;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 2px 3px 2px 14px;
+        }
+        .dc-nav-search-wrap:focus-within {
+            background: #ffffff;
+            border-color: #0066ff;
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.12);
+        }
+        .dc-nav-search-input {
+            border: none;
+            background: transparent;
+            font-size: 0.85rem;
+            color: #1e293b;
+            outline: none;
+            width: 100%;
+        }
+        .dc-nav-search-input::placeholder {
+            color: #94a3b8;
+        }
+        .dc-nav-search-btn {
+            border: none;
+            background: #0066ff;
+            color: #ffffff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+        .dc-nav-search-btn:hover {
+            background: #0052cc;
+            transform: scale(1.05);
         }
 
         .dc-badge-soon {
@@ -166,33 +235,32 @@
         }
 
         .btn-dc-primary {
-            background-color: var(--dc-primary);
-            border-color: var(--dc-primary);
+            background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+            border: none;
             color: #ffffff;
-            font-weight: 600;
-            font-size: 0.925rem;
-            padding: 0.55rem 1.25rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0, 102, 255, 0.2);
+            font-weight: 700;
+            font-size: 0.875rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 999px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
         }
 
         .btn-dc-primary:hover {
-            background-color: var(--dc-primary-hover);
-            border-color: var(--dc-primary-hover);
+            background: linear-gradient(135deg, #0052cc 0%, #004099 100%);
             color: #ffffff;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.28);
+            box-shadow: 0 6px 18px rgba(0, 102, 255, 0.35);
         }
 
         .btn-dc-outline {
-            background-color: transparent;
+            background-color: #ffffff;
             border: 1px solid var(--dc-border);
             color: var(--dc-dark);
             font-weight: 600;
-            font-size: 0.925rem;
-            padding: 0.55rem 1.25rem;
-            border-radius: 8px;
+            font-size: 0.875rem;
+            padding: 0.5rem 1.15rem;
+            border-radius: 999px;
             transition: all 0.2s ease;
         }
 
@@ -204,29 +272,55 @@
 
         /* Footer */
         .dc-footer {
-            background-color: #0b1424;
+            background: linear-gradient(180deg, #0b1424 0%, #060b14 100%);
             color: #94a3b8;
-            padding: 4rem 0 2rem;
+            padding: 4.5rem 0 2rem;
             margin-top: auto;
-            border-top: 1px solid rgba(255,255,255,0.06);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
         }
 
         .dc-footer a {
             color: #cbd5e1;
             text-decoration: none;
-            transition: color 0.2s;
+            transition: all 0.2s ease;
         }
 
         .dc-footer a:hover {
             color: #38bdf8;
+            padding-left: 2px;
         }
 
         .dc-footer-title {
             color: #ffffff;
-            font-size: 0.975rem;
+            font-size: 0.95rem;
             font-weight: 700;
             margin-bottom: 1.25rem;
             letter-spacing: -0.01em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.06em;
+            color: #93c5fd;
+        }
+
+        .dc-footer-social-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .dc-footer-social-btn:hover {
+            background: #0066ff;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
         }
 
         /* Flash Message Alert */
@@ -254,14 +348,18 @@
 
     <!-- Top Announcement Bar -->
     <div class="dc-top-alert">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div>
-                <i class="fa-solid fa-bolt text-warning me-1"></i>
-                <span>Phase 1 Development: Seller Onboarding & Dashboard is now live!</span>
+        <div class="container-fluid px-lg-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="dc-live-dot me-2"></span>
+                <span class="fw-semibold text-light">Digital Class Marketplace:</span>
+                <span class="ms-1 text-secondary">Discover courses, hire experts, shop products & explore local businesses.</span>
             </div>
-            <div class="d-none d-md-block">
-                <span>Are you an educator, agency, or institute? </span>
-                <a href="{{ route('seller.register') }}">Join as a Seller &rarr;</a>
+            <div class="d-none d-md-flex align-items-center gap-3">
+                <span class="text-secondary">Are you an educator, agency, or institute?</span>
+                <a href="{{ route('seller.register') }}" class="d-inline-flex align-items-center gap-1">
+                    <span>Join as a Seller</span>
+                    <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem;"></i>
+                </a>
             </div>
         </div>
     </div>
@@ -316,12 +414,13 @@
                     </li>
                 </ul>
 
-                <!-- Center Search Input with Blue Button -->
-                <form action="{{ route('home') }}" method="GET" class="flex-grow-1 mx-xl-3 my-2 my-xl-0" style="max-width: 480px;">
-                    <div class="input-group">
-                        <input type="text" name="search" value="{{ request('search') }}" class="form-control border-end-0 bg-light" placeholder="Search businesses, shops, institutes, service centers..." style="font-size: 0.85rem; border-color: #e2e8f0;">
-                        <button class="btn btn-primary px-3" type="submit" style="background-color: #0066ff;">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                <!-- Center Search Input with Modern Pill -->
+                <form action="{{ route('home') }}" method="GET" class="flex-grow-1 mx-xl-3 my-2 my-xl-0" style="max-width: 460px;">
+                    <div class="dc-nav-search-wrap">
+                        <i class="fa-solid fa-magnifying-glass text-muted me-2" style="font-size: 0.85rem;"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" class="dc-nav-search-input" placeholder="Search courses, businesses, products, services...">
+                        <button class="dc-nav-search-btn" type="submit" title="Search">
+                            <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
                 </form>
@@ -448,80 +547,130 @@
 
     <!-- Footer -->
     <footer class="dc-footer">
-        <div class="container">
+        <div class="container-fluid px-lg-5">
+            <!-- Trust Metric Highlights Strip -->
+            <div class="row g-3 pb-4 mb-4 border-bottom" style="border-color: rgba(255,255,255,0.08) !important;">
+                <div class="col-md-3 col-6 d-flex align-items-center gap-3">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(0, 102, 255, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-shield-check"></i>
+                    </div>
+                    <div>
+                        <div class="text-white fw-bold small">100% Verified</div>
+                        <div class="text-secondary small" style="font-size: 0.72rem;">Authentic Sellers & Institutes</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 d-flex align-items-center gap-3">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <div class="text-white fw-bold small">Direct Contact</div>
+                        <div class="text-secondary small" style="font-size: 0.72rem;">Call or WhatsApp Sellers Instantly</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 d-flex align-items-center gap-3">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); color: #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div>
+                        <div class="text-white fw-bold small">Genuine Ratings</div>
+                        <div class="text-secondary small" style="font-size: 0.72rem;">Real Community Feedback</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 d-flex align-items-center gap-3">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(168, 85, 247, 0.15); color: #c084fc; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <div class="text-white fw-bold small">Zero Commission</div>
+                        <div class="text-secondary small" style="font-size: 0.72rem;">Grow Your Business Without Hidden Fees</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-4 mb-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 38px; width: auto; background: white; padding: 4px 8px; border-radius: 8px;">
+                        <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 42px; width: auto; background: white; padding: 6px 12px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
                         <h4 class="visually-hidden">Digital Class</h4>
                     </div>
-                    <p class="small text-secondary mb-3">
-                        Digital Class Marketplace &mdash; <strong>Learn. Hire. Buy. Discover.</strong> India's multi-vendor educational and business platform connecting learners, professionals, businesses, and customers in one unified ecosystem.
+                    <p class="small text-secondary mb-3" style="line-height: 1.6;">
+                        Digital Class Marketplace &mdash; <strong>Learn. Hire. Buy. Discover.</strong> India's leading multi-vendor educational and local business ecosystem connecting students, clients, shoppers, and verified businesses in one trusted platform.
                     </p>
+                    
+                    <!-- Social Media Links -->
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="dc-footer-social-btn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="dc-footer-social-btn" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="dc-footer-social-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="dc-footer-social-btn" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="dc-footer-social-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+
                     <div class="d-flex gap-2">
-                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Phase 1: Seller Onboarding</span>
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Laravel 12 + MySQL</span>
+                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Digital Class Official</span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Secure Cloud Platform</span>
                     </div>
                 </div>
 
                 <div class="col-lg-2 col-md-3 col-6">
-                    <div class="dc-footer-title">Navigation</div>
+                    <div class="dc-footer-title">Marketplace</div>
                     <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ route('courses') }}">Courses</a></li>
-                        <li><a href="{{ route('products') }}">Products</a></li>
-                        <li><a href="{{ route('services') }}">Services</a></li>
-                        <li><a href="{{ route('blog.index') }}">Blog & Articles</a></li>
+                        <li><a href="{{ route('home') }}">Local Businesses</a></li>
+                        <li><a href="{{ route('courses') }}">Online Courses</a></li>
+                        <li><a href="{{ route('products') }}">Shop Products</a></li>
+                        <li><a href="{{ route('services') }}">Hire Services</a></li>
+                        <li><a href="{{ route('blog.index') }}">Blog & Guides</a></li>
                     </ul>
                 </div>
 
                 <div class="col-lg-2 col-md-3 col-6">
                     <div class="dc-footer-title">Seller Portal</div>
                     <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
-                        <li><a href="{{ route('seller.register') }}">Become a Seller</a></li>
+                        <li><a href="{{ route('seller.register') }}" class="text-info fw-semibold"><i class="fa-solid fa-arrow-right me-1 small"></i> Become a Seller</a></li>
                         <li><a href="{{ route('seller.login') }}">Seller Login</a></li>
                         <li>
                             <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="text-warning-emphasis">
-                                <i class="fa-solid fa-shield-halved me-1 text-warning"></i> Super Admin Login <i class="fa-solid fa-arrow-up-right-from-square ms-1 small" style="font-size: 0.68rem;"></i>
+                                <i class="fa-solid fa-shield-halved me-1 text-warning"></i> Super Admin Portal <i class="fa-solid fa-arrow-up-right-from-square ms-1 small" style="font-size: 0.68rem;"></i>
                             </a>
                         </li>
                         @auth
                             @if(Auth::user()->isSeller())
                                 <li><a href="{{ route('seller.dashboard') }}">Seller Dashboard</a></li>
-                                <li><a href="{{ route('seller.profile') }}">Seller Profile</a></li>
+                                <li><a href="{{ route('seller.profile') }}">Store Settings</a></li>
                             @endif
                         @endauth
                     </ul>
                 </div>
 
                 <div class="col-lg-4 col-md-12">
-                    <div class="dc-footer-title">Seller Support</div>
+                    <div class="dc-footer-title">Get in Touch</div>
                     <p class="small text-secondary mb-3">
-                        Have questions about opening your store or listing courses, services, and products? Contact our onboarding team.
+                        Have questions about listing your institute, coaching academy, services, or products? Our vendor onboarding advisors are ready to assist.
                     </p>
-                    <div class="d-flex align-items-center gap-2 text-secondary small">
+                    <div class="d-flex align-items-center gap-2 text-secondary small mb-2">
                         <i class="fa-solid fa-envelope text-primary"></i>
                         <span>support@digitalclassworld.com</span>
                     </div>
-                    <div class="d-flex align-items-center gap-2 text-secondary small mt-2">
+                    <div class="d-flex align-items-center gap-2 text-secondary small">
                         <i class="fa-solid fa-phone text-primary"></i>
-                        <span>+91 98765 43210</span>
+                        <span>+91 98765 43210 &bull; Mon - Sat, 9am - 7pm IST</span>
                     </div>
                 </div>
             </div>
 
             <hr style="border-color: rgba(255,255,255,0.08);">
 
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary pt-2">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary pt-2 pb-3">
                 <div>
-                    &copy; {{ date('Y') }} Digital Class Marketplace. All rights reserved.
+                    &copy; {{ date('Y') }} Digital Class Marketplace &bull; All Rights Reserved.
                 </div>
                 <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
                     <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="text-secondary text-decoration-none hover-white small">
-                        <i class="fa-solid fa-lock me-1"></i> Super Admin Portal <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.65rem;"></i>
+                        <i class="fa-solid fa-lock me-1"></i> Admin Portal
                     </a>
-                    <span>•</span>
-                    <span>Designed based on Digital Class UI/UX Specifications</span>
+                    <span>&bull;</span>
+                    <span>100% Genuine & Verified Marketplace</span>
                 </div>
             </div>
         </div>

@@ -9,55 +9,69 @@
        ========================================================================== */
     .hero-marketplace {
         position: relative;
-        background: linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 40%, rgba(255, 255, 255, 0.35) 75%, rgba(255, 255, 255, 0.1) 100%),
+        background: radial-gradient(circle at 85% 15%, rgba(0, 102, 255, 0.12) 0%, transparent 45%),
+                    radial-gradient(circle at 10% 85%, rgba(14, 165, 233, 0.08) 0%, transparent 40%),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 40%, rgba(255, 255, 255, 0.45) 75%, rgba(255, 255, 255, 0.15) 100%),
                     url('https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=1600&auto=format&fit=crop&q=80') center right / cover no-repeat;
         border-bottom: 1px solid #e2e8f0;
-        padding: 2.75rem 0 2.25rem;
+        padding: 3.25rem 0 2.75rem;
         overflow: hidden;
     }
 
     .hero-tag {
-        font-size: 0.72rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
-        color: #1e3a8a;
-        margin-bottom: 0.35rem;
-        display: inline-block;
+        color: #1d4ed8;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        margin-bottom: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        box-shadow: 0 2px 6px rgba(0, 102, 255, 0.08);
     }
 
     .hero-title {
-        font-size: 2.35rem;
+        font-size: 2.65rem;
         font-weight: 800;
-        letter-spacing: -0.025em;
+        letter-spacing: -0.03em;
         line-height: 1.15;
         color: #0f172a;
-        margin-bottom: 0.45rem;
+        margin-bottom: 0.65rem;
     }
 
     .hero-subtitle {
-        font-size: 0.875rem;
+        font-size: 0.925rem;
         color: #475569;
         max-width: 580px;
-        line-height: 1.45;
-        margin-bottom: 1.35rem;
+        line-height: 1.5;
+        margin-bottom: 1.45rem;
     }
 
-    /* Floating Hero Search Box */
+    /* Floating Hero Search Box (AirBNB / Google Style) */
     .hero-search-box {
         background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-        padding: 0.35rem;
-        max-width: 650px;
+        border: 1px solid rgba(203, 213, 225, 0.8);
+        border-radius: 999px;
+        box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.8);
+        padding: 0.35rem 0.45rem;
+        max-width: 660px;
+        transition: all 0.2s ease;
+    }
+    .hero-search-box:focus-within {
+        border-color: #0066ff;
+        box-shadow: 0 20px 40px -4px rgba(0, 102, 255, 0.16), 0 0 0 3px rgba(0, 102, 255, 0.15);
     }
 
     .hero-search-input {
         border: none;
         outline: none;
         font-size: 0.875rem;
-        padding: 0.55rem 0.75rem;
+        padding: 0.65rem 0.85rem;
         color: #1e293b;
         background: transparent;
     }
@@ -71,29 +85,32 @@
         border-left: 1px solid #e2e8f0;
         outline: none;
         font-size: 0.85rem;
-        padding: 0.55rem 0.75rem;
+        padding: 0.65rem 0.85rem;
         color: #334155;
         background: transparent;
         font-weight: 600;
+        cursor: pointer;
     }
 
     .btn-hero-search {
-        background-color: #0066ff;
+        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
         color: #ffffff;
         font-weight: 700;
         font-size: 0.875rem;
-        padding: 0.6rem 1.4rem;
-        border-radius: 8px;
+        padding: 0.65rem 1.6rem;
+        border-radius: 999px;
         border: none;
-        transition: all 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         display: inline-flex;
         align-items: center;
         gap: 0.45rem;
+        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.35);
     }
     .btn-hero-search:hover {
-        background-color: #0052cc;
+        background: linear-gradient(135deg, #0052cc 0%, #004099 100%);
         color: #ffffff;
-        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.45);
     }
 
     /* Popular Searches Pills */
@@ -102,7 +119,7 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 0.35rem;
-        margin-top: 0.85rem;
+        margin-top: 1rem;
         font-size: 0.75rem;
     }
 
@@ -110,34 +127,40 @@
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 999px;
-        padding: 0.2rem 0.65rem;
+        padding: 0.25rem 0.75rem;
         color: #475569;
         text-decoration: none;
         font-weight: 500;
-        transition: all 0.15s;
+        transition: all 0.15s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .popular-pill:hover {
         border-color: #0066ff;
         color: #0066ff;
         background: #eff6ff;
+        transform: translateY(-1px);
     }
 
     /* Hero Right Trust Callout */
     .hero-trust-box {
-        background: rgba(255, 255, 255, 0.94);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(226, 232, 240, 0.9);
-        border-radius: 16px;
-        padding: 1.15rem 1.25rem;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 1.35rem 1.45rem;
+        box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(226, 232, 240, 0.5);
     }
 
     .script-slogan {
         font-family: 'Outfit', cursive, sans-serif;
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #1e3a8a;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
         line-height: 1.25;
+        margin-bottom: 0.85rem;
+        position: relative;
+    }
         margin-bottom: 0.85rem;
         position: relative;
     }
@@ -203,36 +226,42 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-width: 72px;
-        padding: 0.45rem 0.55rem;
-        border-radius: 10px;
-        border: 1px solid transparent;
+        min-width: 78px;
+        padding: 0.55rem 0.65rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
         color: #475569;
         text-decoration: none;
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         font-weight: 600;
-        transition: all 0.15s ease;
-        background: transparent;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        background: #ffffff;
         text-align: center;
-        gap: 0.25rem;
+        gap: 0.35rem;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
     }
     .cat-pill-btn i {
-        font-size: 0.95rem;
+        font-size: 1.05rem;
         color: #64748b;
-        transition: color 0.15s;
+        transition: all 0.2s;
     }
     .cat-pill-btn:hover {
         background: #f8fafc;
-        border-color: #cbd5e1;
+        border-color: #93c5fd;
         color: #0066ff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px -2px rgba(0, 102, 255, 0.12);
     }
     .cat-pill-btn:hover i {
         color: #0066ff;
+        transform: scale(1.1);
     }
     .cat-pill-btn.active {
-        background: #eff6ff;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
         border-color: #0066ff;
         color: #0066ff;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.18);
     }
     .cat-pill-btn.active i {
         color: #0066ff;
@@ -308,24 +337,25 @@
     .business-grid-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 16px;
         overflow: hidden;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;
         flex-direction: column;
         height: 100%;
         position: relative;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     }
     .business-grid-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.06);
-        border-color: #cbd5e1;
+        transform: translateY(-5px);
+        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+        border-color: #93c5fd;
     }
 
     .card-thumb-wrapper {
         position: relative;
         width: 100%;
-        height: 135px;
+        height: 145px;
         background: #f1f5f9;
         overflow: hidden;
     }
@@ -333,76 +363,80 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.25s ease;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .business-grid-card:hover .card-thumb-wrapper img {
-        transform: scale(1.04);
+        transform: scale(1.06);
     }
 
     .card-badge-pill {
         position: absolute;
-        top: 8px;
-        left: 8px;
+        top: 10px;
+        left: 10px;
         font-size: 0.65rem;
         font-weight: 700;
-        padding: 0.15rem 0.5rem;
-        border-radius: 4px;
-        letter-spacing: 0.02em;
+        padding: 0.2rem 0.55rem;
+        border-radius: 6px;
+        letter-spacing: 0.03em;
         z-index: 2;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
     .card-badge-featured {
-        background-color: #f59e0b;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: #ffffff;
     }
     .card-badge-verified {
-        background-color: #0066ff;
+        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
         color: #ffffff;
     }
 
     .card-heart-btn {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 26px;
-        height: 26px;
-        background: rgba(255, 255, 255, 0.85);
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
         border: none;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #ef4444;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         cursor: pointer;
-        transition: all 0.15s;
+        transition: all 0.2s ease;
         z-index: 2;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .card-heart-btn:hover {
         background: #ffffff;
         transform: scale(1.15);
+        color: #dc2626;
     }
     .card-heart-btn.active i {
         font-weight: 900;
     }
 
     .card-content-body {
-        padding: 0.75rem 0.85rem;
+        padding: 0.85rem 1rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
 
     .business-card-title {
-        font-size: 0.875rem;
+        font-size: 0.925rem;
         font-weight: 700;
         color: #0f172a;
-        margin-bottom: 0.25rem;
-        line-height: 1.25;
+        margin-bottom: 0.35rem;
+        line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        height: 2.5em;
+        height: 2.6em;
     }
 
     .card-rating-row {
@@ -410,13 +444,13 @@
         align-items: center;
         gap: 0.35rem;
         font-size: 0.75rem;
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.35rem;
     }
 
     .card-location-row {
-        font-size: 0.72rem;
+        font-size: 0.75rem;
         color: #64748b;
-        margin-bottom: 0.45rem;
+        margin-bottom: 0.5rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -425,37 +459,38 @@
     .card-tag-pill {
         background: #f1f5f9;
         color: #475569;
-        font-size: 0.65rem;
-        font-weight: 500;
-        padding: 0.12rem 0.45rem;
-        border-radius: 4px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 0.15rem 0.5rem;
+        border-radius: 6px;
         display: inline-block;
         margin-right: 0.25rem;
         margin-bottom: 0.25rem;
+        border: 1px solid #e2e8f0;
     }
 
     /* Action Buttons Row */
     .card-actions-row {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        gap: 0.35rem;
-        padding: 0.65rem 0.85rem 0.75rem;
+        gap: 0.4rem;
+        padding: 0.75rem 1rem 0.85rem;
         background: #ffffff;
         border-top: 1px solid #f1f5f9;
     }
 
     .btn-card-action {
-        font-size: 0.7rem;
-        font-weight: 600;
-        padding: 0.35rem 0.35rem;
-        border-radius: 6px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.45rem 0.35rem;
+        border-radius: 8px;
         text-align: center;
         text-decoration: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.25rem;
-        transition: all 0.15s;
+        gap: 0.3rem;
+        transition: all 0.2s ease;
     }
 
     .btn-card-call {
@@ -467,27 +502,32 @@
         background: #0066ff;
         border-color: #0066ff;
         color: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
     }
 
     .btn-card-wa {
-        background: #ecfdf5;
-        border: 1px solid #a7f3d0;
-        color: #059669;
+        background: #25D366;
+        border: 1px solid #25D366;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
     }
     .btn-card-wa:hover {
-        background: #10b981;
-        border-color: #10b981;
+        background: #1eb857;
+        border-color: #1eb857;
         color: #ffffff;
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
     }
 
     .btn-card-view {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        color: #475569;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #0066ff;
     }
     .btn-card-view:hover {
-        background: #f1f5f9;
-        color: #0f172a;
+        background: #0066ff;
+        border-color: #0066ff;
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
     }
 
     /* Right Sidebar Widgets */
@@ -576,12 +616,13 @@
             <!-- Left Hero Content -->
             <div class="col-lg-7 col-xl-8 mb-4 mb-lg-0">
                 <span class="hero-tag">
-                    <i class="fa-solid fa-building-columns me-1 text-primary"></i> Local Businesses & Institutes
+                    <span class="dc-live-dot me-1"></span>
+                    <i class="fa-solid fa-building-columns me-1 text-primary"></i> 50,000+ Verified Local Businesses & Institutes
                 </span>
                 
                 <h1 class="hero-title">
                     Discover Trusted<br>
-                    <span style="color: #0066ff;">Businesses Near You</span>
+                    <span style="background: linear-gradient(135deg, #0066ff 0%, #00c6ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Businesses Near You</span>
                 </h1>
                 
                 <p class="hero-subtitle">
