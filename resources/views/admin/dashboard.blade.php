@@ -295,7 +295,9 @@
                         <div class="kpi-title">Total Revenue</div>
                         <div class="d-flex align-items-center">
                             <span class="kpi-value">{{ $kpis['total_revenue'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['revenue_growth'] }}</span>
+                            @if(!empty($kpis['revenue_growth']) && $kpis['revenue_growth'] !== '0%')
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['revenue_growth'] }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -314,7 +316,9 @@
                         <div class="kpi-title">Payout Due to Sellers</div>
                         <div class="d-flex align-items-center">
                             <span class="kpi-value">{{ $kpis['payout_due'] }}</span>
-                            <span class="kpi-growth-pill bg-danger-subtle text-danger">{{ $kpis['payout_growth'] }}</span>
+                            @if(!empty($kpis['payout_growth']) && $kpis['payout_growth'] !== '0%')
+                                <span class="kpi-growth-pill {{ str_contains($kpis['payout_growth'], '↓') || str_contains($kpis['payout_growth'], '-') ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }}">{{ $kpis['payout_growth'] }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -333,7 +337,9 @@
                         <div class="kpi-title">New Leads</div>
                         <div class="d-flex align-items-center">
                             <span class="kpi-value">{{ $kpis['new_leads'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['leads_growth'] }}</span>
+                            @if(!empty($kpis['leads_growth']) && $kpis['leads_growth'] !== '0%')
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['leads_growth'] }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -352,7 +358,9 @@
                         <div class="kpi-title">App Downloads</div>
                         <div class="d-flex align-items-center">
                             <span class="kpi-value">{{ $kpis['app_downloads'] }}</span>
-                            <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['downloads_growth'] }}</span>
+                            @if(!empty($kpis['downloads_growth']) && $kpis['downloads_growth'] !== '0%')
+                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['downloads_growth'] }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>
