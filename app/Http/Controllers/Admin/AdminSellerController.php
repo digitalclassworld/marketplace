@@ -40,7 +40,7 @@ class AdminSellerController extends Controller
 
         // Account type filtering
         if ($accountType && $accountType !== 'all') {
-            $query->where('account_type', $accountType);
+            $query->where('account_type', 'LIKE', "%{$accountType}%");
         }
 
         // Search query across Seller ID, User Name, User Email, Phone, Business Name

@@ -289,32 +289,50 @@ class AdminUserController extends Controller
         foreach ($dbUsers as $u) {
             $sellerObj = $u->seller;
             $type = 'Student';
-            if ($u->role === 'superadmin') $type = 'Super Admin';
-            elseif ($sellerObj) {
-                $type = $sellerObj->account_type === 'institute' ? 'Institute' : 'Seller';
+
+            if ($u->role === 'superadmin') {
+                $type = 'Super Admin';
+            } elseif ($sellerObj) {
+                $accType = strtolower($sellerObj->account_type ?? '');
+                if (str_contains($accType, 'institute') || str_contains($accType, 'company')) {
+                    $type = 'Institute';
+                } elseif (str_contains($accType, 'agency')) {
+                    $type = 'Professional';
+                } else {
+                    $type = 'Seller';
+                }
+            } elseif ($u->role === 'seller') {
+                $type = 'Seller';
+            } elseif ($u->role === 'professional') {
+                $type = 'Professional';
             }
 
+            $orderCount = $sellerObj ? $sellerObj->orders()->count() : 0;
+            $revenueAmount = $sellerObj ? (float) $sellerObj->orders()->where('status', '!=', 'cancelled')->sum('amount') : 0.0;
+            $city = $sellerObj?->businessDetail?->city ?: 'Ahmedabad';
+            $state = $sellerObj?->businessDetail?->state ?: 'Gujarat';
+
             $curatedUsers[] = [
-                'id' => $u->id,
-                'code' => 'UDC' . str_pad($u->id, 5, '0', STR_PAD_LEFT),
-                'name' => $u->name,
-                'email' => $u->email,
-                'phone' => $u->phone ?: '+91 98765 ' . rand(10000, 99999),
-                'type' => $type,
-                'location' => $sellerObj->businessDetail->city ?? 'Ahmedabad, Gujarat',
-                'city' => $sellerObj->businessDetail->city ?? 'Ahmedabad',
-                'joined_date' => $u->created_at->format('d M Y'),
-                'joined_ago' => $u->created_at->diffForHumans(),
-                'status' => 'Active',
-                'orders_summary' => '1 Account',
-                'spent_summary' => '₹0 spent',
-                'total_spent' => 0,
-                'total_orders' => 0,
+                'id'             => $u->id,
+                'code'           => 'UDC' . str_pad((string)$u->id, 5, '0', STR_PAD_LEFT),
+                'name'           => $u->name,
+                'email'          => $u->email,
+                'phone'          => $u->phone ?: '+91 98765 ' . rand(10000, 99999),
+                'type'           => $type,
+                'location'       => "{$city}, {$state}",
+                'city'           => $city,
+                'joined_date'    => $u->created_at ? $u->created_at->format('d M Y') : now()->format('d M Y'),
+                'joined_ago'     => $u->created_at ? $u->created_at->diffForHumans() : 'Recently',
+                'status'         => ($sellerObj && in_array($sellerObj->seller_status, ['Inactive', 'Suspended'])) ? 'Inactive' : 'Active',
+                'orders_summary' => $orderCount > 0 ? "{$orderCount} Orders" : '1 Account',
+                'spent_summary'  => $revenueAmount > 0 ? '₹' . number_format($revenueAmount) : '₹0 spent',
+                'total_spent'    => $revenueAmount,
+                'total_orders'   => $orderCount,
                 'wishlist_count' => 0,
-                'dob' => '01 Jan 2000',
-                'gender' => 'Unspecified',
-                'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=0066ff&color=fff',
-                'recent_orders' => [],
+                'dob'            => '01 Jan 2000',
+                'gender'         => 'Unspecified',
+                'avatar'         => $u->avatar_url ?: ('https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=0066ff&color=fff'),
+                'recent_orders'  => [],
             ];
         }
 
@@ -328,7 +346,7 @@ class AdminUserController extends Controller
         } elseif ($tab === 'institutes') {
             $allUsers = $allUsers->filter(fn($u) => $u['type'] === 'Institute');
         } elseif ($tab === 'sellers') {
-            $allUsers = $allUsers->filter(fn($u) => $u['type'] === 'Seller');
+            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Seller', 'Institute']));
         } elseif ($tab === 'inactive') {
             $allUsers = $allUsers->filter(fn($u) => $u['status'] === 'Inactive');
         }
@@ -359,31 +377,27 @@ class AdminUserController extends Controller
             $allUsers = $allUsers->filter(fn($u) => str_contains(strtolower($u['location']), strtolower($location)));
         }
 
-        // Stats matching screenshot (database in production, curated on local)
-        if (!$showDummy) {
-            $totalUsers = User::count();
-            $studentsCount = User::where('role', 'user')->count();
-            $sellersCount = User::where('role', 'seller')->count();
-            $stats = [
-                'total_users'     => number_format($totalUsers),
-                'students'        => number_format($studentsCount),
-                'professionals'   => '0',
-                'institutes'      => number_format(Seller::where('account_type', 'Institute')->count()),
-                'sellers'         => number_format($sellersCount),
-                'active_users'    => number_format($totalUsers),
-                'inactive_users'  => '0',
-            ];
-        } else {
-            $stats = [
-                'total_users'     => '1,24,560',
-                'students'        => '82,430',
-                'professionals'   => '18,920',
-                'institutes'      => '6,320',
-                'sellers'         => '1,248',
-                'active_users'    => '1,08,240',
-                'inactive_users'  => '16,320',
-            ];
-        }
+        // Live Real Database KPI Statistics
+        $totalUsers = User::count();
+        $studentsCount = User::whereIn('role', ['user', 'student'])->count();
+        $sellersCount = User::where('role', 'seller')->count();
+        $professionalsCount = User::where('role', 'professional')->count();
+        $institutesCount = Seller::where(function ($q) {
+            $q->where('account_type', 'like', '%Institute%')
+              ->orWhere('account_type', 'like', '%Company%');
+        })->count();
+        $inactiveCount = Seller::whereIn('seller_status', ['Inactive', 'Suspended', 'inactive', 'suspended'])->count();
+        $activeCount = max(0, $totalUsers - $inactiveCount);
+
+        $stats = [
+            'total_users'     => number_format($totalUsers),
+            'students'        => number_format($studentsCount),
+            'professionals'   => number_format($professionalsCount),
+            'institutes'      => number_format($institutesCount),
+            'sellers'         => number_format($sellersCount),
+            'active_users'    => number_format($activeCount),
+            'inactive_users'  => number_format($inactiveCount),
+        ];
 
         return view('admin.users.index', [
             'users'          => $allUsers->values(),
@@ -397,7 +411,7 @@ class AdminUserController extends Controller
     }
 
     /**
-     * Store new user from admin.
+     * Store new user from admin with automatic Seller profile generation if role is seller.
      */
     public function store(Request $request)
     {
@@ -409,15 +423,38 @@ class AdminUserController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'phone'    => $validated['phone'] ?? null,
-            'role'     => $validated['role'],
-            'password' => Hash::make($validated['password']),
+        $user = User::create([
+            'name'              => $validated['name'],
+            'email'             => $validated['email'],
+            'phone'             => $validated['phone'] ?? null,
+            'role'              => $validated['role'],
+            'password'          => Hash::make($validated['password']),
+            'email_verified_at' => now(),
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User ' . $validated['name'] . ' created successfully.');
+        // Auto-create Seller record & store details if created as Seller
+        if ($validated['role'] === 'seller') {
+            $seller = Seller::create([
+                'user_id'             => $user->id,
+                'seller_code'         => 'DC-SELL-' . str_pad((string)$user->id, 6, '0', STR_PAD_LEFT),
+                'account_type'        => Seller::ACCOUNT_TYPE_INSTITUTE,
+                'seller_status'       => Seller::STATUS_ACTIVE,
+                'verification_status' => Seller::VERIFICATION_VERIFIED,
+                'registration_date'   => now(),
+                'approved_at'         => now(),
+                'approved_by'         => \Illuminate\Support\Facades\Auth::id() ?? 1,
+            ]);
+
+            \App\Models\SellerBusinessDetail::create([
+                'seller_id'     => $seller->id,
+                'business_name' => $user->name . "'s Academy",
+                'business_email'=> $user->email,
+                'business_phone'=> $user->phone,
+                'city'          => 'Ahmedabad',
+            ]);
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'Member ' . $validated['name'] . ' created successfully' . ($validated['role'] === 'seller' ? ' with verified seller portal permissions.' : '.'));
     }
 
     /**
