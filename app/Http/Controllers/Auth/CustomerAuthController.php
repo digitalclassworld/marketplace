@@ -102,9 +102,10 @@ class CustomerAuthController extends Controller
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Logged in successfully as Customer!',
-                'user'    => [
+                'success'    => true,
+                'message'    => 'Logged in successfully as Customer!',
+                'csrf_token' => csrf_token(),
+                'user'       => [
                     'id'    => $user->id,
                     'name'  => $user->name,
                     'email' => $user->email,
@@ -159,9 +160,10 @@ class CustomerAuthController extends Controller
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Your customer account has been created successfully!',
-                    'user'    => [
+                    'success'    => true,
+                    'message'    => 'Your customer account has been created successfully!',
+                    'csrf_token' => csrf_token(),
+                    'user'       => [
                         'id'    => $user->id,
                         'name'  => $user->name,
                         'email' => $user->email,

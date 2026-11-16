@@ -19,6 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Request::HEADER_X_FORWARDED_AWS_ELB
         );
 
+        $middleware->validateCsrfTokens(except: [
+            'cart/*',
+            'cart*',
+            'cart/checkout',
+            'refresh-csrf',
+        ]);
+
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
             if ($request->is('admin*') || $request->is('super/admin*')) {
                 return route('admin.login');

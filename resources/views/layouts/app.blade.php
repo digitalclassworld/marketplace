@@ -1434,6 +1434,10 @@
 
                 const data = await res.json();
                 if (data.success) {
+                    if (data.csrf_token) {
+                        document.querySelectorAll('meta[name="csrf-token"]').forEach(m => m.setAttribute('content', data.csrf_token));
+                        document.querySelectorAll('input[name="_token"]').forEach(i => i.value = data.csrf_token);
+                    }
                     window.DC_AUTH = {
                         isLoggedIn: true,
                         isCustomer: true,
@@ -1516,6 +1520,10 @@
 
                 const data = await res.json();
                 if (data.success) {
+                    if (data.csrf_token) {
+                        document.querySelectorAll('meta[name="csrf-token"]').forEach(m => m.setAttribute('content', data.csrf_token));
+                        document.querySelectorAll('input[name="_token"]').forEach(i => i.value = data.csrf_token);
+                    }
                     window.DC_AUTH = {
                         isLoggedIn: true,
                         isCustomer: true,
@@ -1769,15 +1777,41 @@
             };
 
             try {
-                const res = await fetch('{{ route("cart.checkout") }}', {
+                let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                let res = await fetch('{{ route("cart.checkout") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify(payload)
                 });
+
+                // Auto-refresh token and seamlessly retry if 419 session expired occurs
+                if (res.status === 419) {
+                    try {
+                        const refreshRes = await fetch('{{ route("refresh-csrf") }}');
+                        const refreshData = await refreshRes.json();
+                        if (refreshData && refreshData.token) {
+                            csrfToken = refreshData.token;
+                            document.querySelectorAll('meta[name="csrf-token"]').forEach(m => m.setAttribute('content', csrfToken));
+                            document.querySelectorAll('input[name="_token"]').forEach(i => i.value = csrfToken);
+
+                            res = await fetch('{{ route("cart.checkout") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify(payload)
+                            });
+                        }
+                    } catch (retryErr) {
+                        console.error('CSRF auto-recovery failed:', retryErr);
+                    }
+                }
 
                 const data = await res.json();
 
