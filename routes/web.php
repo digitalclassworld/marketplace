@@ -38,6 +38,17 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+Route::get('/debug-db-status', function () {
+    return response()->json([
+        'businesses'     => \App\Models\BusinessListing::all(['id', 'seller_id', 'business_name', 'status']),
+        'seller_details' => \App\Models\SellerBusinessDetail::all(['id', 'seller_id', 'business_name', 'city']),
+        'sellers'        => \App\Models\Seller::with('user:id,name,email')->get(['id', 'user_id', 'seller_code', 'seller_status']),
+        'courses'        => \App\Models\Course::all(['id', 'seller_id', 'title', 'status']),
+        'services'       => \App\Models\Service::all(['id', 'seller_id', 'title', 'status']),
+        'products'       => \App\Models\Product::all(['id', 'seller_id', 'title', 'status']),
+    ]);
+});
+
 // Public Marketplace Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/courses', [HomeController::class, 'courses'])->name('courses');
