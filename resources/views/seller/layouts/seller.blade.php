@@ -358,30 +358,14 @@
     <!-- ================= SELLER SIDEBAR (Page 4 Reference) ================= -->
     <aside class="dc-sidebar" id="sellerSidebar">
         <!-- Brand -->
-        <a href="{{ route('seller.dashboard') }}" class="dc-sidebar-brand d-flex align-items-center gap-2">
-            <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 34px; width: auto; background: white; padding: 4px 8px; border-radius: 8px;">
-            <span class="badge bg-primary text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.05em;">Seller</span>
+        <a href="{{ route('seller.dashboard') }}" class="dc-sidebar-brand d-flex align-items-center justify-content-between">
+            <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 46px; width: auto; background: #ffffff; padding: 6px 12px; border-radius: 10px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+            <span class="badge bg-primary text-uppercase px-2.5 py-1" style="font-size: 0.7rem; letter-spacing: 0.06em; font-weight: 700;">Seller</span>
             <span class="visually-hidden">Digital Class</span>
         </a>
 
-        <!-- Logged-in Seller Mini Profile -->
-        <div class="dc-sidebar-user">
-            <div class="position-relative" style="width: 38px; height: 38px; flex-shrink: 0;">
-                <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover; border: 2px solid rgba(255,255,255,0.15);" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0066ff&color=fff';">
-                <span class="position-absolute bottom-0 end-0 rounded-circle bg-success" style="width: 10px; height: 10px; border: 2px solid var(--dc-sidebar-bg);"></span>
-            </div>
-            <div class="overflow-hidden">
-                <div class="text-white fw-bold text-truncate" style="font-size: 0.875rem;">
-                    {{ Auth::user()->name }}
-                </div>
-                <div class="text-primary fw-semibold font-monospace text-truncate" style="font-size: 0.725rem;">
-                    {{ Auth::user()->seller?->seller_code ?? 'SELLER' }}
-                </div>
-            </div>
-        </div>
-
         <!-- Menu Navigation (Page 4 Design Match) -->
-        <ul class="dc-sidebar-menu">
+        <ul class="dc-sidebar-menu mt-2">
             <!-- 1. Dashboard (Active Blue Pill) -->
             <li class="dc-menu-item">
                 <a href="{{ route('seller.dashboard') }}" class="dc-menu-link {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
