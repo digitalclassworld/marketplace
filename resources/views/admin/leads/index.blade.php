@@ -282,9 +282,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['qualified_leads'] ?? '312' }}</h2>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['qualified_leads'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['qualified_sub'] ?? '50% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['qualified_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -298,9 +298,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['demo_scheduled'] ?? '186' }}</h2>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['demo_scheduled'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['demo_sub'] ?? '30% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['demo_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -314,9 +314,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['converted'] ?? '68' }}</h2>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['converted'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['converted_sub'] ?? '11% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['converted_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -330,9 +330,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['not_interested'] ?? '58' }}</h2>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['not_interested'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['not_interested_sub'] ?? '9% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['not_interested_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
     </div>

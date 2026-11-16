@@ -154,10 +154,10 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['total'] ?? '1,248' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ 12%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['total'] ?? '0' }}</span>
+                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['total_growth'] ?? '0%' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">+132 this month</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['total_sub'] ?? '+0 this month' }}</div>
             </div>
         </div>
 
@@ -171,10 +171,10 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['active'] ?? '982' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ 15%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['active'] ?? '0' }}</span>
+                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['active_growth'] ?? '0%' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">78% of total</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['active_sub'] ?? '0% of total' }}</div>
             </div>
         </div>
 
@@ -188,10 +188,12 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['pending'] ?? '86' }}</span>
-                    <span class="badge bg-warning-subtle text-warning small fw-semibold">↑ 20%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['pending'] ?? '0' }}</span>
+                    @if(!empty($stats['pending']) && $stats['pending'] != '0')
+                        <span class="badge bg-warning-subtle text-warning small fw-semibold">↑ {{ $stats['pending_growth'] ?? '0%' }}</span>
+                    @endif
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">Needs review</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['pending_sub'] ?? 'Needs review' }}</div>
             </div>
         </div>
 
@@ -205,10 +207,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['suspended'] ?? '34' }}</span>
-                    <span class="text-muted small">-</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['suspended'] ?? '0' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">Policy violation</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['suspended_sub'] ?? 'None suspended' }}</div>
             </div>
         </div>
 
@@ -222,10 +223,12 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['total_revenue'] ?? '₹18,72,450' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ 28%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['total_revenue'] ?? '₹0.00' }}</span>
+                    @if(!empty($stats['revenue_growth']) && $stats['revenue_growth'] != '0%')
+                        <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['revenue_growth'] }}</span>
+                    @endif
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">This month</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['revenue_sub'] ?? '+₹0.00 this month' }}</div>
             </div>
         </div>
 
@@ -233,6 +236,18 @@
         <div class="col-12 col-sm-6 col-xl-2">
             <div class="seller-kpi-card h-100">
                 <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-medium">Payout Due</span>
+                    <div class="kpi-icon-circle kpi-icon-blue">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['payout_due'] ?? '₹0.00' }}</span>
+                </div>
+                <div class="text-muted" style="font-size: 0.75rem;">Pending settlements</div>
+            </div>
+        </div>
+    </div>
                     <span class="text-muted small fw-medium">Payout Due</span>
                     <div class="kpi-icon-circle kpi-icon-sky">
                         <i class="fa-solid fa-wallet"></i>

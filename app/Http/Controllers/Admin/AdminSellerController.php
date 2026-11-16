@@ -139,20 +139,45 @@ class AdminSellerController extends Controller
 
         // Real database statistics and counts
         $totalCount = Seller::count();
+        $sellersThisMonth = Seller::where('created_at', '>=', now()->startOfMonth())->count();
+        $sellersGrowth = $totalCount > 0 ? max(0, round(($sellersThisMonth / $totalCount) * 100)) : 0;
+
         $activeCount = Seller::whereIn('seller_status', [Seller::STATUS_ACTIVE, 'Active', 'active'])->count();
+        $activePct = $totalCount > 0 ? round(($activeCount / $totalCount) * 100) : 0;
+
         $pendingCount = Seller::whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending Approval', 'Pending', 'pending'])->count();
+        $pendingPct = $totalCount > 0 ? round(($pendingCount / $totalCount) * 100) : 0;
+
         $suspendedCount = Seller::whereIn('seller_status', [Seller::STATUS_SUSPENDED, 'Suspended', 'suspended'])->count();
+        $suspendedPct = $totalCount > 0 ? round(($suspendedCount / $totalCount) * 100) : 0;
+
         $rejectedCount = Seller::whereIn('seller_status', [Seller::STATUS_REJECTED, 'Rejected', 'rejected'])->count();
 
-        $totalRevenueAmount = Order::where('status', '!=', 'cancelled')->sum('amount') ?? 0;
+        $totalRevenueAmount = (float) (Order::where('status', '!=', 'cancelled')->sum('amount') ?? 0);
+        $revenueThisMonth = (float) (Order::where('status', '!=', 'cancelled')->where('created_at', '>=', now()->startOfMonth())->sum('amount') ?? 0);
+        $revenueGrowth = $totalRevenueAmount > 0 ? round(($revenueThisMonth / $totalRevenueAmount) * 100) : 0;
 
         $stats = [
             'total'          => number_format($totalCount),
+            'total_growth'   => $sellersGrowth . '%',
+            'total_sub'      => '+' . number_format($sellersThisMonth) . ' this month',
+
             'active'         => number_format($activeCount),
+            'active_growth'  => $activePct . '%',
+            'active_sub'     => $activePct . '% of total',
+
             'pending'        => number_format($pendingCount),
+            'pending_growth' => $pendingPct . '%',
+            'pending_sub'    => $pendingCount > 0 ? 'Needs review' : 'All reviewed',
+
             'suspended'      => number_format($suspendedCount),
-            'total_revenue'  => '₹' . number_format($totalRevenueAmount),
-            'payout_due'     => '₹0',
+            'suspended_sub'  => $suspendedCount > 0 ? $suspendedPct . '% of total' : 'None suspended',
+
+            'total_revenue'  => '₹' . number_format($totalRevenueAmount, 2),
+            'revenue_growth' => $revenueGrowth . '%',
+            'revenue_sub'    => '+₹' . number_format($revenueThisMonth, 2) . ' this month',
+
+            'payout_due'     => '₹' . number_format($totalRevenueAmount * 0.85, 2),
         ];
         $counts = [
             'all'       => $totalCount,

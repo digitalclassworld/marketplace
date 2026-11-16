@@ -337,9 +337,18 @@ class AdminUserController extends Controller
 
         // Live Real Database KPI Statistics
         $totalUsers = User::count();
+        $usersThisMonth = User::where('created_at', '>=', now()->startOfMonth())->count();
+        $usersGrowth = $totalUsers > 0 ? max(0, round(($usersThisMonth / $totalUsers) * 100)) : 0;
+
         $studentsCount = User::whereIn('role', ['user', 'student', 'customer'])->count();
+        $studentsPct = $totalUsers > 0 ? round(($studentsCount / $totalUsers) * 100) : 0;
+
         $sellersCount = User::where('role', 'seller')->count();
+        $sellersPct = $totalUsers > 0 ? round(($sellersCount / $totalUsers) * 100) : 0;
+
         $professionalsCount = User::where('role', 'professional')->count();
+        $professionalsPct = $totalUsers > 0 ? round(($professionalsCount / $totalUsers) * 100) : 0;
+
         $institutesCount = 0;
         if (Schema::hasTable('sellers')) {
             $institutesCount = Seller::where(function ($q) {
@@ -347,20 +356,44 @@ class AdminUserController extends Controller
                   ->orWhere('account_type', 'like', '%Company%');
             })->count();
         }
+        $institutesPct = $totalUsers > 0 ? round(($institutesCount / $totalUsers) * 100) : 0;
+
         $inactiveCount = 0;
         if (Schema::hasTable('sellers')) {
             $inactiveCount = Seller::whereIn('seller_status', ['Inactive', 'Suspended', 'inactive', 'suspended'])->count();
         }
         $activeCount = max(0, $totalUsers - $inactiveCount);
+        $activePct = $totalUsers > 0 ? round(($activeCount / $totalUsers) * 100) : 0;
+        $inactivePct = $totalUsers > 0 ? round(($inactiveCount / $totalUsers) * 100) : 0;
 
         $stats = [
-            'total_users'     => number_format($totalUsers),
-            'students'        => number_format($studentsCount),
-            'professionals'   => number_format($professionalsCount),
-            'institutes'      => number_format($institutesCount),
-            'sellers'         => number_format($sellersCount),
-            'active_users'    => number_format($activeCount),
-            'inactive_users'  => number_format($inactiveCount),
+            'total_users'          => number_format($totalUsers),
+            'users_growth'         => $usersGrowth . '%',
+            'users_sub'            => '+' . number_format($usersThisMonth) . ' this month',
+
+            'students'             => number_format($studentsCount),
+            'students_growth'      => $studentsPct . '%',
+            'students_sub'         => $studentsPct . '% of total',
+
+            'professionals'        => number_format($professionalsCount),
+            'professionals_growth' => $professionalsPct . '%',
+            'professionals_sub'    => $professionalsPct . '% of total',
+
+            'institutes'           => number_format($institutesCount),
+            'institutes_growth'    => $institutesPct . '%',
+            'institutes_sub'       => $institutesPct . '% of total',
+
+            'sellers'              => number_format($sellersCount),
+            'sellers_growth'       => $sellersPct . '%',
+            'sellers_sub'          => $sellersPct . '% of total',
+
+            'active_users'         => number_format($activeCount),
+            'active_growth'        => $activePct . '%',
+            'active_sub'           => $activePct . '% active',
+
+            'inactive_users'       => number_format($inactiveCount),
+            'inactive_growth'      => $inactivePct . '%',
+            'inactive_sub'         => $inactivePct . '% inactive',
         ];
 
         return view('admin.users.index', [

@@ -187,10 +187,10 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['total'] ?? '6,320' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ 14%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['total'] ?? '0' }}</span>
+                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['total_growth'] ?? '0%' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">+780 this month</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['total_sub'] ?? '+0 this month' }}</div>
             </div>
         </div>
 
@@ -204,10 +204,10 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['active'] ?? '5,120' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ 18%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['active'] ?? '0' }}</span>
+                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['active_growth'] ?? '0%' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">81% of total</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['active_sub'] ?? '0% of total' }}</div>
             </div>
         </div>
 
@@ -221,10 +221,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['pending'] ?? '720' }}</span>
-                    <span class="badge bg-danger-subtle text-danger small fw-semibold">↓ 12%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['pending'] ?? '0' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">Needs review</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['pending_sub'] ?? 'All reviewed' }}</div>
             </div>
         </div>
 
@@ -238,9 +237,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['rejected'] ?? '260' }}</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['rejected'] ?? '0' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">4% of total</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['rejected_sub'] ?? 'None rejected' }}</div>
             </div>
         </div>
 
@@ -254,10 +253,10 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['featured'] ?? '380' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ 26%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['featured'] ?? '0' }}</span>
+                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['featured_growth'] ?? '0%' }}</span>
                 </div>
-                <div class="text-muted" style="font-size: 0.75rem;">6% of total</div>
+                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['featured_sub'] ?? '0% of total' }}</div>
             </div>
         </div>
 
@@ -271,8 +270,11 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['top_performing'] ?? '420' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ 32%</span>
+                    <span class="fs-4 fw-bold text-dark">{{ $stats['top_performing'] ?? '0' }}</span>
+                </div>
+                <div class="text-muted" style="font-size: 0.75rem;">Active in catalog</div>
+            </div>
+        </div>
                 </div>
                 <div class="text-muted" style="font-size: 0.75rem;">Based on views & inquiries</div>
             </div>

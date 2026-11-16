@@ -268,9 +268,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['approved'] ?? '3,180' }}</h2>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['approved'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['approved_sub'] ?? '93% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['approved_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -283,9 +283,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['pending'] ?? '160' }}</h2>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['pending'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['pending_sub'] ?? '5% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['pending_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -298,9 +298,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['rejected'] ?? '80' }}</h2>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['rejected'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['rejected_sub'] ?? '2% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['rejected_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
     </div>

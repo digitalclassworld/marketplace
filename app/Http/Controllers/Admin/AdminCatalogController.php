@@ -37,7 +37,7 @@ class AdminCatalogController extends Controller
             \Illuminate\Support\Facades\Log::warning('DB error in AdminCatalogController@courses: ' . $e->getMessage());
         }
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         // Curated courses matching screenshot pixel-for-pixel (only on local/testing)
         $curatedCourses = $showDummy ? [
@@ -450,13 +450,34 @@ class AdminCatalogController extends Controller
             $approvedCount = Course::where('status', 'approved')->count();
             $pendingCount = Course::where('status', 'pending')->count();
             $rejectedCount = Course::where('status', 'rejected')->count();
+            $featuredCount = Course::where('is_featured', true)->count();
+            $coursesThisMonth = Course::where('created_at', '>=', now()->startOfMonth())->count();
+            $coursesGrowth = $totalCount > 0 ? round(($coursesThisMonth / $totalCount) * 100) : 0;
+            $activePct = $totalCount > 0 ? round(($approvedCount / $totalCount) * 100) : 0;
+            $rejectedPct = $totalCount > 0 ? round(($rejectedCount / $totalCount) * 100) : 0;
+            $featuredPct = $totalCount > 0 ? round(($featuredCount / $totalCount) * 100) : 0;
+
             $stats = [
                 'total'          => number_format($totalCount),
+                'total_growth'   => $coursesGrowth . '%',
+                'total_sub'      => '+' . number_format($coursesThisMonth) . ' this month',
+
                 'active'         => number_format($approvedCount),
+                'active_growth'  => $activePct . '%',
+                'active_sub'     => $activePct . '% of total',
+
                 'pending'        => number_format($pendingCount),
+                'pending_sub'    => $pendingCount > 0 ? 'Needs review' : 'All reviewed',
+
                 'rejected'       => number_format($rejectedCount),
-                'featured'       => number_format(Course::where('is_featured', true)->count()),
+                'rejected_sub'   => $rejectedCount > 0 ? $rejectedPct . '% of total' : 'None rejected',
+
+                'featured'       => number_format($featuredCount),
+                'featured_growth'=> $featuredPct . '%',
+                'featured_sub'   => $featuredPct . '% of total',
+
                 'top_performing' => number_format($approvedCount),
+                'top_sub'        => $approvedCount > 0 ? 'Active in catalog' : 'No courses',
             ];
             $counts = [
                 'all'      => $totalCount,
@@ -545,7 +566,7 @@ class AdminCatalogController extends Controller
         // Fetch DB Services
         $dbServices = Service::with(['seller.businessDetail', 'seller.user'])->latest()->get();
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         // 10 Curated Services matching Screenshot (only on local/testing)
         $curatedServices = $showDummy ? [
@@ -964,23 +985,44 @@ class AdminCatalogController extends Controller
             $approvedCount = Service::where('status', 'approved')->count();
             $pendingCount = Service::where('status', 'pending')->count();
             $rejectedCount = Service::where('status', 'rejected')->count();
+            $featuredCount = Service::where('is_featured', true)->count();
+            $servicesThisMonth = Service::where('created_at', '>=', now()->startOfMonth())->count();
+            $servicesGrowth = $totalCount > 0 ? round(($servicesThisMonth / $totalCount) * 100) : 0;
+            $activePct = $totalCount > 0 ? round(($approvedCount / $totalCount) * 100) : 0;
+            $rejectedPct = $totalCount > 0 ? round(($rejectedCount / $totalCount) * 100) : 0;
+            $featuredPct = $totalCount > 0 ? round(($featuredCount / $totalCount) * 100) : 0;
+
             $stats = [
                 'total'          => number_format($totalCount),
+                'total_growth'   => $servicesGrowth . '%',
+                'total_sub'      => '+' . number_format($servicesThisMonth) . ' this month',
+
                 'active'         => number_format($approvedCount),
+                'active_growth'  => $activePct . '%',
+                'active_sub'     => $activePct . '% of total',
+
                 'pending'        => number_format($pendingCount),
+                'pending_sub'    => $pendingCount > 0 ? 'Needs review' : 'All reviewed',
+
                 'rejected'       => number_format($rejectedCount),
-                'featured'       => number_format(Service::where('is_featured', true)->count()),
+                'rejected_sub'   => $rejectedCount > 0 ? $rejectedPct . '% of total' : 'None rejected',
+
+                'featured'       => number_format($featuredCount),
+                'featured_growth'=> $featuredPct . '%',
+                'featured_sub'   => $featuredPct . '% of total',
+
                 'top_performing' => number_format($approvedCount),
-                'new'            => number_format(Service::where('created_at', '>=', now()->startOfMonth())->count()),
+                'top_sub'        => $approvedCount > 0 ? 'Active in catalog' : 'No services',
+                'new'            => number_format($servicesThisMonth),
             ];
             $counts = [
                 'all'            => $totalCount,
                 'active'         => $approvedCount,
                 'pending'        => $pendingCount,
                 'rejected'       => $rejectedCount,
-                'featured'       => Service::where('is_featured', true)->count(),
+                'featured'       => $featuredCount,
                 'top_performing' => $approvedCount,
-                'new'            => Service::where('created_at', '>=', now()->startOfMonth())->count(),
+                'new'            => $servicesThisMonth,
             ];
         } else {
             $stats = [
@@ -1074,7 +1116,7 @@ class AdminCatalogController extends Controller
 
         $dbProducts = Product::with(['seller.businessDetail', 'seller.user'])->latest()->get();
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         $curatedProducts = $showDummy ? [
             [
@@ -1485,13 +1527,34 @@ class AdminCatalogController extends Controller
             $approvedCount = Product::where('status', 'approved')->count();
             $pendingCount = Product::where('status', 'pending')->count();
             $rejectedCount = Product::where('status', 'rejected')->count();
+            $featuredCount = Product::where('is_featured', true)->count();
+            $productsThisMonth = Product::where('created_at', '>=', now()->startOfMonth())->count();
+            $productsGrowth = $totalCount > 0 ? round(($productsThisMonth / $totalCount) * 100) : 0;
+            $activePct = $totalCount > 0 ? round(($approvedCount / $totalCount) * 100) : 0;
+            $rejectedPct = $totalCount > 0 ? round(($rejectedCount / $totalCount) * 100) : 0;
+            $featuredPct = $totalCount > 0 ? round(($featuredCount / $totalCount) * 100) : 0;
+
             $stats = [
                 'total'          => number_format($totalCount),
+                'total_growth'   => $productsGrowth . '%',
+                'total_sub'      => '+' . number_format($productsThisMonth) . ' this month',
+
                 'active'         => number_format($approvedCount),
+                'active_growth'  => $activePct . '%',
+                'active_sub'     => $activePct . '% of total',
+
                 'pending'        => number_format($pendingCount),
+                'pending_sub'    => $pendingCount > 0 ? 'Needs review' : 'All reviewed',
+
                 'rejected'       => number_format($rejectedCount),
-                'featured'       => number_format(Product::where('is_featured', true)->count()),
+                'rejected_sub'   => $rejectedCount > 0 ? $rejectedPct . '% of total' : 'None rejected',
+
+                'featured'       => number_format($featuredCount),
+                'featured_growth'=> $featuredPct . '%',
+                'featured_sub'   => $featuredPct . '% of total',
+
                 'top_selling'    => number_format($approvedCount),
+                'top_sub'        => $approvedCount > 0 ? 'Active in catalog' : 'No products',
                 'low_stock'      => number_format(Product::where('stock_quantity', '<', 10)->count()),
             ];
             $counts = [
@@ -1499,7 +1562,7 @@ class AdminCatalogController extends Controller
                 'active'      => $approvedCount,
                 'pending'     => $pendingCount,
                 'rejected'    => $rejectedCount,
-                'featured'    => Product::where('is_featured', true)->count(),
+                'featured'    => $featuredCount,
                 'top_selling' => $approvedCount,
                 'low_stock'   => Product::where('stock_quantity', '<', 10)->count(),
             ];
@@ -1596,7 +1659,7 @@ class AdminCatalogController extends Controller
 
         $dbListings = BusinessListing::with(['seller.businessDetail', 'seller.user'])->latest()->get();
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         $curatedListings = $showDummy ? [
             [
@@ -1974,24 +2037,44 @@ class AdminCatalogController extends Controller
             $approvedCount = BusinessListing::where('status', 'approved')->count();
             $pendingCount = BusinessListing::where('status', 'pending')->count();
             $rejectedCount = BusinessListing::where('status', 'rejected')->count();
+            $featuredCount = BusinessListing::where('is_featured', true)->count();
+            $listingsThisMonth = BusinessListing::where('created_at', '>=', now()->startOfMonth())->count();
+            $listingsGrowth = $totalCount > 0 ? round(($listingsThisMonth / $totalCount) * 100) : 0;
+            $activePct = $totalCount > 0 ? round(($approvedCount / $totalCount) * 100) : 0;
+            $rejectedPct = $totalCount > 0 ? round(($rejectedCount / $totalCount) * 100) : 0;
+            $featuredPct = $totalCount > 0 ? round(($featuredCount / $totalCount) * 100) : 0;
+
             $stats = [
                 'total'          => number_format($totalCount),
+                'total_growth'   => $listingsGrowth . '%',
+                'total_sub'      => '+' . number_format($listingsThisMonth) . ' this month',
+
                 'active'         => number_format($approvedCount),
+                'active_growth'  => $activePct . '%',
+                'active_sub'     => $activePct . '% of total',
+
                 'pending'        => number_format($pendingCount),
+                'pending_sub'    => $pendingCount > 0 ? 'Needs review' : 'All reviewed',
+
                 'rejected'       => number_format($rejectedCount),
-                'featured'       => number_format(BusinessListing::where('is_featured', true)->count()),
+                'rejected_sub'   => $rejectedCount > 0 ? $rejectedPct . '% of total' : 'None rejected',
+
+                'featured'       => number_format($featuredCount),
+                'featured_growth'=> $featuredPct . '%',
+                'featured_sub'   => $featuredPct . '% of total',
+
                 'top_performing' => number_format($approvedCount),
                 'popular'        => number_format($approvedCount),
-                'new'            => number_format(BusinessListing::where('created_at', '>=', now()->startOfMonth())->count()),
+                'new'            => number_format($listingsThisMonth),
             ];
             $counts = [
                 'all'            => $totalCount,
                 'active'         => $approvedCount,
                 'pending'        => $pendingCount,
                 'rejected'       => $rejectedCount,
-                'featured'       => BusinessListing::where('is_featured', true)->count(),
+                'featured'       => $featuredCount,
                 'popular'        => $approvedCount,
-                'new'            => BusinessListing::where('created_at', '>=', now()->startOfMonth())->count(),
+                'new'            => $listingsThisMonth,
             ];
         } else {
             $stats = [

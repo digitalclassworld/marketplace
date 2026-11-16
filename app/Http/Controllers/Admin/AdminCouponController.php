@@ -23,7 +23,7 @@ class AdminCouponController extends Controller
         $statusFilter = $request->query('status');
         $campaignFilter = $request->query('campaign');
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
         $allCoupons = $showDummy ? collect($this->getCuratedCoupons()) : collect();
 
         // Merge DB coupons if any exist
@@ -231,7 +231,7 @@ class AdminCouponController extends Controller
                 'status'         => $dbCoupon->status,
             ];
         } else {
-            $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+            $showDummy = config('marketplace.show_dummy_data', false);
             if (!$showDummy) {
                 abort(404, 'Coupon not found.');
             }

@@ -30,7 +30,7 @@ class AdminMessageController extends Controller
         $unreadOnly = $request->query('unread') === '1';
         $activeTicketId = $request->query('ticket_id');
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         $query = SupportTicket::with('messages')->latest('last_message_at');
 

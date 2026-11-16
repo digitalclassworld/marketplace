@@ -403,9 +403,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['total'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 22%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['total_growth'] ?? '0%' }}</span>
         </div>
-        <div class="stat-sub-text">+1,056 this month</div>
+        <div class="stat-sub-text">{{ $stats['total_sub'] ?? '+0 this month' }}</div>
     </div>
 
     <!-- 2. Active Courses -->
@@ -418,9 +418,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['active'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 18%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['active_growth'] ?? '0%' }}</span>
         </div>
-        <div class="stat-sub-text">85% of total</div>
+        <div class="stat-sub-text">{{ $stats['active_sub'] ?? '0% of total' }}</div>
     </div>
 
     <!-- 3. Pending Approval -->
@@ -433,9 +433,8 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['pending'] }}</span>
-            <span class="stat-trend-tag trend-down"><i class="fa-solid fa-arrow-down"></i> 12%</span>
         </div>
-        <div class="stat-sub-text">Needs review</div>
+        <div class="stat-sub-text">{{ $stats['pending_sub'] ?? 'All reviewed' }}</div>
     </div>
 
     <!-- 4. Rejected -->
@@ -449,7 +448,7 @@
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['rejected'] }}</span>
         </div>
-        <div class="stat-sub-text">5% of total</div>
+        <div class="stat-sub-text">{{ $stats['rejected_sub'] ?? 'None rejected' }}</div>
     </div>
 
     <!-- 5. Featured -->
@@ -462,9 +461,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['featured'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 28%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['featured_growth'] ?? '0%' }}</span>
         </div>
-        <div class="stat-sub-text">7% of total</div>
+        <div class="stat-sub-text">{{ $stats['featured_sub'] ?? '0% of total' }}</div>
     </div>
 
     <!-- 6. Top Performing -->
@@ -477,9 +476,8 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['top_performing'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 35%</span>
         </div>
-        <div class="stat-sub-text">Based on sales &amp; reviews</div>
+        <div class="stat-sub-text">{{ $stats['top_sub'] ?? 'Active in catalog' }}</div>
     </div>
 </div>
 

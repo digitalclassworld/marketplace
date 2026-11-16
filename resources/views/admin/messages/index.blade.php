@@ -404,9 +404,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-1.5 mb-1">
-                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['open_tickets'] ?? '180' }}</h2>
+                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['open_tickets'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['open_sub'] ?? '15% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['open_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -420,9 +420,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-1.5 mb-1">
-                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['in_progress'] ?? '320' }}</h2>
+                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['in_progress'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['in_progress_sub'] ?? '26% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['in_progress_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -436,9 +436,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-1.5 mb-1">
-                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['waiting'] ?? '160' }}</h2>
+                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['waiting'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['waiting_sub'] ?? '13% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['waiting_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 
@@ -452,9 +452,9 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-1.5 mb-1">
-                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['resolved'] ?? '540' }}</h2>
+                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['resolved'] ?? '0' }}</h2>
                 </div>
-                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['resolved_sub'] ?? '44% of total' }}</span>
+                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['resolved_sub'] ?? '0% of total' }}</span>
             </div>
         </div>
 

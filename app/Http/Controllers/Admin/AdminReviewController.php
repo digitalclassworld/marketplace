@@ -26,7 +26,7 @@ class AdminReviewController extends Controller
         $withPhotos = $request->query('with_photos');
         $flaggedOnly = $request->query('flagged_only');
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         $dbReviews = Review::latest()->get();
 

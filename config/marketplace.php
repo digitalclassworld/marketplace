@@ -11,6 +11,6 @@ return [
     | On local development and testing, curated UI fallback data is shown.
     |
     */
-    'show_dummy_data' => env('SHOW_DUMMY_DATA', env('APP_ENV') === 'local' || env('APP_ENV') === 'testing'),
+    'show_dummy_data' => env('SHOW_DUMMY_DATA', false),
 ];
 

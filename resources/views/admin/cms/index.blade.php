@@ -199,10 +199,10 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['total_views'] ?? '1,24,560' }}</h2>
-                    <span class="badge bg-success-subtle text-success fw-bold font-monospace" style="font-size: 0.72rem;">{{ $stats['views_growth'] ?? '↑ 32%' }}</span>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['total_views'] ?? '0' }}</h2>
+                    <span class="badge bg-success-subtle text-success fw-bold font-monospace" style="font-size: 0.72rem;">{{ $stats['views_growth'] ?? '↑ 0%' }}</span>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['views_sub'] ?? '+28,400 this month' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['views_sub'] ?? '+0 this month' }}</span>
             </div>
         </div>
 
@@ -216,10 +216,10 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['unique_visitors'] ?? '42,380' }}</h2>
-                    <span class="badge bg-success-subtle text-success fw-bold font-monospace" style="font-size: 0.72rem;">{{ $stats['visitors_growth'] ?? '↑ 26%' }}</span>
+                    <h2 class="h3 fw-bold text-dark mb-0">{{ $stats['unique_visitors'] ?? '0' }}</h2>
+                    <span class="badge bg-success-subtle text-success fw-bold font-monospace" style="font-size: 0.72rem;">{{ $stats['visitors_growth'] ?? '↑ 0%' }}</span>
                 </div>
-                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['visitors_sub'] ?? '+8,920 this month' }}</span>
+                <span class="text-muted" style="font-size: 0.75rem;">{{ $stats['visitors_sub'] ?? '+0 this month' }}</span>
             </div>
         </div>
 

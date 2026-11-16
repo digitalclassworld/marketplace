@@ -24,7 +24,7 @@ class AdminPromotionController extends Controller
         $statusFilter = $request->query('status');
         $platformFilter = $request->query('platform');
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
         $allBanners = $showDummy ? collect($this->getCuratedBanners()) : collect();
 
         // Merge any DB promotions if exist

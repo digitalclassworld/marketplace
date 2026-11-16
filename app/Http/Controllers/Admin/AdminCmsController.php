@@ -25,7 +25,7 @@ class AdminCmsController extends Controller
         $authorFilter = $request->query('author');
         $statusFilter = $request->query('status');
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         $query = Post::latest('published_at');
 

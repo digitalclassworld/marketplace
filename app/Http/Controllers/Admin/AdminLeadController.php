@@ -25,7 +25,7 @@ class AdminLeadController extends Controller
         $assignedFilter = $request->query('assigned_to');
         $activeLeadId = $request->query('lead_id');
 
-        $showDummy = config('marketplace.show_dummy_data', app()->environment('local', 'testing'));
+        $showDummy = config('marketplace.show_dummy_data', false);
 
         $query = Lead::latest();
 

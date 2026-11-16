@@ -489,9 +489,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['total_users'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 12%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['users_growth'] }}</span>
         </div>
-        <div class="stat-sub-text">+13,250 this month</div>
+        <div class="stat-sub-text">{{ $stats['users_sub'] }}</div>
     </div>
 
     <!-- 2. Students -->
@@ -504,9 +504,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['students'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 15%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['students_growth'] }}</span>
         </div>
-        <div class="stat-sub-text">66% of total</div>
+        <div class="stat-sub-text">{{ $stats['students_sub'] }}</div>
     </div>
 
     <!-- 3. Professionals -->
@@ -519,9 +519,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['professionals'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 18%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['professionals_growth'] }}</span>
         </div>
-        <div class="stat-sub-text">15% of total</div>
+        <div class="stat-sub-text">{{ $stats['professionals_sub'] }}</div>
     </div>
 
     <!-- 4. Institutes -->
@@ -534,9 +534,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['institutes'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 14%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['institutes_growth'] }}</span>
         </div>
-        <div class="stat-sub-text">5% of total</div>
+        <div class="stat-sub-text">{{ $stats['institutes_sub'] }}</div>
     </div>
 
     <!-- 5. Sellers -->
@@ -549,9 +549,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['sellers'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 10%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['sellers_growth'] }}</span>
         </div>
-        <div class="stat-sub-text">1% of total</div>
+        <div class="stat-sub-text">{{ $stats['sellers_sub'] }}</div>
     </div>
 
     <!-- 6. Active Users -->
@@ -564,9 +564,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['active_users'] }}</span>
-            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> 16%</span>
+            <span class="stat-trend-tag trend-up"><i class="fa-solid fa-arrow-up"></i> {{ $stats['active_growth'] }}</span>
         </div>
-        <div class="stat-sub-text">87% active</div>
+        <div class="stat-sub-text">{{ $stats['active_sub'] }}</div>
     </div>
 
     <!-- 7. Inactive Users -->
@@ -579,9 +579,9 @@
         </div>
         <div class="stat-card-num-row">
             <span class="stat-main-number">{{ $stats['inactive_users'] }}</span>
-            <span class="stat-trend-tag trend-down"><i class="fa-solid fa-arrow-down"></i> 8%</span>
+            <span class="stat-trend-tag trend-down"><i class="fa-solid fa-arrow-down"></i> {{ $stats['inactive_growth'] }}</span>
         </div>
-        <div class="stat-sub-text">13% inactive</div>
+        <div class="stat-sub-text">{{ $stats['inactive_sub'] }}</div>
     </div>
 </div>
 

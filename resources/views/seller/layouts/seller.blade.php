@@ -499,14 +499,24 @@
                 @endif
             </li>
 
-            <!-- 7. Orders (Active & Expandable matching screenshot) -->
+            <!-- 7. Orders -->
+            @php
+                $sellerOrdersCount = 0;
+                $sellerUnreadMsgCount = 0;
+                if (Auth::check() && Auth::user()->seller) {
+                    $sellerOrdersCount = \App\Models\Order::where('seller_id', Auth::user()->seller->id)->count();
+                    $sellerUnreadMsgCount = (int) \App\Models\Conversation::where('seller_id', Auth::user()->seller->id)->sum('unread_count');
+                }
+            @endphp
             <li class="dc-menu-item">
                 <a href="{{ route('seller.orders.index') }}" class="dc-menu-link {{ request()->routeIs('seller.orders.*') ? 'active' : '' }} d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <i class="fa-solid fa-cart-shopping menu-icon"></i>
                         <span>Orders</span>
                     </div>
-                    <span class="badge rounded-pill fw-bold" style="background: {{ request()->routeIs('seller.orders.*') ? 'rgba(255,255,255,0.25)' : '#0066ff' }}; color: #ffffff; font-size: 0.65rem; padding: 0.2rem 0.5rem;">24</span>
+                    @if($sellerOrdersCount > 0)
+                        <span class="badge rounded-pill fw-bold" style="background: {{ request()->routeIs('seller.orders.*') ? 'rgba(255,255,255,0.25)' : '#0066ff' }}; color: #ffffff; font-size: 0.65rem; padding: 0.2rem 0.5rem;">{{ $sellerOrdersCount }}</span>
+                    @endif
                 </a>
                 @if(request()->routeIs('seller.orders.*'))
                     <ul class="list-unstyled ps-4 pe-2 pt-1 pb-1 mb-1" style="background: rgba(0, 0, 0, 0.2); border-radius: 8px;">
@@ -554,16 +564,9 @@
                         <i class="fa-solid fa-comments menu-icon"></i>
                         <span>Messages</span>
                     </div>
-                    @php
-                        $unreadMsgCount = 3;
-                        if (Auth::check() && Auth::user()->seller) {
-                            $actualUnread = \App\Models\Conversation::where('seller_id', Auth::user()->seller->id)->sum('unread_count');
-                            if ($actualUnread > 0) {
-                                $unreadMsgCount = $actualUnread;
-                            }
-                        }
-                    @endphp
-                    <span class="badge rounded-pill fw-bold" style="background: {{ request()->routeIs('seller.messages.*') ? 'rgba(255,255,255,0.25)' : '#0066ff' }}; color: #ffffff; font-size: 0.65rem; padding: 0.2rem 0.5rem;">{{ $unreadMsgCount }}</span>
+                    @if($sellerUnreadMsgCount > 0)
+                        <span class="badge rounded-pill fw-bold" style="background: {{ request()->routeIs('seller.messages.*') ? 'rgba(255,255,255,0.25)' : '#0066ff' }}; color: #ffffff; font-size: 0.65rem; padding: 0.2rem 0.5rem;">{{ $sellerUnreadMsgCount }}</span>
+                    @endif
                 </a>
             </li>
 
