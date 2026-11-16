@@ -51,8 +51,6 @@
         line-height: 1.5;
         margin-bottom: 1.45rem;
 
-
-        
     }
 
     /* Floating Hero Search Box (AirBNB / Google Style) */

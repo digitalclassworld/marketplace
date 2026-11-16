@@ -454,27 +454,97 @@
                         </span>
                     </button>
 
-                    <!-- Auth Buttons -->
+                    <!-- Auth Buttons (Customer vs Seller Awareness) -->
                     @auth
-                        @if(Auth::user()->isSeller())
-                            <a href="{{ route('seller.dashboard') }}" class="btn btn-primary btn-sm px-3 fw-bold" style="background-color: #0066ff;">
-                                <i class="fa-solid fa-gauge-high me-1"></i> Seller Dashboard
-                            </a>
+                        @if(Auth::user()->isCustomer())
+                            <!-- Customer Account Menu -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-1.5 rounded-pill px-2.5 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 26px; height: 26px; font-size: 0.75rem;">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <span class="fw-semibold text-dark small text-truncate" style="max-width: 110px;">{{ Auth::user()->name }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-1 py-1" style="min-width: 200px;">
+                                    <li class="px-3 py-2 border-bottom">
+                                        <div class="fw-bold text-dark small">{{ Auth::user()->name }}</div>
+                                        <div class="text-muted text-truncate" style="font-size: 0.72rem;">{{ Auth::user()->email }}</div>
+                                        <span class="badge bg-primary-subtle text-primary mt-1" style="font-size: 0.65rem;">Customer Account</span>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item small py-2" href="{{ route('customer.orders') }}">
+                                            <i class="fa-solid fa-bag-shopping me-2 text-primary"></i> My Orders & Purchases
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li>
+                                        <form method="POST" action="{{ route('customer.logout') }}" class="m-0">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item small py-2 text-danger">
+                                                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        @elseif(Auth::user()->isSeller())
+                            <!-- Logged in as Seller -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-primary dropdown-toggle d-flex align-items-center gap-1.5 rounded-pill px-3 py-1.5 fw-semibold" style="background-color: #0066ff;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-store"></i>
+                                    <span class="small">Seller: {{ \Illuminate\Support\Str::limit(Auth::user()->name, 12) }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-1 py-1" style="min-width: 220px;">
+                                    <li class="px-3 py-2 border-bottom">
+                                        <div class="fw-bold text-dark small">{{ Auth::user()->name }}</div>
+                                        <span class="badge bg-warning-subtle text-warning-emphasis" style="font-size: 0.65rem;">Seller Mode</span>
+                                        <div class="text-muted mt-1" style="font-size: 0.7rem; line-height: 1.3;">To make purchases, customer authentication is required.</div>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item small py-2" href="{{ route('seller.dashboard') }}">
+                                            <i class="fa-solid fa-gauge-high me-2 text-primary"></i> Seller Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item small py-2 text-primary" href="javascript:void(0)" onclick="openCustomerAuthModal('login')">
+                                            <i class="fa-solid fa-user-plus me-2"></i> Login as Customer
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li>
+                                        <form method="POST" action="{{ route('seller.logout') }}" class="m-0">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item small py-2 text-danger">
+                                                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout Seller
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         @elseif(Auth::user()->isSuperAdmin())
-                            <a href="{{ route('admin.dashboard') }}" class="btn btn-dark btn-sm px-3 fw-bold" style="background-color: #0f172a;">
-                                <i class="fa-solid fa-shield-halved text-warning me-1"></i> Admin Dashboard
-                            </a>
-                        @else
-                            <a href="{{ route('seller.register') }}" class="btn btn-primary btn-sm px-3 fw-bold" style="background-color: #0066ff;">
-                                Become a Seller
-                            </a>
+                            <!-- Logged in as Admin -->
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-dark btn-sm px-3 fw-bold" style="background-color: #0f172a;">
+                                    <i class="fa-solid fa-shield-halved text-warning me-1"></i> Admin Dashboard
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}" class="d-inline m-0">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger p-1.5 rounded-circle" title="Logout">
+                                        <i class="fa-solid fa-power-off" style="font-size: 0.75rem;"></i>
+                                    </button>
+                                </form>
+                            </div>
                         @endif
                     @else
-                        <a href="{{ route('seller.login') }}" class="btn btn-outline-secondary btn-sm px-3 fw-semibold">
-                            Login
-                        </a>
-                        <a href="{{ route('seller.register') }}" class="btn btn-primary btn-sm px-3 fw-bold" style="background-color: #0066ff;">
+                        <!-- Guest: Customer Login & Sign Up -->
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-semibold" onclick="openCustomerAuthModal('login')">
+                            <i class="fa-regular fa-user me-1"></i> Login
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm px-3 fw-bold" style="background-color: #0066ff;" onclick="openCustomerAuthModal('register')">
                             Sign Up
+                        </button>
+                        <a href="{{ route('seller.register') }}" class="small text-muted text-decoration-none d-none d-lg-inline ms-1" style="font-size: 0.75rem;" title="Start selling courses & services">
+                            Become a Seller
                         </a>
                     @endauth
                 </div>
@@ -901,6 +971,144 @@
         </div>
     </div>
 
+    <!-- ============================================================================
+         CUSTOMER AUTHENTICATION MODAL (Required for Cart & Orders)
+         ============================================================================ -->
+    <div class="modal fade" id="customerAuthModal" tabindex="-1" aria-labelledby="customerAuthModalLabel" aria-hidden="true" style="z-index: 1070;">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Modal Top Brand Header -->
+                <div class="bg-primary text-white p-3.5 px-4 position-relative" style="background: linear-gradient(135deg, #0066ff 0%, #004ecc 100%) !important;">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                            <i class="fa-solid fa-user fs-6"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-white fs-6" id="customerAuthModalLabel">Customer Account Required</h5>
+                            <small class="text-white-50" style="font-size: 0.725rem;">Login or sign up as a Customer to add items to cart & order</small>
+                        </div>
+                    </div>
+
+                    <!-- Custom Tab Nav -->
+                    <ul class="nav nav-pills nav-fill bg-white bg-opacity-10 p-1 rounded-3 mt-3" id="customerAuthTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active py-1.5 fw-semibold text-white small" id="tab-cust-login-btn" data-bs-toggle="pill" data-bs-target="#tabCustLogin" type="button" role="tab">
+                                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Customer Login
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link py-1.5 fw-semibold text-white small" id="tab-cust-reg-btn" data-bs-toggle="pill" data-bs-target="#tabCustReg" type="button" role="tab">
+                                <i class="fa-solid fa-user-plus me-1"></i> Create Account
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="modal-body p-4 bg-white">
+                    @if(Auth::check() && Auth::user()->isSeller())
+                        <div class="alert alert-warning border-0 small rounded-3 mb-3 p-2.5">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="fa-solid fa-triangle-exclamation text-warning mt-0.5 flex-shrink-0"></i>
+                                <div>
+                                    <strong class="d-block text-dark" style="font-size: 0.78rem;">Currently in Seller Mode</strong>
+                                    <span style="font-size: 0.72rem; line-height: 1.3;" class="text-muted d-block mb-1.5">
+                                        You are logged in as <strong>{{ Auth::user()->name }}</strong> (Seller). To make purchases or add items to cart, please log in with your customer account.
+                                    </span>
+                                    <form method="POST" action="{{ route('seller.logout') }}" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger btn-sm py-0.5 px-2 fw-semibold" style="font-size: 0.7rem;">
+                                            <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Logout Seller & Continue
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="tab-content">
+                        <!-- TAB 1: LOGIN -->
+                        <div class="tab-pane fade show active" id="tabCustLogin" role="tabpanel">
+                            <div id="customerLoginAlert" class="alert alert-danger border-0 small rounded-3 mb-3 p-2 text-center" style="display: none; font-size: 0.78rem;"></div>
+
+                            <form id="customerModalLoginForm" onsubmit="handleCustomerLoginSubmit(event)">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold text-dark mb-1">Email or Phone</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted" style="font-size: 0.85rem;"><i class="fa-regular fa-envelope"></i></span>
+                                        <input type="text" id="custModalLoginEmail" class="form-control form-control-sm bg-light border-start-0" placeholder="name@example.com or phone" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label small fw-semibold text-dark mb-0">Password</label>
+                                        <a href="{{ route('customer.login') }}" class="small text-primary text-decoration-none" style="font-size: 0.72rem;">Forgot?</a>
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted" style="font-size: 0.85rem;"><i class="fa-solid fa-lock"></i></span>
+                                        <input type="password" id="custModalLoginPassword" class="form-control form-control-sm bg-light border-start-0" placeholder="Enter password" required>
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="btnCustModalLogin" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm mb-2.5" style="background-color: #0066ff; font-size: 0.85rem;">
+                                    <span>Login as Customer</span>
+                                </button>
+                            </form>
+
+                            <div class="text-center small text-muted">
+                                New student or client? 
+                                <a href="javascript:void(0)" onclick="switchCustomerAuthTab('register')" class="text-primary fw-bold text-decoration-none">Create an account</a>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: REGISTER -->
+                        <div class="tab-pane fade" id="tabCustReg" role="tabpanel">
+                            <div id="customerRegisterAlert" class="alert alert-danger border-0 small rounded-3 mb-3 p-2 text-center" style="display: none; font-size: 0.78rem;"></div>
+
+                            <form id="customerModalRegisterForm" onsubmit="handleCustomerRegisterSubmit(event)">
+                                <div class="mb-2.5">
+                                    <label class="form-label small fw-semibold text-dark mb-1">Full Name</label>
+                                    <input type="text" id="custModalRegName" class="form-control form-control-sm bg-light" placeholder="e.g. Priya Patel" required>
+                                </div>
+
+                                <div class="mb-2.5">
+                                    <label class="form-label small fw-semibold text-dark mb-1">Email Address</label>
+                                    <input type="email" id="custModalRegEmail" class="form-control form-control-sm bg-light" placeholder="name@example.com" required>
+                                </div>
+
+                                <div class="mb-2.5">
+                                    <label class="form-label small fw-semibold text-dark mb-1">Mobile Phone (Optional)</label>
+                                    <input type="tel" id="custModalRegPhone" class="form-control form-control-sm bg-light" placeholder="9876543210">
+                                </div>
+
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-dark mb-1">Password</label>
+                                        <input type="password" id="custModalRegPass" class="form-control form-control-sm bg-light" placeholder="Min. 6 chars" required minlength="6">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-dark mb-1">Confirm</label>
+                                        <input type="password" id="custModalRegPassConf" class="form-control form-control-sm bg-light" placeholder="Repeat pass" required minlength="6">
+                                    </div>
+                                </div>
+
+                                <button type="submit" id="btnCustModalReg" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm mb-2.5" style="background-color: #0066ff; font-size: 0.85rem;">
+                                    <span>Create Customer Account</span>
+                                </button>
+                            </form>
+
+                            <div class="text-center small text-muted">
+                                Already registered? 
+                                <a href="javascript:void(0)" onclick="switchCustomerAuthTab('login')" class="text-primary fw-bold text-decoration-none">Login here</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Live Toast Alert -->
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
         <div id="cartLiveToast" class="toast align-items-center text-white bg-dark border-0 shadow-lg rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
@@ -918,10 +1126,212 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- ============================================================================
-         CART & CHECKOUT LOGIC ENGINE
+         CART, CHECKOUT & CUSTOMER AUTH ENGINE
          ============================================================================ -->
     <script>
         const CART_STORAGE_KEY = 'dc_marketplace_cart_items';
+
+        // Global Customer Auth State
+        window.DC_AUTH = {
+            isLoggedIn: {{ Auth::check() ? 'true' : 'false' }},
+            isCustomer: {{ (Auth::check() && Auth::user()->isCustomer()) ? 'true' : 'false' }},
+            isSeller: {{ (Auth::check() && Auth::user()->isSeller()) ? 'true' : 'false' }},
+            role: '{{ Auth::check() ? Auth::user()->role : 'guest' }}',
+            userName: '{{ Auth::check() ? addslashes(Auth::user()->name) : '' }}',
+            userEmail: '{{ Auth::check() ? addslashes(Auth::user()->email) : '' }}',
+            userPhone: '{{ Auth::check() ? addslashes(Auth::user()->phone ?? '') : '' }}'
+        };
+
+        window.pendingCartItem = null;
+
+        // Open Customer Auth Modal
+        function openCustomerAuthModal(tab) {
+            const modalEl = document.getElementById('customerAuthModal');
+            if (!modalEl) {
+                window.location.href = "{{ route('customer.login') }}";
+                return;
+            }
+
+            if (tab === 'register') {
+                switchCustomerAuthTab('register');
+            } else {
+                switchCustomerAuthTab('login');
+            }
+
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            bsModal.show();
+        }
+
+        // Switch Tabs in Customer Modal
+        function switchCustomerAuthTab(tab) {
+            if (tab === 'register') {
+                const btn = document.getElementById('tab-cust-reg-btn');
+                if (btn) {
+                    const trigger = new bootstrap.Tab(btn);
+                    trigger.show();
+                }
+            } else {
+                const btn = document.getElementById('tab-cust-login-btn');
+                if (btn) {
+                    const trigger = new bootstrap.Tab(btn);
+                    trigger.show();
+                }
+            }
+        }
+
+        // Handle Customer AJAX Login
+        async function handleCustomerLoginSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnCustModalLogin');
+            const alertBox = document.getElementById('customerLoginAlert');
+            alertBox.style.display = 'none';
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Verifying...';
+
+            const payload = {
+                email: document.getElementById('custModalLoginEmail').value,
+                password: document.getElementById('custModalLoginPassword').value,
+                remember: true
+            };
+
+            try {
+                const res = await fetch('{{ route("customer.login.submit") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    window.DC_AUTH = {
+                        isLoggedIn: true,
+                        isCustomer: true,
+                        isSeller: false,
+                        role: 'customer',
+                        userName: data.user.name,
+                        userEmail: data.user.email,
+                        userPhone: data.user.phone || ''
+                    };
+
+                    const modalEl = document.getElementById('customerAuthModal');
+                    if (modalEl) {
+                        const bsModal = bootstrap.Modal.getInstance(modalEl);
+                        if (bsModal) bsModal.hide();
+                    }
+
+                    showCartToast('Logged in as ' + data.user.name + '!');
+
+                    if (window.pendingCartItem) {
+                        const pending = window.pendingCartItem;
+                        window.pendingCartItem = null;
+                        setTimeout(() => {
+                            addToCart(pending);
+                        }, 300);
+                    } else {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 600);
+                    }
+                } else {
+                    alertBox.textContent = data.message || 'Invalid credentials.';
+                    alertBox.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Login as Customer</span>';
+                }
+            } catch (err) {
+                alertBox.textContent = 'Server error during login. Please try again.';
+                alertBox.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<span>Login as Customer</span>';
+            }
+        }
+
+        // Handle Customer AJAX Registration
+        async function handleCustomerRegisterSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnCustModalReg');
+            const alertBox = document.getElementById('customerRegisterAlert');
+            alertBox.style.display = 'none';
+
+            const pass = document.getElementById('custModalRegPass').value;
+            const passConf = document.getElementById('custModalRegPassConf').value;
+            if (pass !== passConf) {
+                alertBox.textContent = 'Passwords do not match.';
+                alertBox.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Creating Account...';
+
+            const payload = {
+                name: document.getElementById('custModalRegName').value,
+                email: document.getElementById('custModalRegEmail').value,
+                phone: document.getElementById('custModalRegPhone').value,
+                password: pass,
+                password_confirmation: passConf
+            };
+
+            try {
+                const res = await fetch('{{ route("customer.register.submit") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    window.DC_AUTH = {
+                        isLoggedIn: true,
+                        isCustomer: true,
+                        isSeller: false,
+                        role: 'customer',
+                        userName: data.user.name,
+                        userEmail: data.user.email,
+                        userPhone: data.user.phone || ''
+                    };
+
+                    const modalEl = document.getElementById('customerAuthModal');
+                    if (modalEl) {
+                        const bsModal = bootstrap.Modal.getInstance(modalEl);
+                        if (bsModal) bsModal.hide();
+                    }
+
+                    showCartToast('Account created! Welcome, ' + data.user.name);
+
+                    if (window.pendingCartItem) {
+                        const pending = window.pendingCartItem;
+                        window.pendingCartItem = null;
+                        setTimeout(() => {
+                            addToCart(pending);
+                        }, 300);
+                    } else {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 600);
+                    }
+                } else {
+                    alertBox.textContent = data.message || 'Unable to create account.';
+                    alertBox.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Create Customer Account</span>';
+                }
+            } catch (err) {
+                alertBox.textContent = 'Server error during registration. Please try again.';
+                alertBox.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<span>Create Customer Account</span>';
+            }
+        }
 
         // Load cart items from localStorage
         function getCartItems() {
@@ -939,9 +1349,16 @@
             renderCartUI();
         }
 
-        // Add item to cart
+        // Add item to cart (Customer Login REQUIRED)
         function addToCart(item) {
             if (!item || !item.id) return;
+
+            // Check Customer Authentication Requirement
+            if (!window.DC_AUTH || !window.DC_AUTH.isCustomer) {
+                window.pendingCartItem = item;
+                openCustomerAuthModal(window.DC_AUTH && window.DC_AUTH.isLoggedIn ? 'switch' : 'login');
+                return;
+            }
 
             let items = getCartItems();
             const key = (item.type || 'item').toLowerCase() + '_' + item.id;
@@ -972,9 +1389,14 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                     },
                     body: JSON.stringify(item)
+                }).then(r => r.json()).then(data => {
+                    if (data && data.auth_required) {
+                        openCustomerAuthModal('login');
+                    }
                 }).catch(() => {});
             } catch (err) {}
         }
@@ -1026,8 +1448,13 @@
             }
         }
 
-        // Open Checkout Modal
+        // Open Checkout Modal (Customer Login REQUIRED)
         function openCheckoutModal() {
+            if (!window.DC_AUTH || !window.DC_AUTH.isCustomer) {
+                openCustomerAuthModal('login');
+                return;
+            }
+
             const items = getCartItems();
             if (!items.length) {
                 alert('Your cart is empty! Please add items before checking out.');
@@ -1039,6 +1466,16 @@
             if (offcanvasEl) {
                 const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
                 if (bsOffcanvas) bsOffcanvas.hide();
+            }
+
+            // Pre-fill fields from DC_AUTH
+            if (window.DC_AUTH) {
+                const nameInput = document.getElementById('checkoutName');
+                const emailInput = document.getElementById('checkoutEmail');
+                const phoneInput = document.getElementById('checkoutPhone');
+                if (nameInput && !nameInput.value && window.DC_AUTH.userName) nameInput.value = window.DC_AUTH.userName;
+                if (emailInput && !emailInput.value && window.DC_AUTH.userEmail) emailInput.value = window.DC_AUTH.userEmail;
+                if (phoneInput && !phoneInput.value && window.DC_AUTH.userPhone) phoneInput.value = window.DC_AUTH.userPhone;
             }
 
             // Render items preview in checkout modal
@@ -1079,9 +1516,15 @@
             }
         }
 
-        // Handle Checkout Form Submission
+        // Handle Checkout Form Submission (Customer Login REQUIRED)
         async function handleCheckoutSubmit(e) {
             e.preventDefault();
+
+            if (!window.DC_AUTH || !window.DC_AUTH.isCustomer) {
+                openCustomerAuthModal('login');
+                return;
+            }
+
             const btn = document.getElementById('btnPlaceOrder');
             if (btn) {
                 btn.disabled = true;
@@ -1123,6 +1566,12 @@
                     document.getElementById('successOrderRef').textContent = data.order_id || '#DC-10928';
                     document.getElementById('successAmount').textContent = '₹' + (data.total_amount || '0.00');
                     document.getElementById('successCustomer').textContent = data.customer_name || payload.name;
+                } else if (data.auth_required) {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>Confirm & Place Order</span>';
+                    }
+                    openCustomerAuthModal('login');
                 } else {
                     alert(data.message || 'Error processing order. Please try again.');
                     if (btn) {

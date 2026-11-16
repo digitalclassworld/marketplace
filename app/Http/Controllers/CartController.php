@@ -32,10 +32,22 @@ class CartController extends Controller
     }
 
     /**
-     * Add item to cart.
+     * Add item to cart (Requires customer login).
      */
     public function add(Request $request): JsonResponse
     {
+        if (!Auth::check() || !Auth::user()->isCustomer()) {
+            return response()->json([
+                'success'       => false,
+                'auth_required' => true,
+                'is_logged_in'  => Auth::check(),
+                'current_role'  => Auth::check() ? Auth::user()->role : null,
+                'message'       => Auth::check()
+                    ? 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to add items to cart and place orders.'
+                    : 'Customer login required. Please login or create a customer account to add items to cart.',
+            ], 401);
+        }
+
         $validated = $request->validate([
             'id'        => 'required',
             'type'      => 'required|string', // Course, Service, Product
@@ -146,10 +158,22 @@ class CartController extends Controller
     }
 
     /**
-     * Process checkout and create real order(s) in database.
+     * Process checkout and create real order(s) in database (Requires customer login).
      */
     public function checkout(Request $request): JsonResponse
     {
+        if (!Auth::check() || !Auth::user()->isCustomer()) {
+            return response()->json([
+                'success'       => false,
+                'auth_required' => true,
+                'is_logged_in'  => Auth::check(),
+                'current_role'  => Auth::check() ? Auth::user()->role : null,
+                'message'       => Auth::check()
+                    ? 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to complete your purchase.'
+                    : 'Customer login required. Please login or create a customer account to complete your checkout.',
+            ], 401);
+        }
+
         $validated = $request->validate([
             'name'           => 'required|string|max:100',
             'email'          => 'required|email|max:100',
@@ -274,3 +298,4 @@ class CartController extends Controller
         return $total;
     }
 }
+

@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminSeoController;
 use App\Http\Controllers\Admin\AdminSellerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminWebsiteController;
+use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Auth\SellerRegistrationController;
 use App\Http\Controllers\BlogController;
@@ -73,8 +74,20 @@ Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::post('/blog/{slug}/comment', [BlogController::class, 'comment'])->name('blog.comment');
 
-Route::get('/login', fn() => redirect()->route('seller.login'))->name('login');
-Route::get('/register', fn() => redirect()->route('seller.register'))->name('register');
+// Customer Authentication & Order History
+Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+Route::get('/register', [CustomerAuthController::class, 'showRegisterForm'])->name('register');
+Route::match(['get', 'post'], '/logout', [CustomerAuthController::class, 'logout'])->name('logout');
+
+Route::prefix('customer')->name('customer.')->group(function () {
+    Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.submit');
+    Route::get('/register', [CustomerAuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [CustomerAuthController::class, 'register'])->name('register.submit');
+    Route::match(['get', 'post'], '/logout', [CustomerAuthController::class, 'logout'])->name('logout');
+    Route::get('/orders', [CustomerAuthController::class, 'orders'])->name('orders');
+});
+
 Route::get('/refresh-csrf', fn() => response()->json(['token' => csrf_token()]))->name('refresh-csrf');
 
 // Seller Registration & Authentication
