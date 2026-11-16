@@ -986,60 +986,175 @@
     </div>
 
     <!-- ============================================================================
-         CUSTOMER AUTHENTICATION MODAL (Required for Cart & Orders)
+         CUSTOMER AUTHENTICATION MODAL (Enhanced, Bigger & Premium Styling)
          ============================================================================ -->
+    <style>
+        #customerAuthModal .modal-dialog {
+            max-width: 540px;
+        }
+        #customerAuthModal .modal-content {
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
+        }
+        #customerAuthModal .auth-modal-header {
+            background: linear-gradient(135deg, #090e17 0%, #0f1c3f 50%, #0052cc 100%) !important;
+            padding: 2rem 2.25rem 1.75rem;
+            position: relative;
+        }
+        #customerAuthModal .auth-nav-pill-box {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 4px;
+        }
+        #customerAuthModal .auth-nav-pill-box .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 0.55rem 0.75rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #customerAuthModal .auth-nav-pill-box .nav-link.active {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+        }
+        #customerAuthModal .auth-nav-pill-box .nav-link:hover:not(.active) {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        #customerAuthModal .auth-input-group {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        #customerAuthModal .auth-input-group:focus-within {
+            border-color: #0066ff;
+            background: #ffffff;
+            box-shadow: 0 0 0 3.5px rgba(0, 102, 255, 0.15);
+        }
+        #customerAuthModal .auth-input-group .form-control {
+            border: none;
+            background: transparent;
+            height: 48px;
+            font-size: 0.95rem;
+            color: #0f172a;
+            box-shadow: none !important;
+        }
+        #customerAuthModal .auth-input-group .input-group-text {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 1rem;
+            padding: 0 1rem;
+        }
+        #customerAuthModal .btn-auth-submit {
+            background: linear-gradient(135deg, #0066ff 0%, #004ee6 100%);
+            border: none;
+            height: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 12px;
+            color: #ffffff;
+            box-shadow: 0 8px 24px -4px rgba(0, 102, 255, 0.45);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        #customerAuthModal .btn-auth-submit:hover {
+            background: linear-gradient(135deg, #0052cc 0%, #003db3 100%);
+            transform: translateY(-1.5px);
+            box-shadow: 0 12px 28px -4px rgba(0, 102, 255, 0.55);
+            color: #ffffff;
+        }
+        #customerAuthModal .trust-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+    </style>
+
     <div class="modal fade" id="customerAuthModal" tabindex="-1" aria-labelledby="customerAuthModalLabel" aria-hidden="true" style="z-index: 1070;">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                <!-- Modal Top Brand Header -->
-                <div class="bg-primary text-white p-3.5 px-4 position-relative" style="background: linear-gradient(135deg, #0066ff 0%, #004ecc 100%) !important;">
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
-                            <i class="fa-solid fa-user fs-6"></i>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                
+                <!-- Premium Header -->
+                <div class="auth-modal-header text-white">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow-none opacity-75 hover-opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
+                    
+                    <div class="d-flex align-items-center gap-2.5 mb-2">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background: rgba(255, 255, 255, 0.15); border: 1.5px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px);">
+                            <i class="fa-solid fa-graduation-cap text-warning fs-5"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-0 text-white fs-6" id="customerAuthModalLabel">Customer Account Required</h5>
-                            <small class="text-white-50" style="font-size: 0.725rem;">Login or sign up as a Customer to add items to cart & order</small>
+                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-0.5 text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.8px;">Customer Portal</span>
+                            <h4 class="fw-bold mb-0 text-white fs-5 mt-0.5" id="customerAuthModalLabel">Sign In to Your Account</h4>
                         </div>
                     </div>
+                    
+                    <p class="text-white-50 small mb-3" style="font-size: 0.82rem; line-height: 1.4;">
+                        Access online courses, book expert services, track orders & download learning resources.
+                    </p>
 
-                    <!-- Custom Tab Nav -->
-                    <ul class="nav nav-pills nav-fill bg-white bg-opacity-10 p-1 rounded-3 mt-3" id="customerAuthTabs" role="tablist">
+                    <!-- Segmented Tab Navigation -->
+                    <ul class="nav nav-pills nav-fill auth-nav-pill-box" id="customerAuthTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active py-1.5 fw-semibold text-white small" id="tab-cust-login-btn" data-bs-toggle="pill" data-bs-target="#tabCustLogin" type="button" role="tab">
-                                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Customer Login
+                            <button class="nav-link active" id="tab-cust-login-btn" data-bs-toggle="pill" data-bs-target="#tabCustLogin" type="button" role="tab">
+                                <i class="fa-solid fa-arrow-right-to-bracket me-1.5"></i> Customer Login
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link py-1.5 fw-semibold text-white small" id="tab-cust-reg-btn" data-bs-toggle="pill" data-bs-target="#tabCustReg" type="button" role="tab">
-                                <i class="fa-solid fa-user-plus me-1"></i> Customer Sign Up
+                            <button class="nav-link" id="tab-cust-reg-btn" data-bs-toggle="pill" data-bs-target="#tabCustReg" type="button" role="tab">
+                                <i class="fa-solid fa-user-plus me-1.5"></i> Create Account
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a href="{{ route('seller.login') }}" class="nav-link py-1.5 fw-semibold text-white text-opacity-75 small text-nowrap" style="transition: all 0.2s;">
-                                <i class="fa-solid fa-store me-1"></i> Seller Login
+                            <a href="{{ route('seller.login') }}" class="nav-link text-white text-opacity-75" style="border-radius: 10px;" title="Go to Instructor & Institute Portal">
+                                <i class="fa-solid fa-store me-1.5 text-warning"></i> Seller Login
                             </a>
                         </li>
                     </ul>
                 </div>
 
-                <div class="modal-body p-4 bg-white">
+                <!-- Modal Body -->
+                <div class="modal-body p-4 p-md-5 bg-white">
+                    
+                    <!-- Seller Mode Notice -->
                     @if(Auth::check() && Auth::user()->isSeller())
-                        <div class="alert alert-warning border-0 small rounded-3 mb-3 p-2.5">
-                            <div class="d-flex align-items-start gap-2">
-                                <i class="fa-solid fa-triangle-exclamation text-warning mt-0.5 flex-shrink-0"></i>
+                        <div class="alert alert-warning border-0 rounded-3 mb-4 p-3" style="background-color: #fffbeb; border: 1px solid #fde68a !important;">
+                            <div class="d-flex align-items-start gap-2.5">
+                                <i class="fa-solid fa-triangle-exclamation text-warning fs-5 mt-0.5 flex-shrink-0"></i>
                                 <div>
-                                    <strong class="d-block text-dark" style="font-size: 0.78rem;">Currently in Seller Mode</strong>
-                                    <span style="font-size: 0.72rem; line-height: 1.3;" class="text-muted d-block mb-1.5">
-                                        You are logged in as <strong>{{ Auth::user()->name }}</strong> (Seller). To make purchases or add items to cart, please log in with your customer account.
+                                    <strong class="d-block text-dark small fw-bold">Currently in Seller Mode</strong>
+                                    <span style="font-size: 0.775rem; line-height: 1.4;" class="text-muted d-block mb-2">
+                                        You are signed in as <strong>{{ Auth::user()->name }}</strong> (Seller). To add courses or products to your cart and make purchases, please log in with your Customer account.
                                     </span>
-                                    <form method="POST" action="{{ route('seller.logout') }}" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-outline-danger btn-sm py-0.5 px-2 fw-semibold" style="font-size: 0.7rem;">
-                                            <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Logout Seller & Continue
-                                        </button>
-                                    </form>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <form method="POST" action="{{ route('seller.logout') }}" class="d-inline m-0">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger btn-sm py-1 px-2.5 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Logout Seller
+                                            </button>
+                                        </form>
+                                        <a href="{{ route('seller.dashboard') }}" class="btn btn-outline-dark btn-sm py-1 px-2.5 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                            Go to Dashboard
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1048,94 +1163,157 @@
                     <div class="tab-content">
                         <!-- TAB 1: LOGIN -->
                         <div class="tab-pane fade show active" id="tabCustLogin" role="tabpanel">
-                            <div id="customerLoginAlert" class="alert alert-danger border-0 small rounded-3 mb-3 p-2 text-center" style="display: none; font-size: 0.78rem;"></div>
+                            <div id="customerLoginAlert" class="alert alert-danger border-0 small rounded-3 mb-3 p-2.5 text-center" style="display: none; font-size: 0.8rem;"></div>
 
                             <form id="customerModalLoginForm" onsubmit="handleCustomerLoginSubmit(event)">
+                                <!-- Email or Phone -->
                                 <div class="mb-3">
-                                    <label class="form-label small fw-semibold text-dark mb-1">Email or Phone</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0 text-muted" style="font-size: 0.85rem;"><i class="fa-regular fa-envelope"></i></span>
-                                        <input type="text" id="custModalLoginEmail" class="form-control form-control-sm bg-light border-start-0" placeholder="name@example.com or phone" required>
+                                    <label class="form-label small fw-bold text-dark mb-1.5">Email Address or Phone Number</label>
+                                    <div class="input-group auth-input-group">
+                                        <span class="input-group-text"><i class="fa-regular fa-envelope"></i></span>
+                                        <input type="text" id="custModalLoginEmail" class="form-control" placeholder="name@example.com or 10-digit mobile" required autofocus>
                                     </div>
                                 </div>
 
+                                <!-- Password -->
                                 <div class="mb-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label class="form-label small fw-semibold text-dark mb-0">Password</label>
-                                        <a href="{{ route('customer.login') }}" class="small text-primary text-decoration-none" style="font-size: 0.72rem;">Forgot?</a>
+                                    <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                        <label class="form-label small fw-bold text-dark mb-0">Password</label>
+                                        <a href="{{ route('customer.login') }}" class="small text-primary text-decoration-none fw-semibold" style="font-size: 0.75rem;">Forgot password?</a>
                                     </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light border-end-0 text-muted" style="font-size: 0.85rem;"><i class="fa-solid fa-lock"></i></span>
-                                        <input type="password" id="custModalLoginPassword" class="form-control form-control-sm bg-light border-start-0" placeholder="Enter password" required>
+                                    <div class="input-group auth-input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                        <input type="password" id="custModalLoginPassword" class="form-control" placeholder="Enter your password" required>
+                                        <button class="btn btn-link text-muted px-3 text-decoration-none" type="button" onclick="toggleModalPass('custModalLoginPassword', this)" title="Show/Hide Password">
+                                            <i class="fa-regular fa-eye"></i>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <button type="submit" id="btnCustModalLogin" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm mb-2.5" style="background-color: #0066ff; font-size: 0.85rem;">
-                                    <span>Login as Customer</span>
+                                <!-- Remember & Helper -->
+                                <div class="d-flex align-items-center justify-content-between mb-3.5">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="checkbox" id="modalRememberCust" checked>
+                                        <label class="form-check-label small text-muted" for="modalRememberCust" style="font-size: 0.8rem;">
+                                            Keep me logged in
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" id="btnCustModalLogin" class="btn btn-auth-submit w-100 mb-3">
+                                    <span>Sign In as Customer</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
                                 </button>
                             </form>
 
-                            <div class="text-center small text-muted">
-                                New student or client? 
-                                <a href="javascript:void(0)" onclick="switchCustomerAuthTab('register')" class="text-primary fw-bold text-decoration-none">Create an account</a>
+                            <div class="text-center small text-muted mb-3">
+                                Don't have a customer account yet? 
+                                <a href="javascript:void(0)" onclick="switchCustomerAuthTab('register')" class="text-primary fw-bold text-decoration-none">Create free account &rarr;</a>
+                            </div>
+
+                            <!-- Trust Chips -->
+                            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap pt-2 border-top">
+                                <span class="trust-chip"><i class="fa-solid fa-shield-halved text-success"></i> 100% Secure Checkout</span>
+                                <span class="trust-chip"><i class="fa-solid fa-bolt text-warning"></i> Instant Access</span>
+                                <span class="trust-chip"><i class="fa-solid fa-box text-primary"></i> Live Order Tracking</span>
                             </div>
                         </div>
 
                         <!-- TAB 2: REGISTER -->
                         <div class="tab-pane fade" id="tabCustReg" role="tabpanel">
-                            <div id="customerRegisterAlert" class="alert alert-danger border-0 small rounded-3 mb-3 p-2 text-center" style="display: none; font-size: 0.78rem;"></div>
+                            <div id="customerRegisterAlert" class="alert alert-danger border-0 small rounded-3 mb-3 p-2.5 text-center" style="display: none; font-size: 0.8rem;"></div>
 
                             <form id="customerModalRegisterForm" onsubmit="handleCustomerRegisterSubmit(event)">
-                                <div class="mb-2.5">
-                                    <label class="form-label small fw-semibold text-dark mb-1">Full Name</label>
-                                    <input type="text" id="custModalRegName" class="form-control form-control-sm bg-light" placeholder="e.g. Priya Patel" required>
-                                </div>
-
-                                <div class="mb-2.5">
-                                    <label class="form-label small fw-semibold text-dark mb-1">Email Address</label>
-                                    <input type="email" id="custModalRegEmail" class="form-control form-control-sm bg-light" placeholder="name@example.com" required>
-                                </div>
-
-                                <div class="mb-2.5">
-                                    <label class="form-label small fw-semibold text-dark mb-1">Mobile Phone (Optional)</label>
-                                    <input type="tel" id="custModalRegPhone" class="form-control form-control-sm bg-light" placeholder="9876543210">
-                                </div>
-
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <label class="form-label small fw-semibold text-dark mb-1">Password</label>
-                                        <input type="password" id="custModalRegPass" class="form-control form-control-sm bg-light" placeholder="Min. 6 chars" required minlength="6">
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label small fw-semibold text-dark mb-1">Confirm</label>
-                                        <input type="password" id="custModalRegPassConf" class="form-control form-control-sm bg-light" placeholder="Repeat pass" required minlength="6">
+                                <!-- Full Name -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark mb-1.5">Full Name <span class="text-danger">*</span></label>
+                                    <div class="input-group auth-input-group">
+                                        <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+                                        <input type="text" id="custModalRegName" class="form-control" placeholder="e.g. Priya Patel" required>
                                     </div>
                                 </div>
 
-                                <button type="submit" id="btnCustModalReg" class="btn btn-primary w-100 py-2 fw-bold rounded-3 shadow-sm mb-2.5" style="background-color: #0066ff; font-size: 0.85rem;">
-                                    <span>Create Customer Account</span>
+                                <!-- Email Address -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark mb-1.5">Email Address <span class="text-danger">*</span></label>
+                                    <div class="input-group auth-input-group">
+                                        <span class="input-group-text"><i class="fa-regular fa-envelope"></i></span>
+                                        <input type="email" id="custModalRegEmail" class="form-control" placeholder="name@example.com" required>
+                                    </div>
+                                </div>
+
+                                <!-- Mobile Phone -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark mb-1.5">Mobile Phone (Optional)</label>
+                                    <div class="input-group auth-input-group">
+                                        <span class="input-group-text fw-semibold small">+91</span>
+                                        <input type="tel" id="custModalRegPhone" class="form-control" placeholder="9876543210">
+                                    </div>
+                                </div>
+
+                                <!-- Password & Confirm -->
+                                <div class="row g-2 mb-3.5">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-dark mb-1.5">Password <span class="text-danger">*</span></label>
+                                        <div class="input-group auth-input-group">
+                                            <input type="password" id="custModalRegPass" class="form-control" placeholder="Min. 6 chars" required minlength="6">
+                                            <button class="btn btn-link text-muted px-2 text-decoration-none" type="button" onclick="toggleModalPass('custModalRegPass', this)">
+                                                <i class="fa-regular fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-dark mb-1.5">Confirm <span class="text-danger">*</span></label>
+                                        <div class="input-group auth-input-group">
+                                            <input type="password" id="custModalRegPassConf" class="form-control" placeholder="Repeat pass" required minlength="6">
+                                            <button class="btn btn-link text-muted px-2 text-decoration-none" type="button" onclick="toggleModalPass('custModalRegPassConf', this)">
+                                                <i class="fa-regular fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" id="btnCustModalReg" class="btn btn-auth-submit w-100 mb-3">
+                                    <span>Create Free Customer Account</span>
+                                    <i class="fa-solid fa-check"></i>
                                 </button>
                             </form>
 
-                            <div class="text-center small text-muted">
+                            <div class="text-center small text-muted mb-3">
                                 Already registered? 
-                                <a href="javascript:void(0)" onclick="switchCustomerAuthTab('login')" class="text-primary fw-bold text-decoration-none">Login here</a>
+                                <a href="javascript:void(0)" onclick="switchCustomerAuthTab('login')" class="text-primary fw-bold text-decoration-none">Login here &rarr;</a>
+                            </div>
+
+                            <!-- Trust Chips -->
+                            <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap pt-2 border-top">
+                                <span class="trust-chip"><i class="fa-solid fa-lock text-success"></i> Free Registration</span>
+                                <span class="trust-chip"><i class="fa-solid fa-certificate text-primary"></i> Verified Certificates</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Footer Switcher to Seller Login -->
-                    <div class="mt-3 pt-3 border-top text-center bg-light p-2.5 rounded-3">
-                        <span class="small text-muted d-block mb-1" style="font-size: 0.75rem;">Are you an Instructor, Institute, or Service Provider?</span>
-                        <div class="d-flex align-items-center justify-content-center gap-2">
-                            <a href="{{ route('seller.login') }}" class="btn btn-outline-success btn-sm fw-bold rounded-pill px-3" style="font-size: 0.775rem;">
-                                <i class="fa-solid fa-store me-1"></i> Seller Login
-                            </a>
-                            <a href="{{ route('seller.register') }}" class="btn btn-link text-muted btn-sm text-decoration-none" style="font-size: 0.75rem;">
-                                Register Store &rarr;
-                            </a>
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="p-3 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background-color: #f0fdf4; border: 1px solid #bbf7d0;">
+                            <div class="d-flex align-items-center gap-2.5">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-success text-white shadow-xs" style="width: 36px; height: 36px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-store" style="font-size: 0.9rem;"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">Are you a Seller or Instructor?</div>
+                                    <small class="text-muted" style="font-size: 0.725rem;">Manage courses, services, and institute dashboard</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ route('seller.login') }}" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-xs text-nowrap" style="font-size: 0.775rem;">
+                                    Seller Login &rarr;
+                                </a>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -1208,6 +1386,22 @@
                     const trigger = new bootstrap.Tab(btn);
                     trigger.show();
                 }
+            }
+        }
+
+        // Toggle Password Show/Hide in Modal
+        function toggleModalPass(id, btn) {
+            const el = document.getElementById(id);
+            const icon = btn.querySelector('i');
+            if (!el || !icon) return;
+            if (el.type === 'password') {
+                el.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                el.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
 
