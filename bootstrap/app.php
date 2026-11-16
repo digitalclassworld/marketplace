@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
-            if ($request->is('admin*')) {
+            if ($request->is('admin*') || $request->is('super/admin*')) {
                 return route('admin.login');
             }
             return route('seller.login');

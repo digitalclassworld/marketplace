@@ -159,7 +159,7 @@ Route::prefix('super/admin')->group(function () {
 | Protected Super Admin Portal Routes (Role: superadmin)
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'superadmin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['superadmin'])->group(function () {
     Route::get('/', fn() => redirect()->route('admin.dashboard'));
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::post('/profile/avatar', [AdminDashboardController::class, 'updateAvatar'])->name('profile.avatar');

@@ -16,7 +16,8 @@ class AdminAuthController extends Controller
     public function showLoginForm(): View|RedirectResponse
     {
         // Only redirect if already authenticated as Super Admin on admin guard or web guard
-        if (Auth::guard('admin')->check() || (Auth::guard('web')->check() && Auth::guard('web')->user()->isSuperAdmin())) {
+        if ((Auth::guard('admin')->check() && Auth::guard('admin')->user()?->isSuperAdmin()) ||
+            (Auth::guard('web')->check() && Auth::guard('web')->user()?->isSuperAdmin())) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -87,6 +88,12 @@ class AdminAuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         Auth::guard('admin')->logout();
+
+        if (Auth::guard('web')->check() && Auth::guard('web')->user()->isSuperAdmin()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return redirect()->route('admin.login')
             ->with('success', 'You have been safely logged out from the Super Admin portal.');
