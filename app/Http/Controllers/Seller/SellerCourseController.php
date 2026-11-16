@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseContent;
 use App\Models\Seller;
+use App\Traits\HandlesSellerMediaUploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,8 @@ use Illuminate\View\View;
 
 class SellerCourseController extends Controller
 {
+    use HandlesSellerMediaUploads;
+
     private function getSeller(): ?Seller
     {
         return Auth::user()->seller;
@@ -57,6 +60,9 @@ class SellerCourseController extends Controller
         $isFree = $request->boolean('is_free');
         $price = $isFree ? 0.00 : (float) ($validated['price'] ?? 0.00);
 
+        // Process media uploads (badge/thumbnail, cover banner, promo video, gallery)
+        $media = $this->processMediaUploads($request, 'course');
+
         $course = $seller->courses()->create([
             'title'                => $validated['title'],
             'slug'                 => Str::slug($validated['title']) . '-' . Str::random(5),
@@ -65,7 +71,10 @@ class SellerCourseController extends Controller
             'level'                => $validated['level'],
             'short_description'    => $validated['short_description'] ?? null,
             'description'          => $validated['description'] ?? null,
-            'thumbnail'            => $validated['thumbnail'] ?? null,
+            'thumbnail'            => $media['thumbnail'],
+            'cover_image'          => $media['cover_image'],
+            'video_url'            => $media['video_url'],
+            'gallery'              => $media['gallery'],
             'is_free'              => $isFree,
             'price'                => $price,
             'discount_price'       => $validated['discount_price'] ?? null,

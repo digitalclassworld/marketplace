@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Models\BusinessListing;
 use App\Models\Seller;
+use App\Traits\HandlesSellerMediaUploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ use Illuminate\View\View;
 
 class SellerBusinessListingController extends Controller
 {
+    use HandlesSellerMediaUploads;
+
     private function getSeller(): ?Seller
     {
         return Auth::user()->seller;
@@ -66,6 +69,8 @@ class SellerBusinessListingController extends Controller
         $features = is_array($request->features) ? $request->features : (is_string($request->features) ? json_decode($request->features, true) : null);
         $addOns = is_array($request->add_ons) ? $request->add_ons : (is_string($request->add_ons) ? json_decode($request->add_ons, true) : null);
 
+        $media = $this->processMediaUploads($request, 'listing');
+
         $seller->businessListings()->create([
             'business_name'    => $validated['business_name'],
             'slug'             => Str::slug($validated['business_name']) . '-' . Str::random(5),
@@ -86,9 +91,10 @@ class SellerBusinessListingController extends Controller
             'state'            => $validated['state'] ?? null,
             'pincode'          => $validated['pincode'] ?? null,
             'map_location'     => $validated['map_location'] ?? null,
-            'logo'             => $validated['logo'] ?? null,
-            'cover_image'      => $validated['cover_image'] ?? null,
-            'video_url'        => $validated['video_url'] ?? null,
+            'logo'             => $media['logo'] ?: ($media['thumbnail'] ?: ($validated['logo'] ?? null)),
+            'cover_image'      => $media['cover_image'] ?: ($validated['cover_image'] ?? null),
+            'video_url'        => $media['video_url'] ?: ($validated['video_url'] ?? null),
+            'gallery'          => $media['gallery'],
             'plan_name'        => $validated['plan_name'] ?? 'Premium Listing',
             'plan_price'       => $validated['plan_price'] ?? 1499.00,
             'add_ons'          => $addOns,

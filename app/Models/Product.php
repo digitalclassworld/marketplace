@@ -24,6 +24,9 @@ class Product extends Model
         'weight_grams',
         'shipping_details',
         'thumbnail',
+        'cover_image',
+        'video_url',
+        'gallery',
         'status',
         'rejection_reason',
         'approved_at',
@@ -35,6 +38,7 @@ class Product extends Model
         'price' => 'decimal:2',
         'stock_quantity' => 'integer',
         'weight_grams' => 'integer',
+        'gallery' => 'array',
         'approved_at' => 'datetime',
     ];
 

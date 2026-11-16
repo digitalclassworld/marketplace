@@ -24,6 +24,9 @@ class Service extends Model
         'package_features',
         'buyer_requirements',
         'thumbnail',
+        'cover_image',
+        'video_url',
+        'gallery',
         'status',
         'rejection_reason',
         'approved_at',
@@ -33,6 +36,7 @@ class Service extends Model
     protected $casts = [
         'delivery_days' => 'integer',
         'price' => 'decimal:2',
+        'gallery' => 'array',
         'approved_at' => 'datetime',
     ];
 

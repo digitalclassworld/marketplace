@@ -21,6 +21,9 @@ class Course extends Model
         'short_description',
         'description',
         'thumbnail',
+        'cover_image',
+        'video_url',
+        'gallery',
         'is_free',
         'price',
         'discount_price',
@@ -39,6 +42,7 @@ class Course extends Model
         'qa_enabled' => 'boolean',
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
+        'gallery' => 'array',
         'approved_at' => 'datetime',
     ];
 

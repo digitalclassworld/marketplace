@@ -34,6 +34,7 @@ class BusinessListing extends Model
         'logo',
         'cover_image',
         'video_url',
+        'gallery',
         'plan_name',
         'plan_price',
         'add_ons',
@@ -46,6 +47,7 @@ class BusinessListing extends Model
     protected $casts = [
         'approved_at' => 'datetime',
         'features'    => 'array',
+        'gallery'     => 'array',
         'add_ons'     => 'array',
         'plan_price'  => 'decimal:2',
     ];

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Seller;
+use App\Traits\HandlesSellerMediaUploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ use Illuminate\View\View;
 
 class SellerProductController extends Controller
 {
+    use HandlesSellerMediaUploads;
+
     private function getSeller(): ?Seller
     {
         return Auth::user()->seller;
@@ -50,6 +53,8 @@ class SellerProductController extends Controller
             'thumbnail'        => ['nullable', 'string', 'max:255'],
         ]);
 
+        $media = $this->processMediaUploads($request, 'product');
+
         $seller->products()->create([
             'title'            => $validated['title'],
             'slug'             => Str::slug($validated['title']) . '-' . Str::random(5),
@@ -62,7 +67,10 @@ class SellerProductController extends Controller
             'stock_quantity'   => (int) $validated['stock_quantity'],
             'weight_grams'     => $validated['weight_grams'] ?? null,
             'shipping_details' => $validated['shipping_details'] ?? null,
-            'thumbnail'        => $validated['thumbnail'] ?? null,
+            'thumbnail'        => $media['thumbnail'],
+            'cover_image'      => $media['cover_image'],
+            'video_url'        => $media['video_url'],
+            'gallery'          => $media['gallery'],
             'status'           => 'pending',
         ]);
 

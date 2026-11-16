@@ -23,6 +23,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Seller\SellerBusinessListingController;
 use App\Http\Controllers\Seller\SellerCourseController;
 use App\Http\Controllers\Seller\SellerDashboardController;
+use App\Http\Controllers\Seller\SellerMediaController;
 use App\Http\Controllers\Seller\SellerMessageController;
 use App\Http\Controllers\Seller\SellerOrderController;
 use App\Http\Controllers\Seller\SellerProductController;
@@ -109,6 +110,9 @@ Route::prefix('seller')->name('seller.')->middleware(['auth', 'seller'])->group(
     Route::post('/promotions', [SellerPromotionController::class, 'store'])->name('promotions.store');
     Route::post('/promotions/coupons', [SellerPromotionController::class, 'storeCoupon'])->name('promotions.coupons.store');
     Route::post('/promotions/{promotion}/toggle', [SellerPromotionController::class, 'toggleStatus'])->name('promotions.toggle');
+
+    // Instant Media & Video Upload (Courses, Services, Products, Listings)
+    Route::post('/media/upload', [SellerMediaController::class, 'upload'])->name('media.upload');
 
     /*
     |----------------------------------------------------------------------

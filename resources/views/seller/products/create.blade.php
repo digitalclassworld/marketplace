@@ -251,7 +251,7 @@
     @endif
 
     <!-- Main Wizard Form -->
-    <form action="{{ route('seller.products.store') }}" method="POST" id="productWizardForm" novalidate>
+    <form action="{{ route('seller.products.store') }}" method="POST" id="productWizardForm" enctype="multipart/form-data" novalidate>
         @csrf
 
         <!-- ================= STEP 1: CHOOSE PRODUCT TYPE ================= -->
@@ -481,44 +481,57 @@
                 <div class="mb-4">
                     <label class="form-label fw-bold text-dark small">Product Logo / Emblem <span class="text-danger">*</span></label>
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-3 border d-flex flex-column align-items-center justify-content-center p-2 bg-light flex-shrink-0" style="width: 80px; height: 80px;">
-                            <span class="fw-bold text-primary display-heading fs-4">V</span>
-                            <small class="fw-bold text-dark" style="font-size: 0.65rem;">VCEC</small>
+                        <div id="badgePreviewContainer" class="rounded-3 border d-flex flex-column align-items-center justify-content-center p-2 bg-light flex-shrink-0 position-relative overflow-hidden" style="width: 80px; height: 80px;">
+                            <img id="badgePreviewImg" src="" class="w-100 h-100 object-fit-cover rounded-2 d-none" alt="Product Image">
+                            <div id="badgeDefaultPlaceholder" class="text-center">
+                                <span class="fw-bold text-primary display-heading fs-4">V</span>
+                                <small class="fw-bold text-dark d-block" style="font-size: 0.65rem;">VCEC</small>
+                            </div>
                         </div>
-                        <div class="p-3 border border-dashed rounded-3 flex-grow-1 text-center bg-light bg-opacity-25" style="border-style: dashed !important; cursor: pointer;">
-                            <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1"></i>
-                            <div class="fw-bold small text-dark">Upload Logo</div>
-                            <small class="text-muted">PNG, JPG (Max 2MB)</small>
-                            <input type="hidden" name="thumbnail" value="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800">
+                        <div class="p-3 border border-dashed rounded-3 flex-grow-1 text-center bg-light bg-opacity-25" 
+                             style="border-style: dashed !important; cursor: pointer; transition: all 0.2s;"
+                             onclick="document.getElementById('inputThumbnailFile').click()">
+                            <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1" id="badgeUploadIcon"></i>
+                            <div class="fw-bold small text-dark" id="badgeUploadText">Upload Product Image</div>
+                            <small class="text-muted d-block" id="badgeUploadSubtext">PNG, JPG, WEBP (Max 10MB) &bull; Click to Browse</small>
+                            <input type="file" id="inputThumbnailFile" name="thumbnail_file" accept="image/*" class="d-none" onchange="handleThumbnailSelect(this)">
+                            <input type="hidden" name="thumbnail" id="inputThumbnailUrl" value="{{ old('thumbnail', '') }}">
                         </div>
                     </div>
                 </div>
 
                 <!-- Cover Image / Banner -->
                 <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small">Cover Image / Banner</label>
-                    <div class="p-4 rounded-3 text-center text-white mb-3 position-relative overflow-hidden" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800') center/cover; min-height: 140px;">
-                        <span class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-2" style="cursor: pointer;"><i class="fa-solid fa-xmark"></i></span>
-                        <h5 class="display-heading fw-bold mb-0 mt-3 text-white">SKILL TODAY BETTER TOMORROW</h5>
-                        <small class="text-white-50">Cover Banner Preview</small>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-bold text-dark small mb-0">Cover Image / Banner</label>
+                        <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-semibold" onclick="document.getElementById('inputCoverFile').click()">
+                            <i class="fa-solid fa-camera me-1"></i> Change Banner
+                        </button>
                     </div>
-                    <input type="hidden" name="cover_image" value="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800">
+                    <div id="bannerPreviewBox" class="p-4 rounded-3 text-center text-white mb-3 position-relative overflow-hidden d-flex flex-column justify-content-center align-items-center" 
+                         style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800') center/cover; min-height: 140px; cursor: pointer;"
+                         onclick="document.getElementById('inputCoverFile').click()">
+                        <span id="bannerClearBtn" class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-2" style="cursor: pointer;" onclick="event.stopPropagation(); clearBannerImage();" title="Remove custom banner"><i class="fa-solid fa-xmark"></i></span>
+                        <h5 class="display-heading fw-bold mb-0 text-white" id="bannerHeadingText">SKILL TODAY BETTER TOMORROW</h5>
+                        <small class="text-white-50" id="bannerSubtext">Cover Banner Preview &bull; Click anywhere to upload</small>
+                    </div>
+                    <input type="file" id="inputCoverFile" name="cover_file" accept="image/*" class="d-none" onchange="handleCoverSelect(this)">
+                    <input type="hidden" name="cover_image" id="inputCoverUrl" value="{{ old('cover_image', '') }}">
 
                     <!-- Gallery Thumbnails -->
-                    <div class="d-flex flex-wrap gap-2">
-                        <div class="rounded-2 border overflow-hidden position-relative" style="width: 70px; height: 50px;">
-                            <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=200" class="w-100 h-100 object-fit-cover">
+                    <div>
+                        <label class="form-label fw-semibold text-secondary small mb-2">Gallery Images (Optional)</label>
+                        <div class="d-flex flex-wrap gap-2" id="galleryContainer">
+                            <div class="rounded-2 border border-dashed d-flex flex-column align-items-center justify-content-center text-muted bg-light" 
+                                 style="width: 70px; height: 50px; cursor: pointer; font-size: 0.65rem;"
+                                 onclick="document.getElementById('inputGalleryFiles').click()"
+                                 title="Add image to gallery">
+                                <i class="fa-solid fa-plus fs-6 text-primary mb-1"></i>
+                                <span>Add More</span>
+                            </div>
                         </div>
-                        <div class="rounded-2 border overflow-hidden position-relative" style="width: 70px; height: 50px;">
-                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=200" class="w-100 h-100 object-fit-cover">
-                        </div>
-                        <div class="rounded-2 border overflow-hidden position-relative" style="width: 70px; height: 50px;">
-                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200" class="w-100 h-100 object-fit-cover">
-                        </div>
-                        <div class="rounded-2 border border-dashed d-flex flex-column align-items-center justify-content-center text-muted" style="width: 70px; height: 50px; cursor: pointer; font-size: 0.65rem;">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>Add More</span>
-                        </div>
+                        <input type="file" id="inputGalleryFiles" name="gallery_files[]" multiple accept="image/*" class="d-none" onchange="handleGallerySelect(this)">
+                        <input type="hidden" name="gallery" id="inputGalleryJson" value="[]">
                     </div>
                 </div>
 
@@ -526,16 +539,31 @@
                 <div class="mb-4">
                     <label class="form-label fw-bold text-dark small">Product Demo Video (Optional)</label>
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-3 border overflow-hidden position-relative flex-shrink-0" style="width: 90px; height: 60px;">
-                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" class="w-100 h-100 object-fit-cover">
-                            <span class="position-absolute top-50 start-50 translate-middle text-white fs-5"><i class="fa-solid fa-circle-play"></i></span>
+                        <div id="videoPreviewContainer" class="rounded-3 border overflow-hidden position-relative flex-shrink-0 bg-dark d-flex align-items-center justify-content-center" style="width: 90px; height: 60px;">
+                            <video id="videoPreviewPlayer" class="w-100 h-100 object-fit-cover d-none" controls playsinline></video>
+                            <div id="videoPreviewPlaceholder" class="text-center text-white">
+                                <i class="fa-solid fa-circle-play fs-4 text-primary"></i>
+                            </div>
                         </div>
-                        <div class="p-3 border border-dashed rounded-3 flex-grow-1 text-center bg-light bg-opacity-25" style="border-style: dashed !important; cursor: pointer;">
-                            <i class="fa-solid fa-video text-primary fs-4 mb-1"></i>
-                            <div class="fw-bold small text-dark">Upload Video</div>
-                            <small class="text-muted">MP4 (Max 100MB)</small>
-                            <input type="hidden" name="video_url" value="https://example.com/demo-video.mp4">
+                        <div class="p-3 border border-dashed rounded-3 flex-grow-1 text-center bg-light bg-opacity-25" 
+                             style="border-style: dashed !important; cursor: pointer; transition: all 0.2s;"
+                             onclick="document.getElementById('inputVideoFile').click()">
+                            <i class="fa-solid fa-video text-primary fs-4 mb-1" id="videoUploadIcon"></i>
+                            <div class="fw-bold small text-dark" id="videoUploadText">Upload Video</div>
+                            <small class="text-muted d-block" id="videoUploadSubtext">MP4, WEBM, MOV (Max 150MB) &bull; Click to Browse</small>
+                            <input type="file" id="inputVideoFile" name="video_file" accept="video/mp4,video/webm,video/quicktime,video/ogg,.mp4,.mov,.webm" class="d-none" onchange="handleVideoSelect(this)">
+                            <input type="hidden" name="video_url" id="inputVideoUrl" value="{{ old('video_url', '') }}">
                         </div>
+                    </div>
+
+                    <!-- Direct Video URL Alternative -->
+                    <div class="mt-2">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white text-muted"><i class="fa-brands fa-youtube me-1 text-danger"></i> Or Video URL</span>
+                            <input type="url" class="form-control" id="inputVideoUrlField" placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..." 
+                                   oninput="document.getElementById('inputVideoUrl').value = this.value">
+                        </div>
+                        <small class="text-muted" style="font-size: 0.7rem;">Enter YouTube, Vimeo, or hosted MP4 URL if you prefer not uploading directly</small>
                     </div>
                 </div>
 
@@ -977,6 +1005,191 @@
         if (badgeRow) badgeRow.style.display = addon1 ? 'flex' : 'none';
 
         document.getElementById('summaryProductTotalPrice').textContent = '₹' + total.toLocaleString();
+    }
+
+    // ==========================================
+    // MEDIA & GALLERY FILE UPLOAD HANDLERS
+    // ==========================================
+    const uploadApiUrl = "{{ route('seller.media.upload') }}";
+    const csrfToken = "{{ csrf_token() }}";
+
+    function uploadFileAjax(file, type, onSuccess, onError, onProgress) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+        formData.append('_token', csrfToken);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', uploadApiUrl, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        if (onProgress && xhr.upload) {
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    onProgress(percent);
+                }
+            };
+        }
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const res = JSON.parse(xhr.responseText);
+                    if (res.success) {
+                        if (onSuccess) onSuccess(res);
+                        return;
+                    }
+                } catch(e) {}
+            }
+            if (onError) onError(xhr.statusText || 'Upload failed');
+        };
+
+        xhr.onerror = function() {
+            if (onError) onError('Network error occurred during upload');
+        };
+
+        xhr.send(formData);
+    }
+
+    // 1. Thumbnail / Product Logo
+    function handleThumbnailSelect(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewImg = document.getElementById('badgePreviewImg');
+            const defaultPlaceholder = document.getElementById('badgeDefaultPlaceholder');
+            if (previewImg) {
+                previewImg.src = e.target.result;
+                previewImg.classList.remove('d-none');
+            }
+            if (defaultPlaceholder) defaultPlaceholder.classList.add('d-none');
+        };
+        reader.readAsDataURL(file);
+
+        const uploadText = document.getElementById('badgeUploadText');
+        const uploadSub = document.getElementById('badgeUploadSubtext');
+        const uploadIcon = document.getElementById('badgeUploadIcon');
+        if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading ' + file.name + '...</span>';
+
+        uploadFileAjax(file, 'thumbnail', function(res) {
+            if (uploadText) uploadText.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Image Ready: ' + file.name + '</span>';
+            if (uploadSub) uploadSub.textContent = (file.size / 1024).toFixed(1) + ' KB • Click to change';
+            if (uploadIcon) uploadIcon.className = 'fa-solid fa-circle-check text-success fs-4 mb-1';
+            document.getElementById('inputThumbnailUrl').value = res.url;
+        }, function(err) {
+            if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-circle-check me-1"></i> Image Selected: ' + file.name + '</span>';
+            if (uploadSub) uploadSub.textContent = (file.size / 1024).toFixed(1) + ' KB • Ready for save';
+        });
+    }
+
+    // 2. Cover Banner
+    function handleCoverSelect(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const bannerBox = document.getElementById('bannerPreviewBox');
+            if (bannerBox) {
+                bannerBox.style.background = "linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.65)), url('" + e.target.result + "') center/cover";
+            }
+        };
+        reader.readAsDataURL(file);
+
+        const sub = document.getElementById('bannerSubtext');
+        if (sub) sub.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading ' + file.name + '...';
+
+        uploadFileAjax(file, 'cover', function(res) {
+            if (sub) sub.innerHTML = '<i class="fa-solid fa-circle-check text-success me-1"></i> Custom Banner Ready: ' + file.name;
+            document.getElementById('inputCoverUrl').value = res.url;
+        }, function(err) {
+            if (sub) sub.innerHTML = '<i class="fa-solid fa-check text-success me-1"></i> Banner Selected: ' + file.name;
+        });
+    }
+
+    function clearBannerImage() {
+        const input = document.getElementById('inputCoverFile');
+        if (input) input.value = '';
+        document.getElementById('inputCoverUrl').value = '';
+        const bannerBox = document.getElementById('bannerPreviewBox');
+        if (bannerBox) {
+            bannerBox.style.background = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800') center/cover";
+        }
+        const sub = document.getElementById('bannerSubtext');
+        if (sub) sub.textContent = 'Cover Banner Preview • Click anywhere to upload';
+    }
+
+    // 3. Gallery Multi-files
+    let galleryList = [];
+    function handleGallerySelect(input) {
+        if (!input.files || input.files.length === 0) return;
+        const container = document.getElementById('galleryContainer');
+        const addBtn = container.querySelector('.border-dashed');
+
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'rounded-2 border overflow-hidden position-relative';
+                itemDiv.style.width = '70px';
+                itemDiv.style.height = '50px';
+                itemDiv.innerHTML = `
+                    <img src="${e.target.result}" class="w-100 h-100 object-fit-cover">
+                    <span class="position-absolute top-0 end-0 bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" 
+                          style="width: 16px; height: 16px; font-size: 0.55rem; cursor: pointer; margin: 2px;"
+                          onclick="this.parentElement.remove(); updateGalleryJson();" title="Remove">&times;</span>
+                `;
+                container.insertBefore(itemDiv, addBtn);
+            };
+            reader.readAsDataURL(file);
+
+            uploadFileAjax(file, 'gallery', function(res) {
+                galleryList.push(res.url);
+                updateGalleryJson();
+            });
+        });
+    }
+
+    function updateGalleryJson() {
+        document.getElementById('inputGalleryJson').value = JSON.stringify(galleryList);
+    }
+
+    // 4. Video Upload
+    function handleVideoSelect(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        const player = document.getElementById('videoPreviewPlayer');
+        const placeholder = document.getElementById('videoPreviewPlaceholder');
+        if (player) {
+            player.src = URL.createObjectURL(file);
+            player.classList.remove('d-none');
+        }
+        if (placeholder) placeholder.classList.add('d-none');
+
+        const uploadText = document.getElementById('videoUploadText');
+        const uploadSub = document.getElementById('videoUploadSubtext');
+        const uploadIcon = document.getElementById('videoUploadIcon');
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+
+        if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading ' + file.name + ' (' + sizeMb + ' MB)...</span>';
+
+        uploadFileAjax(file, 'video', function(res) {
+            if (uploadText) uploadText.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Video Ready: ' + file.name + '</span>';
+            if (uploadSub) uploadSub.textContent = sizeMb + ' MB • Uploaded successfully';
+            if (uploadIcon) uploadIcon.className = 'fa-solid fa-circle-check text-success fs-4 mb-1';
+            document.getElementById('inputVideoUrl').value = res.url;
+            const urlField = document.getElementById('inputVideoUrlField');
+            if (urlField) urlField.value = res.url;
+        }, function(err) {
+            if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-circle-check me-1"></i> Video Selected: ' + file.name + '</span>';
+            if (uploadSub) uploadSub.textContent = sizeMb + ' MB • Ready for save';
+        }, function(progress) {
+            if (uploadSub) uploadSub.textContent = 'Uploading: ' + progress + '% (' + sizeMb + ' MB)';
+        });
     }
 </script>
 @endsection
