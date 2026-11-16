@@ -29,9 +29,13 @@ class SellerRegistrationController extends Controller
     /**
      * Show the 4-step seller registration form.
      */
-    public function showRegistrationForm(): View
+    public function showRegistrationForm(): \Illuminate\Http\Response
     {
-        return view('auth.seller-register');
+        return response()
+            ->view('auth.seller-register')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     }
 
     /**
