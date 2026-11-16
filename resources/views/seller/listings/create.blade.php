@@ -139,6 +139,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        cursor: pointer;
     }
     .pricing-plan-card:hover {
         border-color: #cbd5e1;
@@ -147,6 +148,62 @@
         border-color: #0066ff;
         background: #f8faff;
         box-shadow: 0 8px 24px -8px rgba(0, 102, 255, 0.2);
+    }
+
+    .pricing-plan-card .btn-plan-action {
+        width: 100%;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.55rem 1rem;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        border: 1.5px solid #0066ff !important;
+        background-color: transparent !important;
+        color: #0066ff !important;
+    }
+    .pricing-plan-card .btn-plan-action:hover {
+        background-color: #eff6ff !important;
+        color: #0052cc !important;
+    }
+    .pricing-plan-card.selected .btn-plan-action {
+        background-color: #0066ff !important;
+        color: #ffffff !important;
+        border-color: #0066ff !important;
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+    }
+    .pricing-plan-card.selected .btn-plan-action:hover {
+        background-color: #0052cc !important;
+        color: #ffffff !important;
+    }
+
+    .plan-feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.25rem 0;
+        flex-grow: 1;
+    }
+    .plan-feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.84rem;
+        color: #334155;
+        font-weight: 500;
+        margin-bottom: 0.65rem;
+        line-height: 1.4;
+    }
+    .plan-feature-check {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #ecfdf5;
+        color: #059669;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        flex-shrink: 0;
+        margin-top: 2px;
     }
 
     .font-mono-code {
@@ -680,42 +737,75 @@
                     <div class="col-md-4">
                         <div class="pricing-plan-card" id="cardPlanFree" onclick="selectPlan('Free Listing', 0, this)">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="plan_radio" class="form-check-input">
-                                <h6 class="fw-bold text-dark mb-0">Free Listing</h6>
+                                <input type="radio" name="plan_radio" class="form-check-input" style="cursor: pointer;">
+                                <h6 class="fw-bold text-dark mb-0 fs-6">Free Listing</h6>
                             </div>
-                            <div class="display-heading fw-bold text-dark mb-3" style="font-size: 1.4rem;">
-                                ₹0 <small class="text-muted fs-6 fw-normal">/ lifetime</small>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹0</span>
+                                <span class="text-secondary small ms-2 fw-medium">/ lifetime</span>
                             </div>
-                            <ul class="list-unstyled small text-secondary flex-grow-1 mb-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Basic business profile</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> 3 images</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Appear in search results</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Get customer inquiries</li>
+                            <ul class="plan-feature-list">
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Basic business profile</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>3 images</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Appear in search results</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Get customer inquiries</span>
+                                </li>
                             </ul>
-                            <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-semibold">Select Plan</button>
+                            <button type="button" class="btn btn-plan-action">Select Plan</button>
                         </div>
                     </div>
 
                     <!-- Plan 2: Premium Listing (Most Popular) -->
                     <div class="col-md-4">
                         <div class="pricing-plan-card selected" id="cardPlanPremium" onclick="selectPlan('Premium Listing', 1499, this)">
-                            <span class="badge bg-primary position-absolute top-0 end-0 m-2 rounded-pill px-2 py-1" style="font-size: 0.65rem;">Most Popular</span>
+                            <span class="badge bg-primary position-absolute top-0 end-0 m-3 rounded-pill px-2.5 py-1 fw-bold shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.02em;">Most Popular</span>
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="plan_radio" class="form-check-input" checked>
-                                <h6 class="fw-bold text-dark mb-0">Premium Listing</h6>
+                                <input type="radio" name="plan_radio" class="form-check-input" style="cursor: pointer;" checked>
+                                <h6 class="fw-bold text-dark mb-0 fs-6">Premium Listing</h6>
                             </div>
-                            <div class="display-heading fw-bold text-dark mb-3" style="font-size: 1.4rem;">
-                                ₹1,499 <small class="text-muted fs-6 fw-normal">/ year</small>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹1,499</span>
+                                <span class="text-muted small ms-2 text-decoration-line-through fw-medium">₹2,999</span>
+                                <span class="text-secondary small ms-2 fw-medium">/ year</span>
                             </div>
-                            <ul class="list-unstyled small text-secondary flex-grow-1 mb-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Business profile with banner</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> 10 images + 1 video</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Featured in search results</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Show contact details</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Get verified badge</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Priority in listings</li>
+                            <ul class="plan-feature-list">
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Business profile with banner</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>10 images + 1 video</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Featured in search results</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Show contact details</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Get verified badge</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Priority in listings</span>
+                                </li>
                             </ul>
-                            <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold" style="background-color: #0066ff;">Selected &check;</button>
+                            <button type="button" class="btn btn-plan-action">Selected ✓</button>
                         </div>
                     </div>
 
@@ -723,21 +813,41 @@
                     <div class="col-md-4">
                         <div class="pricing-plan-card" id="cardPlanFeatured" onclick="selectPlan('Featured Listing', 2999, this)">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="plan_radio" class="form-check-input">
-                                <h6 class="fw-bold text-dark mb-0">Featured Listing</h6>
+                                <input type="radio" name="plan_radio" class="form-check-input" style="cursor: pointer;">
+                                <h6 class="fw-bold text-dark mb-0 fs-6">Featured Listing</h6>
                             </div>
-                            <div class="display-heading fw-bold text-dark mb-3" style="font-size: 1.4rem;">
-                                ₹2,999 <small class="text-muted fs-6 fw-normal">/ year</small>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹2,999</span>
+                                <span class="text-muted small ms-2 text-decoration-line-through fw-medium">₹4,999</span>
+                                <span class="text-secondary small ms-2 fw-medium">/ year</span>
                             </div>
-                            <ul class="list-unstyled small text-secondary flex-grow-1 mb-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> All Premium features</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Top position in category</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Homepage featured</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Special highlight badge</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> More visibility & leads</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Dedicated support</li>
+                            <ul class="plan-feature-list">
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>All Premium features</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Top position in category</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Homepage featured</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Special highlight badge</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>More visibility & leads</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Dedicated support</span>
+                                </li>
                             </ul>
-                            <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-semibold">Select Plan</button>
+                            <button type="button" class="btn btn-plan-action">Select Plan</button>
                         </div>
                     </div>
                 </div>
@@ -979,20 +1089,20 @@
             p.classList.remove('selected');
             const r = p.querySelector('input[type="radio"]');
             if (r) r.checked = false;
-            const btn = p.querySelector('button');
+            const btn = p.querySelector('.btn-plan-action');
             if (btn) {
-                btn.className = 'btn btn-outline-primary btn-sm w-100 fw-semibold';
                 btn.textContent = 'Select Plan';
+                btn.removeAttribute('style');
             }
         });
 
         element.classList.add('selected');
         const r = element.querySelector('input[type="radio"]');
         if (r) r.checked = true;
-        const btn = element.querySelector('button');
+        const btn = element.querySelector('.btn-plan-action');
         if (btn) {
-            btn.className = 'btn btn-primary btn-sm w-100 fw-semibold';
             btn.textContent = 'Selected ✓';
+            btn.removeAttribute('style');
         }
 
         document.getElementById('inputPlanName').value = name;

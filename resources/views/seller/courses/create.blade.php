@@ -139,6 +139,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        cursor: pointer;
     }
     .pricing-plan-card:hover {
         border-color: #cbd5e1;
@@ -147,6 +148,62 @@
         border-color: #0066ff;
         background: #f8faff;
         box-shadow: 0 8px 24px -8px rgba(0, 102, 255, 0.2);
+    }
+
+    .pricing-plan-card .btn-plan-action {
+        width: 100%;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.55rem 1rem;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        border: 1.5px solid #0066ff !important;
+        background-color: transparent !important;
+        color: #0066ff !important;
+    }
+    .pricing-plan-card .btn-plan-action:hover {
+        background-color: #eff6ff !important;
+        color: #0052cc !important;
+    }
+    .pricing-plan-card.selected .btn-plan-action {
+        background-color: #0066ff !important;
+        color: #ffffff !important;
+        border-color: #0066ff !important;
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+    }
+    .pricing-plan-card.selected .btn-plan-action:hover {
+        background-color: #0052cc !important;
+        color: #ffffff !important;
+    }
+
+    .plan-feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.25rem 0;
+        flex-grow: 1;
+    }
+    .plan-feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        font-size: 0.84rem;
+        color: #334155;
+        font-weight: 500;
+        margin-bottom: 0.65rem;
+        line-height: 1.4;
+    }
+    .plan-feature-check {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #ecfdf5;
+        color: #059669;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        flex-shrink: 0;
+        margin-top: 2px;
     }
 
     .font-mono-code {
@@ -694,42 +751,75 @@
                     <div class="col-md-4">
                         <div class="pricing-plan-card" id="cardCourseFree" onclick="selectCoursePricingPlan('Free Preview Tier', 0, 0, this)">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="course_plan_radio" class="form-check-input">
-                                <h6 class="fw-bold text-dark mb-0">Free Preview Tier</h6>
+                                <input type="radio" name="course_plan_radio" class="form-check-input" style="cursor: pointer;">
+                                <h6 class="fw-bold text-dark mb-0 fs-6">Free Preview Tier</h6>
                             </div>
-                            <div class="display-heading fw-bold text-dark mb-3" style="font-size: 1.4rem;">
-                                ₹0 <small class="text-muted fs-6 fw-normal">/ lifetime</small>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹0</span>
+                                <span class="text-secondary small ms-2 fw-medium">/ lifetime</span>
                             </div>
-                            <ul class="list-unstyled small text-secondary flex-grow-1 mb-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Access to introductory modules</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Community forum read access</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Standard video playback</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Lead generation access</li>
+                            <ul class="plan-feature-list">
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Access to introductory modules</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Community forum read access</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Standard video playback</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Lead generation access</span>
+                                </li>
                             </ul>
-                            <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-semibold">Select Plan</button>
+                            <button type="button" class="btn btn-plan-action">Select Plan</button>
                         </div>
                     </div>
 
                     <!-- Plan 2: Premium Course Track (Most Popular) -->
                     <div class="col-md-4">
                         <div class="pricing-plan-card selected" id="cardCoursePremium" onclick="selectCoursePricingPlan('Premium Course Track', 1499, 2999, this)">
-                            <span class="badge bg-primary position-absolute top-0 end-0 m-2 rounded-pill px-2 py-1" style="font-size: 0.65rem;">Most Popular</span>
+                            <span class="badge bg-primary position-absolute top-0 end-0 m-3 rounded-pill px-2.5 py-1 fw-bold shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.02em;">Most Popular</span>
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="course_plan_radio" class="form-check-input" checked>
-                                <h6 class="fw-bold text-dark mb-0">Premium Listing</h6>
+                                <input type="radio" name="course_plan_radio" class="form-check-input" style="cursor: pointer;" checked>
+                                <h6 class="fw-bold text-dark mb-0 fs-6">Premium Listing</h6>
                             </div>
-                            <div class="display-heading fw-bold text-dark mb-3" style="font-size: 1.4rem;">
-                                ₹1,499 <small class="text-muted fs-6 fw-normal text-decoration-line-through">₹2,999</small>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹1,499</span>
+                                <span class="text-muted small ms-2 text-decoration-line-through fw-medium">₹2,999</span>
+                                <span class="text-secondary small ms-2 fw-medium">/ lifetime</span>
                             </div>
-                            <ul class="list-unstyled small text-secondary flex-grow-1 mb-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Full lifetime course access</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> 48.5 Hours of HD video lessons</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Verified completion certificate</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> 45+ Downloadable resource files</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Direct instructor Q&A access</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Featured on category top shelf</li>
+                            <ul class="plan-feature-list">
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Full lifetime course access</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>48.5 Hours of HD video lessons</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Verified completion certificate</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>45+ Downloadable resource files</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Direct instructor Q&A access</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Featured on category top shelf</span>
+                                </li>
                             </ul>
-                            <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold" style="background-color: #0066ff;">Selected &check;</button>
+                            <button type="button" class="btn btn-plan-action">Selected ✓</button>
                         </div>
                     </div>
 
@@ -737,21 +827,41 @@
                     <div class="col-md-4">
                         <div class="pricing-plan-card" id="cardCourseFeatured" onclick="selectCoursePricingPlan('Featured Master Track', 2999, 4999, this)">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="course_plan_radio" class="form-check-input">
-                                <h6 class="fw-bold text-dark mb-0">Featured Listing</h6>
+                                <input type="radio" name="course_plan_radio" class="form-check-input" style="cursor: pointer;">
+                                <h6 class="fw-bold text-dark mb-0 fs-6">Featured Listing</h6>
                             </div>
-                            <div class="display-heading fw-bold text-dark mb-3" style="font-size: 1.4rem;">
-                                ₹2,999 <small class="text-muted fs-6 fw-normal text-decoration-line-through">₹4,999</small>
+                            <div class="d-flex align-items-baseline mb-3">
+                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹2,999</span>
+                                <span class="text-muted small ms-2 text-decoration-line-through fw-medium">₹4,999</span>
+                                <span class="text-secondary small ms-2 fw-medium">/ lifetime</span>
                             </div>
-                            <ul class="list-unstyled small text-secondary flex-grow-1 mb-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> All Premium features included</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> 1-on-1 Project code review</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Homepage featured banner position</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Special highlight verified badge</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Career counseling & mock interviews</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-1"></i> Dedicated student support</li>
+                            <ul class="plan-feature-list">
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>All Premium features included</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>1-on-1 Project code review</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Homepage featured banner position</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Special highlight verified badge</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Career counseling & mock interviews</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
+                                    <span>Dedicated student support</span>
+                                </li>
                             </ul>
-                            <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-semibold">Select Plan</button>
+                            <button type="button" class="btn btn-plan-action">Select Plan</button>
                         </div>
                     </div>
                 </div>
@@ -985,20 +1095,20 @@
             p.classList.remove('selected');
             const r = p.querySelector('input[type="radio"]');
             if (r) r.checked = false;
-            const btn = p.querySelector('button');
+            const btn = p.querySelector('.btn-plan-action');
             if (btn) {
-                btn.className = 'btn btn-outline-primary btn-sm w-100 fw-semibold';
                 btn.textContent = 'Select Plan';
+                btn.removeAttribute('style');
             }
         });
 
         element.classList.add('selected');
         const r = element.querySelector('input[type="radio"]');
         if (r) r.checked = true;
-        const btn = element.querySelector('button');
+        const btn = element.querySelector('.btn-plan-action');
         if (btn) {
-            btn.className = 'btn btn-primary btn-sm w-100 fw-semibold';
             btn.textContent = 'Selected ✓';
+            btn.removeAttribute('style');
         }
 
         document.getElementById('inputCoursePlanName').value = name;
