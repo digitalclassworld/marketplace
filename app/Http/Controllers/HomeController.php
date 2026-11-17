@@ -40,7 +40,7 @@ class HomeController extends Controller
         // Safely check if database table exists
         try {
             if (Schema::hasTable('business_listings')) {
-                $query = BusinessListing::query()->whereIn('status', ['approved', 'active', 'published', 'pending']);
+                $query = BusinessListing::query()->whereIn('status', ['approved', 'active', 'published']);
 
                 if (!empty($searchQuery)) {
                     $query->where(function ($q) use ($searchQuery) {
@@ -109,7 +109,7 @@ class HomeController extends Controller
             // Also load seller uploaded courses, services and products for homepage showcase
             if (Schema::hasTable('courses')) {
                 $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
                     ->latest()
                     ->take(8)
                     ->get();
@@ -117,7 +117,7 @@ class HomeController extends Controller
 
             if (Schema::hasTable('services')) {
                 $featuredServices = Service::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
                     ->latest()
                     ->take(8)
                     ->get();
@@ -201,7 +201,14 @@ class HomeController extends Controller
                 }
                 if (!$business) {
                     $business = BusinessListing::where('business_name', 'like', '%VCEC%')->first()
-                             ?? BusinessListing::first();
+                             ?? BusinessListing::whereIn('status', ['approved', 'active', 'published'])->first();
+                }
+
+                if ($business && !in_array(strtolower($business->status), ['approved', 'active', 'published'])) {
+                    $canPreview = (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->id === ($business->seller->user_id ?? null)));
+                    if (!$canPreview) {
+                        abort(404, 'This business listing is currently pending admin review and is not publicly available yet.');
+                    }
                 }
             }
         } catch (\Throwable $e) {
@@ -444,7 +451,7 @@ class HomeController extends Controller
 
         try {
             if (Schema::hasTable('courses')) {
-                $query = \App\Models\Course::query()->whereIn('status', ['approved', 'active', 'published', 'pending']);
+                $query = \App\Models\Course::query()->whereIn('status', ['approved', 'active', 'published']);
 
                 if (!empty($searchQuery)) {
                     $query->where(function ($q) use ($searchQuery) {
@@ -936,7 +943,7 @@ class HomeController extends Controller
         try {
             if (Schema::hasTable('services')) {
                 $dbServices = \App\Models\Service::query()
-                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
                     ->with('seller.businessDetail', 'seller.user')
                     ->get();
 
@@ -1105,6 +1112,13 @@ class HomeController extends Controller
                         ->where('title', 'like', "%{$normalized}%")
                         ->orWhere('slug', 'like', "%{$slug}%")
                         ->first();
+                }
+
+                if ($service && !in_array(strtolower($service->status), ['approved', 'active', 'published'])) {
+                    $canPreview = (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->id === ($service->seller->user_id ?? null)));
+                    if (!$canPreview) {
+                        abort(404, 'This service is currently pending admin review and is not publicly available yet.');
+                    }
                 }
             }
         } catch (\Throwable $e) {
@@ -2127,12 +2141,19 @@ class HomeController extends Controller
             abort(404, 'Course not found');
         }
 
+        if ($course && !in_array(strtolower($course->status), ['approved', 'active', 'published'])) {
+            $canPreview = (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->id === ($course->seller->user_id ?? null)));
+            if (!$canPreview) {
+                abort(404, 'This course is currently pending admin review and is not publicly available yet.');
+            }
+        }
+
         // Related courses for "You May Also Like"
         $relatedCourses = collect();
         try {
             if (Schema::hasTable('courses')) {
                 $relatedCourses = \App\Models\Course::where('id', '!=', $course?->id ?? 0)
-                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
                     ->take(4)
                     ->get();
             }
@@ -3083,13 +3104,13 @@ class HomeController extends Controller
             if (Schema::hasTable('products')) {
                 $similarProducts = \App\Models\Product::where('id', '!=', $product->id ?? 0)
                     ->where('category', $product->category)
-                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
                     ->take(3)
                     ->get();
 
                 if ($similarProducts->isEmpty()) {
                     $similarProducts = \App\Models\Product::where('id', '!=', $product->id ?? 0)
-                        ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                        ->whereIn('status', ['approved', 'active', 'published'])
                         ->take(3)
                         ->get();
                 }

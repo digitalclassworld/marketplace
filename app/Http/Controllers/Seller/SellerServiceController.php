@@ -71,10 +71,10 @@ class SellerServiceController extends Controller
             'cover_image'        => $media['cover_image'],
             'video_url'          => $media['video_url'],
             'gallery'            => $media['gallery'],
-            'status'             => 'approved',
+            'status'             => 'pending',
         ]);
 
-        return redirect()->route('seller.services.index')->with('success', 'Service published successfully! Your listing is now live on the marketplace.');
+        return redirect()->route('seller.services.index')->with('success', 'Service submitted successfully! It has been submitted for admin approval and will appear on the marketplace once approved.');
     }
 }
 

@@ -104,6 +104,7 @@ class CatalogManagementTest extends TestCase
             'seller_id' => $seller->id,
             'title'     => 'Complete Digital Marketing Course',
             'price'     => 2999.00,
+            'status'    => 'pending',
         ]);
 
         $this->assertDatabaseHas('course_contents', [
@@ -133,6 +134,7 @@ class CatalogManagementTest extends TestCase
             'seller_id' => $seller->id,
             'title'     => 'Professional Logo Design Service',
             'price'     => 1999.00,
+            'status'    => 'pending',
         ]);
     }
 
@@ -178,6 +180,7 @@ class CatalogManagementTest extends TestCase
         $this->assertDatabaseHas('business_listings', [
             'seller_id'     => $seller->id,
             'business_name' => 'Apex Academy of Code',
+            'status'        => 'pending',
         ]);
     }
 
@@ -217,6 +220,100 @@ class CatalogManagementTest extends TestCase
         $responseApproved = $this->get(route('products'));
         $responseApproved->assertStatus(200);
         $responseApproved->assertSee('Unique Mechanical Keyboard Pro');
+    }
+
+    public function test_pending_course_requires_admin_approval_before_appearing_on_marketplace(): void
+    {
+        [$user, $seller] = $this->createApprovedSeller();
+        $admin = $this->createAdminUser();
+
+        $this->actingAs($user)->post(route('seller.courses.store'), [
+            'title'             => 'Advanced Python Framework Mastery',
+            'category'          => 'Software & Tech',
+            'language'          => 'English',
+            'level'             => 'Advanced',
+            'short_description' => 'Deep dive into Python web architecture.',
+            'price'             => 4999.00,
+            'discount_price'    => 2499.00,
+            'access_type'       => 'Lifetime Access',
+        ])->assertRedirect(route('seller.courses.index'));
+
+        $course = \App\Models\Course::where('title', 'Advanced Python Framework Mastery')->first();
+        $this->assertNotNull($course);
+        $this->assertSame('pending', $course->status);
+
+        // Does not show on marketplace courses
+        $this->get(route('courses'))->assertDontSee('Advanced Python Framework Mastery');
+
+        // Admin approves course
+        $this->actingAs($admin)->post(route('admin.catalog.courses.approve', $course->id))->assertRedirect();
+
+        $course->refresh();
+        $this->assertSame('approved', $course->status);
+
+        // Shows on marketplace
+        $this->get(route('courses'))->assertSee('Advanced Python Framework Mastery');
+    }
+
+    public function test_pending_service_requires_admin_approval_before_appearing_on_marketplace(): void
+    {
+        [$user, $seller] = $this->createApprovedSeller();
+        $admin = $this->createAdminUser();
+
+        $this->actingAs($user)->post(route('seller.services.store'), [
+            'title'              => 'NextGen UI/UX Brand Design Pack',
+            'category'           => 'Design & Creative',
+            'short_description'  => 'Complete Figma UI kit and landing page design.',
+            'delivery_days'      => 5,
+            'package_name'       => 'Full Brand Kit',
+            'price'              => 8999.00,
+        ])->assertRedirect(route('seller.services.index'));
+
+        $service = \App\Models\Service::where('title', 'NextGen UI/UX Brand Design Pack')->first();
+        $this->assertNotNull($service);
+        $this->assertSame('pending', $service->status);
+
+        // Does not show on services directory
+        $this->get(route('services'))->assertDontSee('NextGen UI/UX Brand Design Pack');
+
+        // Admin approves service
+        $this->actingAs($admin)->post(route('admin.catalog.services.approve', $service->id))->assertRedirect();
+
+        $service->refresh();
+        $this->assertSame('approved', $service->status);
+
+        // Shows on marketplace
+        $this->get(route('services'))->assertSee('NextGen UI/UX Brand Design Pack');
+    }
+
+    public function test_pending_business_listing_requires_admin_approval_before_appearing_on_marketplace(): void
+    {
+        [$user, $seller] = $this->createApprovedSeller();
+        $admin = $this->createAdminUser();
+
+        $this->actingAs($user)->post(route('seller.listings.store'), [
+            'business_name' => 'Royal Tech Innovation Labs',
+            'category'      => 'Educational Institute',
+            'city'          => 'Ahmedabad',
+            'state'         => 'Gujarat',
+            'pincode'       => '380015',
+        ])->assertRedirect(route('seller.listings.index'));
+
+        $listing = \App\Models\BusinessListing::where('business_name', 'Royal Tech Innovation Labs')->first();
+        $this->assertNotNull($listing);
+        $this->assertSame('pending', $listing->status);
+
+        // Does not show on homepage businesses
+        $this->get(route('home'))->assertDontSee('Royal Tech Innovation Labs');
+
+        // Admin approves listing
+        $this->actingAs($admin)->post(route('admin.catalog.listings.approve', $listing->id))->assertRedirect();
+
+        $listing->refresh();
+        $this->assertSame('approved', $listing->status);
+
+        // Shows on homepage
+        $this->get(route('home'))->assertSee('Royal Tech Innovation Labs');
     }
 
     public function test_super_admin_can_use_entire_seller_portal_and_catalog_creation(): void

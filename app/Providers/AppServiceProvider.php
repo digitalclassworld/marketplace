@@ -135,17 +135,6 @@ class AppServiceProvider extends ServiceProvider
                         'AutoCare Service Center',
                     ])->delete();
                 }
-
-                // Automatically approve all seller items so they show on the marketplace
-                if (\Illuminate\Support\Facades\Schema::hasTable('courses')) {
-                    \App\Models\Course::whereIn('status', ['pending', 'draft'])->update(['status' => 'approved']);
-                }
-                if (\Illuminate\Support\Facades\Schema::hasTable('services')) {
-                    \App\Models\Service::whereIn('status', ['pending', 'draft'])->update(['status' => 'approved']);
-                }
-                if (\Illuminate\Support\Facades\Schema::hasTable('business_listings')) {
-                    \App\Models\BusinessListing::whereIn('status', ['pending', 'draft'])->update(['status' => 'approved']);
-                }
             }
         } catch (\Throwable $e) {
             // Ignore during early migrations or db failures

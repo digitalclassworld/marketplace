@@ -308,7 +308,7 @@
         <div class="wizard-step-item" id="step-nav-7" onclick="goToStep(7)">
             <div class="wizard-step-num">7</div>
             <div>
-                <span class="wizard-step-title">Pricing & Publish</span>
+                <span class="wizard-step-title">Pricing & Plan</span>
                 <span class="wizard-step-sub">Enrollment & add-ons</span>
             </div>
             <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
@@ -317,8 +317,8 @@
         <div class="wizard-step-item" id="step-nav-8" onclick="goToStep(8)">
             <div class="wizard-step-num">8</div>
             <div>
-                <span class="wizard-step-title">Preview & Publish</span>
-                <span class="wizard-step-sub">Final course review</span>
+                <span class="wizard-step-title">Preview & Submit</span>
+                <span class="wizard-step-sub">Submit for admin review</span>
             </div>
         </div>
     </div>
@@ -1138,8 +1138,8 @@
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <h5 class="display-heading fw-bold text-dark mb-1">Preview & Publish</h5>
-                        <p class="text-muted small mb-0">Review your course listing and publish</p>
+                        <h5 class="display-heading fw-bold text-dark mb-1">Preview & Submit</h5>
+                        <p class="text-muted small mb-0">Review your course details and submit for admin approval</p>
                     </div>
                     <div class="btn-group btn-group-sm">
                         <button type="button" class="btn btn-primary fw-semibold px-3" style="background-color: #0066ff;">Desktop View</button>
@@ -1219,11 +1219,16 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mt-4 pt-3 border-top">
                     <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(7)">&larr; Back to Plan</button>
-                    <button type="submit" class="btn btn-success px-5 fw-bold btn-lg shadow-sm">
-                        <i class="fa-solid fa-cloud-arrow-up me-2"></i> Publish Listing
-                    </button>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-success px-5 fw-bold btn-lg shadow-sm">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Submit for Admin Review
+                        </button>
+                        <div class="text-muted small mt-1">
+                            <i class="fa-solid fa-shield-halved text-primary me-1"></i> Requires admin approval before going live on the marketplace
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
