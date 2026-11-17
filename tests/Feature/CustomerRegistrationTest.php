@@ -169,5 +169,25 @@ class CustomerRegistrationTest extends TestCase
             'interests'  => 'Courses, Products',
         ]);
     }
+
+    public function test_customer_profession_displays_under_name_in_navbar(): void
+    {
+        $customer = User::create([
+            'name'              => 'Vaishali Patel',
+            'email'             => 'vaishalipatel123@gmail.com',
+            'phone'             => '9876543210',
+            'profession'        => 'Parent / Guardian',
+            'city'              => 'Ahmedabad',
+            'state'             => 'Gujarat',
+            'role'              => 'customer',
+            'password'          => bcrypt('password123'),
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($customer)->get(route('home'));
+        $response->assertStatus(200);
+        $response->assertSee('Vaishali Patel');
+        $response->assertSee('Parent');
+    }
 }
 

@@ -477,17 +477,27 @@
                         @if(Auth::user()->isCustomer())
                             <!-- Customer Account Menu -->
                             <div class="dropdown">
-                                <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-1.5 rounded-pill px-2.5 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 26px; height: 26px; font-size: 0.75rem;">
+                                <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-2.5 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: #ffffff; border-color: #cbd5e1;">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 28px; height: 28px; font-size: 0.78rem;">
                                         <i class="fa-solid fa-user"></i>
                                     </div>
-                                    <span class="fw-semibold text-dark small text-truncate" style="max-width: 110px;">{{ Auth::user()->name }}</span>
+                                    <div class="text-start d-flex flex-column justify-content-center pe-1" style="line-height: 1.15;">
+                                        <span class="fw-bold text-dark small text-truncate" style="max-width: 120px;">{{ Auth::user()->name }}</span>
+                                        <span class="text-muted text-truncate" style="font-size: 0.68rem; font-weight: 600; max-width: 120px;" title="{{ Auth::user()->profession ?? 'Customer' }}">
+                                            {{ Auth::user()->profession_label ?? (Auth::user()->profession ?? 'Customer') }}
+                                        </span>
+                                    </div>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-1 py-1" style="min-width: 200px;">
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-1 py-1" style="min-width: 220px;">
                                     <li class="px-3 py-2 border-bottom">
                                         <div class="fw-bold text-dark small">{{ Auth::user()->name }}</div>
                                         <div class="text-muted text-truncate" style="font-size: 0.72rem;">{{ Auth::user()->email }}</div>
-                                        <span class="badge bg-primary-subtle text-primary mt-1" style="font-size: 0.65rem;">Customer Account</span>
+                                        <div class="d-flex align-items-center gap-1.5 mt-1.5 flex-wrap">
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle d-inline-flex align-items-center gap-1" style="font-size: 0.68rem; font-weight: 600;">
+                                                <i class="fa-solid fa-user-tag" style="font-size: 0.65rem;"></i>
+                                                {{ Auth::user()->profession ?? 'Customer Account' }}
+                                            </span>
+                                        </div>
                                     </li>
                                     <li>
                                         <a class="dropdown-item small py-2" href="{{ route('customer.profile') }}">
@@ -1270,6 +1280,26 @@
                                     </div>
                                 </div>
 
+                                <!-- Profession / Profile Type -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-dark mb-1.5">Profession / Profile Type <span class="text-danger">*</span></label>
+                                    <div class="input-group auth-input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-graduation-cap"></i></span>
+                                        <select id="custModalRegProfession" class="form-select form-select-sm" required>
+                                            <option value="Student / Learner" selected>Student / Learner (College / School)</option>
+                                            <option value="Parent / Guardian">Parent / Guardian (For my children)</option>
+                                            <option value="Teacher / Educator">Teacher / Educator / Private Tutor</option>
+                                            <option value="Business Owner">Business Owner / Founder / MSME</option>
+                                            <option value="Working Professional / Employee">Working Professional / Employee</option>
+                                            <option value="Job Seeker / Fresher">Job Seeker / Fresher</option>
+                                            <option value="Freelancer / Agency">Freelancer / Agency</option>
+                                            <option value="Retailer / Merchant">Retailer / Store Owner</option>
+                                            <option value="Institute Representative">Institute Representative</option>
+                                            <option value="Other Professional">Other Professional Profile</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <!-- Password & Confirm -->
                                 <div class="row g-2 mb-3.5">
                                     <div class="col-6">
@@ -1521,6 +1551,7 @@
                 name: document.getElementById('custModalRegName').value,
                 email: document.getElementById('custModalRegEmail').value,
                 phone: document.getElementById('custModalRegPhone').value,
+                profession: document.getElementById('custModalRegProfession')?.value || 'Student / Learner',
                 password: pass,
                 password_confirmation: passConf
             };

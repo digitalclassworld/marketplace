@@ -109,4 +109,51 @@ class User extends Authenticatable
     {
         return $this->role === 'customer';
     }
+
+    /**
+     * Get a clean, displayable label for customer profession/type.
+     */
+    public function getProfessionLabelAttribute(): string
+    {
+        if (empty($this->profession)) {
+            return 'Customer';
+        }
+
+        $raw = trim($this->profession);
+
+        if (str_starts_with($raw, 'Student')) {
+            return 'Student';
+        }
+        if (str_starts_with($raw, 'Parent')) {
+            return 'Parent';
+        }
+        if (str_starts_with($raw, 'Teacher') || str_starts_with($raw, 'Educator')) {
+            return 'Teacher';
+        }
+        if (str_starts_with($raw, 'Business')) {
+            return 'Business Owner';
+        }
+        if (str_starts_with($raw, 'Working')) {
+            return 'Working Professional';
+        }
+        if (str_starts_with($raw, 'Job')) {
+            return 'Job Seeker';
+        }
+        if (str_starts_with($raw, 'Retailer')) {
+            return 'Retailer';
+        }
+        if (str_starts_with($raw, 'Freelancer')) {
+            return 'Freelancer';
+        }
+        if (str_starts_with($raw, 'Institute')) {
+            return 'Institute';
+        }
+
+        if (str_contains($raw, '/')) {
+            $parts = explode('/', $raw);
+            return trim($parts[0]);
+        }
+
+        return $raw;
+    }
 }
