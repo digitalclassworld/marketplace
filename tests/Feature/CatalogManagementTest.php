@@ -55,10 +55,23 @@ class CatalogManagementTest extends TestCase
     {
         [$user, $seller] = $this->createApprovedSeller();
 
-        $this->actingAs($user)->get(route('seller.courses.create'))->assertStatus(200);
-        $this->actingAs($user)->get(route('seller.services.create'))->assertStatus(200);
-        $this->actingAs($user)->get(route('seller.products.create'))->assertStatus(200);
-        $this->actingAs($user)->get(route('seller.listings.create'))->assertStatus(200);
+        $courseRes = $this->actingAs($user)->get(route('seller.courses.create'))->assertStatus(200);
+        $courseRes->assertSee('step-content-6');
+        $courseRes->assertSee('step-content-8');
+        $courseRes->assertSee('Course Price');
+
+        $serviceRes = $this->actingAs($user)->get(route('seller.services.create'))->assertStatus(200);
+        $serviceRes->assertSee('step-content-6');
+        $serviceRes->assertSee('step-content-8');
+        $serviceRes->assertSee('Service Price');
+
+        $productRes = $this->actingAs($user)->get(route('seller.products.create'))->assertStatus(200);
+        $productRes->assertSee('step-content-6');
+        $productRes->assertSee('step-content-8');
+        $productRes->assertSee('Product Price');
+
+        $listingRes = $this->actingAs($user)->get(route('seller.listings.create'))->assertStatus(200);
+        $listingRes->assertSee('step-content-7');
     }
 
     public function test_pending_seller_cannot_access_catalog_creation_pages(): void

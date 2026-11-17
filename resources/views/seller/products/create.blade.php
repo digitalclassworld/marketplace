@@ -211,6 +211,25 @@
         font-weight: 700;
         letter-spacing: 0.02em;
     }
+
+    .pricing-model-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        position: relative;
+    }
+    .pricing-model-card:hover {
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+    }
+    .pricing-model-card.selected {
+        border-color: #0066ff;
+        background-color: #f0f7ff;
+        box-shadow: 0 4px 14px -2px rgba(0, 102, 255, 0.15);
+    }
 </style>
 @endsection
 
@@ -280,14 +299,23 @@
         <div class="wizard-step-item" id="step-nav-6" onclick="goToStep(6)">
             <div class="wizard-step-num">6</div>
             <div>
-                <span class="wizard-step-title">Pricing & Plan</span>
-                <span class="wizard-step-sub">Listing plan & add-ons</span>
+                <span class="wizard-step-title">Product Price</span>
+                <span class="wizard-step-sub">Pricing, MRP & stock</span>
             </div>
             <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-7" onclick="goToStep(7)">
             <div class="wizard-step-num">7</div>
+            <div>
+                <span class="wizard-step-title">Pricing & Plan</span>
+                <span class="wizard-step-sub">Listing plan & add-ons</span>
+            </div>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
+        </div>
+
+        <div class="wizard-step-item" id="step-nav-8" onclick="goToStep(8)">
+            <div class="wizard-step-num">8</div>
             <div>
                 <span class="wizard-step-title">Preview & Submit</span>
                 <span class="wizard-step-sub">Submit for admin review</span>
@@ -424,17 +452,18 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-dark small">SKU Code</label>
                         <input type="text" name="sku" id="inputProductSku" class="form-control font-mono-code" placeholder="e.g. DC-PROD-SAAS26" value="{{ old('sku', 'DC-PROD-SAAS26') }}">
+                        <div class="form-text small text-muted">Unique inventory identifier for this product</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Available Stock Units <span class="text-danger">*</span></label>
-                        <input type="number" name="stock_quantity" id="inputStock" class="form-control" value="{{ old('stock_quantity', '250') }}" min="0" required>
+                        <label class="form-label fw-bold text-dark small">Inventory Tracking</label>
+                        <select class="form-select">
+                            <option value="track" selected>Track Stock Units (Configured in Step 6)</option>
+                            <option value="digital">Digital Unlimited Download</option>
+                            <option value="custom">Made to Order</option>
+                        </select>
+                        <div class="form-text small text-muted">Stock units, price & shipping details configured in Step 6</div>
                     </div>
                 </div>
-
-                <!-- Hidden Pass-through for Controller -->
-                <input type="hidden" name="mrp" id="inputMrp" value="3999.00">
-                <input type="hidden" name="weight_grams" value="0">
-                <input type="hidden" name="shipping_details" value="Instant Digital Download (ZIP package containing full source code and Figma file)">
 
                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
                     <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(1)">&larr; Back</button>
@@ -717,16 +746,190 @@
             </div>
         </div>
 
-        <!-- ================= STEP 6: PLAN & PUBLISH ================= -->
+        <!-- ================= STEP 6: PRODUCT PRICE & INVENTORY ================= -->
         <div class="wizard-step-content d-none" id="step-content-6">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Plan & Publish</h5>
+                    <h5 class="display-heading fw-bold text-dark mb-1">Product Price & Inventory</h5>
+                    <p class="text-muted small mb-0">Set regular MRP, selling price, available stock units, and shipping details</p>
+                </div>
+
+                <!-- Hidden Input for Product Pricing Model -->
+                <input type="hidden" name="is_free_product" id="inputIsFreeProduct" value="0">
+
+                <!-- Pricing Model Selector (Paid vs Free Resource) -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="pricing-model-card selected" id="cardProductPaid" onclick="setProductPricingModel('paid')">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="product_pricing_model_radio" id="radioProductPaid" class="form-check-input" checked>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-1" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-tag me-1"></i> Paid Product
+                                    </span>
+                                </div>
+                                <span class="badge bg-success rounded-pill px-2 py-0.5 small fw-semibold">Recommended</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Standard Paid Item</h6>
+                            <p class="text-muted small mb-0">Monetize your physical or digital item with direct buyer orders.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="pricing-model-card" id="cardProductFree" onclick="setProductPricingModel('free')">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="product_pricing_model_radio" id="radioProductFree" class="form-check-input">
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-gift me-1"></i> Free Download / Sample
+                                    </span>
+                                </div>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-0.5 small fw-semibold">Lead Magnet</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">100% Free For All Buyers</h6>
+                            <p class="text-muted small mb-0">Give away sample templates, source code or study kits freely.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Pricing & MRP Section -->
+                <div id="productPricingFieldsSection" class="p-3.5 rounded-4 bg-light border mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Regular Price (MRP) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white fw-bold text-secondary">₹</span>
+                                <input type="number" step="0.01" min="0" name="mrp" id="inputProductMrp" class="form-control font-mono-code fw-bold" placeholder="3999.00" value="{{ old('mrp', '3999.00') }}" oninput="calculateProductDiscount()">
+                            </div>
+                            <div class="form-text small text-muted">Original list price shown as crossed-out original price</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Offer / Selling Price <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white fw-bold text-primary">₹</span>
+                                <input type="number" step="0.01" min="0" name="price" id="inputProductPrice" class="form-control font-mono-code fw-bold text-primary" placeholder="1499.00" value="{{ old('price', '1499.00') }}" required oninput="calculateProductDiscount()">
+                            </div>
+                            <div class="form-text small text-muted">The actual final amount the customer pays to purchase</div>
+                        </div>
+
+                        <!-- Live Calculation & Savings Badge -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 bg-white border">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger rounded-pill px-2.5 py-1 fw-bold fs-7" id="liveProductDiscountBadge">62% OFF</span>
+                                    <span class="small text-secondary" id="liveProductSavingsText">Customers save <strong>₹2,500.00</strong> on this product!</span>
+                                </div>
+                                <div class="small fw-semibold text-success d-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-circle-check"></i> High Conversion Pricing
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock, Weight & Shipping Details -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark small mb-1">
+                            Available Stock Units <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="fa-solid fa-boxes-stacked"></i></span>
+                            <input type="number" min="0" name="stock_quantity" id="inputStockQuantity" class="form-control font-mono-code fw-bold" placeholder="250" value="{{ old('stock_quantity', '250') }}" required oninput="updateLiveProductPill()">
+                            <span class="input-group-text bg-white text-muted">Units</span>
+                        </div>
+                        <div class="form-text small text-muted">Current inventory available for ordering</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark small mb-1">
+                            Item Weight (Grams)
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="fa-solid fa-weight-scale"></i></span>
+                            <input type="number" min="0" name="weight_grams" id="inputWeightGrams" class="form-control font-mono-code fw-semibold" placeholder="0" value="{{ old('weight_grams', '0') }}">
+                            <span class="input-group-text bg-white text-muted">g</span>
+                        </div>
+                        <div class="form-text small text-muted">Leave 0 for digital files or software kits</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark small mb-1">
+                            Shipping / Delivery Method
+                        </label>
+                        <input type="text" name="shipping_details" id="inputShippingDetails" class="form-control fw-semibold" placeholder="e.g. Instant Digital Download" value="{{ old('shipping_details', 'Instant Digital Download (ZIP package containing full source code and Figma file)') }}" oninput="updateLiveProductPill()">
+                        <div class="form-text small text-muted">Fulfillment instructions shown to buyers</div>
+                    </div>
+                </div>
+
+                <!-- Product Guarantees & Features -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label class="form-label fw-bold text-dark small mb-1">Trust & Buyer Guarantees</label>
+                        <div class="d-flex flex-wrap gap-4 pt-1">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchProductGenuine" checked>
+                                <label class="form-check-label small fw-semibold text-dark" for="switchProductGenuine">
+                                    100% Genuine & Verified
+                                </label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchProductReplacement" checked>
+                                <label class="form-check-label small fw-semibold text-dark" for="switchProductReplacement">
+                                    7-Day Replacement Guarantee
+                                </label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchProductFreeShipping" checked>
+                                <label class="form-check-label small fw-semibold text-dark" for="switchProductFreeShipping">
+                                    Free Delivery / Instant Access
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Client Pricing Pill -->
+                <div class="p-3 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-25 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="fa-solid fa-box-open fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="small text-secondary fw-semibold">Live Marketplace Price Tag</div>
+                            <div class="fw-bold text-dark" id="liveProductSummaryText">
+                                Instant Digital Download • 250 Units Available
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="small text-muted text-decoration-line-through font-mono-code" id="liveProductMrpDisplay">₹3,999.00</div>
+                        <div class="fs-4 fw-bolder text-primary font-mono-code" id="liveProductPriceDisplay">₹1,499.00</div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(5)">&larr; Back</button>
+                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(7)">Continue &rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= STEP 7: PLAN & PUBLISH ================= -->
+        <div class="wizard-step-content d-none" id="step-content-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="mb-4">
+                    <h5 class="display-heading fw-bold text-dark mb-1">Pricing & Plan</h5>
                     <p class="text-muted small mb-0">Choose a listing plan and publish your product</p>
                 </div>
 
                 <input type="hidden" name="plan_name" id="inputProductPlanName" value="Premium Listing">
-                <input type="hidden" name="price" id="inputProductPrice" value="1499.00">
+                <input type="hidden" name="listing_plan_price" id="inputListingPlanPrice" value="1499.00">
 
                 <div class="row g-3 mb-4">
                     <!-- Plan 1: Free Listing -->
@@ -895,14 +1098,14 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(5)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(7)">Continue &rarr;</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(6)">&larr; Back</button>
+                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(8)">Continue &rarr;</button>
                 </div>
             </div>
         </div>
 
-        <!-- ================= STEP 7: PREVIEW & PUBLISH ================= -->
-        <div class="wizard-step-content d-none" id="step-content-7">
+        <!-- ================= STEP 8: PREVIEW & PUBLISH ================= -->
+        <div class="wizard-step-content d-none" id="step-content-8">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
@@ -987,7 +1190,7 @@
                 </div>
 
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(6)">&larr; Back</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(7)">&larr; Back</button>
                     <div class="text-end">
                         <button type="submit" class="btn btn-success px-5 fw-bold btn-lg shadow-sm">
                             <i class="fa-solid fa-paper-plane me-2"></i> Submit for Admin Review
@@ -1012,7 +1215,7 @@
     function goToStep(step) {
         currentStep = step;
 
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 1; i <= 8; i++) {
             const content = document.getElementById('step-content-' + i);
             const nav = document.getElementById('step-nav-' + i);
             if (content) content.classList.add('d-none');
@@ -1033,7 +1236,7 @@
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        if (step === 7) {
+        if (step === 8) {
             const title = document.getElementById('inputProductTitle')?.value;
             const cat = document.getElementById('inputProductCategory')?.value;
             const sub = document.getElementById('inputProductSubCategory')?.value;
@@ -1050,6 +1253,110 @@
             if (cat && sub) document.getElementById('previewProductCategory').textContent = sub + ' • ' + cat;
             if (city && state) document.getElementById('previewProductLocation').textContent = city + ', ' + state;
             if (desc) document.getElementById('previewProductAbout').textContent = desc;
+        }
+    }
+
+    function setProductPricingModel(model) {
+        const cardPaid = document.getElementById('cardProductPaid');
+        const cardFree = document.getElementById('cardProductFree');
+        const radioPaid = document.getElementById('radioProductPaid');
+        const radioFree = document.getElementById('radioProductFree');
+        const pricingSection = document.getElementById('productPricingFieldsSection');
+        const isFreeInput = document.getElementById('inputIsFreeProduct');
+        const priceInput = document.getElementById('inputProductPrice');
+
+        if (model === 'free') {
+            cardPaid.classList.remove('selected');
+            cardFree.classList.add('selected');
+            if (radioPaid) radioPaid.checked = false;
+            if (radioFree) radioFree.checked = true;
+            isFreeInput.value = '1';
+            if (pricingSection) pricingSection.style.display = 'none';
+            if (priceInput) priceInput.value = '0.00';
+            const priceDisp = document.getElementById('liveProductPriceDisplay');
+            if (priceDisp) priceDisp.textContent = 'FREE';
+            const mrpDisp = document.getElementById('liveProductMrpDisplay');
+            if (mrpDisp) mrpDisp.textContent = '';
+        } else {
+            cardFree.classList.remove('selected');
+            cardPaid.classList.add('selected');
+            if (radioFree) radioFree.checked = false;
+            if (radioPaid) radioPaid.checked = true;
+            isFreeInput.value = '0';
+            if (pricingSection) pricingSection.style.display = 'block';
+            if (priceInput && (!priceInput.value || parseFloat(priceInput.value) <= 0)) {
+                priceInput.value = '1499.00';
+            }
+            calculateProductDiscount();
+        }
+        updateLiveProductPill();
+    }
+
+    function calculateProductDiscount() {
+        const mrpInput = document.getElementById('inputProductMrp');
+        const priceInput = document.getElementById('inputProductPrice');
+        const badge = document.getElementById('liveProductDiscountBadge');
+        const savingsText = document.getElementById('liveProductSavingsText');
+
+        if (!mrpInput || !priceInput) return;
+
+        const mrp = parseFloat(mrpInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+
+        if (mrp > price && price >= 0 && mrp > 0) {
+            const savings = mrp - price;
+            const percent = Math.round((savings / mrp) * 100);
+            if (badge) {
+                badge.textContent = percent + '% OFF';
+                badge.className = 'badge bg-danger rounded-pill px-2.5 py-1 fw-bold fs-7';
+            }
+            if (savingsText) {
+                savingsText.innerHTML = 'Customers save <strong>₹' + savings.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</strong> on this product!';
+            }
+        } else if (price === mrp && price > 0) {
+            if (badge) {
+                badge.textContent = 'Standard MRP';
+                badge.className = 'badge bg-secondary rounded-pill px-2.5 py-1 fw-bold fs-7';
+            }
+            if (savingsText) savingsText.innerHTML = 'Standard list price';
+        } else {
+            if (badge) {
+                badge.textContent = 'Special Deal';
+                badge.className = 'badge bg-info rounded-pill px-2.5 py-1 fw-bold fs-7';
+            }
+            if (savingsText) savingsText.innerHTML = 'Special deal item';
+        }
+        updateLiveProductPill();
+    }
+
+    function updateLiveProductPill() {
+        const stock = document.getElementById('inputStockQuantity')?.value || '250';
+        const shipping = document.getElementById('inputShippingDetails')?.value || 'Instant Digital Download';
+        const price = parseFloat(document.getElementById('inputProductPrice')?.value) || 0;
+        const mrp = parseFloat(document.getElementById('inputProductMrp')?.value) || 0;
+        const isFree = document.getElementById('inputIsFreeProduct')?.value === '1';
+
+        const summaryEl = document.getElementById('liveProductSummaryText');
+        if (summaryEl) {
+            summaryEl.textContent = shipping + ' • ' + stock + ' Units Available';
+        }
+
+        const priceEl = document.getElementById('liveProductPriceDisplay');
+        const mrpEl = document.getElementById('liveProductMrpDisplay');
+
+        if (isFree) {
+            if (priceEl) priceEl.textContent = 'FREE Download';
+            if (mrpEl) mrpEl.textContent = '';
+        } else {
+            if (priceEl) priceEl.textContent = '₹' + price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (mrpEl) {
+                if (mrp > price) {
+                    mrpEl.style.display = 'block';
+                    mrpEl.textContent = '₹' + mrp.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    mrpEl.style.display = 'none';
+                }
+            }
         }
     }
 
@@ -1099,13 +1406,13 @@
         }
 
         document.getElementById('inputProductPlanName').value = name;
-        document.getElementById('inputProductPrice').value = price.toFixed(2);
+        document.getElementById('inputListingPlanPrice').value = price.toFixed(2);
         updateProductSummary();
     }
 
     function updateProductSummary() {
         const planName = document.getElementById('inputProductPlanName').value;
-        const planPrice = parseFloat(document.getElementById('inputProductPrice').value) || 0;
+        const planPrice = parseFloat(document.getElementById('inputListingPlanPrice').value) || 0;
         const addon1 = document.getElementById('productAddon1').checked;
         const addon2 = document.getElementById('productAddon2').checked;
 
@@ -1306,5 +1613,11 @@
             if (uploadSub) uploadSub.textContent = 'Uploading: ' + progress + '% (' + sizeMb + ' MB)';
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        calculateProductDiscount();
+        updateLiveProductPill();
+        updateProductSummary();
+    });
 </script>
 @endsection

@@ -211,6 +211,25 @@
         font-weight: 700;
         letter-spacing: 0.02em;
     }
+
+    .pricing-model-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        position: relative;
+    }
+    .pricing-model-card:hover {
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+    }
+    .pricing-model-card.selected {
+        border-color: #0066ff;
+        background-color: #f0f7ff;
+        box-shadow: 0 4px 14px -2px rgba(0, 102, 255, 0.15);
+    }
 </style>
 @endsection
 
@@ -280,14 +299,23 @@
         <div class="wizard-step-item" id="step-nav-6" onclick="goToStep(6)">
             <div class="wizard-step-num">6</div>
             <div>
-                <span class="wizard-step-title">Pricing & Plan</span>
-                <span class="wizard-step-sub">Pricing tier & add-ons</span>
+                <span class="wizard-step-title">Service Price</span>
+                <span class="wizard-step-sub">Package & delivery time</span>
             </div>
             <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-7" onclick="goToStep(7)">
             <div class="wizard-step-num">7</div>
+            <div>
+                <span class="wizard-step-title">Pricing & Plan</span>
+                <span class="wizard-step-sub">Listing plan & add-ons</span>
+            </div>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
+        </div>
+
+        <div class="wizard-step-item" id="step-nav-8" onclick="goToStep(8)">
+            <div class="wizard-step-num">8</div>
             <div>
                 <span class="wizard-step-title">Preview & Submit</span>
                 <span class="wizard-step-sub">Submit for admin review</span>
@@ -422,8 +450,13 @@
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Delivery Time (Days) <span class="text-danger">*</span></label>
-                        <input type="number" name="delivery_days" id="inputDeliveryDays" class="form-control" placeholder="5" value="{{ old('delivery_days', '5') }}" required>
+                        <label class="form-label fw-bold text-dark small">Service Level / Model</label>
+                        <select class="form-select">
+                            <option value="Fixed Package" selected>Fixed Price Package (Configured in Step 6)</option>
+                            <option value="Consultation">Free Consultation & Custom Quote</option>
+                            <option value="Dedicated Support">Dedicated Monthly Retainer</option>
+                        </select>
+                        <div class="form-text small text-muted">Delivery turnaround & exact package pricing configured in Step 6</div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-dark small">Search Tags</label>
@@ -515,9 +548,8 @@
                 </div>
 
                 <!-- Hidden Pass-through for Controller -->
-                <input type="hidden" name="package_name" id="inputPackageName" value="Standard">
-                <input type="hidden" name="package_features" value="Up to 5 Responsive Pages, Admin Dashboard, REST APIs, 30 Days Free Support">
-                <input type="hidden" name="buyer_requirements" value="1. Scope of work, 2. Reference websites, 3. Logo & Brand colors, 4. Hosting server credentials">
+                <input type="hidden" name="package_features" id="inputPackageFeatures" value="Up to 5 Responsive Pages, Admin Dashboard, REST APIs, 30 Days Free Support">
+                <input type="hidden" name="buyer_requirements" id="inputBuyerRequirements" value="1. Scope of work, 2. Reference websites, 3. Logo & Brand colors, 4. Hosting server credentials">
 
                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
                     <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(2)">&larr; Back</button>
@@ -717,16 +749,189 @@
             </div>
         </div>
 
-        <!-- ================= STEP 6: PLAN & PUBLISH ================= -->
+        <!-- ================= STEP 6: SERVICE PRICE & PACKAGE ================= -->
         <div class="wizard-step-content d-none" id="step-content-6">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Plan & Publish</h5>
+                    <h5 class="display-heading fw-bold text-dark mb-1">Service Price & Package</h5>
+                    <p class="text-muted small mb-0">Define your package tier, service delivery turnaround, client deliverables, and pricing</p>
+                </div>
+
+                <!-- Hidden Input for Consultation Mode -->
+                <input type="hidden" name="is_consultation" id="inputIsConsultation" value="0">
+
+                <!-- Pricing Model Selector (Fixed Package vs Free Consultation) -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="pricing-model-card selected" id="cardServiceFixed" onclick="setServicePricingModel('paid')">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="service_pricing_model_radio" id="radioServicePaid" class="form-check-input" checked>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-1" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-tag me-1"></i> Fixed Price Package
+                                    </span>
+                                </div>
+                                <span class="badge bg-success rounded-pill px-2 py-0.5 small fw-semibold">Recommended</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Charge For Completed Service</h6>
+                            <p class="text-muted small mb-0">Provide clear deliverables and transparent pricing for instant orders.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="pricing-model-card" id="cardServiceConsult" onclick="setServicePricingModel('free')">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="service_pricing_model_radio" id="radioServiceFree" class="form-check-input">
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-handshake me-1"></i> Free Consultation
+                                    </span>
+                                </div>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-0.5 small fw-semibold">Lead Magnet</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Free Discovery & Custom Quote</h6>
+                            <p class="text-muted small mb-0">Offer clients a complimentary 30-min call and provide customized quotes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Package & Pricing Scope Section -->
+                <div id="servicePricingFieldsSection" class="p-3.5 rounded-4 bg-light border mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Package Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="package_name" id="inputPackageName" class="form-control fw-semibold" placeholder="e.g. Standard Delivery Package" value="{{ old('package_name', 'Standard Delivery Package') }}" required oninput="updateLiveServicePill()">
+                            <div class="form-text small text-muted">A clear name for this service tier or scope</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Delivery Turnaround (Days) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-muted"><i class="fa-solid fa-clock"></i></span>
+                                <input type="number" min="1" max="90" name="delivery_days" id="inputServiceDeliveryDays" class="form-control font-mono-code fw-bold" placeholder="5" value="{{ old('delivery_days', '5') }}" required oninput="updateLiveServicePill()">
+                                <span class="input-group-text bg-white text-muted">Days</span>
+                            </div>
+                            <div class="form-text small text-muted">Estimated working days to complete and deliver</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Regular Price (MRP / List Price) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white fw-bold text-secondary">₹</span>
+                                <input type="number" step="0.01" min="0" name="service_mrp" id="inputServiceMrp" class="form-control font-mono-code fw-bold" placeholder="2999.00" value="2999.00" oninput="calculateServiceDiscount()">
+                            </div>
+                            <div class="form-text small text-muted">Original service value shown as strikethrough price</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Offer / Selling Price <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white fw-bold text-primary">₹</span>
+                                <input type="number" step="0.01" min="0" name="price" id="inputServicePrice" class="form-control font-mono-code fw-bold text-primary" placeholder="1499.00" value="{{ old('price', '1499.00') }}" required oninput="calculateServiceDiscount()">
+                            </div>
+                            <div class="form-text small text-muted">The actual final amount the client pays for this service</div>
+                        </div>
+
+                        <!-- Live Calculation & Savings Badge -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 bg-white border">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger rounded-pill px-2.5 py-1 fw-bold fs-7" id="liveServiceDiscountBadge">50% OFF</span>
+                                    <span class="small text-secondary" id="liveServiceSavingsText">Clients save <strong>₹1,500.00</strong> on this package!</span>
+                                </div>
+                                <div class="small fw-semibold text-success d-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-circle-check"></i> High Conversion Pricing
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Inclusions & Deliverables -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small mb-1">
+                            Revisions Included <span class="text-danger">*</span>
+                        </label>
+                        <select name="revisions" id="inputServiceRevisions" class="form-select fw-semibold" onchange="updateLiveServicePill()">
+                            <option value="3 Revisions" selected>3 Revisions Included</option>
+                            <option value="5 Revisions">5 Revisions Included</option>
+                            <option value="Unlimited Revisions">Unlimited Revisions</option>
+                            <option value="1 Revision">1 Revision Only</option>
+                            <option value="No Revisions">No Revisions</option>
+                        </select>
+                        <div class="form-text small text-muted">Number of modification cycles offered with this package</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small mb-1">Package Deliverables</label>
+                        <div class="d-flex flex-column gap-2 pt-1">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchSourceCode" checked>
+                                <label class="form-check-label small fw-semibold text-dark" for="switchSourceCode">
+                                    Source Files & Assets Included
+                                </label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchCommercialUse" checked>
+                                <label class="form-check-label small fw-semibold text-dark" for="switchCommercialUse">
+                                    Commercial Usage Rights
+                                </label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchSupport" checked>
+                                <label class="form-check-label small fw-semibold text-dark" for="switchSupport">
+                                    30 Days Post-Delivery Support
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Client Pricing Pill -->
+                <div class="p-3 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-25 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="fa-solid fa-briefcase fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="small text-secondary fw-semibold">Client Checkout Preview</div>
+                            <div class="fw-bold text-dark" id="liveServiceSummaryText">
+                                Standard Delivery Package • 5 Days Delivery • 3 Revisions
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="small text-muted text-decoration-line-through font-mono-code" id="liveServiceMrpDisplay">₹2,999.00</div>
+                        <div class="fs-4 fw-bolder text-primary font-mono-code" id="liveServicePriceDisplay">₹1,499.00</div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(5)">&larr; Back</button>
+                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(7)">Continue &rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= STEP 7: PLAN & PUBLISH ================= -->
+        <div class="wizard-step-content d-none" id="step-content-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="mb-4">
+                    <h5 class="display-heading fw-bold text-dark mb-1">Pricing & Plan</h5>
                     <p class="text-muted small mb-0">Choose a listing plan and publish your service</p>
                 </div>
 
                 <input type="hidden" name="plan_name" id="inputServicePlanName" value="Premium Listing">
-                <input type="hidden" name="price" id="inputServicePrice" value="1499.00">
+                <input type="hidden" name="listing_plan_price" id="inputListingPlanPrice" value="1499.00">
 
                 <div class="row g-3 mb-4">
                     <!-- Plan 1: Free Listing -->
@@ -895,14 +1100,14 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(5)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(7)">Continue &rarr;</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(6)">&larr; Back</button>
+                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(8)">Continue &rarr;</button>
                 </div>
             </div>
         </div>
 
-        <!-- ================= STEP 7: PREVIEW & PUBLISH ================= -->
-        <div class="wizard-step-content d-none" id="step-content-7">
+        <!-- ================= STEP 8: PREVIEW & PUBLISH ================= -->
+        <div class="wizard-step-content d-none" id="step-content-8">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
@@ -987,7 +1192,7 @@
                 </div>
 
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(6)">&larr; Back</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(7)">&larr; Back</button>
                     <div class="text-end">
                         <button type="submit" class="btn btn-success px-5 fw-bold btn-lg shadow-sm">
                             <i class="fa-solid fa-paper-plane me-2"></i> Submit for Admin Review
@@ -1012,7 +1217,7 @@
     function goToStep(step) {
         currentStep = step;
 
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 1; i <= 8; i++) {
             const content = document.getElementById('step-content-' + i);
             const nav = document.getElementById('step-nav-' + i);
             if (content) content.classList.add('d-none');
@@ -1033,7 +1238,7 @@
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        if (step === 7) {
+        if (step === 8) {
             const title = document.getElementById('inputServiceTitle')?.value;
             const cat = document.getElementById('inputServiceCategory')?.value;
             const sub = document.getElementById('inputServiceSubCategory')?.value;
@@ -1050,6 +1255,111 @@
             if (cat && sub) document.getElementById('previewServiceCategory').textContent = sub + ' • ' + cat;
             if (city && state) document.getElementById('previewServiceLocation').textContent = city + ', ' + state;
             if (desc) document.getElementById('previewServiceAbout').textContent = desc;
+        }
+    }
+
+    function setServicePricingModel(model) {
+        const cardPaid = document.getElementById('cardServiceFixed');
+        const cardConsult = document.getElementById('cardServiceConsult');
+        const radioPaid = document.getElementById('radioServicePaid');
+        const radioFree = document.getElementById('radioServiceFree');
+        const pricingSection = document.getElementById('servicePricingFieldsSection');
+        const isConsultInput = document.getElementById('inputIsConsultation');
+        const priceInput = document.getElementById('inputServicePrice');
+
+        if (model === 'free') {
+            cardPaid.classList.remove('selected');
+            cardConsult.classList.add('selected');
+            if (radioPaid) radioPaid.checked = false;
+            if (radioFree) radioFree.checked = true;
+            isConsultInput.value = '1';
+            if (pricingSection) pricingSection.style.display = 'none';
+            if (priceInput) priceInput.value = '0.00';
+            const priceDisp = document.getElementById('liveServicePriceDisplay');
+            if (priceDisp) priceDisp.textContent = 'FREE Consultation';
+            const mrpDisp = document.getElementById('liveServiceMrpDisplay');
+            if (mrpDisp) mrpDisp.textContent = '';
+        } else {
+            cardConsult.classList.remove('selected');
+            cardPaid.classList.add('selected');
+            if (radioFree) radioFree.checked = false;
+            if (radioPaid) radioPaid.checked = true;
+            isConsultInput.value = '0';
+            if (pricingSection) pricingSection.style.display = 'block';
+            if (priceInput && (!priceInput.value || parseFloat(priceInput.value) <= 0)) {
+                priceInput.value = '1499.00';
+            }
+            calculateServiceDiscount();
+        }
+        updateLiveServicePill();
+    }
+
+    function calculateServiceDiscount() {
+        const mrpInput = document.getElementById('inputServiceMrp');
+        const priceInput = document.getElementById('inputServicePrice');
+        const badge = document.getElementById('liveServiceDiscountBadge');
+        const savingsText = document.getElementById('liveServiceSavingsText');
+
+        if (!mrpInput || !priceInput) return;
+
+        const mrp = parseFloat(mrpInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+
+        if (mrp > price && price >= 0 && mrp > 0) {
+            const savings = mrp - price;
+            const percent = Math.round((savings / mrp) * 100);
+            if (badge) {
+                badge.textContent = percent + '% OFF';
+                badge.className = 'badge bg-danger rounded-pill px-2.5 py-1 fw-bold fs-7';
+            }
+            if (savingsText) {
+                savingsText.innerHTML = 'Clients save <strong>₹' + savings.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</strong> on this package!';
+            }
+        } else if (price === mrp && price > 0) {
+            if (badge) {
+                badge.textContent = 'Standard MRP';
+                badge.className = 'badge bg-secondary rounded-pill px-2.5 py-1 fw-bold fs-7';
+            }
+            if (savingsText) savingsText.innerHTML = 'Standard package price with direct client booking';
+        } else {
+            if (badge) {
+                badge.textContent = 'Custom Rate';
+                badge.className = 'badge bg-info rounded-pill px-2.5 py-1 fw-bold fs-7';
+            }
+            if (savingsText) savingsText.innerHTML = 'Custom rate package';
+        }
+        updateLiveServicePill();
+    }
+
+    function updateLiveServicePill() {
+        const pkgName = document.getElementById('inputPackageName')?.value || 'Standard Delivery Package';
+        const days = document.getElementById('inputServiceDeliveryDays')?.value || '5';
+        const rev = document.getElementById('inputServiceRevisions')?.value || '3 Revisions';
+        const price = parseFloat(document.getElementById('inputServicePrice')?.value) || 0;
+        const mrp = parseFloat(document.getElementById('inputServiceMrp')?.value) || 0;
+        const isFree = document.getElementById('inputIsConsultation')?.value === '1';
+
+        const summaryEl = document.getElementById('liveServiceSummaryText');
+        if (summaryEl) {
+            summaryEl.textContent = pkgName + ' • ' + days + ' Days Delivery • ' + rev;
+        }
+
+        const priceEl = document.getElementById('liveServicePriceDisplay');
+        const mrpEl = document.getElementById('liveServiceMrpDisplay');
+
+        if (isFree) {
+            if (priceEl) priceEl.textContent = 'FREE Consultation';
+            if (mrpEl) mrpEl.textContent = '';
+        } else {
+            if (priceEl) priceEl.textContent = '₹' + price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (mrpEl) {
+                if (mrp > price) {
+                    mrpEl.style.display = 'block';
+                    mrpEl.textContent = '₹' + mrp.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    mrpEl.style.display = 'none';
+                }
+            }
         }
     }
 
@@ -1099,13 +1409,13 @@
         }
 
         document.getElementById('inputServicePlanName').value = name;
-        document.getElementById('inputServicePrice').value = price.toFixed(2);
+        document.getElementById('inputListingPlanPrice').value = price.toFixed(2);
         updateServiceSummary();
     }
 
     function updateServiceSummary() {
         const planName = document.getElementById('inputServicePlanName').value;
-        const planPrice = parseFloat(document.getElementById('inputServicePrice').value) || 0;
+        const planPrice = parseFloat(document.getElementById('inputListingPlanPrice').value) || 0;
         const addon1 = document.getElementById('serviceAddon1').checked;
         const addon2 = document.getElementById('serviceAddon2').checked;
 
@@ -1306,5 +1616,11 @@
             if (uploadSub) uploadSub.textContent = 'Uploading: ' + progress + '% (' + sizeMb + ' MB)';
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        calculateServiceDiscount();
+        updateLiveServicePill();
+        updateServiceSummary();
+    });
 </script>
 @endsection
