@@ -86,6 +86,10 @@
             color: #7dd3fc;
             text-decoration: underline;
         }
+        .dc-top-alert a.text-light:hover {
+            color: #38bdf8 !important;
+            text-decoration: none;
+        }
 
         .dc-live-dot {
             width: 7px;
@@ -356,20 +360,29 @@
         <div class="container-fluid px-lg-4 d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <span class="dc-live-dot me-2"></span>
-                <span class="fw-semibold text-light">Digital Class Marketplace:</span>
-                <span class="ms-1 text-secondary">Discover courses, hire experts, shop products & explore local businesses.</span>
+                <a href="{{ route('home') }}" class="fw-semibold text-light text-decoration-none d-inline-flex align-items-center" title="Digital Class Marketplace Homepage">
+                    <span>Digital Class Marketplace:</span>
+                </a>
+                <span class="ms-1 text-secondary d-none d-lg-inline">Discover courses, hire experts, shop products & explore local businesses.</span>
             </div>
-            <div class="d-none d-md-flex align-items-center gap-3">
-                <span class="text-secondary">Are you an educator, agency, or institute?</span>
-                <a href="{{ route('seller.register') }}" class="d-inline-flex align-items-center gap-1 text-decoration-none">
-                    <span>Join as a Seller</span>
-                    <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem;"></i>
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('home') }}" class="d-inline-flex align-items-center gap-1 text-light text-decoration-none fw-semibold" title="Go to Marketplace Homepage">
+                    <i class="fa-solid fa-shop text-info" style="font-size: 0.75rem;"></i>
+                    <span>Go to Marketplace</span>
                 </a>
-                <span class="text-secondary opacity-50">•</span>
-                <a href="{{ route('seller.login') }}" class="d-inline-flex align-items-center gap-1 text-light text-decoration-none fw-semibold">
-                    <i class="fa-solid fa-store text-warning" style="font-size: 0.75rem;"></i>
-                    <span>Seller Login</span>
-                </a>
+                <span class="text-secondary opacity-50 d-none d-md-inline">•</span>
+                <div class="d-none d-md-flex align-items-center gap-3">
+                    <span class="text-secondary">Are you an educator, agency, or institute?</span>
+                    <a href="{{ route('seller.register') }}" class="d-inline-flex align-items-center gap-1 text-decoration-none">
+                        <span>Join as a Seller</span>
+                        <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem;"></i>
+                    </a>
+                    <span class="text-secondary opacity-50">•</span>
+                    <a href="{{ route('seller.login') }}" class="d-inline-flex align-items-center gap-1 text-light text-decoration-none fw-semibold">
+                        <i class="fa-solid fa-store text-warning" style="font-size: 0.75rem;"></i>
+                        <span>Seller Login</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
