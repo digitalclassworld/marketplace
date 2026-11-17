@@ -14,12 +14,12 @@ class EnsureSellerApproved
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check()) {
+        $user = Auth::guard('web')->user() ?: Auth::user();
+
+        if (!$user) {
             return redirect()->guest(route('seller.login'))
                 ->with('error', 'Please log in to continue.');
         }
-
-        $user = Auth::user();
 
         // Allow Super Admin full access to selling features
         if ($user->isSuperAdmin()) {

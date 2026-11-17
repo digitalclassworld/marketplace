@@ -1060,7 +1060,7 @@
 
 @section('scripts')
 <script>
-    let currentBanner = @json($banners[0] ?? []);
+    let currentBanner = @json($banners->first() ?? []);
 
     function inspectBanner(b, rowElement) {
         currentBanner = b;
@@ -1198,9 +1198,11 @@
 
         // Initialize first banner
         const firstRow = document.querySelector('.banner-row');
-        if (firstRow && @json(isset($banners[0]))) {
-            inspectBanner(@json($banners[0]), firstRow);
-        }
+        @if($banners->isNotEmpty())
+            if (firstRow) {
+                inspectBanner(@json($banners->first()), firstRow);
+            }
+        @endif
     });
 </script>
 @endsection

@@ -719,8 +719,8 @@
                         <li><a href="{{ route('seller.register') }}" class="text-info fw-semibold"><i class="fa-solid fa-arrow-right me-1 small"></i> Become a Seller</a></li>
                         <li><a href="{{ route('seller.login') }}">Seller Login</a></li>
                         <li>
-                            <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="text-warning-emphasis">
-                                <i class="fa-solid fa-shield-halved me-1 text-warning"></i> Super Admin Portal <i class="fa-solid fa-arrow-up-right-from-square ms-1 small" style="font-size: 0.68rem;"></i>
+                            <a href="{{ route('admin.login') }}" target="_blank" rel="noopener noreferrer" class="text-warning-emphasis">
+                                <i class="fa-solid fa-shield-halved me-1 text-warning"></i> Super Admin Login <i class="fa-solid fa-arrow-up-right-from-square ms-1 small" style="font-size: 0.68rem;"></i>
                             </a>
                         </li>
                         @auth

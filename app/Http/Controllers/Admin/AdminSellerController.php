@@ -225,18 +225,74 @@ class AdminSellerController extends Controller
         }
 
         if (!$seller) {
-            abort(404, 'Seller profile not found.');
+            $showDummy = config('marketplace.show_dummy_data', false);
+            if (!$showDummy) {
+                abort(404, 'Seller profile not found.');
+            }
+            $curatedList = $this->getCuratedSellers();
+            $matched = null;
+
+            // Search by id, store_slug, or seller_code
+            foreach ($curatedList as $c) {
+                if ($c['id'] == $id || (isset($c['store_slug']) && $c['store_slug'] === $id) || (isset($c['seller_code']) && $c['seller_code'] === $id)) {
+                    $matched = $c;
+                    break;
+                }
+            }
+
+            // Fallback: match index or default to Tech Skills Academy
+            if (!$matched) {
+                if (is_numeric($id) && isset($curatedList[$id - 1])) {
+                    $matched = $curatedList[$id - 1];
+                } elseif ($id == 101 || $id == 1) {
+                    $matched = $curatedList[0];
+                } else {
+                    $matched = $curatedList[1] ?? $curatedList[0];
+                }
+            }
+
+            $seller = new Seller([
+                'id' => is_numeric($id) ? (int)$id : ($matched['id'] ?? 102),
+                'seller_code' => $matched['seller_code'] ?? 'SELL000123',
+                'account_type' => $matched['type'] ?? 'Institute',
+                'seller_status' => (isset($matched['status']) && strtolower($matched['status']) === 'pending') ? Seller::STATUS_PENDING_APPROVAL : ((isset($matched['status']) && strtolower($matched['status']) === 'suspended') ? Seller::STATUS_SUSPENDED : Seller::STATUS_ACTIVE),
+                'verification_status' => !empty($matched['is_verified']) ? Seller::VERIFICATION_VERIFIED : Seller::VERIFICATION_UNVERIFIED,
+                'registration_date' => now()->subMonths(21),
+                'approved_at' => now()->subMonths(21),
+            ]);
+            $seller->id = is_numeric($id) ? (int)$id : ($matched['id'] ?? 102);
+
+            $seller->setRelation('user', new \App\Models\User([
+                'id' => 125,
+                'name' => $matched['owner_name'] ?? ($matched['name'] ?? 'Rahul Sharma'),
+                'email' => $matched['email'] ?? 'rahul@techskills.in',
+                'phone' => $matched['mobile'] ?? '+91 98765 43210',
+            ]));
+
+            $seller->setRelation('businessDetail', new \App\Models\SellerBusinessDetail([
+                'business_name' => $matched['name'] ?? 'Tech Skills Academy',
+                'city' => $matched['city'] ?? 'Surat',
+                'state' => 'Gujarat',
+                'address' => $matched['address'] ?? '401, Skyline Business Hub, Vesu, Surat - 395007',
+                'website' => $matched['website'] ?? 'https://techskills.in',
+                'about' => $matched['about'] ?? 'We provide industry-focused IT and digital skills training for students and professionals. Our goal is to make quality education accessible to everyone.',
+            ]));
+            $seller->setRelation('courses', collect([]));
+            $seller->setRelation('services', collect([]));
+            $seller->setRelation('products', collect([]));
+            $seller->setRelation('businessListings', collect([]));
+            $seller->setRelation('orders', collect([]));
         }
 
         // Real Database Metric Aggregations (matches Seller Dashboard 1:1)
-        $ordersCount = $seller->orders()->count();
-        $totalEarnings = (float) $seller->orders()->where('status', '!=', 'cancelled')->sum('amount');
-        $totalCustomers = $seller->orders()->distinct('customer_email')->count('customer_email');
+        $ordersCount = $seller->exists ? $seller->orders()->count() : 1240;
+        $totalEarnings = $seller->exists ? (float) $seller->orders()->where('status', '!=', 'cancelled')->sum('amount') : 371760;
+        $totalCustomers = $seller->exists ? $seller->orders()->distinct('customer_email')->count('customer_email') : 2480;
 
-        $coursesCount = $seller->courses()->count();
-        $servicesCount = $seller->services()->count();
-        $productsCount = $seller->products()->count();
-        $listingsCount = $seller->businessListings()->count();
+        $coursesCount = $seller->exists ? $seller->courses()->count() : 28;
+        $servicesCount = $seller->exists ? $seller->services()->count() : 12;
+        $productsCount = $seller->exists ? $seller->products()->count() : 5;
+        $listingsCount = $seller->exists ? $seller->businessListings()->count() : 1;
 
         $stats = [
             'total_courses'   => $coursesCount,
@@ -246,21 +302,39 @@ class AdminSellerController extends Controller
             'total_orders'    => number_format($ordersCount),
             'total_students'  => number_format($totalCustomers),
             'total_revenue'   => '₹' . number_format($totalEarnings),
-            'lifetime_payout' => '₹0',
+            'lifetime_payout' => '₹' . number_format($totalEarnings * 0.85),
             'rating'          => '5.0',
             'reviews_count'   => 0,
         ];
 
         // Real Top Performing Courses
-        $topCourses = $seller->courses()->latest()->take(5)->get()->map(function($c) {
+        $topCourses = $seller->exists ? $seller->courses()->latest()->take(5)->get()->map(function($c) {
             return [
                 'name' => $c->title,
                 'enrollments' => $c->enrollments_count ?? 0,
                 'revenue' => '₹' . number_format($c->price ?? 0),
                 'rating' => $c->rating ?? 5.0,
+                'badge' => 'Active',
                 'img' => $c->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&auto=format&fit=crop&q=80',
             ];
-        })->toArray();
+        })->toArray() : [
+            [
+                'name' => 'Full Stack Web Development Bootcamp',
+                'enrollments' => 640,
+                'revenue' => '₹1,92,000',
+                'rating' => 4.9,
+                'badge' => 'Top Seller',
+                'img' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&auto=format&fit=crop&q=80',
+            ],
+            [
+                'name' => 'Data Science & Machine Learning with Python',
+                'enrollments' => 420,
+                'revenue' => '₹1,26,000',
+                'rating' => 4.8,
+                'badge' => 'Popular',
+                'img' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&auto=format&fit=crop&q=80',
+            ],
+        ];
 
         // Real Recent Orders
         $recentOrders = $seller->orders()->latest()->take(5)->get()->map(function($o) {

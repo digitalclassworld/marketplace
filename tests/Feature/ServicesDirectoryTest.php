@@ -54,7 +54,7 @@ class ServicesDirectoryTest extends TestCase
         $user = User::factory()->create(['role' => 'seller']);
         $seller = new Seller([
             'user_id'             => $user->id,
-            'seller_code'         => 'DC-SELL-000001',
+            'seller_code'         => \App\Services\SellerIdService::generateTempCode(),
             'account_type'        => Seller::ACCOUNT_TYPE_INSTITUTE,
             'seller_status'       => Seller::STATUS_ACTIVE,
             'verification_status' => Seller::VERIFICATION_VERIFIED,

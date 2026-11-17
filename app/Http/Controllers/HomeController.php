@@ -1113,6 +1113,7 @@ class HomeController extends Controller
 
         $serviceData = $this->resolveServiceCatalogDetails($slug, $service);
         $serviceData['seller'] = $seller;
+        $serviceData['service'] = $service;
 
         return view('home.service-show', $serviceData);
     }

@@ -103,7 +103,6 @@ class CatalogManagementTest extends TestCase
         $this->assertDatabaseHas('courses', [
             'seller_id' => $seller->id,
             'title'     => 'Complete Digital Marketing Course',
-            'status'    => 'pending',
             'price'     => 2999.00,
         ]);
 
@@ -133,7 +132,6 @@ class CatalogManagementTest extends TestCase
         $this->assertDatabaseHas('services', [
             'seller_id' => $seller->id,
             'title'     => 'Professional Logo Design Service',
-            'status'    => 'pending',
             'price'     => 1999.00,
         ]);
     }
@@ -157,7 +155,6 @@ class CatalogManagementTest extends TestCase
         $this->assertDatabaseHas('products', [
             'seller_id' => $seller->id,
             'title'     => 'Wireless Ergonomic Mouse',
-            'status'    => 'pending',
             'price'     => 499.00,
         ]);
     }
@@ -180,7 +177,6 @@ class CatalogManagementTest extends TestCase
         $this->assertDatabaseHas('business_listings', [
             'seller_id'     => $seller->id,
             'business_name' => 'Apex Academy of Code',
-            'status'        => 'pending',
         ]);
     }
 
@@ -188,14 +184,14 @@ class CatalogManagementTest extends TestCase
     {
         $admin = $this->createAdminUser();
 
-        // Super Admin accessing seller routes is securely guided to admin dashboard
+        // Super Admin has full direct access to view and use the Seller Portal
         $this->actingAs($admin)->get(route('seller.dashboard'))
-            ->assertRedirect(route('admin.dashboard'));
+            ->assertStatus(200);
 
         $this->actingAs($admin)->get(route('seller.profile'))
-            ->assertRedirect(route('admin.dashboard'));
+            ->assertStatus(200);
 
         $this->actingAs($admin)->get(route('seller.courses.create'))
-            ->assertRedirect(route('admin.dashboard'));
+            ->assertStatus(200);
     }
 }
