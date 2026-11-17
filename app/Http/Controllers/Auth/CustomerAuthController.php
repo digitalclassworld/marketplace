@@ -125,14 +125,19 @@ class CustomerAuthController extends Controller
     public function register(Request $request): JsonResponse|RedirectResponse
     {
         $validator = Validator::make($request->all(), [
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|max:100|unique:users,email',
-            'phone'    => 'nullable|string|max:20',
-            'password' => 'required|string|min:6|confirmed',
+            'name'       => 'required|string|max:100',
+            'email'      => 'required|email|max:100|unique:users,email',
+            'phone'      => 'nullable|string|max:20',
+            'profession' => 'required|string|max:100',
+            'city'       => 'nullable|string|max:100',
+            'state'      => 'nullable|string|max:100',
+            'interests'  => 'nullable',
+            'password'   => 'required|string|min:6|confirmed',
         ], [
-            'email.unique'       => 'An account with this email already exists. Please login instead.',
-            'password.confirmed' => 'The password confirmation does not match.',
-            'password.min'       => 'Password must be at least 6 characters long.',
+            'profession.required' => 'Please select your profession / profile type from the dropdown.',
+            'email.unique'        => 'An account with this email already exists. Please login instead.',
+            'password.confirmed'  => 'The password confirmation does not match.',
+            'password.min'        => 'Password must be at least 6 characters long.',
         ]);
 
         if ($validator->fails()) {
@@ -146,10 +151,17 @@ class CustomerAuthController extends Controller
         }
 
         try {
+            $interestsRaw = $request->input('interests');
+            $interestsStr = is_array($interestsRaw) ? implode(', ', $interestsRaw) : (is_string($interestsRaw) ? $interestsRaw : null);
+
             $user = User::create([
                 'name'              => trim($request->input('name')),
                 'email'             => strtolower(trim($request->input('email'))),
                 'phone'             => trim((string)$request->input('phone')),
+                'profession'        => trim((string)$request->input('profession')),
+                'city'              => trim((string)$request->input('city', 'Ahmedabad')),
+                'state'             => trim((string)$request->input('state', 'Gujarat')),
+                'interests'         => $interestsStr,
                 'password'          => Hash::make($request->input('password')),
                 'role'              => 'customer',
                 'email_verified_at' => now(),
@@ -161,20 +173,21 @@ class CustomerAuthController extends Controller
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success'    => true,
-                    'message'    => 'Your customer account has been created successfully!',
+                    'message'    => 'Your account is active! You can now explore, learn, and buy directly.',
                     'csrf_token' => csrf_token(),
                     'user'       => [
-                        'id'    => $user->id,
-                        'name'  => $user->name,
-                        'email' => $user->email,
-                        'phone' => $user->phone,
-                        'role'  => $user->role,
+                        'id'         => $user->id,
+                        'name'       => $user->name,
+                        'email'      => $user->email,
+                        'phone'      => $user->phone,
+                        'profession' => $user->profession,
+                        'role'       => $user->role,
                     ],
                     'redirect' => $request->input('redirect_to') ?: route('home'),
                 ]);
             }
 
-            return redirect()->route('home')->with('success', 'Welcome to Digital Class, ' . $user->name . '!');
+            return redirect()->intended(route('home'))->with('success', 'Welcome to Digital Class Marketplace, ' . $user->name . '! Your account is active. You can now explore, learn, and buy directly without any waiting or approvals.');
 
         } catch (Exception $e) {
             $msg = 'Registration error: ' . $e->getMessage();

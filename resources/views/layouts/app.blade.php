@@ -568,10 +568,10 @@
                                 <span>Login</span>
                             </button>
 
-                            <!-- 3. Customer Sign Up -->
-                            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3.5 fw-bold text-nowrap shadow-sm d-inline-flex align-items-center" style="height: 36px; font-size: 0.8125rem; background-color: #0066ff;" onclick="openCustomerAuthModal('register')">
+                            <!-- 3. Customer Sign Up (Dedicated Registration Page) -->
+                            <a href="{{ route('customer.register') }}" class="btn btn-sm btn-primary rounded-pill px-3.5 fw-bold text-nowrap shadow-sm d-inline-flex align-items-center" style="height: 36px; font-size: 0.8125rem; background-color: #0066ff;">
                                 <span>Sign Up</span>
-                            </button>
+                            </a>
                         </div>
                     @endauth
                 </div>
@@ -1132,9 +1132,9 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="tab-cust-reg-btn" data-bs-toggle="pill" data-bs-target="#tabCustReg" type="button" role="tab">
+                            <a href="{{ route('customer.register') }}" class="nav-link text-white text-opacity-75" style="border-radius: 10px;" title="Go to Customer Registration Page">
                                 <i class="fa-solid fa-user-plus me-1.5"></i> Create Account
-                            </button>
+                            </a>
                         </li>
                         <li class="nav-item" role="presentation">
                             <a href="{{ route('seller.login') }}" class="nav-link text-white text-opacity-75" style="border-radius: 10px;" title="Go to Instructor & Institute Portal">
@@ -1222,7 +1222,7 @@
 
                             <div class="text-center small text-muted mb-3">
                                 Don't have a customer account yet? 
-                                <a href="javascript:void(0)" onclick="switchCustomerAuthTab('register')" class="text-primary fw-bold text-decoration-none">Create free account &rarr;</a>
+                                <a href="{{ route('customer.register') }}" class="text-primary fw-bold text-decoration-none">Create free account &rarr;</a>
                             </div>
 
                             <!-- Trust Chips -->
@@ -1369,18 +1369,18 @@
 
         // Open Customer Auth Modal
         function openCustomerAuthModal(tab) {
+            if (tab === 'register') {
+                window.location.href = "{{ route('customer.register') }}";
+                return;
+            }
+
             const modalEl = document.getElementById('customerAuthModal');
             if (!modalEl) {
                 window.location.href = "{{ route('customer.login') }}";
                 return;
             }
 
-            if (tab === 'register') {
-                switchCustomerAuthTab('register');
-            } else {
-                switchCustomerAuthTab('login');
-            }
-
+            switchCustomerAuthTab('login');
             const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
             bsModal.show();
         }

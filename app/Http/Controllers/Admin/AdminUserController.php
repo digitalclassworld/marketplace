@@ -79,6 +79,8 @@ class AdminUserController extends Controller
                 $type = 'Seller';
             } elseif ($u->role === 'professional') {
                 $type = 'Professional';
+            } elseif (!empty($u->profession)) {
+                $type = $u->profession;
             }
 
             // 1. DYNAMIC ORDERS FETCHING (From both customer checkouts AND seller sales)
@@ -160,8 +162,8 @@ class AdminUserController extends Controller
             }
 
             // 2. DYNAMIC ACTIVITIES STREAM
-            $city = $sellerObj?->businessDetail?->city ?: 'Ahmedabad';
-            $state = $sellerObj?->businessDetail?->state ?: 'Gujarat';
+            $city = $u->city ?: ($sellerObj?->businessDetail?->city ?: 'Ahmedabad');
+            $state = $u->state ?: ($sellerObj?->businessDetail?->state ?: 'Gujarat');
 
             $activities = [];
 
@@ -298,11 +300,11 @@ class AdminUserController extends Controller
 
         // Apply Tab Filter
         if ($tab === 'students') {
-            $allUsers = $allUsers->filter(fn($u) => $u['type'] === 'Student');
+            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Student', 'Student / Learner']));
         } elseif ($tab === 'professionals') {
-            $allUsers = $allUsers->filter(fn($u) => $u['type'] === 'Professional');
+            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Professional', 'Working Professional', 'Working Employee / Professional', 'Business Owner', 'Teacher / Educator', 'Freelancer / Agency', 'Freelancer / Consultant', 'Job Seeker', 'Parent / Guardian']));
         } elseif ($tab === 'institutes') {
-            $allUsers = $allUsers->filter(fn($u) => $u['type'] === 'Institute');
+            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Institute', 'Institute Representative', 'Institute / Organization']));
         } elseif ($tab === 'sellers') {
             $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Seller', 'Institute']));
         } elseif ($tab === 'inactive') {

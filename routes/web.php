@@ -78,7 +78,9 @@ Route::post('/blog/{slug}/comment', [BlogController::class, 'comment'])->name('b
 
 // Customer Authentication & Order History
 Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.submit');
 Route::get('/register', [CustomerAuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [CustomerAuthController::class, 'register'])->name('register.submit');
 Route::match(['get', 'post'], '/logout', [CustomerAuthController::class, 'logout'])->name('logout');
 
 Route::prefix('customer')->name('customer.')->group(function () {
