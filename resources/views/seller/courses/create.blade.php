@@ -211,6 +211,25 @@
         font-weight: 700;
         letter-spacing: 0.02em;
     }
+
+    .pricing-model-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.25rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        position: relative;
+    }
+    .pricing-model-card:hover {
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+    }
+    .pricing-model-card.selected {
+        border-color: #0066ff;
+        background-color: #f0f7ff;
+        box-shadow: 0 4px 14px -2px rgba(0, 102, 255, 0.15);
+    }
 </style>
 @endsection
 
@@ -280,14 +299,23 @@
         <div class="wizard-step-item" id="step-nav-6" onclick="goToStep(6)">
             <div class="wizard-step-num">6</div>
             <div>
-                <span class="wizard-step-title">Pricing & Publish</span>
-                <span class="wizard-step-sub">Enrollment & add-ons</span>
+                <span class="wizard-step-title">Course Price</span>
+                <span class="wizard-step-sub">Free or paid pricing</span>
             </div>
             <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
         <div class="wizard-step-item" id="step-nav-7" onclick="goToStep(7)">
             <div class="wizard-step-num">7</div>
+            <div>
+                <span class="wizard-step-title">Pricing & Publish</span>
+                <span class="wizard-step-sub">Enrollment & add-ons</span>
+            </div>
+            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
+        </div>
+
+        <div class="wizard-step-item" id="step-nav-8" onclick="goToStep(8)">
+            <div class="wizard-step-num">8</div>
             <div>
                 <span class="wizard-step-title">Preview & Publish</span>
                 <span class="wizard-step-sub">Final course review</span>
@@ -732,19 +760,205 @@
             </div>
         </div>
 
-        <!-- ================= STEP 6: PRICING & PLAN ================= -->
+        <!-- ================= STEP 6: COURSE PRICE & ACCESS ================= -->
         <div class="wizard-step-content d-none" id="step-content-6">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Plan & Publish</h5>
-                    <p class="text-muted small mb-0">Choose a course pricing plan and enrollment options</p>
+                    <h5 class="display-heading fw-bold text-dark mb-1">Course Price & Access</h5>
+                    <p class="text-muted small mb-0">Set whether this course is free or paid, configure regular MRP and offer pricing, and enrollment duration</p>
                 </div>
 
+                <!-- Hidden Input for Database Validation -->
                 <input type="hidden" name="is_free" id="inputIsFree" value="0">
-                <input type="hidden" name="price" id="inputCoursePrice" value="2999.00">
-                <input type="hidden" name="discount_price" id="inputCourseDiscount" value="1499.00">
-                <input type="hidden" name="access_type" value="Lifetime Access">
+
+                <!-- Pricing Model Selector (Paid vs Free) -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="pricing-model-card selected" id="cardModelPaid" onclick="setCoursePricingModel('paid')">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="pricing_model_radio" id="radioModelPaid" class="form-check-input" checked>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-1" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-tag me-1"></i> Paid Course
+                                    </span>
+                                </div>
+                                <span class="badge bg-success rounded-pill px-2 py-0.5 small fw-semibold">Recommended</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Charge For Enrollment</h6>
+                            <p class="text-muted small mb-0">Monetize your course by setting a regular MRP and student offer price.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="pricing-model-card" id="cardModelFree" onclick="setCoursePricingModel('free')">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="radio" name="pricing_model_radio" id="radioModelFree" class="form-check-input">
+                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-gift me-1"></i> Free Course
+                                    </span>
+                                </div>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-0.5 small fw-semibold">Lead Magnet</span>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">100% Free For All Students</h6>
+                            <p class="text-muted small mb-0">Allow any registered student to enroll freely without any payment.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paid Course Pricing Controls (Shown when Paid is selected) -->
+                <div id="paidPricingFieldsSection" class="p-3.5 rounded-4 bg-light border mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Regular Price (MRP) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white fw-bold text-secondary">₹</span>
+                                <input type="number" step="0.01" min="0" name="price" id="inputCoursePrice" class="form-control font-mono-code fw-bold" placeholder="2999.00" value="2999.00" oninput="calculateLiveDiscount()">
+                            </div>
+                            <div class="form-text small text-muted">Original list price shown as crossed-out original price</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">
+                                Offer / Discounted Price <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white fw-bold text-primary">₹</span>
+                                <input type="number" step="0.01" min="0" name="discount_price" id="inputCourseDiscount" class="form-control font-mono-code fw-bold text-primary" placeholder="1499.00" value="1499.00" oninput="calculateLiveDiscount()">
+                            </div>
+                            <div class="form-text small text-muted">The actual final amount the student pays to enroll</div>
+                        </div>
+
+                        <!-- Live Calculation & Savings Badge -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 bg-white border">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-danger rounded-pill px-2.5 py-1 fw-bold fs-7" id="liveDiscountBadge">50% OFF</span>
+                                    <span class="small text-secondary" id="liveSavingsText">Students save <strong>₹1,500.00</strong> on this course!</span>
+                                </div>
+                                <div class="small fw-semibold text-success d-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-circle-check"></i> High Conversion Pricing
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Access Duration & Enrollment Details -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small mb-1">
+                            Access Duration <span class="text-danger">*</span>
+                        </label>
+                        <select name="access_type" id="inputAccessType" class="form-select fw-semibold" onchange="updateLivePricingPill()">
+                            <option value="Lifetime Access" selected>Lifetime Access (Unlimited)</option>
+                            <option value="1 Year Access">1 Year Access</option>
+                            <option value="6 Months Access">6 Months Access</option>
+                            <option value="90 Days Access">90 Days Access</option>
+                            <option value="30 Days Access">30 Days Access</option>
+                        </select>
+                        <div class="form-text small text-muted">How long enrolled students will have full access to lessons</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small mb-1">
+                            Enrollment Capacity
+                        </label>
+                        <select name="enrollment_capacity" id="inputEnrollmentCap" class="form-select fw-semibold">
+                            <option value="unlimited" selected>Unlimited Students</option>
+                            <option value="50">Limited: 50 Students</option>
+                            <option value="100">Limited: 100 Students</option>
+                            <option value="250">Limited: 250 Students</option>
+                            <option value="500">Limited: 500 Students</option>
+                        </select>
+                        <div class="form-text small text-muted">Set student seat limits (useful for live cohorts & masterclasses)</div>
+                    </div>
+                </div>
+
+                <!-- Course Inclusions & Deliverables -->
+                <div class="border rounded-4 p-3 bg-white mb-4">
+                    <label class="form-label fw-bold text-dark small mb-2 d-block">
+                        Course Inclusions & Deliverables (Included with Enrollment)
+                    </label>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="p-2.5 rounded-3 border bg-light d-flex align-items-center justify-content-between">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" name="certificate_included" value="1" id="pricingCertIncluded" checked onchange="updateLivePricingPill()">
+                                    <label class="form-check-label small fw-semibold text-dark ms-1" for="pricingCertIncluded">
+                                        Verified Certificate
+                                    </label>
+                                </div>
+                                <i class="fa-solid fa-award text-primary"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="p-2.5 rounded-3 border bg-light d-flex align-items-center justify-content-between">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" name="qa_enabled" value="1" id="pricingQaEnabled" checked onchange="updateLivePricingPill()">
+                                    <label class="form-check-label small fw-semibold text-dark ms-1" for="pricingQaEnabled">
+                                        Instructor Q&A Support
+                                    </label>
+                                </div>
+                                <i class="fa-solid fa-comments text-success"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="p-2.5 rounded-3 border bg-light d-flex align-items-center justify-content-between">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" name="downloadable_resources" value="1" id="pricingResourcesIncluded" checked onchange="updateLivePricingPill()">
+                                    <label class="form-check-label small fw-semibold text-dark ms-1" for="pricingResourcesIncluded">
+                                        Downloadable Resources
+                                    </label>
+                                </div>
+                                <i class="fa-solid fa-folder-open text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Student Price Tag Preview -->
+                <div class="p-3 rounded-4 border bg-light d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 bg-white border p-2 text-center" style="min-width: 65px;">
+                            <span class="small text-muted d-block text-uppercase" style="font-size: 0.65rem; font-weight: 700;">Price</span>
+                            <i class="fa-solid fa-tag text-primary fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-baseline gap-2">
+                                <span class="fs-4 fw-bolder text-dark font-mono-code" id="livePillHeadline">₹1,499.00</span>
+                                <span class="text-muted small text-decoration-line-through font-mono-code" id="livePillSubline">₹2,999.00</span>
+                                <span class="badge bg-danger rounded-pill px-2 py-0.5 fw-bold small" id="livePillBadge">50% OFF</span>
+                            </div>
+                            <span class="text-muted small" id="livePillDetails">Includes Lifetime Access • Certificate • Q&A Support • Resources</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill small fw-semibold">
+                        <i class="fa-solid fa-eye me-1"></i> Student Checkout Preview
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(5)">&larr; Back</button>
+                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(7)">Continue to Listing Plan &rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= STEP 7: LISTING PLAN & ADD-ONS ================= -->
+        <div class="wizard-step-content d-none" id="step-content-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="mb-4">
+                    <h5 class="display-heading fw-bold text-dark mb-1">Pricing & Publish</h5>
+                    <p class="text-muted small mb-0">Choose a marketplace listing plan tier and directory promotion options</p>
+                </div>
+
                 <input type="hidden" name="plan_name" id="inputCoursePlanName" value="Premium Course Track">
+                <input type="hidden" name="listing_plan_price" id="inputListingPlanPrice" value="1499.00">
 
                 <div class="row g-3 mb-4">
                     <!-- Plan 1: Free Preview -->
@@ -873,9 +1087,9 @@
                         <div class="d-flex flex-column gap-2">
                             <div class="p-3 border rounded-3 d-flex justify-content-between align-items-center">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="certificate_included" value="1" id="courseAddon1" checked onchange="updateCourseSummary()">
+                                    <input class="form-check-input" type="checkbox" name="listing_addon_badge" value="1" id="courseAddon1" checked onchange="updateCourseSummary()">
                                     <label class="form-check-label small fw-semibold text-dark" for="courseAddon1">
-                                        Verified Business Badge & Certificate
+                                        Verified Business Badge & Featured Status
                                     </label>
                                 </div>
                                 <span class="fw-bold text-dark font-mono-code small">₹499 / year</span>
@@ -883,7 +1097,7 @@
 
                             <div class="p-3 border rounded-3 d-flex justify-content-between align-items-center">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="qa_enabled" value="1" id="courseAddon2" onchange="updateCourseSummary()">
+                                    <input class="form-check-input" type="checkbox" name="listing_addon_gallery" value="1" id="courseAddon2" onchange="updateCourseSummary()">
                                     <label class="form-check-label small fw-semibold text-dark" for="courseAddon2">
                                         Additional Gallery Images & Assets (up to 20)
                                     </label>
@@ -913,14 +1127,14 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(5)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(7)">Continue &rarr;</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(6)">&larr; Back to Course Price</button>
+                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(8)">Continue to Preview &rarr;</button>
                 </div>
             </div>
         </div>
 
-        <!-- ================= STEP 7: PREVIEW & PUBLISH ================= -->
-        <div class="wizard-step-content d-none" id="step-content-7">
+        <!-- ================= STEP 8: PREVIEW & PUBLISH ================= -->
+        <div class="wizard-step-content d-none" id="step-content-8">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
@@ -933,7 +1147,7 @@
                     </div>
                 </div>
 
-                <!-- Full Course Directory Live Card Preview (Matching Page 40) -->
+                <!-- Full Course Directory Live Card Preview -->
                 <div class="border rounded-4 overflow-hidden mb-4 shadow-sm">
                     <!-- Banner -->
                     <div class="text-white text-center d-flex align-items-center justify-content-center p-4 position-relative" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800') center/cover; min-height: 160px;">
@@ -954,6 +1168,7 @@
                                             VCEC - Vinayak Computer Education Center
                                         </h5>
                                         <span class="badge bg-primary rounded-pill small px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Verified</span>
+                                        <span class="badge bg-success rounded-pill small px-2.5 py-1 font-mono-code fw-bold" id="previewCoursePriceBadge">₹1,499.00</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-2 small mt-1">
                                         <div class="text-warning">
@@ -978,8 +1193,8 @@
 
                         <!-- Info Chips Row -->
                         <div class="d-flex flex-wrap gap-3 mt-3 pt-3 border-top small text-secondary">
-                            <div><i class="fa-regular fa-calendar text-muted me-1"></i> Year <strong class="text-dark">2015</strong></div>
-                            <div><i class="fa-solid fa-users text-muted me-1"></i> Employees <strong class="text-dark">5 - 10</strong></div>
+                            <div><i class="fa-regular fa-calendar text-muted me-1"></i> Access <strong class="text-dark" id="previewCourseAccess">Lifetime Access</strong></div>
+                            <div><i class="fa-solid fa-award text-muted me-1"></i> Certificate <strong class="text-dark" id="previewCourseCert">Included</strong></div>
                             <div><i class="fa-solid fa-location-dot text-danger me-1"></i> Location <strong class="text-dark" id="previewCourseLocation">Ahmedabad, Gujarat</strong></div>
                             <div><i class="fa-solid fa-chart-line text-primary me-1"></i> Inquiries <strong class="text-dark">250+</strong></div>
                         </div>
@@ -1005,7 +1220,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(6)">&larr; Back</button>
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(7)">&larr; Back to Plan</button>
                     <button type="submit" class="btn btn-success px-5 fw-bold btn-lg shadow-sm">
                         <i class="fa-solid fa-cloud-arrow-up me-2"></i> Publish Listing
                     </button>
@@ -1025,7 +1240,7 @@
     function goToStep(step) {
         currentStep = step;
 
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 1; i <= 8; i++) {
             const content = document.getElementById('step-content-' + i);
             const nav = document.getElementById('step-nav-' + i);
             if (content) content.classList.add('d-none');
@@ -1046,13 +1261,18 @@
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        if (step === 7) {
+        if (step === 8) {
             const title = document.getElementById('inputCourseTitle')?.value;
             const cat = document.getElementById('inputCourseCategory')?.value;
             const sub = document.getElementById('inputCourseSubCategory')?.value;
             const city = document.getElementById('inputCourseCity')?.value;
             const state = document.getElementById('inputCourseState')?.value;
             const desc = document.getElementById('inputCourseDesc')?.value;
+            const access = document.getElementById('inputAccessType')?.value || 'Lifetime Access';
+            const cert = document.getElementById('pricingCertIncluded')?.checked;
+            const isFree = document.getElementById('inputIsFree')?.value === '1';
+            const price = parseFloat(document.getElementById('inputCoursePrice')?.value) || 0;
+            const discount = parseFloat(document.getElementById('inputCourseDiscount')?.value) || 0;
 
             if (title) {
                 document.getElementById('previewCourseTitle').textContent = title;
@@ -1063,7 +1283,128 @@
             if (cat && sub) document.getElementById('previewCourseCategory').textContent = sub + ' • ' + cat;
             if (city && state) document.getElementById('previewCourseLocation').textContent = city + ', ' + state;
             if (desc) document.getElementById('previewCourseAbout').textContent = desc;
+
+            const accessEl = document.getElementById('previewCourseAccess');
+            if (accessEl) accessEl.textContent = access;
+
+            const certEl = document.getElementById('previewCourseCert');
+            if (certEl) certEl.textContent = cert ? 'Included' : 'None';
+
+            const priceBadge = document.getElementById('previewCoursePriceBadge');
+            if (priceBadge) {
+                if (isFree) {
+                    priceBadge.textContent = 'FREE';
+                    priceBadge.className = 'badge bg-success rounded-pill small px-2.5 py-1 font-mono-code fw-bold';
+                } else {
+                    const finalPrice = discount > 0 ? discount : price;
+                    priceBadge.textContent = '₹' + finalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                    priceBadge.className = 'badge bg-primary rounded-pill small px-2.5 py-1 font-mono-code fw-bold';
+                }
+            }
         }
+    }
+
+    // ==========================================
+    // STEP 6: COURSE PRICING CONTROLS
+    // ==========================================
+    function setCoursePricingModel(model) {
+        const cardPaid = document.getElementById('cardModelPaid');
+        const cardFree = document.getElementById('cardModelFree');
+        const radioPaid = document.getElementById('radioModelPaid');
+        const radioFree = document.getElementById('radioModelFree');
+        const paidSection = document.getElementById('paidPricingFieldsSection');
+        const isFreeInput = document.getElementById('inputIsFree');
+
+        if (model === 'free') {
+            if (cardPaid) cardPaid.classList.remove('selected');
+            if (cardFree) cardFree.classList.add('selected');
+            if (radioPaid) radioPaid.checked = false;
+            if (radioFree) radioFree.checked = true;
+            if (paidSection) paidSection.style.display = 'none';
+            if (isFreeInput) isFreeInput.value = '1';
+
+            const pillHeadline = document.getElementById('livePillHeadline');
+            const pillSubline = document.getElementById('livePillSubline');
+            const pillBadge = document.getElementById('livePillBadge');
+
+            if (pillHeadline) {
+                pillHeadline.textContent = 'FREE';
+                pillHeadline.className = 'fs-4 fw-bolder text-success font-mono-code';
+            }
+            if (pillSubline) pillSubline.style.display = 'none';
+            if (pillBadge) {
+                pillBadge.textContent = '100% Free';
+                pillBadge.className = 'badge bg-success rounded-pill px-2 py-0.5 fw-bold small';
+                pillBadge.style.display = 'inline-block';
+            }
+        } else {
+            if (cardFree) cardFree.classList.remove('selected');
+            if (cardPaid) cardPaid.classList.add('selected');
+            if (radioFree) radioFree.checked = false;
+            if (radioPaid) radioPaid.checked = true;
+            if (paidSection) paidSection.style.display = 'block';
+            if (isFreeInput) isFreeInput.value = '0';
+
+            const pillSubline = document.getElementById('livePillSubline');
+            const pillHeadline = document.getElementById('livePillHeadline');
+            if (pillSubline) pillSubline.style.display = 'inline';
+            if (pillHeadline) pillHeadline.className = 'fs-4 fw-bolder text-dark font-mono-code';
+            calculateLiveDiscount();
+        }
+        updateLivePricingPill();
+    }
+
+    function calculateLiveDiscount() {
+        const mrp = parseFloat(document.getElementById('inputCoursePrice')?.value) || 0;
+        const discount = parseFloat(document.getElementById('inputCourseDiscount')?.value) || 0;
+        const discountBadge = document.getElementById('liveDiscountBadge');
+        const savingsText = document.getElementById('liveSavingsText');
+        const pillHeadline = document.getElementById('livePillHeadline');
+        const pillSubline = document.getElementById('livePillSubline');
+        const pillBadge = document.getElementById('livePillBadge');
+
+        if (pillHeadline) pillHeadline.textContent = '₹' + discount.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+        if (pillSubline) pillSubline.textContent = '₹' + mrp.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+        if (mrp > 0 && discount > 0 && mrp > discount) {
+            const savings = mrp - discount;
+            const pct = Math.round((savings / mrp) * 100);
+            if (discountBadge) {
+                discountBadge.textContent = pct + '% OFF';
+                discountBadge.style.display = 'inline-block';
+            }
+            if (pillBadge) {
+                pillBadge.textContent = pct + '% OFF';
+                pillBadge.style.display = 'inline-block';
+                pillBadge.className = 'badge bg-danger rounded-pill px-2 py-0.5 fw-bold small';
+            }
+            if (savingsText) {
+                savingsText.innerHTML = 'Students save <strong>₹' + savings.toLocaleString('en-IN', { minimumFractionDigits: 2 }) + '</strong> on this course!';
+            }
+        } else if (mrp > 0 && mrp === discount) {
+            if (discountBadge) discountBadge.style.display = 'none';
+            if (pillBadge) pillBadge.style.display = 'none';
+            if (savingsText) savingsText.textContent = 'Course offered at regular list price.';
+        } else {
+            if (discountBadge) discountBadge.style.display = 'none';
+            if (pillBadge) pillBadge.style.display = 'none';
+            if (savingsText) savingsText.textContent = 'Enter regular & offer prices above.';
+        }
+    }
+
+    function updateLivePricingPill() {
+        const access = document.getElementById('inputAccessType')?.value || 'Lifetime Access';
+        const cert = document.getElementById('pricingCertIncluded')?.checked;
+        const qa = document.getElementById('pricingQaEnabled')?.checked;
+        const res = document.getElementById('pricingResourcesIncluded')?.checked;
+
+        let parts = ['Includes ' + access];
+        if (cert) parts.push('Certificate');
+        if (qa) parts.push('Q&A Support');
+        if (res) parts.push('Resources');
+
+        const detailsEl = document.getElementById('livePillDetails');
+        if (detailsEl) detailsEl.textContent = parts.join(' • ');
     }
 
     function selectCourseType(type, element) {
@@ -1112,15 +1453,14 @@
         }
 
         document.getElementById('inputCoursePlanName').value = name;
-        document.getElementById('inputCourseDiscount').value = price.toFixed(2);
-        document.getElementById('inputCoursePrice').value = mrp.toFixed(2);
-        document.getElementById('inputIsFree').value = price === 0 ? '1' : '0';
+        const listingPriceInput = document.getElementById('inputListingPlanPrice');
+        if (listingPriceInput) listingPriceInput.value = price.toFixed(2);
         updateCourseSummary();
     }
 
     function updateCourseSummary() {
         const planName = document.getElementById('inputCoursePlanName').value;
-        const planPrice = parseFloat(document.getElementById('inputCourseDiscount').value) || 0;
+        const planPrice = parseFloat(document.getElementById('inputListingPlanPrice')?.value || 1499);
         const addon1 = document.getElementById('courseAddon1').checked;
         const addon2 = document.getElementById('courseAddon2').checked;
 
