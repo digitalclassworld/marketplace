@@ -102,4 +102,72 @@ class CustomerRegistrationTest extends TestCase
         $response->assertSee('Teacher / Educator');
         $response->assertSee('Active');
     }
+
+    public function test_guest_cannot_access_customer_profile(): void
+    {
+        $response = $this->get(route('customer.profile'));
+        $response->assertRedirect(route('customer.login'));
+    }
+
+    public function test_authenticated_customer_can_view_account_page(): void
+    {
+        $customer = User::create([
+            'name'              => 'Vaishali Patel',
+            'email'             => 'vaishalipatel123@gmail.com',
+            'phone'             => '9876543210',
+            'profession'        => 'Business Owner',
+            'city'              => 'Ahmedabad',
+            'state'             => 'Gujarat',
+            'role'              => 'customer',
+            'password'          => bcrypt('password123'),
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($customer)->get(route('customer.profile'));
+        $response->assertStatus(200);
+        $response->assertSee('My Account');
+        $response->assertSee('Vaishali Patel');
+        $response->assertSee('vaishalipatel123@gmail.com');
+        $response->assertSee('Business Owner');
+    }
+
+    public function test_customer_can_update_all_account_details(): void
+    {
+        $customer = User::create([
+            'name'              => 'Vaishali Patel',
+            'email'             => 'vaishalipatel123@gmail.com',
+            'phone'             => '9876543210',
+            'profession'        => 'Student / Learner',
+            'city'              => 'Ahmedabad',
+            'state'             => 'Gujarat',
+            'role'              => 'customer',
+            'password'          => bcrypt('password123'),
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($customer)->put(route('customer.profile.update'), [
+            'name'       => 'Vaishali P. Shah',
+            'email'      => 'vaishali.shah@example.com',
+            'phone'      => '9988771122',
+            'profession' => 'Working Professional / Employee',
+            'city'       => 'Vadodara',
+            'state'      => 'Gujarat',
+            'interests'  => ['Courses', 'Products'],
+        ]);
+
+        $response->assertRedirect(route('customer.profile'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'id'         => $customer->id,
+            'name'       => 'Vaishali P. Shah',
+            'email'      => 'vaishali.shah@example.com',
+            'phone'      => '9988771122',
+            'profession' => 'Working Professional / Employee',
+            'city'       => 'Vadodara',
+            'state'      => 'Gujarat',
+            'interests'  => 'Courses, Products',
+        ]);
+    }
 }
+

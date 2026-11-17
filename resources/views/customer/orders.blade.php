@@ -12,7 +12,10 @@
                 <h3 class="fw-bold text-dark mb-1">My Orders & Purchases</h3>
                 <p class="text-muted small mb-0">Track your courses, services, and product orders in real-time</p>
             </div>
-            <div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('customer.profile') }}" class="btn btn-outline-secondary btn-sm fw-semibold rounded-pill px-3">
+                    <i class="fa-regular fa-user me-1"></i> My Account
+                </a>
                 <a href="{{ route('home') }}" class="btn btn-outline-primary btn-sm fw-semibold rounded-pill px-3">
                     <i class="fa-solid fa-arrow-left me-1"></i> Continue Shopping
                 </a>

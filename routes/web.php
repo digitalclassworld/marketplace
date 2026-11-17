@@ -90,7 +90,12 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::post('/register', [CustomerAuthController::class, 'register'])->name('register.submit');
     Route::match(['get', 'post'], '/logout', [CustomerAuthController::class, 'logout'])->name('logout');
     Route::get('/orders', [CustomerAuthController::class, 'orders'])->name('orders');
+    Route::get('/profile', [CustomerAuthController::class, 'profile'])->name('profile');
+    Route::put('/profile', [CustomerAuthController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/account', fn() => redirect()->route('customer.profile'))->name('account');
 });
+
+Route::get('/account', fn() => redirect()->route('customer.profile'));
 
 Route::get('/refresh-csrf', fn() => response()->json(['token' => csrf_token()]))->name('refresh-csrf');
 

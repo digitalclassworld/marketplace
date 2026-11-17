@@ -490,6 +490,11 @@
                                         <span class="badge bg-primary-subtle text-primary mt-1" style="font-size: 0.65rem;">Customer Account</span>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item small py-2" href="{{ route('customer.profile') }}">
+                                            <i class="fa-regular fa-user me-2 text-primary"></i> My Account
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item small py-2" href="{{ route('customer.orders') }}">
                                             <i class="fa-solid fa-bag-shopping me-2 text-primary"></i> My Orders & Purchases
                                         </a>
