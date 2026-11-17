@@ -156,6 +156,7 @@ class CatalogManagementTest extends TestCase
             'seller_id' => $seller->id,
             'title'     => 'Wireless Ergonomic Mouse',
             'price'     => 499.00,
+            'status'    => 'pending',
         ]);
     }
 
@@ -178,6 +179,44 @@ class CatalogManagementTest extends TestCase
             'seller_id'     => $seller->id,
             'business_name' => 'Apex Academy of Code',
         ]);
+    }
+
+    public function test_pending_product_requires_admin_approval_before_appearing_on_marketplace(): void
+    {
+        [$user, $seller] = $this->createApprovedSeller();
+        $admin = $this->createAdminUser();
+
+        // 1. Seller creates product
+        $this->actingAs($user)->post(route('seller.products.store'), [
+            'title'          => 'Unique Mechanical Keyboard Pro',
+            'category'       => 'Laptops & Computers',
+            'product_type'   => 'Physical',
+            'description'    => 'RGB Mechanical gaming and typing keyboard.',
+            'price'          => 2999.00,
+            'mrp'            => 4999.00,
+            'stock_quantity' => 15,
+        ])->assertRedirect(route('seller.products.index'));
+
+        $product = Product::where('title', 'Unique Mechanical Keyboard Pro')->first();
+        $this->assertNotNull($product);
+        $this->assertSame('pending', $product->status);
+
+        // 2. Pending product must NOT appear on public marketplace
+        $responseMarketplace = $this->get(route('products'));
+        $responseMarketplace->assertStatus(200);
+        $responseMarketplace->assertDontSee('Unique Mechanical Keyboard Pro');
+
+        // 3. Admin approves product
+        $this->actingAs($admin)->post(route('admin.catalog.products.approve', $product->id))
+            ->assertRedirect();
+
+        $product->refresh();
+        $this->assertSame('approved', $product->status);
+
+        // 4. Approved product now appears on public marketplace
+        $responseApproved = $this->get(route('products'));
+        $responseApproved->assertStatus(200);
+        $responseApproved->assertSee('Unique Mechanical Keyboard Pro');
     }
 
     public function test_super_admin_can_use_entire_seller_portal_and_catalog_creation(): void

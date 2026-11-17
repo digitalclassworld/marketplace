@@ -125,7 +125,7 @@ class HomeController extends Controller
 
             if (Schema::hasTable('products')) {
                 $featuredProducts = Product::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published', 'pending'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
                     ->latest()
                     ->take(8)
                     ->get();
@@ -1800,7 +1800,7 @@ class HomeController extends Controller
 
         try {
             if (Schema::hasTable('products')) {
-                $query = \App\Models\Product::query()->whereIn('status', ['approved', 'active', 'published', 'pending']);
+                $query = \App\Models\Product::query()->whereIn('status', ['approved', 'active', 'published']);
 
                 if (!empty($searchQuery)) {
                     $query->where(function ($q) use ($searchQuery) {
@@ -2313,6 +2313,13 @@ class HomeController extends Controller
                         ->where('title', 'like', "%{$normalized}%")
                         ->orWhere('slug', 'like', "%{$slug}%")
                         ->first();
+                }
+
+                if ($product && !in_array(strtolower($product->status), ['approved', 'active', 'published'])) {
+                    $canPreview = (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->id === ($product->seller->user_id ?? null)));
+                    if (!$canPreview) {
+                        abort(404, 'This product is currently pending admin review and is not publicly available yet.');
+                    }
                 }
             }
         } catch (\Throwable $e) {

@@ -143,9 +143,6 @@ class AppServiceProvider extends ServiceProvider
                 if (\Illuminate\Support\Facades\Schema::hasTable('services')) {
                     \App\Models\Service::whereIn('status', ['pending', 'draft'])->update(['status' => 'approved']);
                 }
-                if (\Illuminate\Support\Facades\Schema::hasTable('products')) {
-                    \App\Models\Product::whereIn('status', ['pending', 'draft'])->update(['status' => 'approved']);
-                }
                 if (\Illuminate\Support\Facades\Schema::hasTable('business_listings')) {
                     \App\Models\BusinessListing::whereIn('status', ['pending', 'draft'])->update(['status' => 'approved']);
                 }

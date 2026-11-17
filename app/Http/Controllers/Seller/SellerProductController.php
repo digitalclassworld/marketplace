@@ -71,10 +71,10 @@ class SellerProductController extends Controller
             'cover_image'      => $media['cover_image'],
             'video_url'        => $media['video_url'],
             'gallery'          => $media['gallery'],
-            'status'           => 'approved',
+            'status'           => 'pending',
         ]);
 
-        return redirect()->route('seller.products.index')->with('success', 'Product listed successfully! Your product is now live on the marketplace.');
+        return redirect()->route('seller.products.index')->with('success', 'Product submitted successfully! It has been submitted for admin approval and will appear on the marketplace once approved.');
     }
 }
 
