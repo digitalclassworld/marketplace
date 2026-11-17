@@ -91,7 +91,8 @@
         }
 
         .dc-sidebar-brand {
-            padding: 1.25rem 1.25rem;
+            padding: 0.75rem 1.25rem;
+            min-height: 54px;
             display: flex;
             align-items: center;
             gap: 0.75rem;
@@ -402,11 +403,14 @@
 <div class="dc-layout-wrapper">
     <!-- ================= SELLER SIDEBAR (Page 4 Reference) ================= -->
     <aside class="dc-sidebar" id="sellerSidebar">
-        <!-- Brand -->
+        <!-- Brand / Header -->
         <div class="dc-sidebar-brand d-flex align-items-center justify-content-between">
-            <a href="{{ route('seller.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-                <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 42px; width: auto; background: #ffffff; padding: 5px 10px; border-radius: 9px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
-                <span class="badge bg-primary text-uppercase px-2 py-1" style="font-size: 0.65rem; letter-spacing: 0.06em; font-weight: 700;">Seller</span>
+            <a href="{{ route('seller.dashboard') }}" class="d-inline-flex align-items-center text-decoration-none">
+                @if(Auth::user()?->isSeller() || Auth::user()?->seller)
+                    <span class="badge bg-primary text-uppercase px-2.5 py-1" style="font-size: 0.7rem; letter-spacing: 0.06em; font-weight: 700; border-radius: 6px;">Seller</span>
+                @elseif(Auth::user()?->isSuperAdmin())
+                    <span class="badge bg-danger text-uppercase px-2.5 py-1" style="font-size: 0.7rem; letter-spacing: 0.06em; font-weight: 700; border-radius: 6px;">Super Admin</span>
+                @endif
             </a>
             <button type="button" class="btn btn-sm text-secondary border-0 d-lg-none p-1" onclick="toggleSidebar()" title="Close Sidebar">
                 <i class="fa-solid fa-xmark fs-5"></i>
@@ -414,7 +418,7 @@
         </div>
 
         <!-- Menu Navigation (Page 4 Design Match) -->
-        <ul class="dc-sidebar-menu mt-2">
+        <ul class="dc-sidebar-menu mt-1">
             <!-- 1. Dashboard (Active Blue Pill) -->
             <li class="dc-menu-item">
                 <a href="{{ route('seller.dashboard') }}" class="dc-menu-link {{ request()->routeIs('seller.dashboard') ? 'active' : '' }}">
