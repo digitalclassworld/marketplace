@@ -343,4 +343,60 @@ class CatalogManagementTest extends TestCase
         $this->actingAs($admin)->get(route('seller.courses.create'))
             ->assertStatus(200);
     }
+
+    public function test_super_admin_services_catalog_management_view_and_actions(): void
+    {
+        [$user, $seller] = $this->createApprovedSeller();
+        $admin = $this->createAdminUser();
+
+        $service = Service::create([
+            'seller_id'    => $seller->id,
+            'title'        => 'Custom Web Platform Architecture',
+            'slug'         => 'custom-web-platform-architecture',
+            'category'     => 'Development',
+            'sub_category' => 'Web Design & Development',
+            'price'        => 7999.00,
+            'status'       => 'pending',
+            'is_featured'  => false,
+        ]);
+
+        // 1. View services catalog page
+        $response = $this->actingAs($admin)->get(route('admin.catalog.services'));
+        $response->assertStatus(200);
+        $response->assertSee('Services Management');
+        $response->assertSee('Custom Web Platform Architecture');
+        $response->assertSee('Total Services');
+        $response->assertSee('Active Services');
+        $response->assertSee('Pending Approval');
+
+        // 2. Filter by status
+        $this->actingAs($admin)->get(route('admin.catalog.services', ['status' => 'pending']))
+            ->assertStatus(200)
+            ->assertSee('Custom Web Platform Architecture');
+
+        // 3. Approve service
+        $this->actingAs($admin)->post(route('admin.catalog.services.approve', $service->id))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $service->refresh();
+        $this->assertSame('approved', $service->status);
+
+        // 4. Toggle featured
+        $this->actingAs($admin)->post(route('admin.catalog.services.toggle-featured', $service->id))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $service->refresh();
+        $this->assertTrue((bool)$service->is_featured);
+
+        // 5. Reject service with reason
+        $this->actingAs($admin)->post(route('admin.catalog.services.reject', $service->id), [
+            'reason' => 'Service terms need revision.',
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $service->refresh();
+        $this->assertSame('rejected', $service->status);
+        $this->assertSame('Service terms need revision.', $service->rejection_reason);
+    }
 }

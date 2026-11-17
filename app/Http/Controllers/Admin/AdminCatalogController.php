@@ -1096,6 +1096,13 @@ class AdminCatalogController extends Controller
 
     public function toggleFeaturedService(int $id): RedirectResponse
     {
+        $service = Service::find($id);
+        if ($service) {
+            $service->is_featured = !$service->is_featured;
+            $service->save();
+            $status = $service->is_featured ? 'marked as featured' : 'removed from featured';
+            return back()->with('success', "Service '{$service->title}' {$status} successfully.");
+        }
         return back()->with('success', "Service featured status updated successfully.");
     }
 

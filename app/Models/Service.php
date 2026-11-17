@@ -27,6 +27,7 @@ class Service extends Model
         'cover_image',
         'video_url',
         'gallery',
+        'is_featured',
         'status',
         'rejection_reason',
         'approved_at',
@@ -37,6 +38,7 @@ class Service extends Model
         'delivery_days' => 'integer',
         'price' => 'decimal:2',
         'gallery' => 'array',
+        'is_featured' => 'boolean',
         'approved_at' => 'datetime',
     ];
 
