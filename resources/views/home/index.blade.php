@@ -647,14 +647,23 @@
 
                     <div class="d-flex align-items-center">
                         <i class="fa-solid fa-location-dot text-primary ms-2 me-1"></i>
-                        <select name="city" class="hero-location-select" onchange="this.form.submit()">
+                        <select name="city" class="hero-location-select" id="heroCitySelect" onchange="handleHeroCityChange(this)">
+                            <option value="near_me" {{ in_array($selectedCity, ['Near Me', 'near_me']) ? 'selected' : '' }}>📍 Near Me (GPS)</option>
                             <option value="Ahmedabad" {{ $selectedCity === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
                             <option value="Surat" {{ $selectedCity === 'Surat' ? 'selected' : '' }}>Surat</option>
                             <option value="Vadodara" {{ $selectedCity === 'Vadodara' ? 'selected' : '' }}>Vadodara</option>
                             <option value="Rajkot" {{ $selectedCity === 'Rajkot' ? 'selected' : '' }}>Rajkot</option>
                             <option value="Gandhinagar" {{ $selectedCity === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
-                            <option value="All Locations" {{ $selectedCity === 'All Locations' ? 'selected' : '' }}>All Locations</option>
+                            <option value="Mumbai" {{ $selectedCity === 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
+                            <option value="Delhi NCR" {{ $selectedCity === 'Delhi NCR' ? 'selected' : '' }}>Delhi NCR</option>
+                            <option value="Bengaluru" {{ $selectedCity === 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
+                            <option value="Pune" {{ $selectedCity === 'Pune' ? 'selected' : '' }}>Pune</option>
+                            <option value="Jaipur" {{ $selectedCity === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
+                            <option value="Indore" {{ $selectedCity === 'Indore' ? 'selected' : '' }}>Indore</option>
+                            <option value="All Locations" {{ $selectedCity === 'All Locations' ? 'selected' : '' }}>All India</option>
                         </select>
+                        <input type="hidden" name="lat" id="heroLat" value="{{ request('lat') }}">
+                        <input type="hidden" name="lng" id="heroLng" value="{{ request('lng') }}">
                     </div>
 
                     <button type="submit" class="btn-hero-search ms-2">
@@ -714,13 +723,16 @@
                         </div>
                     </div>
 
-                    <div class="trust-badge-item">
+                    <div class="trust-badge-item" onclick="detectGlobalNavLocation()" style="cursor: pointer;" title="Click to find businesses near your current GPS location">
                         <div class="trust-icon-pill bg-info-subtle text-info">
                             <i class="fa-solid fa-location-crosshairs"></i>
                         </div>
                         <div>
-                            <div class="fw-bold small text-dark" style="font-size: 0.78rem;">Find Near You</div>
-                            <div class="text-muted" style="font-size: 0.68rem;">Location-Based Proximity Search</div>
+                            <div class="fw-bold small text-dark d-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                <span>Find Near You</span>
+                                <span class="badge bg-primary text-white" style="font-size: 0.6rem;">GPS</span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.68rem;">Click for Instant Proximity Search</div>
                         </div>
                     </div>
                 </div>
@@ -780,21 +792,34 @@
 
                     <!-- Location Selector -->
                     <div class="mb-3">
-                        <div class="filter-section-title">Location</div>
-                        <select name="city" class="form-select form-select-sm mb-2" onchange="document.getElementById('homeFilterForm').submit()">
+                        <div class="filter-section-title">Location & Proximity</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary w-100 mb-2 fw-semibold d-flex align-items-center justify-content-center gap-1.5" onclick="detectSidebarLocation()">
+                            <i class="fa-solid fa-location-crosshairs"></i> <span id="btnSidebarLocText">Use Current Location</span>
+                        </button>
+                        <select name="city" id="sidebarCitySelect" class="form-select form-select-sm mb-2" onchange="handleSidebarCityChange(this)">
+                            <option value="near_me" {{ in_array($selectedCity, ['Near Me', 'near_me']) ? 'selected' : '' }}>📍 Near Me (GPS)</option>
                             <option value="Ahmedabad" {{ $selectedCity === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
                             <option value="Surat" {{ $selectedCity === 'Surat' ? 'selected' : '' }}>Surat</option>
                             <option value="Vadodara" {{ $selectedCity === 'Vadodara' ? 'selected' : '' }}>Vadodara</option>
                             <option value="Rajkot" {{ $selectedCity === 'Rajkot' ? 'selected' : '' }}>Rajkot</option>
                             <option value="Gandhinagar" {{ $selectedCity === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
-                            <option value="All Locations" {{ $selectedCity === 'All Locations' ? 'selected' : '' }}>All Locations</option>
+                            <option value="Mumbai" {{ $selectedCity === 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
+                            <option value="Delhi NCR" {{ $selectedCity === 'Delhi NCR' ? 'selected' : '' }}>Delhi NCR</option>
+                            <option value="Bengaluru" {{ $selectedCity === 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
+                            <option value="Pune" {{ $selectedCity === 'Pune' ? 'selected' : '' }}>Pune</option>
+                            <option value="Jaipur" {{ $selectedCity === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
+                            <option value="Indore" {{ $selectedCity === 'Indore' ? 'selected' : '' }}>Indore</option>
+                            <option value="All Locations" {{ $selectedCity === 'All Locations' ? 'selected' : '' }}>All India</option>
                         </select>
                         <select name="distance" class="form-select form-select-sm text-muted" onchange="document.getElementById('homeFilterForm').submit()">
                             <option value="all" {{ ($selectedDistance ?? 'all') === 'all' ? 'selected' : '' }}>Any Distance</option>
                             <option value="5" {{ ($selectedDistance ?? '') === '5' ? 'selected' : '' }}>Within 5 km</option>
                             <option value="10" {{ ($selectedDistance ?? '') === '10' ? 'selected' : '' }}>Within 10 km</option>
                             <option value="25" {{ ($selectedDistance ?? '') === '25' ? 'selected' : '' }}>Within 25 km</option>
+                            <option value="50" {{ ($selectedDistance ?? '') === '50' ? 'selected' : '' }}>Within 50 km</option>
                         </select>
+                        <input type="hidden" name="lat" id="sidebarLat" value="{{ request('lat') }}">
+                        <input type="hidden" name="lng" id="sidebarLng" value="{{ request('lng') }}">
                     </div>
 
                     <!-- Business Category -->
@@ -1109,9 +1134,16 @@
                                         @endif
                                     </div>
 
-                                    <!-- Location -->
-                                    <div class="card-location-row">
-                                        <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $b->area_text }}
+                                    <!-- Location & Distance -->
+                                    <div class="card-location-row d-flex align-items-center justify-content-between">
+                                        <span class="text-truncate" title="{{ $b->area_text }}">
+                                            <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $b->area_text }}
+                                        </span>
+                                        @if(isset($b->distance_km))
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1 px-1.5 py-0.5" style="font-size: 0.65rem; font-weight: 700; white-space: nowrap;" title="{{ $b->distance_km }} km away from your selected location">
+                                                <i class="fa-solid fa-location-arrow me-0.5"></i> {{ $b->distance_km }} km
+                                            </span>
+                                        @endif
                                     </div>
 
                                     <!-- Tags -->
@@ -1685,6 +1717,61 @@
             toastEl.style.opacity = '0';
             toastEl.style.transform = 'translateY(10px)';
         }, 2500);
+    }
+
+    // Hero location handler (GPS vs City)
+    function handleHeroCityChange(selectEl) {
+        if (selectEl.value === 'near_me') {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser.');
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                document.getElementById('heroLat').value = pos.coords.latitude;
+                document.getElementById('heroLng').value = pos.coords.longitude;
+                selectEl.form.submit();
+            }, function(err) {
+                alert('Unable to retrieve location: ' + err.message);
+                selectEl.value = 'Ahmedabad';
+            }, { timeout: 10000, enableHighAccuracy: true });
+        } else {
+            document.getElementById('heroLat').value = '';
+            document.getElementById('heroLng').value = '';
+            selectEl.form.submit();
+        }
+    }
+
+    // Sidebar location handler
+    function handleSidebarCityChange(selectEl) {
+        if (selectEl.value === 'near_me') {
+            detectSidebarLocation();
+        } else {
+            document.getElementById('sidebarLat').value = '';
+            document.getElementById('sidebarLng').value = '';
+            document.getElementById('homeFilterForm').submit();
+        }
+    }
+
+    // Detect sidebar current location
+    function detectSidebarLocation() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+        const btnText = document.getElementById('btnSidebarLocText');
+        const orig = btnText ? btnText.textContent : '';
+        if (btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Locating...';
+
+        navigator.geolocation.getCurrentPosition(function(pos) {
+            document.getElementById('sidebarLat').value = pos.coords.latitude;
+            document.getElementById('sidebarLng').value = pos.coords.longitude;
+            const select = document.getElementById('sidebarCitySelect');
+            if (select) select.value = 'near_me';
+            document.getElementById('homeFilterForm').submit();
+        }, function(err) {
+            alert('Unable to retrieve location: ' + err.message + '. Please ensure location permissions are enabled.');
+            if (btnText) btnText.textContent = orig;
+        }, { timeout: 10000, enableHighAccuracy: true });
     }
 </script>
 

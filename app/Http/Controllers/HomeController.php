@@ -31,6 +31,17 @@ class HomeController extends Controller
         $selectedBusinessTypes = (array) $request->input('business_type', []);
         $selectedDistance = $request->input('distance', 'all');
         $sortBy = $request->input('sort', 'popular');
+        $userLat = $request->filled('lat') ? (float)$request->input('lat') : null;
+        $userLng = $request->filled('lng') ? (float)$request->input('lng') : null;
+
+        // If user chose a specific city without GPS, resolve reference coordinates from city lookup
+        if (($userLat === null || $userLng === null) && !empty($selectedCity) && !in_array($selectedCity, ['All Locations', 'all', 'Near Me', 'near_me'])) {
+            $cityKey = strtolower(trim($selectedCity));
+            if (isset(BusinessListing::$cityCoordinates[$cityKey])) {
+                $userLat = BusinessListing::$cityCoordinates[$cityKey]['lat'];
+                $userLng = BusinessListing::$cityCoordinates[$cityKey]['lng'];
+            }
+        }
 
         $businesses = collect();
         $featuredCourses = collect();
@@ -59,14 +70,29 @@ class HomeController extends Controller
                     });
                 }
 
-                if (!empty($selectedCity) && $selectedCity !== 'All Locations' && $selectedCity !== 'all') {
+                if (!empty($selectedCity) && !in_array($selectedCity, ['All Locations', 'all', 'Near Me', 'near_me'])) {
                     $query->where(function ($q) use ($selectedCity) {
                         $q->where('city', 'like', "%{$selectedCity}%")
                           ->orWhere('address', 'like', "%{$selectedCity}%");
                     });
                 }
 
-                $businesses = $query->get();
+                $businesses = $query->take(30)->get();
+
+                // Compute distance in KM for each business when reference coordinates exist
+                if ($userLat !== null && $userLng !== null) {
+                    foreach ($businesses as $b) {
+                        $b->distance_km = $b->calculateDistanceKm($userLat, $userLng);
+                    }
+
+                    // Apply distance radius filter (5km, 10km, 25km, 50km)
+                    if ($selectedDistance !== 'all' && is_numeric($selectedDistance)) {
+                        $maxDist = (float)$selectedDistance;
+                        $businesses = $businesses->filter(function ($b) use ($maxDist) {
+                            return $b->distance_km !== null && $b->distance_km <= $maxDist;
+                        });
+                    }
+                }
 
                 // Client-side JSON attribute filters
                 if (!empty($selectedRating)) {
@@ -93,8 +119,12 @@ class HomeController extends Controller
                     });
                 }
 
-                // Apply sorting
-                if ($sortBy === 'rating') {
+                // Apply sorting (Nearest first when sorting by nearest or GPS mode)
+                if ($sortBy === 'nearest' || $sortBy === 'distance' || in_array($selectedCity, ['Near Me', 'near_me'])) {
+                    $businesses = $businesses->sortBy(function ($b) {
+                        return $b->distance_km ?? 99999;
+                    })->values();
+                } elseif ($sortBy === 'rating') {
                     $businesses = $businesses->sortByDesc(fn($b) => (float)$b->rating)->values();
                 } elseif ($sortBy === 'newest') {
                     $businesses = $businesses->sortByDesc(fn($b) => $b->created_at)->values();
@@ -180,6 +210,8 @@ class HomeController extends Controller
             'selectedFacilities'    => $selectedFacilities,
             'selectedBusinessTypes' => $selectedBusinessTypes,
             'sortBy'                => $sortBy,
+            'userLat'               => $userLat,
+            'userLng'               => $userLng,
         ]);
     }
 

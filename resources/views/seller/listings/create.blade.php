@@ -697,20 +697,34 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small">Google Maps Location</label>
-                    <div class="input-group mb-2">
-                        <input type="text" name="map_location" id="inputMap" class="form-control" placeholder="Google Maps share link or location URL" value="{{ old('map_location', 'https://maps.google.com/?q=VCEC+Nikol') }}">
-                        <button class="btn btn-outline-primary fw-semibold" type="button">Get Location</button>
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <label class="form-label fw-bold text-dark small mb-0">Google Maps Location</label>
+                        <span class="text-muted small" style="font-size: 0.72rem;"><i class="fa-solid fa-satellite-dish text-primary me-1"></i> Auto-detects GPS & pin</span>
                     </div>
-                    <!-- Miniature Map Preview Card Matching Screenshot -->
-                    <div class="border rounded-3 p-2 bg-light d-flex align-items-center justify-content-between" style="max-width: 280px;">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-danger fs-5"></i>
+                    <div class="input-group mb-2 shadow-xs">
+                        <input type="text" name="map_location" id="inputMap" class="form-control" placeholder="Google Maps link or click 'Get Location'" value="{{ old('map_location', 'https://maps.google.com/?q=VCEC+Nikol') }}">
+                        <button class="btn btn-primary fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnGetLocation" onclick="fetchCurrentLocation()">
+                            <i class="fa-solid fa-location-crosshairs"></i> <span id="btnGetLocationText">Get Location</span>
+                        </button>
+                    </div>
+                    <input type="hidden" name="latitude" id="inputLatitude" value="{{ old('latitude') }}">
+                    <input type="hidden" name="longitude" id="inputLongitude" value="{{ old('longitude') }}">
+                    
+                    <!-- Dynamic Live Map Preview Card Matching Screenshot -->
+                    <div class="border rounded-3 p-2.5 bg-light d-flex align-items-center justify-content-between shadow-xs" style="max-width: 340px;" id="mapPreviewCard">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <i class="fa-solid fa-location-dot text-danger fs-4" id="mapPreviewIcon"></i>
                             <div>
-                                <div class="fw-bold small text-dark" style="font-size: 0.8rem;">VCEC - Nikol</div>
-                                <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none" style="font-size: 0.7rem;">View larger map</a>
+                                <div class="fw-bold small text-dark" style="font-size: 0.82rem;" id="mapPreviewTitle">VCEC - Nikol</div>
+                                <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.72rem;" id="mapPreviewLink">
+                                    <span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i>
+                                </a>
                             </div>
                         </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle" id="mapPreviewStatus" style="font-size: 0.65rem;">Active Pin</span>
+                    </div>
+                    <div class="form-text small text-muted mt-1" style="font-size: 0.72rem;">
+                        <i class="fa-solid fa-circle-info text-info me-1"></i> Clicking <strong>Get Location</strong> detects your device's exact GPS coordinates and auto-fills your City & Pincode!
                     </div>
                 </div>
 
@@ -1316,6 +1330,109 @@
             if (uploadSub) uploadSub.textContent = sizeMb + ' MB • Ready for save';
         }, function(progress) {
             if (uploadSub) uploadSub.textContent = 'Uploading: ' + progress + '% (' + sizeMb + ' MB)';
+        });
+    }
+
+    // 5. Live Location & Map Synchronization
+    function fetchCurrentLocation() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        const btnText = document.getElementById('btnGetLocationText');
+        const originalText = btnText ? btnText.textContent : 'Get Location';
+        if (btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Locating...';
+
+        navigator.geolocation.getCurrentPosition(async function(pos) {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+
+            document.getElementById('inputLatitude').value = lat;
+            document.getElementById('inputLongitude').value = lng;
+            
+            const bName = document.getElementById('inputBusinessName')?.value || 'Your Business Location';
+            const mapUrl = `https://maps.google.com/?q=${lat},${lng}`;
+            document.getElementById('inputMap').value = mapUrl;
+
+            // Update Preview Card
+            updateMapPreview(mapUrl, `${bName} (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+
+            // Reverse geocode via free Nominatim to auto-fill Address, City, State, Pincode if empty
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.address) {
+                        const addr = data.address;
+                        const cityVal = addr.city || addr.town || addr.village || addr.suburb || addr.district || '';
+                        const stateVal = addr.state || '';
+                        const pincodeVal = addr.postcode || '';
+                        
+                        if (cityVal && !document.getElementById('inputCity').value) {
+                            document.getElementById('inputCity').value = cityVal;
+                        }
+                        if (stateVal && !document.getElementById('inputState').value) {
+                            document.getElementById('inputState').value = stateVal;
+                        }
+                        if (pincodeVal && !document.getElementById('inputPincode').value) {
+                            document.getElementById('inputPincode').value = pincodeVal;
+                        }
+                        if (data.display_name && !document.getElementById('inputAddress').value) {
+                            document.getElementById('inputAddress').value = data.display_name.split(',').slice(0, 3).join(', ');
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Reverse geocoding notice:', e);
+            }
+
+            if (btnText) {
+                btnText.innerHTML = '<i class="fa-solid fa-check text-white me-1"></i> Located!';
+                setTimeout(() => { btnText.textContent = originalText; }, 2500);
+            }
+        }, function(err) {
+            alert('Location access denied or unavailable: ' + err.message + '. Please ensure browser location permissions are allowed.');
+            if (btnText) btnText.textContent = originalText;
+        }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    function updateMapPreview(url, customLabel) {
+        const titleEl = document.getElementById('mapPreviewTitle');
+        const linkEl = document.getElementById('mapPreviewLink');
+        const bName = document.getElementById('inputBusinessName')?.value || 'Your Business Location';
+        
+        if (titleEl) titleEl.textContent = customLabel || bName;
+        if (linkEl) {
+            linkEl.href = url || 'https://maps.google.com';
+            linkEl.innerHTML = '<span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.65rem;"></i>';
+        }
+    }
+
+    // Auto-update map link when address, city, state changes
+    ['inputAddress', 'inputCity', 'inputState', 'inputPincode', 'inputBusinessName'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', function() {
+                const bName = document.getElementById('inputBusinessName')?.value || '';
+                const addr = document.getElementById('inputAddress')?.value || '';
+                const city = document.getElementById('inputCity')?.value || '';
+                const state = document.getElementById('inputState')?.value || '';
+                
+                const queryParts = [bName, addr, city, state].filter(Boolean);
+                if (queryParts.length > 0 && !document.getElementById('inputLatitude')?.value) {
+                    const generatedUrl = 'https://maps.google.com/?q=' + encodeURIComponent(queryParts.join(', '));
+                    document.getElementById('inputMap').value = generatedUrl;
+                    updateMapPreview(generatedUrl, bName || city);
+                }
+            });
+        }
+    });
+
+    const inputMapEl = document.getElementById('inputMap');
+    if (inputMapEl) {
+        inputMapEl.addEventListener('input', function() {
+            updateMapPreview(this.value.trim());
         });
     }
 </script>

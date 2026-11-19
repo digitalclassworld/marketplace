@@ -520,16 +520,32 @@
                 <!-- Right Side Elements -->
                 <div class="d-flex align-items-center gap-2 gap-xl-2.5 ms-xl-auto mt-2 mt-xl-0 flex-wrap flex-xl-nowrap">
                     <!-- Location Selector -->
-                    <div class="dropdown d-none d-md-block">
-                        <button class="btn btn-sm btn-light border-0 dropdown-toggle small text-muted d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+                    <div class="dropdown d-none d-md-block" id="navLocationDropdown">
+                        <button class="btn btn-sm btn-light border-0 dropdown-toggle small text-muted d-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown" id="navLocationBtn">
                             <i class="fa-solid fa-location-dot text-primary"></i>
-                            <span class="text-dark fw-semibold">Ahmedabad</span>
+                            <span class="text-dark fw-semibold" id="navSelectedCityText">{{ request('city', 'Ahmedabad') }}</span>
                         </button>
-                        <ul class="dropdown-menu shadow-sm border-0 rounded-3">
-                            <li><a class="dropdown-item small" href="#">Ahmedabad</a></li>
-                            <li><a class="dropdown-item small" href="#">Mumbai</a></li>
-                            <li><a class="dropdown-item small" href="#">Delhi NCR</a></li>
-                            <li><a class="dropdown-item small" href="#">Bengaluru</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2" style="min-width: 230px;">
+                            <li>
+                                <button type="button" class="dropdown-item small text-primary fw-bold py-2 rounded-2 d-flex align-items-center gap-2" onclick="detectGlobalNavLocation()">
+                                    <i class="fa-solid fa-location-crosshairs text-primary"></i>
+                                    <span>Detect My Location (Near Me)</span>
+                                </button>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li class="dropdown-header small text-muted fw-bold py-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">POPULAR CITIES</li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'All Locations' ? 'active' : '' }}" href="{{ route('home', ['city' => 'All Locations']) }}"><i class="fa-solid fa-globe me-1.5 text-secondary"></i> All India</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ (!request('city') || request('city') === 'Ahmedabad') ? 'active' : '' }}" href="{{ route('home', ['city' => 'Ahmedabad']) }}">Ahmedabad</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Surat' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Surat']) }}">Surat</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Vadodara' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Vadodara']) }}">Vadodara</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Rajkot' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Rajkot']) }}">Rajkot</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Gandhinagar' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Gandhinagar']) }}">Gandhinagar</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Mumbai' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Mumbai']) }}">Mumbai</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Delhi NCR' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Delhi NCR']) }}">Delhi NCR</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Bengaluru' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Bengaluru']) }}">Bengaluru</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Pune' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Pune']) }}">Pune</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Jaipur' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Jaipur']) }}">Jaipur</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Indore' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Indore']) }}">Indore</a></li>
                         </ul>
                     </div>
 
@@ -2092,6 +2108,31 @@
                 bsAlert.close();
             });
         }, 5000);
+
+        // Global Geolocation Detector (Navbar & Filter)
+        function detectGlobalNavLocation() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser.');
+                return;
+            }
+            const btn = document.getElementById('navLocationBtn');
+            const origHtml = btn ? btn.innerHTML : '';
+            if (btn) btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Locating...';
+
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const url = new URL("{{ route('home') }}", window.location.origin);
+                url.searchParams.set('lat', lat);
+                url.searchParams.set('lng', lng);
+                url.searchParams.set('city', 'Near Me');
+                url.searchParams.set('sort', 'nearest');
+                window.location.href = url.toString();
+            }, function(err) {
+                alert('Unable to retrieve your location: ' + err.message + '. Please ensure location permissions are granted in your browser.');
+                if (btn) btn.innerHTML = origHtml;
+            }, { timeout: 10000, enableHighAccuracy: true });
+        }
     </script>
     @yield('scripts')
 </body>
