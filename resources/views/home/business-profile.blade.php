@@ -18,24 +18,24 @@
 
 @push('schema')
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  "name": "{{ addslashes($bName) }}",
-  "description": "{{ addslashes($bDescTruncated) }}",
-  "url": "{{ url()->current() }}",
-  "logo": "{{ $bLogo }}",
-  "telephone": "{{ $business->phone ?? '+91' }}",
-  "email": "{{ $business->email ?? '' }}",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "{{ addslashes($business->address ?? '') }}",
-    "addressLocality": "{{ $bCity }}",
-    "addressRegion": "{{ $business->state ?? 'Gujarat' }}",
-    "postalCode": "{{ $business->pincode ?? '' }}",
-    "addressCountry": "IN"
-  }
-}
+{!! json_encode([
+  '@context' => 'https://schema.org',
+  '@type' => 'EducationalOrganization',
+  'name' => $bName,
+  'description' => $bDescTruncated,
+  'url' => url()->current(),
+  'logo' => $bLogo,
+  'telephone' => $business->phone ?? '+91',
+  'email' => $business->email ?? '',
+  'address' => [
+    '@type' => 'PostalAddress',
+    'streetAddress' => $business->address ?? '',
+    'addressLocality' => $bCity,
+    'addressRegion' => $business->state ?? 'Gujarat',
+    'postalCode' => $business->pincode ?? '',
+    'addressCountry' => 'IN',
+  ],
+], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
 
