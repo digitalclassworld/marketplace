@@ -3177,7 +3177,11 @@ class HomeController extends Controller
      */
     public function sitemap(Request $request): \Illuminate\Http\Response
     {
-        $baseUrl = url('/');
+        $baseUrl = rtrim(config('app.url', 'https://web.digitalclassworld.in'), '/');
+        if (str_contains($baseUrl, 'localhost')) {
+            $host = $request->getSchemeAndHttpHost();
+            $baseUrl = str_contains($host, 'localhost') ? 'https://web.digitalclassworld.in' : $host;
+        }
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
