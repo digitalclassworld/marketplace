@@ -1,6 +1,43 @@
 @extends('layouts.app')
 
-@section('title', ($business->business_name ?? 'VCEC - Vinayak Computer Education Center') . ' - Digital Class')
+@php
+    $bName = $business->business_name ?? 'Educational Institute';
+    $bCity = $business->city ?? 'Ahmedabad';
+    $bCategory = $business->category ?? 'Educational Institute';
+    $bDesc = strip_tags($business->description ?? ($bName . ' offers premier coaching, training, and certification programs in ' . $bCity . '. Check courses, fees, contact details, reviews and admission inquiries.'));
+    $bDescTruncated = \Illuminate\Support\Str::limit($bDesc, 160);
+    $bKeywords = $bName . ', ' . $bCategory . ' in ' . $bCity . ', best classes in ' . $bCity . ', coaching institute ' . $bCity . ', tuition center near me, digital class';
+    $bLogo = $business->logo ?: asset('images/default-business.jpg');
+@endphp
+
+@section('title', $bName . ' - ' . $bCategory . ' in ' . $bCity . ' | Digital Class')
+@section('meta_description', $bDescTruncated)
+@section('meta_keywords', $bKeywords)
+@section('og_image', $bLogo)
+@section('og_type', 'business.business')
+
+@push('schema')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "{{ addslashes($bName) }}",
+  "description": "{{ addslashes($bDescTruncated) }}",
+  "url": "{{ url()->current() }}",
+  "logo": "{{ $bLogo }}",
+  "telephone": "{{ $business->phone ?? '+91' }}",
+  "email": "{{ $business->email ?? '' }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ addslashes($business->address ?? '') }}",
+    "addressLocality": "{{ $bCity }}",
+    "addressRegion": "{{ $business->state ?? 'Gujarat' }}",
+    "postalCode": "{{ $business->pincode ?? '' }}",
+    "addressCountry": "IN"
+  }
+}
+</script>
+@endpush
 
 @section('styles')
 <style>

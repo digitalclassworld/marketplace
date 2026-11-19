@@ -4,7 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Digital Class Marketplace - Learn, Hire, Buy, Discover')</title>
+    <title>@yield('title', 'Digital Class - India\'s Leading Educational Marketplace & Coaching Directory')</title>
+    <meta name="description" content="@yield('meta_description', 'Digital Class is India\'s premier educational marketplace. Explore 11,000+ verified coaching institutes, enroll in certified online courses, hire freelance experts, and access premium study materials.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'online courses India, coaching institutes directory, computer classes, spoken english institute, freelance services, educational products, learn online, digital class marketplace')">
+    <meta name="robots" content="@yield('meta_robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')">
+    <link rel="canonical" href="@yield('canonical_url', url()->current())">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:site_name" content="Digital Class">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="@yield('og_title', View::yieldContent('title', 'Digital Class - Educational Marketplace & Coaching Directory'))">
+    <meta property="og:description" content="@yield('og_description', View::yieldContent('meta_description', 'Explore 11,000+ verified coaching institutes, online courses, and freelance services on Digital Class.'))">
+    <meta property="og:url" content="@yield('canonical_url', url()->current())">
+    <meta property="og:image" content="@yield('og_image', asset('images/digital-class-banner.jpg'))">
+    <meta property="og:locale" content="en_IN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@DigitalClassWorld">
+    <meta name="twitter:title" content="@yield('og_title', View::yieldContent('title', 'Digital Class - Educational Marketplace'))">
+    <meta name="twitter:description" content="@yield('og_description', View::yieldContent('meta_description', 'Explore verified coaching institutes, courses, and services on Digital Class.'))">
+    <meta name="twitter:image" content="@yield('og_image', asset('images/digital-class-banner.jpg'))">
+
+    <!-- Geo Metadata for India -->
+    <meta name="geo.region" content="IN-GJ">
+    <meta name="geo.placename" content="Ahmedabad">
+    <meta name="geo.position" content="23.0225;72.5714">
+    <meta name="ICBM" content="23.0225, 72.5714">
+
+    <!-- Global Organization & WebSite JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "{{ url('/') }}/#organization",
+          "name": "Digital Class",
+          "url": "{{ url('/') }}",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{{ asset('images/logo.png') }}",
+            "caption": "Digital Class Logo"
+          },
+          "sameAs": [
+            "https://www.facebook.com/digitalclassworld",
+            "https://www.instagram.com/digitalclassworld",
+            "https://www.linkedin.com/company/digitalclassworld",
+            "https://twitter.com/digitalclassw"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ url('/') }}/#website",
+          "url": "{{ url('/') }}",
+          "name": "Digital Class",
+          "publisher": {
+            "@id": "{{ url('/') }}/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ url('/search') }}?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
+    @stack('schema')
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">

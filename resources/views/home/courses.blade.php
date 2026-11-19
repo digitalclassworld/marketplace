@@ -1,7 +1,9 @@
 
 @extends('layouts.app')
 
-@section('title', 'All Courses - Learn In-Demand Skills on Digital Class')
+@section('title', 'All Online Courses - Learn In-Demand Tech, Business & Creative Skills | Digital Class')
+@section('meta_description', 'Explore top-rated online courses on Digital Class. Learn Web Development, Python, Digital Marketing, Graphic Design, Spoken English, and Competitive Exam prep with verified certifications.')
+@section('meta_keywords', 'online courses India, learn coding online, digital marketing course, spoken english classes, certification courses, edtech marketplace')
 
 @section('styles')
 <style>

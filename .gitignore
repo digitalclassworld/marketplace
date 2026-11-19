@@ -28,3 +28,4 @@ test_*.php
 marketplace/
 scratch/
 *.sql
+*.zip

@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('title', ($course->title ?? 'Digital Marketing Complete Course 2026') . ' - Digital Class')
+@section('meta_description', \Illuminate\Support\Str::limit(strip_tags($course->meta_description ?? ($course->short_description ?: 'Learn ' . $course->title . ' with step by step practical training, live projects and industry certification.')), 160))
+@section('meta_keywords', $course->meta_keywords ?? ($course->category . ', ' . $course->title . ', online courses, certification, digital class'))
+@section('og_image', $course->thumbnail)
+@section('og_type', 'article')
 
 @section('styles')
 <!-- SEO Meta Tags -->
