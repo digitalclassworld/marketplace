@@ -3163,4 +3163,79 @@ class HomeController extends Controller
             'similarProducts' => $similarProducts,
         ];
     }
+
+    /**
+     * Dedicated SEO Landing Page: Online Course Selling Platform
+     */
+    public function sellCoursesLanding(Request $request): View
+    {
+        return view('home.sell-courses');
+    }
+
+    /**
+     * Dynamic XML Sitemap for Google Search Console
+     */
+    public function sitemap(Request $request): \Illuminate\Http\Response
+    {
+        $baseUrl = url('/');
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+        // Static Key Pages
+        $staticPages = [
+            '/' => '1.0',
+            '/courses' => '0.9',
+            '/online-course-selling-platform' => '0.9',
+            '/sell-courses' => '0.9',
+            '/become-seller' => '0.9',
+            '/services' => '0.8',
+            '/products' => '0.8',
+            '/listings' => '0.8',
+            '/blog' => '0.7',
+            '/seller/register' => '0.8',
+        ];
+
+        foreach ($staticPages as $path => $priority) {
+            $xml .= "  <url>\n";
+            $xml .= "    <loc>" . htmlspecialchars($baseUrl . $path) . "</loc>\n";
+            $xml .= "    <lastmod>" . date('Y-m-d') . "</lastmod>\n";
+            $xml .= "    <changefreq>daily</changefreq>\n";
+            $xml .= "    <priority>{$priority}</priority>\n";
+            $xml .= "  </url>\n";
+        }
+
+        // Active Courses
+        try {
+            $courses = Course::where('status', 'approved')->select('slug', 'updated_at')->take(1000)->get();
+            foreach ($courses as $c) {
+                if ($c->slug) {
+                    $xml .= "  <url>\n";
+                    $xml .= "    <loc>" . htmlspecialchars($baseUrl . '/course/' . $c->slug) . "</loc>\n";
+                    $xml .= "    <lastmod>" . ($c->updated_at ? $c->updated_at->format('Y-m-d') : date('Y-m-d')) . "</lastmod>\n";
+                    $xml .= "    <changefreq>weekly</changefreq>\n";
+                    $xml .= "    <priority>0.8</priority>\n";
+                    $xml .= "  </url>\n";
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        // Active Business Listings (Top 2000)
+        try {
+            $listings = BusinessListing::whereIn('status', ['approved', 'active', 'published'])->select('slug', 'updated_at')->take(2000)->get();
+            foreach ($listings as $l) {
+                if ($l->slug) {
+                    $xml .= "  <url>\n";
+                    $xml .= "    <loc>" . htmlspecialchars($baseUrl . '/business/' . $l->slug) . "</loc>\n";
+                    $xml .= "    <lastmod>" . ($l->updated_at ? $l->updated_at->format('Y-m-d') : date('Y-m-d')) . "</lastmod>\n";
+                    $xml .= "    <changefreq>weekly</changefreq>\n";
+                    $xml .= "    <priority>0.7</priority>\n";
+                    $xml .= "  </url>\n";
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        $xml .= '</urlset>';
+
+        return response($xml, 200, ['Content-Type' => 'application/xml']);
+    }
 }

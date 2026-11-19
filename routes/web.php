@@ -71,6 +71,12 @@ Route::post('/business/{slug?}/enquiry', [HomeController::class, 'submitEnquiry'
 Route::post('/business/{slug?}/demo', [HomeController::class, 'bookDemo'])->name('business.demo');
 Route::post('/business/{slug?}/review', [HomeController::class, 'submitReview'])->name('business.review');
 
+// High-Converting SEO Landing Pages & XML Sitemap
+Route::get('/online-course-selling-platform', [HomeController::class, 'sellCoursesLanding'])->name('sell-courses.landing');
+Route::get('/sell-courses', [HomeController::class, 'sellCoursesLanding'])->name('sell-courses');
+Route::get('/become-seller', [HomeController::class, 'sellCoursesLanding'])->name('become-seller');
+Route::get('/sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap.xml');
+
 // Public Blog Directory & Article Reader
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');

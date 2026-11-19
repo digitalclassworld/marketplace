@@ -34,42 +34,42 @@
 
     <!-- Global Organization & WebSite JSON-LD Schema -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "{{ url('/') }}/#organization",
-          "name": "Digital Class",
-          "url": "{{ url('/') }}",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "{{ asset('images/logo.png') }}",
-            "caption": "Digital Class Logo"
-          },
-          "sameAs": [
-            "https://www.facebook.com/digitalclassworld",
-            "https://www.instagram.com/digitalclassworld",
-            "https://www.linkedin.com/company/digitalclassworld",
-            "https://twitter.com/digitalclassw"
+    {!! json_encode([
+      '@context' => 'https://schema.org',
+      '@graph' => [
+        [
+          '@type' => 'Organization',
+          '@id' => url('/') . '/#organization',
+          'name' => 'Digital Class',
+          'url' => url('/'),
+          'logo' => [
+            '@type' => 'ImageObject',
+            'url' => asset('images/logo.png'),
+            'caption' => 'Digital Class Logo'
+          ],
+          'sameAs' => [
+            'https://www.facebook.com/digitalclassworld',
+            'https://www.instagram.com/digitalclassworld',
+            'https://www.linkedin.com/company/digitalclassworld',
+            'https://twitter.com/digitalclassw'
           ]
-        },
-        {
-          "@type": "WebSite",
-          "@id": "{{ url('/') }}/#website",
-          "url": "{{ url('/') }}",
-          "name": "Digital Class",
-          "publisher": {
-            "@id": "{{ url('/') }}/#organization"
-          },
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "{{ url('/search') }}?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
-        }
+        ],
+        [
+          '@type' => 'WebSite',
+          '@id' => url('/') . '/#website',
+          'url' => url('/'),
+          'name' => 'Digital Class',
+          'publisher' => [
+            '@id' => url('/') . '/#organization'
+          ],
+          'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => url('/search') . '?q={search_term_string}',
+            'query-input' => 'required name=search_term_string'
+          ]
+        ]
       ]
-    }
+    ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
     @stack('schema')
 
