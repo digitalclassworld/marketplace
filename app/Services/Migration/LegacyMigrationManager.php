@@ -368,7 +368,7 @@ class LegacyMigrationManager
                 $this->existingUserEmails[$email] = $userId;
             }
 
-            $sellerCode = 'DC-SELL-' . str_pad((string)(++$sellerCounter), 6, '0', STR_PAD_LEFT);
+            $sellerCode = 'DC-SELL-T' . str_pad($oldId, 6, '0', STR_PAD_LEFT);
             $sellerStatus = LegacyDataTransformer::normalizeStatus($row['status'] ?? 'active');
             $verStatus = ($row['verified'] ?? 'no') === 'yes' ? 'verified' : 'pending';
 
@@ -469,7 +469,7 @@ class LegacyMigrationManager
                 if ($existingSellerId) {
                     $sellerId = $existingSellerId;
                 } else {
-                    $sellerCode = 'DC-SELL-' . str_pad((string)(++$sellerCounter), 6, '0', STR_PAD_LEFT);
+                    $sellerCode = 'DC-SELL-A' . str_pad($oldId, 6, '0', STR_PAD_LEFT);
                     $status = LegacyDataTransformer::normalizeStatus($row['status'] ?? 'active');
                     $sellerId = DB::table('sellers')->insertGetId([
                         'user_id' => $userId,
@@ -499,7 +499,7 @@ class LegacyMigrationManager
                 ]);
                 $this->existingUserEmails[$email] = $userId;
 
-                $sellerCode = 'DC-SELL-' . str_pad((string)(++$sellerCounter), 6, '0', STR_PAD_LEFT);
+                $sellerCode = 'DC-SELL-A' . str_pad($oldId, 6, '0', STR_PAD_LEFT);
                 $status = LegacyDataTransformer::normalizeStatus($row['status'] ?? 'active');
 
                 // Create Seller
@@ -546,7 +546,7 @@ class LegacyMigrationManager
                 'business_name' => $schoolName,
                 'slug' => $slug,
                 'category' => LegacyDataTransformer::cleanText($row['coaching_category'] ?? '') ?: 'Educational Institute',
-                'tagline' => substr(LegacyDataTransformer::cleanText($row['short_description'] ?? '') ?: $schoolName, 0, 255),
+                'tagline' => LegacyDataTransformer::truncate(LegacyDataTransformer::cleanText($row['short_description'] ?? '') ?: $schoolName, 250),
                 'description' => LegacyDataTransformer::cleanText($row['full_description'] ?? '') ?: 'Leading educational academy & training institute on Digital Class.',
                 'city' => LegacyDataTransformer::cleanText($row['city'] ?? '') ?: 'Ahmedabad',
                 'state' => LegacyDataTransformer::cleanText($row['state'] ?? '') ?: 'Gujarat',

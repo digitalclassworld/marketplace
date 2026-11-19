@@ -109,8 +109,16 @@ class LegacyDataTransformer
     {
         if ($text === null) return null;
         $str = str_replace(["\r\n", "\r"], "\n", $text);
-        $clean = @iconv('UTF-8', 'UTF-8//IGNORE', $str);
-        return trim($clean !== false ? $clean : $str);
+        return mb_convert_encoding($str, 'UTF-8', 'UTF-8');
+    }
+
+    /**
+     * Safely truncate multi-byte UTF-8 string without cutting multi-byte characters
+     */
+    public static function truncate(?string $text, int $length): ?string
+    {
+        if ($text === null) return null;
+        return mb_substr($text, 0, $length, 'UTF-8');
     }
 
     /**
