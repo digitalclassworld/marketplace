@@ -66,7 +66,7 @@ class HomeController extends Controller
                     });
                 }
 
-                $businesses = $query->get();
+                $businesses = $query->take(15)->get();
 
                 // Client-side JSON attribute filters
                 if (!empty($selectedRating)) {
@@ -111,7 +111,7 @@ class HomeController extends Controller
                 $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
                     ->latest()
-                    ->take(8)
+                    ->take(10)
                     ->get();
             }
 
@@ -119,7 +119,7 @@ class HomeController extends Controller
                 $featuredServices = Service::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
                     ->latest()
-                    ->take(8)
+                    ->take(10)
                     ->get();
             }
 
@@ -127,7 +127,7 @@ class HomeController extends Controller
                 $featuredProducts = Product::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
                     ->latest()
-                    ->take(8)
+                    ->take(10)
                     ->get();
             }
         } catch (\Throwable $e) {
