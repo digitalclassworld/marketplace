@@ -5,6 +5,9 @@
 @section('meta_description', 'India\'s trusted marketplace for online courses, professional services, products, and verified coaching institutes and businesses.')
 
 @section('styles')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
     /* ==========================================================================
        HERO SECTION WITH MODERN MARKETPLACE CALLOUTS
@@ -185,50 +188,55 @@
     .hero-visual-wrap {
         position: relative;
         text-align: center;
-        padding: 1.5rem 0;
+        padding: 3rem 1.5rem 2rem;
+        max-width: 480px;
+        margin: 0 auto;
     }
     .hero-visual-img {
         max-width: 100%;
         max-height: 480px;
-        object-fit: contain;
+        object-fit: cover;
         position: relative;
         z-index: 2;
         border-radius: 24px;
+        box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.18);
     }
     .floating-card-item {
         position: absolute;
-        background: rgba(255, 255, 255, 0.96);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid #ffffff;
-        box-shadow: 0 14px 30px -4px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.6);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.7);
         border-radius: 14px;
         padding: 0.65rem 0.95rem;
         display: flex;
         align-items: center;
         gap: 0.65rem;
         z-index: 3;
-        transition: transform 0.25s ease;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
         text-align: left;
+        white-space: nowrap;
     }
     .floating-card-item:hover {
         transform: translateY(-3px);
+        box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.18);
     }
     .floating-card-item.card-top-left {
-        top: 8%;
-        left: -4%;
+        top: 14%;
+        left: -15px;
     }
     .floating-card-item.card-top-right {
-        top: 2%;
-        right: 4%;
+        top: 24%;
+        right: -15px;
     }
     .floating-card-item.card-bottom-left {
         bottom: 12%;
-        left: -8%;
+        left: -20px;
     }
     .floating-card-item.card-bottom-right {
-        bottom: 8%;
-        right: -2%;
+        bottom: 6%;
+        right: -15px;
     }
     .fc-icon-wrap {
         width: 32px;
@@ -252,16 +260,45 @@
     }
     .hero-script-tag {
         position: absolute;
-        top: -10px;
-        right: 15px;
-        font-family: 'Segoe Script', 'Brush Script MT', cursive, sans-serif;
+        top: -12px;
+        right: 0px;
+        font-family: 'Caveat', 'Segoe Script', 'Brush Script MT', cursive, sans-serif;
         color: #0f172a;
-        font-size: 1.1rem;
-        line-height: 1.25;
+        font-size: 1.45rem;
+        line-height: 1.15;
         font-weight: 700;
         text-align: right;
-        transform: rotate(3deg);
+        transform: rotate(4deg);
         z-index: 4;
+        pointer-events: none;
+        letter-spacing: 0.02em;
+    }
+    @media (max-width: 991px) {
+        .hero-visual-wrap {
+            margin-top: 2rem;
+            padding: 2.5rem 1rem 1.5rem;
+        }
+        .floating-card-item.card-top-left { left: 0; top: 12%; }
+        .floating-card-item.card-top-right { right: 0; top: 22%; }
+        .floating-card-item.card-bottom-left { left: 0; bottom: 12%; }
+        .floating-card-item.card-bottom-right { right: 0; bottom: 4%; }
+    }
+    @media (max-width: 576px) {
+        .floating-card-item {
+            padding: 0.45rem 0.65rem;
+            gap: 0.45rem;
+        }
+        .fc-icon-wrap {
+            width: 26px;
+            height: 26px;
+            font-size: 0.75rem;
+        }
+        .fc-title {
+            font-size: 0.75rem;
+        }
+        .fc-desc {
+            font-size: 0.62rem;
+        }
     }
 
     /* ==========================================================================
