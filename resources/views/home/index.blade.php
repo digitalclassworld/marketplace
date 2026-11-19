@@ -1476,7 +1476,7 @@
                 <div class="d-inline-flex p-3 rounded-circle bg-primary-subtle text-primary mb-3">
                     <i class="fa-solid fa-phone fs-2"></i>
                 </div>
-                <h4 class="fw-bold mb-1" id="contactModalPhone">+91 98765 43210</h4>
+                <h4 class="fw-bold mb-1" id="contactModalPhone">+91 91738 60404</h4>
                 <p class="text-muted small mb-4">Click below to connect directly with this business</p>
                 <div class="d-flex justify-content-center gap-2">
                     <a id="contactModalCallBtn" href="#" class="btn btn-primary px-4 fw-bold">
@@ -1577,8 +1577,8 @@
     // Open Contact Modal
     function openContactModal(name, phone) {
         document.getElementById('contactModalTitle').innerText = name;
-        document.getElementById('contactModalPhone').innerText = phone || '+91 98765 43210';
-        document.getElementById('contactModalCallBtn').href = 'tel:' + (phone || '9876543210');
+        document.getElementById('contactModalPhone').innerText = phone || '+91 91738 60404';
+        document.getElementById('contactModalCallBtn').href = 'tel:' + (phone || '9173860404');
         const modal = new bootstrap.Modal(document.getElementById('contactModal'));
         modal.show();
     }

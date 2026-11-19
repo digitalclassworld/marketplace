@@ -42,6 +42,8 @@
           '@id' => url('/') . '/#organization',
           'name' => 'Digital Class',
           'url' => url('/'),
+          'telephone' => '+919173860404',
+          'email' => 'support@digitalclassworldin.com',
           'logo' => [
             '@type' => 'ImageObject',
             'url' => asset('images/logo.png'),
@@ -834,11 +836,12 @@
                     </p>
                     <div class="d-flex align-items-center gap-2 text-secondary small mb-2">
                         <i class="fa-solid fa-envelope text-primary"></i>
-                        <span>support@digitalclassworld.com</span>
+                        <a href="mailto:support@digitalclassworldin.com" class="text-secondary text-decoration-none">support@digitalclassworldin.com</a>
                     </div>
                     <div class="d-flex align-items-center gap-2 text-secondary small">
                         <i class="fa-solid fa-phone text-primary"></i>
-                        <span>+91 98765 43210 &bull; Mon - Sat, 9am - 7pm IST</span>
+                        <a href="tel:+919173860404" class="text-secondary text-decoration-none">+91 91738 60404</a>
+                        <span>&bull; Mon - Sat, 9am - 7pm IST</span>
                     </div>
                 </div>
             </div>
