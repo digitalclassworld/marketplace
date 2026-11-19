@@ -1019,9 +1019,9 @@
 
             <!-- Right Brand -->
             <div class="hero-right-brand">
-                <div class="hero-brand-name">VCEC</div>
-                <div class="hero-brand-sub">COMPUTER EDUCATION</div>
-                <div class="hero-brand-tagline">Learn | Practice | Grow</div>
+                <div class="hero-brand-name">{{ $business->business_name ? explode(' ', $business->business_name)[0] : 'VCEC' }}</div>
+                <div class="hero-brand-sub">{{ strtoupper($business->category ?? 'EDUCATION') }}</div>
+                <div class="hero-brand-tagline">{{ $business->tagline ?? 'Learn | Practice | Grow' }}</div>
                 <div class="hero-stats-row">
                     <div class="hero-stat-box">
                         <span class="hero-stat-number"><i class="fa-solid fa-users fa-xs me-1"></i>10000+</span>
@@ -1045,9 +1045,13 @@
         <div class="store-profile-flex">
             <!-- Left Logo -->
             <div class="store-avatar-box">
-                <i class="fa-solid fa-graduation-cap"></i>
-                <span class="store-avatar-title">VCEC</span>
-                <span class="store-avatar-sub">COMPUTER EDUCATION</span>
+                @if(!empty($business->logo))
+                    <img src="{{ $business->logo }}" alt="{{ $business->business_name }}" class="w-100 h-100 rounded-3 object-fit-cover">
+                @else
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span class="store-avatar-title">{{ $business->business_name ? strtoupper(substr($business->business_name, 0, 4)) : 'VCEC' }}</span>
+                    <span class="store-avatar-sub">{{ strtoupper($business->category ?? 'EDUCATION') }}</span>
+                @endif
             </div>
 
             <!-- Center Info -->
@@ -1073,7 +1077,7 @@
                     <span>&bull;</span>
                     <span><i class="fa-solid fa-code-branch text-primary me-1"></i> 3 Branches</span>
                     <span>&bull;</span>
-                    <span><i class="fa-solid fa-location-dot text-danger me-1"></i> Ahmedabad, Gujarat</span>
+                    <span><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $business->city ? ($business->city . ($business->state ? ', ' . $business->state : '')) : 'Ahmedabad, Gujarat' }}</span>
                     <span>&bull;</span>
                     <span><i class="fa-solid fa-calendar-check text-muted me-1"></i> Since 2012</span>
                 </div>
@@ -1280,25 +1284,30 @@
                     </li>
                     <li class="contact-info-item whatsapp">
                         <i class="fa-brands fa-whatsapp"></i>
-                        <a href="https://wa.me/919876543210?text=Hi%20VCEC,%20I%20am%20interested%20in%20courses." target="_blank">Chat on WhatsApp</a>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $business->whatsapp_number ?: ($business->phone ?: '919173860404')) }}?text={{ urlencode('Hi ' . $business->business_name . ', I am interested in your classes/services.') }}" target="_blank">Chat on WhatsApp</a>
                     </li>
                     <li class="contact-info-item">
                         <i class="fa-solid fa-envelope"></i>
-                        <a href="mailto:info@vcec.in" class="text-decoration-none text-dark">info@vcec.in</a>
+                        <a href="mailto:{{ $business->email ?: ($business->seller?->user?->email ?: 'support@digitalclassworldin.com') }}" class="text-decoration-none text-dark">{{ $business->email ?: ($business->seller?->user?->email ?: 'support@digitalclassworldin.com') }}</a>
                     </li>
                     <li class="contact-info-item">
                         <i class="fa-solid fa-location-dot text-danger"></i>
-                        <span>201, Shreeji Complex, Nikol Main Road, Nikol, Ahmedabad - 382350, Gujarat</span>
+                        <span>{{ $business->address ?: (($business->city ?? 'Ahmedabad') . ($business->state ? ', ' . $business->state : '')) }}</span>
                     </li>
                 </ul>
 
-                <!-- Map Thumbnail -->
-                <div class="minimap-preview-wrap">
-                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&auto=format&fit=crop&q=80" alt="Nikol Ahmedabad Map Preview">
-                    <i class="fa-solid fa-location-dot minimap-pin"></i>
+                @php
+                    $fullLoc = trim(($business->business_name ?? '') . ' ' . ($business->address ?? '') . ' ' . ($business->city ?? '') . ' ' . ($business->state ?? ''));
+                    $mapSearchTarget = $business->map_location ?: $fullLoc;
+                    $embedUrl = 'https://maps.google.com/maps?q=' . urlencode($mapSearchTarget) . '&t=&z=14&ie=UTF8&iwloc=&output=embed';
+                @endphp
+
+                <!-- Live Embedded Interactive Map -->
+                <div class="minimap-preview-wrap mb-2 overflow-hidden rounded-3 border position-relative" style="height: 180px;">
+                    <iframe width="100%" height="180" style="border:0;" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="{{ $embedUrl }}"></iframe>
                 </div>
-                <button type="button" class="btn-directions-map w-100" onclick="openDirectionsMap()">
-                    <i class="fa-solid fa-diamond-turn-right me-1"></i> Get Directions
+                <button type="button" class="btn-directions-map w-100 d-flex align-items-center justify-content-center gap-1.5" onclick="openDirectionsMap()">
+                    <i class="fa-solid fa-diamond-turn-right text-primary"></i> <span>Get Directions on Google Maps</span>
                 </button>
             </div>
 
@@ -1498,7 +1507,8 @@
     }
 
     function openDirectionsMap() {
-        window.open('https://maps.google.com/?q=Nikol+Ahmedabad+Gujarat', '_blank');
+        const query = encodeURIComponent("{{ addslashes($business->map_location ?: trim(($business->business_name ?? '') . ' ' . ($business->address ?? '') . ' ' . ($business->city ?? ''))) }}");
+        window.open('https://www.google.com/maps/search/?api=1&query=' + query, '_blank');
     }
 
     function openBranchesModal() {

@@ -687,7 +687,7 @@
                         <label class="form-label fw-bold text-dark small">Support Phone <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light">+91</span>
-                            <input type="text" name="phone" id="inputCoursePhone" class="form-control" placeholder="10-digit mobile number" value="{{ old('phone', '9876543210') }}" required>
+                            <input type="text" name="phone" id="inputCoursePhone" class="form-control" placeholder="10-digit mobile number" value="{{ old('phone', $seller->businessDetail?->business_phone ?? ($seller->user?->phone ?? '9876543210')) }}" required>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -700,7 +700,7 @@
                         </div>
                         <div class="input-group">
                             <span class="input-group-text bg-light">+91</span>
-                            <input type="text" name="whatsapp_number" id="inputCourseWhatsapp" class="form-control" placeholder="Enter WhatsApp number" value="{{ old('whatsapp_number', '9876543210') }}">
+                            <input type="text" name="whatsapp_number" id="inputCourseWhatsapp" class="form-control" placeholder="Enter WhatsApp number" value="{{ old('whatsapp_number', $seller->businessListings->first()?->whatsapp_number ?? ($seller->businessDetail?->business_phone ?? '9876543210')) }}">
                         </div>
                     </div>
                 </div>
@@ -708,48 +708,71 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-dark small">Official Email <span class="text-danger">*</span></label>
-                        <input type="email" name="email" id="inputCourseEmail" class="form-control" placeholder="support@academy.com" value="{{ old('email', 'info@vcec.in') }}" required>
+                        <input type="email" name="email" id="inputCourseEmail" class="form-control" placeholder="support@academy.com" value="{{ old('email', $seller->businessDetail?->business_email ?? ($seller->user?->email ?? 'info@vcec.in')) }}" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-dark small">Website / Portal (Optional)</label>
-                        <input type="url" name="website" id="inputCourseWebsite" class="form-control" placeholder="https://www.academy.com" value="{{ old('website', 'https://www.vcec.in') }}">
+                        <input type="url" name="website" id="inputCourseWebsite" class="form-control" placeholder="https://www.academy.com" value="{{ old('website', $seller->businessDetail?->website ?? '') }}">
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold text-dark small">Institute / Academy Address <span class="text-danger">*</span></label>
-                    <input type="text" name="address" id="inputCourseAddress" class="form-control" placeholder="Campus / Institute Street Address" value="{{ old('address', '3rd Floor, Shreeji Complex, Nikol, Ahmedabad - 382350') }}" required>
+                    <input type="text" name="address" id="inputCourseAddress" class="form-control" placeholder="Campus / Institute Street Address" value="{{ old('address', $seller->businessDetail?->address ?? ($seller->businessListings->first()?->address ?? '3rd Floor, Shreeji Complex, Nikol, Ahmedabad - 382350')) }}" required>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark small">City <span class="text-danger">*</span></label>
-                        <input type="text" name="city" id="inputCourseCity" class="form-control" placeholder="Ahmedabad" value="{{ old('city', 'Ahmedabad') }}" required>
+                        <input type="text" name="city" id="inputCourseCity" class="form-control" placeholder="Ahmedabad" value="{{ old('city', $seller->businessDetail?->city ?? ($seller->businessListings->first()?->city ?? 'Ahmedabad')) }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark small">State <span class="text-danger">*</span></label>
-                        <input type="text" name="state" id="inputCourseState" class="form-control" placeholder="Gujarat" value="{{ old('state', 'Gujarat') }}" required>
+                        <input type="text" name="state" id="inputCourseState" class="form-control" placeholder="Gujarat" value="{{ old('state', $seller->businessDetail?->state ?? ($seller->businessListings->first()?->state ?? 'Gujarat')) }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark small">Pincode <span class="text-danger">*</span></label>
-                        <input type="text" name="pincode" id="inputCoursePincode" class="form-control font-mono-code" placeholder="382350" value="{{ old('pincode', '382350') }}" required>
+                        <input type="text" name="pincode" id="inputCoursePincode" class="form-control font-mono-code" placeholder="382350" value="{{ old('pincode', $seller->businessDetail?->pincode ?? ($seller->businessListings->first()?->pincode ?? '382350')) }}" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small">Campus Map Location</label>
-                    <div class="input-group mb-2">
-                        <input type="text" name="map_location" id="inputCourseMap" class="form-control" placeholder="Google Maps link" value="{{ old('map_location', 'https://maps.google.com/?q=VCEC+Nikol') }}">
-                        <button class="btn btn-outline-primary fw-semibold" type="button">Get Location</button>
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <label class="form-label fw-bold text-dark small mb-0">Campus Map Location</label>
+                        <span class="text-muted small" style="font-size: 0.72rem;"><i class="fa-solid fa-satellite-dish text-primary me-1"></i> Auto-detects GPS & Google Maps</span>
                     </div>
-                    <div class="border rounded-3 p-2 bg-light d-flex align-items-center justify-content-between" style="max-width: 280px;">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-danger fs-5"></i>
-                            <div>
-                                <div class="fw-bold small text-dark" style="font-size: 0.8rem;">VCEC - Nikol</div>
-                                <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none" style="font-size: 0.7rem;">View larger map</a>
+                    <div class="input-group mb-2 shadow-xs">
+                        <input type="text" name="map_location" id="inputCourseMap" class="form-control" placeholder="Enter class name, Google Maps link, or search below" value="{{ old('map_location', $seller->businessListings->first()?->map_location ?? 'https://maps.google.com/?q=VCEC+Nikol') }}">
+                        <button class="btn btn-outline-danger fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnOpenGoogleMapsCourse" onclick="openGoogleMapsSearchCourse()" title="Search for your institute on Google Maps">
+                            <i class="fa-solid fa-map-location-dot"></i> <span>Search Google Maps</span>
+                        </button>
+                        <button class="btn btn-primary fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnGetLocationCourse" onclick="fetchCurrentLocationCourse()">
+                            <i class="fa-solid fa-location-crosshairs"></i> <span id="btnGetLocationCourseText">Get Location</span>
+                        </button>
+                    </div>
+                    <input type="hidden" name="latitude" id="inputCourseLatitude" value="{{ old('latitude', $seller->businessListings->first()?->latitude) }}">
+                    <input type="hidden" name="longitude" id="inputCourseLongitude" value="{{ old('longitude', $seller->businessListings->first()?->longitude) }}">
+
+                    <!-- Interactive Live Map Preview Card with Real Embedded Map -->
+                    <div class="border rounded-3 p-3 bg-light shadow-xs mb-2" style="max-width: 480px;" id="courseMapPreviewCard">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-location-dot text-danger fs-5"></i>
+                                <div>
+                                    <div class="fw-bold small text-dark" style="font-size: 0.85rem;" id="courseMapPreviewTitle">VCEC - Nikol</div>
+                                    <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.72rem;" id="courseMapPreviewLink">
+                                        <span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i>
+                                    </a>
+                                </div>
                             </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.7rem;"><i class="fa-solid fa-circle-check me-1"></i>Active Pin</span>
                         </div>
+                        <div class="overflow-hidden rounded-2 border bg-white" style="height: 140px;">
+                            <iframe id="courseMapPreviewIframe" width="100%" height="140" style="border:0;" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q={{ urlencode(old('map_location', 'VCEC Nikol Ahmedabad')) }}&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+                        </div>
+                    </div>
+                    <div class="form-text small text-muted" style="font-size: 0.72rem;">
+                        <i class="fa-solid fa-circle-info text-info me-1"></i> Click <strong>Search Google Maps</strong> to find your class (e.g. <em>XYZ class</em>) or <strong>Get Location</strong> to auto-fill using your current GPS coordinates.
                     </div>
                 </div>
 
@@ -1666,6 +1689,166 @@
             if (uploadSub) uploadSub.textContent = sizeMb + ' MB • Ready for save';
         }, function(progress) {
             if (uploadSub) uploadSub.textContent = 'Uploading: ' + progress + '% (' + sizeMb + ' MB)';
+        });
+    }
+
+    // 5. Campus Location & Google Maps Synchronization
+    function openGoogleMapsSearchCourse() {
+        const inputMap = document.getElementById('inputCourseMap')?.value?.trim() || '';
+        const address = document.getElementById('inputCourseAddress')?.value?.trim() || '';
+        const city = document.getElementById('inputCourseCity')?.value?.trim() || '';
+        const state = document.getElementById('inputCourseState')?.value?.trim() || '';
+
+        let query = '';
+        if (inputMap && !inputMap.startsWith('http')) {
+            query = inputMap;
+        } else if (address || city) {
+            query = [address, city, state].filter(Boolean).join(', ');
+        } else if (inputMap.startsWith('http')) {
+            window.open(inputMap, '_blank');
+            return;
+        } else {
+            query = 'Coaching Institute in ' + (city || 'Ahmedabad');
+        }
+
+        const gmapsSearchUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+        window.open(gmapsSearchUrl, '_blank');
+    }
+
+    function fetchCurrentLocationCourse() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        const btnText = document.getElementById('btnGetLocationCourseText');
+        const originalText = btnText ? btnText.textContent : 'Get Location';
+        if (btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Locating...';
+
+        navigator.geolocation.getCurrentPosition(async function(pos) {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+
+            document.getElementById('inputCourseLatitude').value = lat;
+            document.getElementById('inputCourseLongitude').value = lng;
+            
+            const mapUrl = `https://maps.google.com/?q=${lat},${lng}`;
+            document.getElementById('inputCourseMap').value = mapUrl;
+
+            updateCourseMapPreview(mapUrl, `Current GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+
+            // Reverse geocode via Nominatim
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.address) {
+                        const addr = data.address;
+                        const cityVal = addr.city || addr.town || addr.village || addr.suburb || addr.district || '';
+                        const stateVal = addr.state || '';
+                        const pincodeVal = addr.postcode || '';
+                        
+                        if (cityVal) document.getElementById('inputCourseCity').value = cityVal;
+                        if (stateVal) document.getElementById('inputCourseState').value = stateVal;
+                        if (pincodeVal) document.getElementById('inputCoursePincode').value = pincodeVal;
+                        if (data.display_name && !document.getElementById('inputCourseAddress').value) {
+                            document.getElementById('inputCourseAddress').value = data.display_name.split(',').slice(0, 3).join(', ');
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Reverse geocoding error:', e);
+            }
+
+            if (btnText) {
+                btnText.innerHTML = '<i class="fa-solid fa-check text-white me-1"></i> Located!';
+                setTimeout(() => { btnText.textContent = originalText; }, 2500);
+            }
+        }, function(err) {
+            alert('Location access denied or unavailable: ' + err.message + '. Please ensure location permissions are granted in your browser.');
+            if (btnText) btnText.textContent = originalText;
+        }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    function updateCourseMapPreview(val, customLabel) {
+        const titleEl = document.getElementById('courseMapPreviewTitle');
+        const linkEl = document.getElementById('courseMapPreviewLink');
+        const iframeEl = document.getElementById('courseMapPreviewIframe');
+        
+        const raw = (val || document.getElementById('inputCourseMap')?.value || '').trim();
+        const address = document.getElementById('inputCourseAddress')?.value?.trim() || '';
+        const city = document.getElementById('inputCourseCity')?.value?.trim() || 'Ahmedabad';
+        
+        let query = raw || [address, city].filter(Boolean).join(', ') || city;
+        let displayName = customLabel;
+
+        // Try extracting coordinates or place name
+        const coordMatch = query.match(/([-+]?\d{1,2}\.\d+)[,\s]+([-+]?\d{1,3}\.\d+)/);
+        if (coordMatch) {
+            document.getElementById('inputCourseLatitude').value = coordMatch[1];
+            document.getElementById('inputCourseLongitude').value = coordMatch[2];
+        }
+
+        if (!displayName) {
+            if (query.includes('google.com/maps')) {
+                try {
+                    const parsedUrl = new URL(query);
+                    const q = parsedUrl.searchParams.get('query') || parsedUrl.searchParams.get('q');
+                    if (q) {
+                        displayName = decodeURIComponent(q.replace(/\+/g, ' '));
+                        query = q;
+                    } else if (query.includes('/place/')) {
+                        const place = query.split('/place/')[1]?.split('/')[0];
+                        if (place) {
+                            displayName = decodeURIComponent(place.replace(/\+/g, ' '));
+                            query = place;
+                        }
+                    }
+                } catch (e) {}
+            }
+            if (!displayName) {
+                displayName = query.startsWith('http') ? (city + ' Campus') : query;
+            }
+        }
+
+        if (titleEl) titleEl.textContent = displayName;
+        
+        const targetUrl = query.startsWith('http') ? query : ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query));
+        if (linkEl) {
+            linkEl.href = targetUrl;
+            linkEl.innerHTML = '<span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.65rem;"></i>';
+        }
+
+        if (iframeEl) {
+            const cleanEmbed = query.replace(/^https?:\/\/[^\/]+\/?/i, '');
+            const finalEmbedQuery = query.startsWith('http') ? displayName : query;
+            iframeEl.src = 'https://maps.google.com/maps?q=' + encodeURIComponent(finalEmbedQuery) + '&t=&z=14&ie=UTF8&iwloc=&output=embed';
+        }
+    }
+
+    // Auto-sync map preview when address / city / state inputs change
+    ['inputCourseAddress', 'inputCourseCity', 'inputCourseState', 'inputCoursePincode'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', function() {
+                const addr = document.getElementById('inputCourseAddress')?.value || '';
+                const city = document.getElementById('inputCourseCity')?.value || '';
+                const state = document.getElementById('inputCourseState')?.value || '';
+                const mapField = document.getElementById('inputCourseMap');
+                if (mapField && (!mapField.value || !mapField.value.startsWith('http'))) {
+                    const parts = [addr, city, state].filter(Boolean);
+                    if (parts.length > 0) {
+                        updateCourseMapPreview(parts.join(', '));
+                    }
+                }
+            });
+        }
+    });
+
+    const inputCourseMapEl = document.getElementById('inputCourseMap');
+    if (inputCourseMapEl) {
+        inputCourseMapEl.addEventListener('input', function() {
+            updateCourseMapPreview(this.value.trim());
         });
     }
 </script>

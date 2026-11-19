@@ -55,6 +55,18 @@ class SellerCourseController extends Controller
             'certificate_included' => ['nullable', 'boolean'],
             'qa_enabled'           => ['nullable', 'boolean'],
             'sections'             => ['nullable', 'array'],
+            // Contact & Campus Location fields
+            'phone'                => ['nullable', 'string', 'max:30'],
+            'whatsapp_number'      => ['nullable', 'string', 'max:30'],
+            'email'                => ['nullable', 'string', 'max:100'],
+            'website'              => ['nullable', 'string', 'max:255'],
+            'address'              => ['nullable', 'string', 'max:500'],
+            'city'                 => ['nullable', 'string', 'max:100'],
+            'state'                => ['nullable', 'string', 'max:100'],
+            'pincode'              => ['nullable', 'string', 'max:20'],
+            'map_location'         => ['nullable', 'string', 'max:500'],
+            'latitude'             => ['nullable', 'numeric'],
+            'longitude'            => ['nullable', 'numeric'],
         ]);
 
         $isFree = $request->boolean('is_free');
@@ -99,6 +111,66 @@ class SellerCourseController extends Controller
                     ]);
                 }
             }
+        }
+
+        // Sync Instructor Campus Location to Seller's Business Profile & Directory Listing
+        try {
+            if ($seller && ($request->filled('address') || $request->filled('city') || $request->filled('map_location') || $request->filled('phone'))) {
+                $seller->businessDetail()->updateOrCreate(
+                    ['seller_id' => $seller->id],
+                    [
+                        'business_phone'  => $request->input('phone', $seller->businessDetail?->business_phone),
+                        'business_email'  => $request->input('email', $seller->businessDetail?->business_email),
+                        'website'         => $request->input('website', $seller->businessDetail?->website),
+                        'address'         => $request->input('address', $seller->businessDetail?->address),
+                        'city'            => $request->input('city', $seller->businessDetail?->city),
+                        'state'           => $request->input('state', $seller->businessDetail?->state),
+                        'pincode'         => $request->input('pincode', $seller->businessDetail?->pincode),
+                    ]
+                );
+
+                // Update or create active business listing for this seller
+                $listing = $seller->businessListings()->first();
+                if ($listing) {
+                    $listing->update([
+                        'phone'           => $request->input('phone', $listing->phone),
+                        'whatsapp_number' => $request->input('whatsapp_number', $listing->whatsapp_number),
+                        'email'           => $request->input('email', $listing->email),
+                        'website'         => $request->input('website', $listing->website),
+                        'address'         => $request->input('address', $listing->address),
+                        'city'            => $request->input('city', $listing->city),
+                        'state'           => $request->input('state', $listing->state),
+                        'pincode'         => $request->input('pincode', $listing->pincode),
+                        'map_location'    => $request->input('map_location', $listing->map_location),
+                        'latitude'        => $request->input('latitude', $listing->latitude),
+                        'longitude'       => $request->input('longitude', $listing->longitude),
+                    ]);
+                } else {
+                    $bName = $seller->businessDetail?->business_name ?: ($seller->user?->name ?: 'Institute');
+                    $seller->businessListings()->create([
+                        'business_name'   => $bName,
+                        'slug'            => Str::slug($bName) . '-' . Str::random(5),
+                        'category'        => 'Educational Institute',
+                        'listing_type'    => 'Coaching & Academy',
+                        'tagline'         => 'Certified coaching & courses institute',
+                        'description'     => 'Offering practical offline and online education courses.',
+                        'phone'           => $request->input('phone'),
+                        'whatsapp_number' => $request->input('whatsapp_number'),
+                        'email'           => $request->input('email'),
+                        'website'         => $request->input('website'),
+                        'address'         => $request->input('address'),
+                        'city'            => $request->input('city'),
+                        'state'           => $request->input('state'),
+                        'pincode'         => $request->input('pincode'),
+                        'map_location'    => $request->input('map_location'),
+                        'latitude'        => $request->input('latitude'),
+                        'longitude'       => $request->input('longitude'),
+                        'status'          => 'approved',
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Course business location sync skipped: ' . $e->getMessage());
         }
 
         return redirect()->route('seller.courses.index')->with('success', 'Course submitted successfully! It has been submitted for admin approval and will appear on the marketplace once approved.');

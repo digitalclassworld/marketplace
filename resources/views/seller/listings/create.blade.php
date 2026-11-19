@@ -647,7 +647,7 @@
                         <label class="form-label fw-bold text-dark small">Business Phone <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <span class="input-group-text bg-light">+91</span>
-                            <input type="text" name="phone" id="inputPhone" class="form-control" placeholder="Enter 10-digit mobile number" value="{{ old('phone', '9876543210') }}" required>
+                            <input type="text" name="phone" id="inputPhone" class="form-control" placeholder="Enter 10-digit mobile number" value="{{ old('phone', $seller->businessDetail?->business_phone ?? ($seller->user?->phone ?? '9876543210')) }}" required>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -660,7 +660,7 @@
                         </div>
                         <div class="input-group">
                             <span class="input-group-text bg-light">+91</span>
-                            <input type="text" name="whatsapp_number" id="inputWhatsapp" class="form-control" placeholder="Enter WhatsApp number" value="{{ old('whatsapp_number', '9876543210') }}">
+                            <input type="text" name="whatsapp_number" id="inputWhatsapp" class="form-control" placeholder="Enter WhatsApp number" value="{{ old('whatsapp_number', $seller->businessDetail?->business_phone ?? '9876543210') }}">
                         </div>
                     </div>
                 </div>
@@ -668,31 +668,31 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-dark small">Business Email <span class="text-danger">*</span></label>
-                        <input type="email" name="email" id="inputEmail" class="form-control" placeholder="contact@yourbusiness.com" value="{{ old('email', 'info@vcec.in') }}" required>
+                        <input type="email" name="email" id="inputEmail" class="form-control" placeholder="contact@yourbusiness.com" value="{{ old('email', $seller->businessDetail?->business_email ?? ($seller->user?->email ?? 'info@vcec.in')) }}" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-dark small">Website (Optional)</label>
-                        <input type="url" name="website" id="inputWebsite" class="form-control" placeholder="https://www.yourbusiness.com" value="{{ old('website', 'https://www.vcec.in') }}">
+                        <input type="url" name="website" id="inputWebsite" class="form-control" placeholder="https://www.yourbusiness.com" value="{{ old('website', $seller->businessDetail?->website ?? '') }}">
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bold text-dark small">Address <span class="text-danger">*</span></label>
-                    <input type="text" name="address" id="inputAddress" class="form-control" placeholder="Floor, Building, Street, Landmark" value="{{ old('address', '3rd Floor, Shreeji Complex, Nikol, Ahmedabad - 382350') }}" required>
+                    <input type="text" name="address" id="inputAddress" class="form-control" placeholder="Floor, Building, Street, Landmark" value="{{ old('address', $seller->businessDetail?->address ?? '3rd Floor, Shreeji Complex, Nikol, Ahmedabad - 382350') }}" required>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark small">City <span class="text-danger">*</span></label>
-                        <input type="text" name="city" id="inputCity" class="form-control" placeholder="Ahmedabad" value="{{ old('city', 'Ahmedabad') }}" required>
+                        <input type="text" name="city" id="inputCity" class="form-control" placeholder="Ahmedabad" value="{{ old('city', $seller->businessDetail?->city ?? 'Ahmedabad') }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark small">State <span class="text-danger">*</span></label>
-                        <input type="text" name="state" id="inputState" class="form-control" placeholder="Gujarat" value="{{ old('state', 'Gujarat') }}" required>
+                        <input type="text" name="state" id="inputState" class="form-control" placeholder="Gujarat" value="{{ old('state', $seller->businessDetail?->state ?? 'Gujarat') }}" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark small">Pincode <span class="text-danger">*</span></label>
-                        <input type="text" name="pincode" id="inputPincode" class="form-control font-mono-code" placeholder="380001" value="{{ old('pincode', '382350') }}" required>
+                        <input type="text" name="pincode" id="inputPincode" class="form-control font-mono-code" placeholder="380001" value="{{ old('pincode', $seller->businessDetail?->pincode ?? '382350') }}" required>
                     </div>
                 </div>
 
@@ -702,7 +702,10 @@
                         <span class="text-muted small" style="font-size: 0.72rem;"><i class="fa-solid fa-satellite-dish text-primary me-1"></i> Auto-detects GPS & pin</span>
                     </div>
                     <div class="input-group mb-2 shadow-xs">
-                        <input type="text" name="map_location" id="inputMap" class="form-control" placeholder="Google Maps link or click 'Get Location'" value="{{ old('map_location', 'https://maps.google.com/?q=VCEC+Nikol') }}">
+                        <input type="text" name="map_location" id="inputMap" class="form-control" placeholder="Google Maps link, place name or search below" value="{{ old('map_location', 'https://maps.google.com/?q=VCEC+Nikol') }}">
+                        <button class="btn btn-outline-danger fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnOpenGoogleMapsListing" onclick="openGoogleMapsSearchListing()" title="Search for your business on Google Maps">
+                            <i class="fa-solid fa-map-location-dot"></i> <span>Search Google Maps</span>
+                        </button>
                         <button class="btn btn-primary fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnGetLocation" onclick="fetchCurrentLocation()">
                             <i class="fa-solid fa-location-crosshairs"></i> <span id="btnGetLocationText">Get Location</span>
                         </button>
@@ -710,21 +713,26 @@
                     <input type="hidden" name="latitude" id="inputLatitude" value="{{ old('latitude') }}">
                     <input type="hidden" name="longitude" id="inputLongitude" value="{{ old('longitude') }}">
                     
-                    <!-- Dynamic Live Map Preview Card Matching Screenshot -->
-                    <div class="border rounded-3 p-2.5 bg-light d-flex align-items-center justify-content-between shadow-xs" style="max-width: 340px;" id="mapPreviewCard">
-                        <div class="d-flex align-items-center gap-2.5">
-                            <i class="fa-solid fa-location-dot text-danger fs-4" id="mapPreviewIcon"></i>
-                            <div>
-                                <div class="fw-bold small text-dark" style="font-size: 0.82rem;" id="mapPreviewTitle">VCEC - Nikol</div>
-                                <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.72rem;" id="mapPreviewLink">
-                                    <span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i>
-                                </a>
+                    <!-- Dynamic Live Map Preview Card with Live Embedded Map -->
+                    <div class="border rounded-3 p-3 bg-light shadow-xs mb-2" style="max-width: 480px;" id="mapPreviewCard">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-location-dot text-danger fs-5" id="mapPreviewIcon"></i>
+                                <div>
+                                    <div class="fw-bold small text-dark" style="font-size: 0.85rem;" id="mapPreviewTitle">VCEC - Nikol</div>
+                                    <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.72rem;" id="mapPreviewLink">
+                                        <span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i>
+                                    </a>
+                                </div>
                             </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle" id="mapPreviewStatus" style="font-size: 0.7rem;"><i class="fa-solid fa-circle-check me-1"></i>Active Pin</span>
                         </div>
-                        <span class="badge bg-success-subtle text-success border border-success-subtle" id="mapPreviewStatus" style="font-size: 0.65rem;">Active Pin</span>
+                        <div class="overflow-hidden rounded-2 border bg-white" style="height: 140px;">
+                            <iframe id="mapPreviewIframe" width="100%" height="140" style="border:0;" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q={{ urlencode(old('map_location', 'VCEC Nikol Ahmedabad')) }}&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+                        </div>
                     </div>
                     <div class="form-text small text-muted mt-1" style="font-size: 0.72rem;">
-                        <i class="fa-solid fa-circle-info text-info me-1"></i> Clicking <strong>Get Location</strong> detects your device's exact GPS coordinates and auto-fills your City & Pincode!
+                        <i class="fa-solid fa-circle-info text-info me-1"></i> Click <strong>Search Google Maps</strong> to find your business or <strong>Get Location</strong> to auto-fill using your device's current GPS!
                     </div>
                 </div>
 
@@ -1334,6 +1342,29 @@
     }
 
     // 5. Live Location & Map Synchronization
+    function openGoogleMapsSearchListing() {
+        const inputMap = document.getElementById('inputMap')?.value?.trim() || '';
+        const bName = document.getElementById('inputBusinessName')?.value?.trim() || '';
+        const address = document.getElementById('inputAddress')?.value?.trim() || '';
+        const city = document.getElementById('inputCity')?.value?.trim() || '';
+        const state = document.getElementById('inputState')?.value?.trim() || '';
+
+        let query = '';
+        if (inputMap && !inputMap.startsWith('http')) {
+            query = inputMap;
+        } else if (bName || address || city) {
+            query = [bName, address, city, state].filter(Boolean).join(', ');
+        } else if (inputMap.startsWith('http')) {
+            window.open(inputMap, '_blank');
+            return;
+        } else {
+            query = 'Business in ' + (city || 'Ahmedabad');
+        }
+
+        const gmapsSearchUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+        window.open(gmapsSearchUrl, '_blank');
+    }
+
     function fetchCurrentLocation() {
         if (!navigator.geolocation) {
             alert('Geolocation is not supported by your browser.');
@@ -1397,15 +1428,59 @@
         }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
-    function updateMapPreview(url, customLabel) {
+    function updateMapPreview(val, customLabel) {
         const titleEl = document.getElementById('mapPreviewTitle');
         const linkEl = document.getElementById('mapPreviewLink');
-        const bName = document.getElementById('inputBusinessName')?.value || 'Your Business Location';
+        const iframeEl = document.getElementById('mapPreviewIframe');
         
-        if (titleEl) titleEl.textContent = customLabel || bName;
+        const raw = (val || document.getElementById('inputMap')?.value || '').trim();
+        const bName = document.getElementById('inputBusinessName')?.value?.trim() || '';
+        const address = document.getElementById('inputAddress')?.value?.trim() || '';
+        const city = document.getElementById('inputCity')?.value?.trim() || 'Ahmedabad';
+        
+        let query = raw || [bName, address, city].filter(Boolean).join(', ') || city;
+        let displayName = customLabel;
+
+        // Try extracting coordinates or place name
+        const coordMatch = query.match(/([-+]?\d{1,2}\.\d+)[,\s]+([-+]?\d{1,3}\.\d+)/);
+        if (coordMatch) {
+            document.getElementById('inputLatitude').value = coordMatch[1];
+            document.getElementById('inputLongitude').value = coordMatch[2];
+        }
+
+        if (!displayName) {
+            if (query.includes('google.com/maps')) {
+                try {
+                    const parsedUrl = new URL(query);
+                    const q = parsedUrl.searchParams.get('query') || parsedUrl.searchParams.get('q');
+                    if (q) {
+                        displayName = decodeURIComponent(q.replace(/\+/g, ' '));
+                        query = q;
+                    } else if (query.includes('/place/')) {
+                        const place = query.split('/place/')[1]?.split('/')[0];
+                        if (place) {
+                            displayName = decodeURIComponent(place.replace(/\+/g, ' '));
+                            query = place;
+                        }
+                    }
+                } catch (e) {}
+            }
+            if (!displayName) {
+                displayName = query.startsWith('http') ? (bName || (city + ' Business')) : query;
+            }
+        }
+
+        if (titleEl) titleEl.textContent = displayName;
+        
+        const targetUrl = query.startsWith('http') ? query : ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query));
         if (linkEl) {
-            linkEl.href = url || 'https://maps.google.com';
+            linkEl.href = targetUrl;
             linkEl.innerHTML = '<span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.65rem;"></i>';
+        }
+
+        if (iframeEl) {
+            const finalEmbedQuery = query.startsWith('http') ? displayName : query;
+            iframeEl.src = 'https://maps.google.com/maps?q=' + encodeURIComponent(finalEmbedQuery) + '&t=&z=14&ie=UTF8&iwloc=&output=embed';
         }
     }
 
@@ -1418,16 +1493,24 @@
                 const addr = document.getElementById('inputAddress')?.value || '';
                 const city = document.getElementById('inputCity')?.value || '';
                 const state = document.getElementById('inputState')?.value || '';
+                const mapField = document.getElementById('inputMap');
                 
-                const queryParts = [bName, addr, city, state].filter(Boolean);
-                if (queryParts.length > 0 && !document.getElementById('inputLatitude')?.value) {
-                    const generatedUrl = 'https://maps.google.com/?q=' + encodeURIComponent(queryParts.join(', '));
-                    document.getElementById('inputMap').value = generatedUrl;
-                    updateMapPreview(generatedUrl, bName || city);
+                if (mapField && (!mapField.value || !mapField.value.startsWith('http'))) {
+                    const queryParts = [bName, addr, city, state].filter(Boolean);
+                    if (queryParts.length > 0) {
+                        updateMapPreview(queryParts.join(', '));
+                    }
                 }
             });
         }
     });
+
+    const inputMapEl = document.getElementById('inputMap');
+    if (inputMapEl) {
+        inputMapEl.addEventListener('input', function() {
+            updateMapPreview(this.value.trim());
+        });
+    }
 
     const inputMapEl = document.getElementById('inputMap');
     if (inputMapEl) {
