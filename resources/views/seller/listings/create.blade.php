@@ -3,7 +3,6 @@
 @section('title', 'Add Business Listing - Digital Class Seller')
 
 @section('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     .display-heading {
         font-family: var(--dc-font-heading);
@@ -677,74 +676,37 @@
                     </div>
                 </div>
 
+                <!-- Structured Business Address -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small">Address <span class="text-danger">*</span></label>
-                    <input type="text" name="address" id="inputAddress" class="form-control" placeholder="Floor, Building, Street, Landmark" value="{{ old('address', $seller->businessDetail?->address ?? '3rd Floor, Shreeji Complex, Nikol, Ahmedabad - 382350') }}" required>
+                    <label class="form-label fw-bold text-dark small">Business Address (Building, Floor, Flat/Shop No., Street) <span class="text-danger">*</span></label>
+                    <input type="text" name="address" id="inputAddress" class="form-control" placeholder="e.g. 3rd Floor, Shreeji Complex, Near Cross Road" value="{{ old('address', $seller->businessDetail?->address ?? '') }}" required>
                 </div>
 
                 <div class="row g-3 mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-dark small">City <span class="text-danger">*</span></label>
-                        <input type="text" name="city" id="inputCity" class="form-control" placeholder="Ahmedabad" value="{{ old('city', $seller->businessDetail?->city ?? 'Ahmedabad') }}" required>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small">Area / Locality <span class="text-danger">*</span></label>
+                        <input type="text" name="area" id="inputArea" class="form-control" placeholder="e.g. Nikol, Bopal, Vastrapur" value="{{ old('area', $seller->businessDetail?->area ?? '') }}" required>
+                        <div class="form-text text-muted" style="font-size: 0.72rem;">Area helps local customers discover your business in neighborhood searches.</div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-dark small">State <span class="text-danger">*</span></label>
-                        <input type="text" name="state" id="inputState" class="form-control" placeholder="Gujarat" value="{{ old('state', $seller->businessDetail?->state ?? 'Gujarat') }}" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-dark small">Pincode <span class="text-danger">*</span></label>
-                        <input type="text" name="pincode" id="inputPincode" class="form-control font-mono-code" placeholder="380001" value="{{ old('pincode', $seller->businessDetail?->pincode ?? '382350') }}" required>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small">Landmark (Optional)</label>
+                        <input type="text" name="landmark" id="inputLandmark" class="form-control" placeholder="e.g. Near Shreeji Complex, Opp. Metro Station" value="{{ old('landmark', $seller->businessDetail?->landmark ?? '') }}">
+                        <div class="form-text text-muted" style="font-size: 0.72rem;">Prominent landmark nearby for easy navigation.</div>
                     </div>
                 </div>
 
-                <!-- ================= INTERACTIVE BUSINESS MAP PICKER ================= -->
-                <div class="mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-1">
-                        <label class="form-label fw-bold text-dark small mb-0">Business Map Location</label>
-                        <span class="text-primary small fw-semibold" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-hand-pointer me-1"></i> Click anywhere on the map or drag the pin to set location
-                        </span>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark small">City <span class="text-danger">*</span></label>
+                        <input type="text" name="city" id="inputCity" class="form-control" placeholder="e.g. Ahmedabad" value="{{ old('city', $seller->businessDetail?->city ?? 'Ahmedabad') }}" required>
                     </div>
-
-                    <!-- Search Place on Map & Action Controls -->
-                    <div class="input-group mb-2 shadow-xs">
-                        <input type="text" id="mapSearchBoxListing" class="form-control" placeholder="Search business name, landmark or area..." onkeydown="if(event.key==='Enter'){event.preventDefault();searchOnMapListing();}">
-                        <button class="btn btn-dark fw-semibold d-inline-flex align-items-center gap-1.5" type="button" onclick="searchOnMapListing()">
-                            <i class="fa-solid fa-magnifying-glass"></i> <span id="btnSearchMapTextListing">Search on Map</span>
-                        </button>
-                        <button class="btn btn-primary fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnGetLocation" onclick="fetchCurrentLocation()">
-                            <i class="fa-solid fa-location-crosshairs"></i> <span id="btnGetLocationText">Use My GPS</span>
-                        </button>
-                        <button class="btn btn-outline-danger fw-semibold d-inline-flex align-items-center gap-1" type="button" onclick="openGoogleMapsExternalListing()" title="Open location in Google Maps">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Google Maps</span>
-                        </button>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark small">State <span class="text-danger">*</span></label>
+                        <input type="text" name="state" id="inputState" class="form-control" placeholder="e.g. Gujarat" value="{{ old('state', $seller->businessDetail?->state ?? 'Gujarat') }}" required>
                     </div>
-
-                    <!-- Interactive Map Container -->
-                    <div class="border rounded-3 overflow-hidden shadow-xs mb-2 position-relative" style="height: 300px; background-color: #f1f5f9;">
-                        <div id="listingLeafletMap" style="width: 100%; height: 100%; min-height: 300px; z-index: 1;"></div>
-                        <!-- Live Bottom Status Bar -->
-                        <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-80 text-white px-3 py-1.5 small d-flex justify-content-between align-items-center" style="z-index: 1000; font-size: 0.74rem;">
-                            <div class="text-truncate me-2">
-                                <i class="fa-solid fa-location-dot text-danger me-1"></i>
-                                <span id="listingMapStatusText">Click anywhere on the map or drag the pin to set your business location</span>
-                            </div>
-                            <span class="badge bg-success font-mono-code" id="listingMapCoordsBadge">Ready</span>
-                        </div>
-                    </div>
-
-                    <!-- Auto-Synced Google Maps URL Field -->
-                    <div class="input-group input-group-sm mb-1">
-                        <span class="input-group-text bg-light text-muted fw-semibold" style="font-size: 0.75rem;">Google Maps URL</span>
-                        <input type="text" name="map_location" id="inputMap" class="form-control bg-light font-mono-code" placeholder="Auto-generated from map pin" value="{{ old('map_location', 'https://maps.google.com/?q=23.0456,72.6789') }}">
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyMapUrlListing()"><i class="fa-regular fa-copy"></i> Copy</button>
-                    </div>
-
-                    <input type="hidden" name="latitude" id="inputLatitude" value="{{ old('latitude', '23.0456') }}">
-                    <input type="hidden" name="longitude" id="inputLongitude" value="{{ old('longitude', '72.6789') }}">
-
-                    <div class="form-text small text-muted" style="font-size: 0.72rem;">
-                        <i class="fa-solid fa-circle-check text-success me-1"></i> Pinning your location ensures nearby customers find your business when using <strong>"Near Me"</strong> searches.
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark small">Pincode / Zip Code <span class="text-danger">*</span></label>
+                        <input type="text" name="pincode" id="inputPincode" class="form-control font-mono-code" placeholder="e.g. 382350" value="{{ old('pincode', $seller->businessDetail?->pincode ?? '382350') }}" required>
                     </div>
                 </div>
 
@@ -1044,7 +1006,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     let currentStep = 1;
 
@@ -1074,10 +1035,6 @@
 
         // Scroll smoothly to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        if (step === 5) {
-            setTimeout(initListingLeafletMap, 200);
-        }
 
         // Update step 7 preview fields dynamically
         if (step === 7) {
@@ -1356,182 +1313,6 @@
         }, function(progress) {
             if (uploadSub) uploadSub.textContent = 'Uploading: ' + progress + '% (' + sizeMb + ' MB)';
         });
-    }
-
-    // 5. Interactive Leaflet Business Location Picker
-    let listingLeafletMap = null;
-    let listingLeafletMarker = null;
-
-    function initListingLeafletMap() {
-        const container = document.getElementById('listingLeafletMap');
-        if (!container) return;
-
-        let lat = parseFloat(document.getElementById('inputLatitude')?.value) || 23.0456;
-        let lng = parseFloat(document.getElementById('inputLongitude')?.value) || 72.6789;
-
-        if (listingLeafletMap) {
-            listingLeafletMap.invalidateSize();
-            return;
-        }
-
-        listingLeafletMap = L.map('listingLeafletMap').setView([lat, lng], 14);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
-            maxZoom: 19
-        }).addTo(listingLeafletMap);
-
-        const customPinIcon = L.divIcon({
-            className: 'custom-leaflet-pin',
-            html: '<div style="font-size: 2.2rem; color: #dc2626; transform: translate(-50%, -100%); text-shadow: 0 2px 8px rgba(0,0,0,0.4);"><i class="fa-solid fa-location-dot"></i></div>',
-            iconSize: [0, 0],
-            iconAnchor: [0, 0]
-        });
-
-        listingLeafletMarker = L.marker([lat, lng], {
-            draggable: true,
-            icon: customPinIcon
-        }).addTo(listingLeafletMap);
-
-        listingLeafletMarker.bindPopup("<b>Your Business Location</b><br>Drag pin or click anywhere to reposition").openPopup();
-
-        // Click anywhere on map -> Immediately move pin and update coordinates
-        listingLeafletMap.on('click', function(e) {
-            setListingLocation(e.latlng.lat, e.latlng.lng);
-        });
-
-        // Drag pin -> Update coordinates
-        listingLeafletMarker.on('dragend', function(e) {
-            const pos = e.target.getLatLng();
-            setListingLocation(pos.lat, pos.lng);
-        });
-    }
-
-    async function setListingLocation(lat, lng, customLabel) {
-        if (!listingLeafletMap) initListingLeafletMap();
-
-        if (listingLeafletMarker) {
-            listingLeafletMarker.setLatLng([lat, lng]);
-            listingLeafletMarker.bindPopup("<b>" + (customLabel || "Selected Business") + "</b><br>" + lat.toFixed(4) + ", " + lng.toFixed(4)).openPopup();
-        }
-
-        document.getElementById('inputLatitude').value = lat.toFixed(7);
-        document.getElementById('inputLongitude').value = lng.toFixed(7);
-
-        const gmapsLink = `https://maps.google.com/?q=${lat.toFixed(7)},${lng.toFixed(7)}`;
-        document.getElementById('inputMap').value = gmapsLink;
-
-        const badge = document.getElementById('listingMapCoordsBadge');
-        if (badge) badge.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-
-        const statusText = document.getElementById('listingMapStatusText');
-        if (statusText) statusText.innerHTML = `<span class="text-warning fw-bold"><i class="fa-solid fa-circle-check text-success me-1"></i> Pinned:</span> ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-
-        // Reverse geocode via Nominatim to populate City, State, Pincode, Address
-        try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.address) {
-                    const addr = data.address;
-                    const cityVal = addr.city || addr.town || addr.village || addr.suburb || addr.district || '';
-                    const stateVal = addr.state || '';
-                    const pincodeVal = addr.postcode || '';
-
-                    if (cityVal && !document.getElementById('inputCity').value) document.getElementById('inputCity').value = cityVal;
-                    if (stateVal && !document.getElementById('inputState').value) document.getElementById('inputState').value = stateVal;
-                    if (pincodeVal && !document.getElementById('inputPincode').value) document.getElementById('inputPincode').value = pincodeVal;
-                    if (data.display_name && !document.getElementById('inputAddress').value) {
-                        document.getElementById('inputAddress').value = data.display_name.split(',').slice(0, 3).join(', ');
-                    }
-                    if (statusText) {
-                        statusText.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Location Set:</span> ${cityVal ? (cityVal + ', ') : ''}${stateVal || ''} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-                    }
-                }
-            }
-        } catch (e) {
-            console.log('Reverse geocode notice:', e);
-        }
-    }
-
-    async function searchOnMapListing() {
-        const query = document.getElementById('mapSearchBoxListing')?.value?.trim() 
-                   || [document.getElementById('inputAddress')?.value, document.getElementById('inputCity')?.value].filter(Boolean).join(', ')
-                   || document.getElementById('inputCity')?.value?.trim();
-
-        if (!query) {
-            alert('Please enter a business name, place, or city in the search box.');
-            return;
-        }
-
-        const btnText = document.getElementById('btnSearchMapTextListing');
-        const orig = btnText ? btnText.textContent : 'Search on Map';
-        if (btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Searching...';
-
-        try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
-            if (res.ok) {
-                const results = await res.json();
-                if (results && results.length > 0) {
-                    const item = results[0];
-                    const lat = parseFloat(item.lat);
-                    const lon = parseFloat(item.lon);
-
-                    if (!listingLeafletMap) initListingLeafletMap();
-                    listingLeafletMap.flyTo([lat, lon], 16, { animate: true, duration: 1.2 });
-                    setListingLocation(lat, lon, item.display_name.split(',')[0]);
-                } else {
-                    alert('No exact map match found for "' + query + '". You can click directly anywhere on the map to place your pin!');
-                }
-            }
-        } catch (err) {
-            alert('Search service busy. Please click directly on the map to set your location pin.');
-        } finally {
-            if (btnText) btnText.textContent = orig;
-        }
-    }
-
-    function fetchCurrentLocation() {
-        if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser.');
-            return;
-        }
-
-        const btnText = document.getElementById('btnGetLocationText');
-        const originalText = btnText ? btnText.textContent : 'Use My GPS';
-        if (btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Locating...';
-
-        navigator.geolocation.getCurrentPosition(function(pos) {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-
-            if (!listingLeafletMap) initListingLeafletMap();
-            listingLeafletMap.flyTo([lat, lng], 16, { animate: true, duration: 1.2 });
-            setListingLocation(lat, lng, 'Current GPS Location');
-
-            if (btnText) {
-                btnText.innerHTML = '<i class="fa-solid fa-check text-white me-1"></i> Pinned!';
-                setTimeout(() => { btnText.textContent = originalText; }, 2500);
-            }
-        }, function(err) {
-            alert('Location access denied or unavailable: ' + err.message + '. Please ensure browser location permissions are allowed.');
-            if (btnText) btnText.textContent = originalText;
-        }, { enableHighAccuracy: true, timeout: 10000 });
-    }
-
-    function openGoogleMapsExternalListing() {
-        const lat = document.getElementById('inputLatitude')?.value || '23.0456';
-        const lng = document.getElementById('inputLongitude')?.value || '72.6789';
-        const bName = document.getElementById('inputBusinessName')?.value || 'Business';
-        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(bName)}+${lat},${lng}`, '_blank');
-    }
-
-    function copyMapUrlListing() {
-        const val = document.getElementById('inputMap')?.value;
-        if (val) {
-            navigator.clipboard.writeText(val);
-            alert('Google Maps link copied to clipboard:\n' + val);
-        }
     }
 </script>
 @endsection

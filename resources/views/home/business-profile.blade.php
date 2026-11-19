@@ -1290,24 +1290,23 @@
                         <i class="fa-solid fa-envelope"></i>
                         <a href="mailto:{{ $business->email ?: ($business->seller?->user?->email ?: 'support@digitalclassworldin.com') }}" class="text-decoration-none text-dark">{{ $business->email ?: ($business->seller?->user?->email ?: 'support@digitalclassworldin.com') }}</a>
                     </li>
-                    <li class="contact-info-item">
-                        <i class="fa-solid fa-location-dot text-danger"></i>
-                        <span>{{ $business->address ?: (($business->city ?? 'Ahmedabad') . ($business->state ? ', ' . $business->state : '')) }}</span>
+                    <li class="contact-info-item align-items-start">
+                        <i class="fa-solid fa-location-dot text-danger mt-1"></i>
+                        <div>
+                            <div class="fw-semibold text-dark">{{ $business->address ?: (($business->city ?? 'Ahmedabad') . ($business->state ? ', ' . $business->state : '')) }}</div>
+                            @if(!empty($business->landmark))
+                                <div class="small text-muted"><i class="fa-solid fa-map-pin text-primary me-1"></i> Landmark: {{ $business->landmark }}</div>
+                            @endif
+                            @if(!empty($business->area))
+                                <div class="small text-muted"><i class="fa-solid fa-city text-secondary me-1"></i> Area: {{ $business->area }}</div>
+                            @endif
+                            <div class="small text-muted">{{ $business->city ?? 'Ahmedabad' }}{{ $business->state ? ', ' . $business->state : '' }}{{ $business->pincode ? ' - ' . $business->pincode : '' }}</div>
+                        </div>
                     </li>
                 </ul>
 
-                @php
-                    $fullLoc = trim(($business->business_name ?? '') . ' ' . ($business->address ?? '') . ' ' . ($business->city ?? '') . ' ' . ($business->state ?? ''));
-                    $mapSearchTarget = $business->map_location ?: $fullLoc;
-                    $embedUrl = 'https://maps.google.com/maps?q=' . urlencode($mapSearchTarget) . '&t=&z=14&ie=UTF8&iwloc=&output=embed';
-                @endphp
-
-                <!-- Live Embedded Interactive Map -->
-                <div class="minimap-preview-wrap mb-2 overflow-hidden rounded-3 border position-relative" style="height: 180px;">
-                    <iframe width="100%" height="180" style="border:0;" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="{{ $embedUrl }}"></iframe>
-                </div>
-                <button type="button" class="btn-directions-map w-100 d-flex align-items-center justify-content-center gap-1.5" onclick="openDirectionsMap()">
-                    <i class="fa-solid fa-diamond-turn-right text-primary"></i> <span>Get Directions on Google Maps</span>
+                <button type="button" class="btn-directions-map w-100 d-flex align-items-center justify-content-center gap-1.5 mt-2" onclick="openDirectionsMap()">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-primary"></i> <span>Open in Google Maps</span>
                 </button>
             </div>
 

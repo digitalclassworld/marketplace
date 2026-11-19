@@ -706,11 +706,22 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small">Address <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold text-dark small">Service Office / Center Address (Building, Floor, Flat/Shop No., Street) <span class="text-danger">*</span></label>
                     <input type="text" name="address" id="inputServiceAddress" class="form-control" placeholder="Floor, Building, Street, Landmark" value="{{ old('address', '3rd Floor, Shreeji Complex, Nikol, Ahmedabad - 382350') }}" required>
                 </div>
 
                 <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small">Area / Locality <span class="text-danger">*</span></label>
+                        <input type="text" name="area" id="inputServiceArea" class="form-control" placeholder="e.g. Nikol, Bopal, Vastrapur" value="{{ old('area', 'Nikol') }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark small">Landmark (Optional)</label>
+                        <input type="text" name="landmark" id="inputServiceLandmark" class="form-control" placeholder="e.g. Near Shreeji Complex" value="{{ old('landmark', 'Near Shreeji Complex') }}">
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark small">City <span class="text-danger">*</span></label>
                         <input type="text" name="city" id="inputServiceCity" class="form-control" placeholder="Ahmedabad" value="{{ old('city', 'Ahmedabad') }}" required>
@@ -720,25 +731,8 @@
                         <input type="text" name="state" id="inputServiceState" class="form-control" placeholder="Gujarat" value="{{ old('state', 'Gujarat') }}" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-dark small">Pincode <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold text-dark small">Pincode / Zip Code <span class="text-danger">*</span></label>
                         <input type="text" name="pincode" id="inputServicePincode" class="form-control font-mono-code" placeholder="382350" value="{{ old('pincode', '382350') }}" required>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small">Google Maps Location</label>
-                    <div class="input-group mb-2">
-                        <input type="text" name="map_location" id="inputServiceMap" class="form-control" placeholder="Google Maps link" value="{{ old('map_location', 'https://maps.google.com/?q=VCEC+Nikol') }}">
-                        <button class="btn btn-outline-primary fw-semibold" type="button">Get Location</button>
-                    </div>
-                    <div class="border rounded-3 p-2 bg-light d-flex align-items-center justify-content-between" style="max-width: 280px;">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-danger fs-5"></i>
-                            <div>
-                                <div class="fw-bold small text-dark" style="font-size: 0.8rem;">VCEC - Nikol</div>
-                                <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none" style="font-size: 0.7rem;">View larger map</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
 

@@ -62,12 +62,11 @@ class SellerCourseController extends Controller
             'email'                => ['nullable', 'string', 'max:100'],
             'website'              => ['nullable', 'string', 'max:255'],
             'address'              => ['nullable', 'string', 'max:500'],
+            'area'                 => ['nullable', 'string', 'max:150'],
+            'landmark'             => ['nullable', 'string', 'max:255'],
             'city'                 => ['nullable', 'string', 'max:100'],
             'state'                => ['nullable', 'string', 'max:100'],
             'pincode'              => ['nullable', 'string', 'max:20'],
-            'map_location'         => ['nullable', 'string', 'max:500'],
-            'latitude'             => ['nullable', 'numeric'],
-            'longitude'            => ['nullable', 'numeric'],
         ]);
 
         $isFree = $request->boolean('is_free');
@@ -116,21 +115,29 @@ class SellerCourseController extends Controller
 
         // Sync Instructor Campus Location to Seller's Business Profile & Directory Listing
         try {
-            if ($seller && ($request->filled('business_name') || $request->filled('address') || $request->filled('city') || $request->filled('map_location') || $request->filled('phone'))) {
+            if ($seller && ($request->filled('business_name') || $request->filled('address') || $request->filled('city') || $request->filled('phone') || $request->filled('area'))) {
                 $bName = trim($request->input('business_name')) ?: ($seller->businessDetail?->business_name ?: ($seller->user?->name . ' Academy'));
+
+                $detailData = [
+                    'business_name'   => $bName,
+                    'business_phone'  => $request->input('phone', $seller->businessDetail?->business_phone),
+                    'business_email'  => $request->input('email', $seller->businessDetail?->business_email),
+                    'website'         => $request->input('website', $seller->businessDetail?->website),
+                    'address'         => $request->input('address', $seller->businessDetail?->address),
+                    'city'            => $request->input('city', $seller->businessDetail?->city),
+                    'state'           => $request->input('state', $seller->businessDetail?->state),
+                    'pincode'         => $request->input('pincode', $seller->businessDetail?->pincode),
+                ];
+                if (\Illuminate\Support\Facades\Schema::hasColumn('seller_business_details', 'area')) {
+                    $detailData['area'] = $request->input('area', $seller->businessDetail?->area);
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('seller_business_details', 'landmark')) {
+                    $detailData['landmark'] = $request->input('landmark', $seller->businessDetail?->landmark);
+                }
 
                 $seller->businessDetail()->updateOrCreate(
                     ['seller_id' => $seller->id],
-                    [
-                        'business_name'   => $bName,
-                        'business_phone'  => $request->input('phone', $seller->businessDetail?->business_phone),
-                        'business_email'  => $request->input('email', $seller->businessDetail?->business_email),
-                        'website'         => $request->input('website', $seller->businessDetail?->website),
-                        'address'         => $request->input('address', $seller->businessDetail?->address),
-                        'city'            => $request->input('city', $seller->businessDetail?->city),
-                        'state'           => $request->input('state', $seller->businessDetail?->state),
-                        'pincode'         => $request->input('pincode', $seller->businessDetail?->pincode),
-                    ]
+                    $detailData
                 );
 
                 // Update or create active business listing for this seller
@@ -145,9 +152,15 @@ class SellerCourseController extends Controller
                     'city'            => $request->input('city', $listing?->city),
                     'state'           => $request->input('state', $listing?->state),
                     'pincode'         => $request->input('pincode', $listing?->pincode),
-                    'map_location'    => $request->input('map_location', $listing?->map_location),
                     'status'          => 'approved',
                 ];
+
+                if (\Illuminate\Support\Facades\Schema::hasColumn('business_listings', 'area')) {
+                    $listingData['area'] = $request->input('area', $listing?->area);
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('business_listings', 'landmark')) {
+                    $listingData['landmark'] = $request->input('landmark', $listing?->landmark);
+                }
 
                 if (\Illuminate\Support\Facades\Schema::hasColumn('business_listings', 'latitude')) {
                     $listingData['latitude'] = $request->input('latitude', $listing?->latitude);

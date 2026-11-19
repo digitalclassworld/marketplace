@@ -54,9 +54,11 @@ class SellerBusinessListingController extends Controller
             'email'            => ['nullable', 'email', 'max:100'],
             'website'          => ['nullable', 'url', 'max:255'],
             'address'          => ['nullable', 'string'],
+            'area'             => ['nullable', 'string', 'max:150'],
+            'landmark'         => ['nullable', 'string', 'max:255'],
             'city'             => ['nullable', 'string', 'max:100'],
             'state'            => ['nullable', 'string', 'max:100'],
-            'pincode'          => ['nullable', 'string', 'max:10'],
+            'pincode'          => ['nullable', 'string', 'max:20'],
             'map_location'     => ['nullable', 'string', 'max:255'],
             'latitude'         => ['nullable', 'numeric'],
             'longitude'        => ['nullable', 'numeric'],
@@ -89,6 +91,8 @@ class SellerBusinessListingController extends Controller
             'email'            => $validated['email'] ?? null,
             'website'          => $validated['website'] ?? null,
             'address'          => $validated['address'] ?? null,
+            'area'             => $validated['area'] ?? null,
+            'landmark'         => $validated['landmark'] ?? null,
             'city'             => $validated['city'] ?? null,
             'state'            => $validated['state'] ?? null,
             'pincode'          => $validated['pincode'] ?? null,
@@ -104,6 +108,28 @@ class SellerBusinessListingController extends Controller
             'add_ons'          => $addOns,
             'status'           => 'pending',
         ]);
+
+        try {
+            $sellerDetailData = [
+                'business_name'   => $validated['business_name'],
+                'business_phone'  => $validated['phone'] ?? $seller->businessDetail?->business_phone,
+                'business_email'  => $validated['email'] ?? $seller->businessDetail?->business_email,
+                'website'         => $validated['website'] ?? $seller->businessDetail?->website,
+                'address'         => $validated['address'] ?? $seller->businessDetail?->address,
+                'city'            => $validated['city'] ?? $seller->businessDetail?->city,
+                'state'           => $validated['state'] ?? $seller->businessDetail?->state,
+                'pincode'         => $validated['pincode'] ?? $seller->businessDetail?->pincode,
+            ];
+            if (\Illuminate\Support\Facades\Schema::hasColumn('seller_business_details', 'area')) {
+                $sellerDetailData['area'] = $validated['area'] ?? $seller->businessDetail?->area;
+            }
+            if (\Illuminate\Support\Facades\Schema::hasColumn('seller_business_details', 'landmark')) {
+                $sellerDetailData['landmark'] = $validated['landmark'] ?? $seller->businessDetail?->landmark;
+            }
+            $seller->businessDetail()->updateOrCreate(['seller_id' => $seller->id], $sellerDetailData);
+        } catch (\Throwable $e) {
+            // Ignore if business detail table doesn't match
+        }
 
         return redirect()->route('seller.listings.index')->with('success', 'Business Directory listing submitted successfully! It has been submitted for admin approval and will appear on the marketplace once approved.');
     }

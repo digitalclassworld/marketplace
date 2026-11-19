@@ -27,6 +27,8 @@ class BusinessListing extends Model
         'email',
         'website',
         'address',
+        'area',
+        'landmark',
         'city',
         'state',
         'pincode',
@@ -107,11 +109,26 @@ class BusinessListing extends Model
 
     public function getAreaTextAttribute(): string
     {
-        $area = $this->features['area'] ?? null;
+        $area = $this->area ?? ($this->features['area'] ?? null);
         if ($area && $this->city) {
             return $area . ', ' . $this->city;
         }
-        return $this->address ?: ($this->city ?: 'Ahmedabad');
+        if ($area) {
+            return $area;
+        }
+        return $this->city ?: ($this->address ?: 'Ahmedabad');
+    }
+
+    public function getFullAddressAttribute(): string
+    {
+        $parts = array_filter([
+            $this->address,
+            $this->landmark,
+            $this->area,
+            $this->city,
+            $this->state ? ($this->pincode ? $this->state . ' - ' . $this->pincode : $this->state) : $this->pincode,
+        ]);
+        return count($parts) > 0 ? implode(', ', $parts) : ($this->address ?: 'Ahmedabad, Gujarat');
     }
 
     public function getDisplayImageAttribute(): string

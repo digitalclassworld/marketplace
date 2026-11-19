@@ -53,13 +53,24 @@ class HomeController extends Controller
             if (Schema::hasTable('business_listings')) {
                 $query = BusinessListing::query()->whereIn('status', ['approved', 'active', 'published']);
 
+                $hasAreaCol = Schema::hasColumn('business_listings', 'area');
+                $hasLandmarkCol = Schema::hasColumn('business_listings', 'landmark');
+
                 if (!empty($searchQuery)) {
-                    $query->where(function ($q) use ($searchQuery) {
+                    $query->where(function ($q) use ($searchQuery, $hasAreaCol, $hasLandmarkCol) {
                         $q->where('business_name', 'like', "%{$searchQuery}%")
                           ->orWhere('category', 'like', "%{$searchQuery}%")
                           ->orWhere('sub_category', 'like', "%{$searchQuery}%")
                           ->orWhere('city', 'like', "%{$searchQuery}%")
-                          ->orWhere('address', 'like', "%{$searchQuery}%");
+                          ->orWhere('address', 'like', "%{$searchQuery}%")
+                          ->orWhere('pincode', 'like', "%{$searchQuery}%");
+
+                        if ($hasAreaCol) {
+                            $q->orWhere('area', 'like', "%{$searchQuery}%");
+                        }
+                        if ($hasLandmarkCol) {
+                            $q->orWhere('landmark', 'like', "%{$searchQuery}%");
+                        }
                     });
                 }
 
@@ -71,9 +82,14 @@ class HomeController extends Controller
                 }
 
                 if (!empty($selectedCity) && !in_array($selectedCity, ['All Locations', 'all', 'Near Me', 'near_me'])) {
-                    $query->where(function ($q) use ($selectedCity) {
+                    $query->where(function ($q) use ($selectedCity, $hasAreaCol) {
                         $q->where('city', 'like', "%{$selectedCity}%")
-                          ->orWhere('address', 'like', "%{$selectedCity}%");
+                          ->orWhere('address', 'like', "%{$selectedCity}%")
+                          ->orWhere('pincode', 'like', "%{$selectedCity}%");
+
+                        if ($hasAreaCol) {
+                            $q->orWhere('area', 'like', "%{$selectedCity}%");
+                        }
                     });
                 }
 
