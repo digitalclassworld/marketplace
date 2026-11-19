@@ -75,6 +75,17 @@ class LegacyDataTransformer
     }
 
     /**
+     * Normalize MySQL datetime string, converting legacy '0000-00-00' to current timestamp
+     */
+    public static function normalizeDateTime(?string $dt): string
+    {
+        if (empty($dt) || str_starts_with($dt, '0000-00-00') || !strtotime($dt)) {
+            return now()->toDateTimeString();
+        }
+        return date('Y-m-d H:i:s', strtotime($dt));
+    }
+
+    /**
      * Map profession string
      */
     public static function mapProfession(?string $flag): string

@@ -222,7 +222,7 @@ class LegacyMigrationManager
             $profession = LegacyDataTransformer::mapProfession($row['flag'] ?? null);
             $city = LegacyDataTransformer::cleanText($row['city'] ?? '') ?: 'Ahmedabad';
             $state = LegacyDataTransformer::cleanText($row['state'] ?? '') ?: 'Gujarat';
-            $createdAt = $row['created_at'] ?? now();
+            $createdAt = LegacyDataTransformer::normalizeDateTime($row['created_at'] ?? null);
             $password = LegacyDataTransformer::hashPassword($row['password'] ?? '123456');
 
             if (empty($email)) {
@@ -285,6 +285,8 @@ class LegacyMigrationManager
                 return;
             }
 
+            $createdAt = LegacyDataTransformer::normalizeDateTime($row['created_at'] ?? null);
+
             $newAdminId = DB::table('users')->insertGetId([
                 'name' => LegacyDataTransformer::cleanText($row['name'] ?? 'Admin Staff'),
                 'email' => $email,
@@ -292,7 +294,7 @@ class LegacyMigrationManager
                 'role' => 'admin',
                 'password' => LegacyDataTransformer::hashPassword($row['password'] ?? 'Admin@123'),
                 'email_verified_at' => now(),
-                'created_at' => $row['created_at'] ?? now(),
+                'created_at' => $createdAt,
                 'updated_at' => now(),
             ]);
 
@@ -336,6 +338,8 @@ class LegacyMigrationManager
                 $email = 'tutor' . $oldId . '@tutor.digitalclassworld.in';
             }
 
+            $createdAt = LegacyDataTransformer::normalizeDateTime($row['created_at'] ?? null);
+
             // Check if user already exists
             if (isset($this->existingUserEmails[$email])) {
                 $userId = $this->existingUserEmails[$email];
@@ -358,7 +362,7 @@ class LegacyMigrationManager
                     'role' => 'seller',
                     'password' => LegacyDataTransformer::hashPassword($row['password'] ?? 'Seller@123'),
                     'email_verified_at' => now(),
-                    'created_at' => $row['created_at'] ?? now(),
+                    'created_at' => $createdAt,
                     'updated_at' => now(),
                 ]);
                 $this->existingUserEmails[$email] = $userId;
@@ -374,9 +378,9 @@ class LegacyMigrationManager
                 'account_type' => 'individual',
                 'seller_status' => $sellerStatus === 'active' ? 'Active' : 'Suspended',
                 'verification_status' => $verStatus === 'verified' ? 'Verified' : 'Pending',
-                'registration_date' => $row['created_at'] ?? now(),
-                'approved_at' => $verStatus === 'verified' ? ($row['created_at'] ?? now()) : null,
-                'created_at' => $row['created_at'] ?? now(),
+                'registration_date' => $createdAt,
+                'approved_at' => $verStatus === 'verified' ? $createdAt : null,
+                'created_at' => $createdAt,
                 'updated_at' => now(),
             ]);
 
@@ -394,7 +398,7 @@ class LegacyMigrationManager
                 'country' => 'India',
                 'pincode' => substr(preg_replace('/[^0-9]/', '', $row['pincode'] ?? ''), 0, 10),
                 'website' => $row['website'] ?? null,
-                'created_at' => $row['created_at'] ?? now(),
+                'created_at' => $createdAt,
                 'updated_at' => now(),
             ]);
 
@@ -443,6 +447,7 @@ class LegacyMigrationManager
 
             $schoolName = LegacyDataTransformer::cleanText($row['school_name'] ?? '') ?: 'Institute ' . $oldId;
             $email = LegacyDataTransformer::normalizeEmail($row['email'] ?? null);
+            $createdAt = LegacyDataTransformer::normalizeDateTime($row['created_at'] ?? null);
 
             if (empty($email)) {
                 $email = 'affiliate' . $oldId . '@institute.digitalclassworld.in';
@@ -472,9 +477,9 @@ class LegacyMigrationManager
                         'account_type' => 'institute',
                         'seller_status' => $status === 'active' ? 'Active' : 'Pending Approval',
                         'verification_status' => $status === 'active' ? 'Verified' : 'Pending',
-                        'registration_date' => $row['created_at'] ?? now(),
-                        'approved_at' => $status === 'active' ? ($row['created_at'] ?? now()) : null,
-                        'created_at' => $row['created_at'] ?? now(),
+                        'registration_date' => $createdAt,
+                        'approved_at' => $status === 'active' ? $createdAt : null,
+                        'created_at' => $createdAt,
                         'updated_at' => now(),
                     ]);
                 }
@@ -489,7 +494,7 @@ class LegacyMigrationManager
                     'role' => 'seller',
                     'password' => LegacyDataTransformer::hashPassword('Institute@123'),
                     'email_verified_at' => now(),
-                    'created_at' => $row['created_at'] ?? now(),
+                    'created_at' => $createdAt,
                     'updated_at' => now(),
                 ]);
                 $this->existingUserEmails[$email] = $userId;
@@ -504,9 +509,9 @@ class LegacyMigrationManager
                     'account_type' => 'institute',
                     'seller_status' => $status === 'active' ? 'Active' : 'Pending Approval',
                     'verification_status' => $status === 'active' ? 'Verified' : 'Pending',
-                    'registration_date' => $row['created_at'] ?? now(),
-                    'approved_at' => $status === 'active' ? ($row['created_at'] ?? now()) : null,
-                    'created_at' => $row['created_at'] ?? now(),
+                    'registration_date' => $createdAt,
+                    'approved_at' => $status === 'active' ? $createdAt : null,
+                    'created_at' => $createdAt,
                     'updated_at' => now(),
                 ]);
             }
@@ -525,7 +530,7 @@ class LegacyMigrationManager
                 'country' => 'India',
                 'pincode' => substr(preg_replace('/[^0-9]/', '', $row['pincode'] ?? ''), 0, 10),
                 'website' => $row['website_url'] ?? null,
-                'created_at' => $row['created_at'] ?? now(),
+                'created_at' => $createdAt,
                 'updated_at' => now(),
             ]);
 
@@ -552,7 +557,7 @@ class LegacyMigrationManager
                 'website' => $row['website_url'] ?? null,
                 'status' => $status === 'active' ? 'approved' : 'pending',
                 'approved_at' => $status === 'active' ? now() : null,
-                'created_at' => $row['created_at'] ?? now(),
+                'created_at' => $createdAt,
                 'updated_at' => now(),
             ]);
 
