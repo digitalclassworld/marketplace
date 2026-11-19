@@ -76,6 +76,9 @@ Route::get('/online-course-selling-platform', [HomeController::class, 'sellCours
 Route::get('/sell-courses', [HomeController::class, 'sellCoursesLanding'])->name('sell-courses');
 Route::get('/become-seller', [HomeController::class, 'sellCoursesLanding'])->name('become-seller');
 Route::get('/sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap.xml');
+Route::get('/googlef8ebe72df07d405f.html', function () {
+    return response('google-site-verification: googlef8ebe72df07d405f.html', 200, ['Content-Type' => 'text/html']);
+});
 
 // Public Blog Directory & Article Reader
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
