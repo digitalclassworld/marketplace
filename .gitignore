@@ -27,3 +27,4 @@ test_*.php
 *.sqlite-journal
 marketplace/
 scratch/
+*.sql
