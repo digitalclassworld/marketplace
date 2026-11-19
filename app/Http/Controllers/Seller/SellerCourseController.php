@@ -56,6 +56,7 @@ class SellerCourseController extends Controller
             'qa_enabled'           => ['nullable', 'boolean'],
             'sections'             => ['nullable', 'array'],
             // Contact & Campus Location fields
+            'business_name'        => ['nullable', 'string', 'max:255'],
             'phone'                => ['nullable', 'string', 'max:30'],
             'whatsapp_number'      => ['nullable', 'string', 'max:30'],
             'email'                => ['nullable', 'string', 'max:100'],
@@ -115,10 +116,13 @@ class SellerCourseController extends Controller
 
         // Sync Instructor Campus Location to Seller's Business Profile & Directory Listing
         try {
-            if ($seller && ($request->filled('address') || $request->filled('city') || $request->filled('map_location') || $request->filled('phone'))) {
+            if ($seller && ($request->filled('business_name') || $request->filled('address') || $request->filled('city') || $request->filled('map_location') || $request->filled('phone'))) {
+                $bName = trim($request->input('business_name')) ?: ($seller->businessDetail?->business_name ?: ($seller->user?->name . ' Academy'));
+
                 $seller->businessDetail()->updateOrCreate(
                     ['seller_id' => $seller->id],
                     [
+                        'business_name'   => $bName,
                         'business_phone'  => $request->input('phone', $seller->businessDetail?->business_phone),
                         'business_email'  => $request->input('email', $seller->businessDetail?->business_email),
                         'website'         => $request->input('website', $seller->businessDetail?->website),
@@ -131,42 +135,36 @@ class SellerCourseController extends Controller
 
                 // Update or create active business listing for this seller
                 $listing = $seller->businessListings()->first();
+                $listingData = [
+                    'business_name'   => $bName,
+                    'phone'           => $request->input('phone', $listing?->phone),
+                    'whatsapp_number' => $request->input('whatsapp_number', $listing?->whatsapp_number),
+                    'email'           => $request->input('email', $listing?->email),
+                    'website'         => $request->input('website', $listing?->website),
+                    'address'         => $request->input('address', $listing?->address),
+                    'city'            => $request->input('city', $listing?->city),
+                    'state'           => $request->input('state', $listing?->state),
+                    'pincode'         => $request->input('pincode', $listing?->pincode),
+                    'map_location'    => $request->input('map_location', $listing?->map_location),
+                    'status'          => 'approved',
+                ];
+
+                if (\Illuminate\Support\Facades\Schema::hasColumn('business_listings', 'latitude')) {
+                    $listingData['latitude'] = $request->input('latitude', $listing?->latitude);
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn('business_listings', 'longitude')) {
+                    $listingData['longitude'] = $request->input('longitude', $listing?->longitude);
+                }
+
                 if ($listing) {
-                    $listing->update([
-                        'phone'           => $request->input('phone', $listing->phone),
-                        'whatsapp_number' => $request->input('whatsapp_number', $listing->whatsapp_number),
-                        'email'           => $request->input('email', $listing->email),
-                        'website'         => $request->input('website', $listing->website),
-                        'address'         => $request->input('address', $listing->address),
-                        'city'            => $request->input('city', $listing->city),
-                        'state'           => $request->input('state', $listing->state),
-                        'pincode'         => $request->input('pincode', $listing->pincode),
-                        'map_location'    => $request->input('map_location', $listing->map_location),
-                        'latitude'        => $request->input('latitude', $listing->latitude),
-                        'longitude'       => $request->input('longitude', $listing->longitude),
-                    ]);
+                    $listing->update($listingData);
                 } else {
-                    $bName = $seller->businessDetail?->business_name ?: ($seller->user?->name ?: 'Institute');
-                    $seller->businessListings()->create([
-                        'business_name'   => $bName,
-                        'slug'            => Str::slug($bName) . '-' . Str::random(5),
-                        'category'        => 'Educational Institute',
-                        'listing_type'    => 'Coaching & Academy',
-                        'tagline'         => 'Certified coaching & courses institute',
-                        'description'     => 'Offering practical offline and online education courses.',
-                        'phone'           => $request->input('phone'),
-                        'whatsapp_number' => $request->input('whatsapp_number'),
-                        'email'           => $request->input('email'),
-                        'website'         => $request->input('website'),
-                        'address'         => $request->input('address'),
-                        'city'            => $request->input('city'),
-                        'state'           => $request->input('state'),
-                        'pincode'         => $request->input('pincode'),
-                        'map_location'    => $request->input('map_location'),
-                        'latitude'        => $request->input('latitude'),
-                        'longitude'       => $request->input('longitude'),
-                        'status'          => 'approved',
-                    ]);
+                    $listingData['slug'] = Str::slug($bName) . '-' . Str::random(5);
+                    $listingData['category'] = 'Educational Institute';
+                    $listingData['listing_type'] = 'Coaching & Academy';
+                    $listingData['tagline'] = 'Certified coaching & courses institute';
+                    $listingData['description'] = 'Offering practical offline and online education courses.';
+                    $seller->businessListings()->create($listingData);
                 }
             }
         } catch (\Throwable $e) {

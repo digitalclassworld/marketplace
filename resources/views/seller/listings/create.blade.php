@@ -3,6 +3,7 @@
 @section('title', 'Add Business Listing - Digital Class Seller')
 
 @section('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     .display-heading {
         font-family: var(--dc-font-heading);
@@ -387,7 +388,7 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bold text-dark small">Business Name <span class="text-danger">*</span></label>
-                    <input type="text" name="business_name" id="inputBusinessName" class="form-control" placeholder="e.g. Apex Coding Academy & Training Institute" value="{{ old('business_name', 'VCEC - Vinayak Computer Education Center') }}" required>
+                    <input type="text" name="business_name" id="inputBusinessName" class="form-control" placeholder="e.g. XYZ Classes, Apex Academy & Institute" value="{{ old('business_name', $seller->businessDetail?->business_name ?? ($seller->businessListings->first()?->business_name ?? '')) }}" required>
                 </div>
 
                 <div class="mb-3">
@@ -696,43 +697,54 @@
                     </div>
                 </div>
 
+                <!-- ================= INTERACTIVE BUSINESS MAP PICKER ================= -->
                 <div class="mb-4">
                     <div class="d-flex align-items-center justify-content-between mb-1">
-                        <label class="form-label fw-bold text-dark small mb-0">Google Maps Location</label>
-                        <span class="text-muted small" style="font-size: 0.72rem;"><i class="fa-solid fa-satellite-dish text-primary me-1"></i> Auto-detects GPS & pin</span>
+                        <label class="form-label fw-bold text-dark small mb-0">Business Map Location</label>
+                        <span class="text-primary small fw-semibold" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-hand-pointer me-1"></i> Click anywhere on the map or drag the pin to set location
+                        </span>
                     </div>
+
+                    <!-- Search Place on Map & Action Controls -->
                     <div class="input-group mb-2 shadow-xs">
-                        <input type="text" name="map_location" id="inputMap" class="form-control" placeholder="Google Maps link, place name or search below" value="{{ old('map_location', 'https://maps.google.com/?q=VCEC+Nikol') }}">
-                        <button class="btn btn-outline-danger fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnOpenGoogleMapsListing" onclick="openGoogleMapsSearchListing()" title="Search for your business on Google Maps">
-                            <i class="fa-solid fa-map-location-dot"></i> <span>Search Google Maps</span>
+                        <input type="text" id="mapSearchBoxListing" class="form-control" placeholder="Search business name, landmark or area..." onkeydown="if(event.key==='Enter'){event.preventDefault();searchOnMapListing();}">
+                        <button class="btn btn-dark fw-semibold d-inline-flex align-items-center gap-1.5" type="button" onclick="searchOnMapListing()">
+                            <i class="fa-solid fa-magnifying-glass"></i> <span id="btnSearchMapTextListing">Search on Map</span>
                         </button>
                         <button class="btn btn-primary fw-semibold d-inline-flex align-items-center gap-1.5" type="button" id="btnGetLocation" onclick="fetchCurrentLocation()">
-                            <i class="fa-solid fa-location-crosshairs"></i> <span id="btnGetLocationText">Get Location</span>
+                            <i class="fa-solid fa-location-crosshairs"></i> <span id="btnGetLocationText">Use My GPS</span>
+                        </button>
+                        <button class="btn btn-outline-danger fw-semibold d-inline-flex align-items-center gap-1" type="button" onclick="openGoogleMapsExternalListing()" title="Open location in Google Maps">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Google Maps</span>
                         </button>
                     </div>
-                    <input type="hidden" name="latitude" id="inputLatitude" value="{{ old('latitude') }}">
-                    <input type="hidden" name="longitude" id="inputLongitude" value="{{ old('longitude') }}">
-                    
-                    <!-- Dynamic Live Map Preview Card with Live Embedded Map -->
-                    <div class="border rounded-3 p-3 bg-light shadow-xs mb-2" style="max-width: 480px;" id="mapPreviewCard">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-location-dot text-danger fs-5" id="mapPreviewIcon"></i>
-                                <div>
-                                    <div class="fw-bold small text-dark" style="font-size: 0.85rem;" id="mapPreviewTitle">VCEC - Nikol</div>
-                                    <a href="https://maps.google.com/?q=VCEC+Nikol" target="_blank" class="text-primary small text-decoration-none d-inline-flex align-items-center gap-1" style="font-size: 0.72rem;" id="mapPreviewLink">
-                                        <span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i>
-                                    </a>
-                                </div>
+
+                    <!-- Interactive Map Container -->
+                    <div class="border rounded-3 overflow-hidden shadow-xs mb-2 position-relative" style="height: 300px; background-color: #f1f5f9;">
+                        <div id="listingLeafletMap" style="width: 100%; height: 100%; min-height: 300px; z-index: 1;"></div>
+                        <!-- Live Bottom Status Bar -->
+                        <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-80 text-white px-3 py-1.5 small d-flex justify-content-between align-items-center" style="z-index: 1000; font-size: 0.74rem;">
+                            <div class="text-truncate me-2">
+                                <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                                <span id="listingMapStatusText">Click anywhere on the map or drag the pin to set your business location</span>
                             </div>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle" id="mapPreviewStatus" style="font-size: 0.7rem;"><i class="fa-solid fa-circle-check me-1"></i>Active Pin</span>
-                        </div>
-                        <div class="overflow-hidden rounded-2 border bg-white" style="height: 140px;">
-                            <iframe id="mapPreviewIframe" width="100%" height="140" style="border:0;" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q={{ urlencode(old('map_location', 'VCEC Nikol Ahmedabad')) }}&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+                            <span class="badge bg-success font-mono-code" id="listingMapCoordsBadge">Ready</span>
                         </div>
                     </div>
-                    <div class="form-text small text-muted mt-1" style="font-size: 0.72rem;">
-                        <i class="fa-solid fa-circle-info text-info me-1"></i> Click <strong>Search Google Maps</strong> to find your business or <strong>Get Location</strong> to auto-fill using your device's current GPS!
+
+                    <!-- Auto-Synced Google Maps URL Field -->
+                    <div class="input-group input-group-sm mb-1">
+                        <span class="input-group-text bg-light text-muted fw-semibold" style="font-size: 0.75rem;">Google Maps URL</span>
+                        <input type="text" name="map_location" id="inputMap" class="form-control bg-light font-mono-code" placeholder="Auto-generated from map pin" value="{{ old('map_location', 'https://maps.google.com/?q=23.0456,72.6789') }}">
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyMapUrlListing()"><i class="fa-regular fa-copy"></i> Copy</button>
+                    </div>
+
+                    <input type="hidden" name="latitude" id="inputLatitude" value="{{ old('latitude', '23.0456') }}">
+                    <input type="hidden" name="longitude" id="inputLongitude" value="{{ old('longitude', '72.6789') }}">
+
+                    <div class="form-text small text-muted" style="font-size: 0.72rem;">
+                        <i class="fa-solid fa-circle-check text-success me-1"></i> Pinning your location ensures nearby customers find your business when using <strong>"Near Me"</strong> searches.
                     </div>
                 </div>
 
@@ -1032,6 +1044,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     let currentStep = 1;
 
@@ -1061,6 +1074,10 @@
 
         // Scroll smoothly to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (step === 5) {
+            setTimeout(initListingLeafletMap, 200);
+        }
 
         // Update step 7 preview fields dynamically
         if (step === 7) {
@@ -1341,28 +1358,137 @@
         });
     }
 
-    // 5. Live Location & Map Synchronization
-    function openGoogleMapsSearchListing() {
-        const inputMap = document.getElementById('inputMap')?.value?.trim() || '';
-        const bName = document.getElementById('inputBusinessName')?.value?.trim() || '';
-        const address = document.getElementById('inputAddress')?.value?.trim() || '';
-        const city = document.getElementById('inputCity')?.value?.trim() || '';
-        const state = document.getElementById('inputState')?.value?.trim() || '';
+    // 5. Interactive Leaflet Business Location Picker
+    let listingLeafletMap = null;
+    let listingLeafletMarker = null;
 
-        let query = '';
-        if (inputMap && !inputMap.startsWith('http')) {
-            query = inputMap;
-        } else if (bName || address || city) {
-            query = [bName, address, city, state].filter(Boolean).join(', ');
-        } else if (inputMap.startsWith('http')) {
-            window.open(inputMap, '_blank');
+    function initListingLeafletMap() {
+        const container = document.getElementById('listingLeafletMap');
+        if (!container) return;
+
+        let lat = parseFloat(document.getElementById('inputLatitude')?.value) || 23.0456;
+        let lng = parseFloat(document.getElementById('inputLongitude')?.value) || 72.6789;
+
+        if (listingLeafletMap) {
+            listingLeafletMap.invalidateSize();
             return;
-        } else {
-            query = 'Business in ' + (city || 'Ahmedabad');
         }
 
-        const gmapsSearchUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
-        window.open(gmapsSearchUrl, '_blank');
+        listingLeafletMap = L.map('listingLeafletMap').setView([lat, lng], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(listingLeafletMap);
+
+        const customPinIcon = L.divIcon({
+            className: 'custom-leaflet-pin',
+            html: '<div style="font-size: 2.2rem; color: #dc2626; transform: translate(-50%, -100%); text-shadow: 0 2px 8px rgba(0,0,0,0.4);"><i class="fa-solid fa-location-dot"></i></div>',
+            iconSize: [0, 0],
+            iconAnchor: [0, 0]
+        });
+
+        listingLeafletMarker = L.marker([lat, lng], {
+            draggable: true,
+            icon: customPinIcon
+        }).addTo(listingLeafletMap);
+
+        listingLeafletMarker.bindPopup("<b>Your Business Location</b><br>Drag pin or click anywhere to reposition").openPopup();
+
+        // Click anywhere on map -> Immediately move pin and update coordinates
+        listingLeafletMap.on('click', function(e) {
+            setListingLocation(e.latlng.lat, e.latlng.lng);
+        });
+
+        // Drag pin -> Update coordinates
+        listingLeafletMarker.on('dragend', function(e) {
+            const pos = e.target.getLatLng();
+            setListingLocation(pos.lat, pos.lng);
+        });
+    }
+
+    async function setListingLocation(lat, lng, customLabel) {
+        if (!listingLeafletMap) initListingLeafletMap();
+
+        if (listingLeafletMarker) {
+            listingLeafletMarker.setLatLng([lat, lng]);
+            listingLeafletMarker.bindPopup("<b>" + (customLabel || "Selected Business") + "</b><br>" + lat.toFixed(4) + ", " + lng.toFixed(4)).openPopup();
+        }
+
+        document.getElementById('inputLatitude').value = lat.toFixed(7);
+        document.getElementById('inputLongitude').value = lng.toFixed(7);
+
+        const gmapsLink = `https://maps.google.com/?q=${lat.toFixed(7)},${lng.toFixed(7)}`;
+        document.getElementById('inputMap').value = gmapsLink;
+
+        const badge = document.getElementById('listingMapCoordsBadge');
+        if (badge) badge.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+        const statusText = document.getElementById('listingMapStatusText');
+        if (statusText) statusText.innerHTML = `<span class="text-warning fw-bold"><i class="fa-solid fa-circle-check text-success me-1"></i> Pinned:</span> ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+        // Reverse geocode via Nominatim to populate City, State, Pincode, Address
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.address) {
+                    const addr = data.address;
+                    const cityVal = addr.city || addr.town || addr.village || addr.suburb || addr.district || '';
+                    const stateVal = addr.state || '';
+                    const pincodeVal = addr.postcode || '';
+
+                    if (cityVal && !document.getElementById('inputCity').value) document.getElementById('inputCity').value = cityVal;
+                    if (stateVal && !document.getElementById('inputState').value) document.getElementById('inputState').value = stateVal;
+                    if (pincodeVal && !document.getElementById('inputPincode').value) document.getElementById('inputPincode').value = pincodeVal;
+                    if (data.display_name && !document.getElementById('inputAddress').value) {
+                        document.getElementById('inputAddress').value = data.display_name.split(',').slice(0, 3).join(', ');
+                    }
+                    if (statusText) {
+                        statusText.innerHTML = `<span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Location Set:</span> ${cityVal ? (cityVal + ', ') : ''}${stateVal || ''} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('Reverse geocode notice:', e);
+        }
+    }
+
+    async function searchOnMapListing() {
+        const query = document.getElementById('mapSearchBoxListing')?.value?.trim() 
+                   || [document.getElementById('inputAddress')?.value, document.getElementById('inputCity')?.value].filter(Boolean).join(', ')
+                   || document.getElementById('inputCity')?.value?.trim();
+
+        if (!query) {
+            alert('Please enter a business name, place, or city in the search box.');
+            return;
+        }
+
+        const btnText = document.getElementById('btnSearchMapTextListing');
+        const orig = btnText ? btnText.textContent : 'Search on Map';
+        if (btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Searching...';
+
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+            if (res.ok) {
+                const results = await res.json();
+                if (results && results.length > 0) {
+                    const item = results[0];
+                    const lat = parseFloat(item.lat);
+                    const lon = parseFloat(item.lon);
+
+                    if (!listingLeafletMap) initListingLeafletMap();
+                    listingLeafletMap.flyTo([lat, lon], 16, { animate: true, duration: 1.2 });
+                    setListingLocation(lat, lon, item.display_name.split(',')[0]);
+                } else {
+                    alert('No exact map match found for "' + query + '". You can click directly anywhere on the map to place your pin!');
+                }
+            }
+        } catch (err) {
+            alert('Search service busy. Please click directly on the map to set your location pin.');
+        } finally {
+            if (btnText) btnText.textContent = orig;
+        }
     }
 
     function fetchCurrentLocation() {
@@ -1372,54 +1498,19 @@
         }
 
         const btnText = document.getElementById('btnGetLocationText');
-        const originalText = btnText ? btnText.textContent : 'Get Location';
+        const originalText = btnText ? btnText.textContent : 'Use My GPS';
         if (btnText) btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Locating...';
 
-        navigator.geolocation.getCurrentPosition(async function(pos) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
 
-            document.getElementById('inputLatitude').value = lat;
-            document.getElementById('inputLongitude').value = lng;
-            
-            const bName = document.getElementById('inputBusinessName')?.value || 'Your Business Location';
-            const mapUrl = `https://maps.google.com/?q=${lat},${lng}`;
-            document.getElementById('inputMap').value = mapUrl;
-
-            // Update Preview Card
-            updateMapPreview(mapUrl, `${bName} (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
-
-            // Reverse geocode via free Nominatim to auto-fill Address, City, State, Pincode if empty
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.address) {
-                        const addr = data.address;
-                        const cityVal = addr.city || addr.town || addr.village || addr.suburb || addr.district || '';
-                        const stateVal = addr.state || '';
-                        const pincodeVal = addr.postcode || '';
-                        
-                        if (cityVal && !document.getElementById('inputCity').value) {
-                            document.getElementById('inputCity').value = cityVal;
-                        }
-                        if (stateVal && !document.getElementById('inputState').value) {
-                            document.getElementById('inputState').value = stateVal;
-                        }
-                        if (pincodeVal && !document.getElementById('inputPincode').value) {
-                            document.getElementById('inputPincode').value = pincodeVal;
-                        }
-                        if (data.display_name && !document.getElementById('inputAddress').value) {
-                            document.getElementById('inputAddress').value = data.display_name.split(',').slice(0, 3).join(', ');
-                        }
-                    }
-                }
-            } catch (e) {
-                console.log('Reverse geocoding notice:', e);
-            }
+            if (!listingLeafletMap) initListingLeafletMap();
+            listingLeafletMap.flyTo([lat, lng], 16, { animate: true, duration: 1.2 });
+            setListingLocation(lat, lng, 'Current GPS Location');
 
             if (btnText) {
-                btnText.innerHTML = '<i class="fa-solid fa-check text-white me-1"></i> Located!';
+                btnText.innerHTML = '<i class="fa-solid fa-check text-white me-1"></i> Pinned!';
                 setTimeout(() => { btnText.textContent = originalText; }, 2500);
             }
         }, function(err) {
@@ -1428,95 +1519,19 @@
         }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
-    function updateMapPreview(val, customLabel) {
-        const titleEl = document.getElementById('mapPreviewTitle');
-        const linkEl = document.getElementById('mapPreviewLink');
-        const iframeEl = document.getElementById('mapPreviewIframe');
-        
-        const raw = (val || document.getElementById('inputMap')?.value || '').trim();
-        const bName = document.getElementById('inputBusinessName')?.value?.trim() || '';
-        const address = document.getElementById('inputAddress')?.value?.trim() || '';
-        const city = document.getElementById('inputCity')?.value?.trim() || 'Ahmedabad';
-        
-        let query = raw || [bName, address, city].filter(Boolean).join(', ') || city;
-        let displayName = customLabel;
-
-        // Try extracting coordinates or place name
-        const coordMatch = query.match(/([-+]?\d{1,2}\.\d+)[,\s]+([-+]?\d{1,3}\.\d+)/);
-        if (coordMatch) {
-            document.getElementById('inputLatitude').value = coordMatch[1];
-            document.getElementById('inputLongitude').value = coordMatch[2];
-        }
-
-        if (!displayName) {
-            if (query.includes('google.com/maps')) {
-                try {
-                    const parsedUrl = new URL(query);
-                    const q = parsedUrl.searchParams.get('query') || parsedUrl.searchParams.get('q');
-                    if (q) {
-                        displayName = decodeURIComponent(q.replace(/\+/g, ' '));
-                        query = q;
-                    } else if (query.includes('/place/')) {
-                        const place = query.split('/place/')[1]?.split('/')[0];
-                        if (place) {
-                            displayName = decodeURIComponent(place.replace(/\+/g, ' '));
-                            query = place;
-                        }
-                    }
-                } catch (e) {}
-            }
-            if (!displayName) {
-                displayName = query.startsWith('http') ? (bName || (city + ' Business')) : query;
-            }
-        }
-
-        if (titleEl) titleEl.textContent = displayName;
-        
-        const targetUrl = query.startsWith('http') ? query : ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query));
-        if (linkEl) {
-            linkEl.href = targetUrl;
-            linkEl.innerHTML = '<span>View larger map</span> <i class="fa-solid fa-arrow-up-right-from-square ms-1" style="font-size: 0.65rem;"></i>';
-        }
-
-        if (iframeEl) {
-            const finalEmbedQuery = query.startsWith('http') ? displayName : query;
-            iframeEl.src = 'https://maps.google.com/maps?q=' + encodeURIComponent(finalEmbedQuery) + '&t=&z=14&ie=UTF8&iwloc=&output=embed';
-        }
+    function openGoogleMapsExternalListing() {
+        const lat = document.getElementById('inputLatitude')?.value || '23.0456';
+        const lng = document.getElementById('inputLongitude')?.value || '72.6789';
+        const bName = document.getElementById('inputBusinessName')?.value || 'Business';
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(bName)}+${lat},${lng}`, '_blank');
     }
 
-    // Auto-update map link when address, city, state changes
-    ['inputAddress', 'inputCity', 'inputState', 'inputPincode', 'inputBusinessName'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('input', function() {
-                const bName = document.getElementById('inputBusinessName')?.value || '';
-                const addr = document.getElementById('inputAddress')?.value || '';
-                const city = document.getElementById('inputCity')?.value || '';
-                const state = document.getElementById('inputState')?.value || '';
-                const mapField = document.getElementById('inputMap');
-                
-                if (mapField && (!mapField.value || !mapField.value.startsWith('http'))) {
-                    const queryParts = [bName, addr, city, state].filter(Boolean);
-                    if (queryParts.length > 0) {
-                        updateMapPreview(queryParts.join(', '));
-                    }
-                }
-            });
+    function copyMapUrlListing() {
+        const val = document.getElementById('inputMap')?.value;
+        if (val) {
+            navigator.clipboard.writeText(val);
+            alert('Google Maps link copied to clipboard:\n' + val);
         }
-    });
-
-    const inputMapEl = document.getElementById('inputMap');
-    if (inputMapEl) {
-        inputMapEl.addEventListener('input', function() {
-            updateMapPreview(this.value.trim());
-        });
-    }
-
-    const inputMapEl = document.getElementById('inputMap');
-    if (inputMapEl) {
-        inputMapEl.addEventListener('input', function() {
-            updateMapPreview(this.value.trim());
-        });
     }
 </script>
 @endsection
