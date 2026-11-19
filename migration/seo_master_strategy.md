@@ -282,3 +282,4 @@ Sitemap: https://web.digitalclassworld.in/sitemap.xml
    - Injected EducationalOrganization JSON-LD Schema for rich Google Knowledge Panel & local pack rankings across all 11,770+ institutes.
 3. **`resources/views/home/courses.blade.php` & `course-show.blade.php`:**
    - Normalized meta tags and Course JSON-LD Schema.
+
