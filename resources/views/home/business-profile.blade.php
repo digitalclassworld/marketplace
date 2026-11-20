@@ -986,23 +986,41 @@
 
 @section('content')
 <div class="container py-3">
-    <!-- Breadcrumbs -->
+    <!-- Breadcrumbs matching legacy digitalclassworld.com -->
     <div class="profile-breadcrumbs">
         <a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a>
         <span class="separator">&gt;</span>
-        <a href="{{ route('courses') }}">Sellers</a>
+        @php
+            $displayCategory = !empty($business->category) ? $business->category : 'Coaching Institutes';
+            if (stripos($displayCategory, 'institute') === false && stripos($displayCategory, 'classes') === false && stripos($displayCategory, 'school') === false) {
+                $displayCategory = rtrim($displayCategory, 's') . ' Institutes';
+            }
+            $displayState = $business->state ?: 'Gujarat';
+            $displayCity = $business->city ?: 'Ahmedabad';
+        @endphp
+        <a href="{{ url('/courses?category=' . urlencode($business->category_slug ?? 'coaching')) }}">{{ $displayCategory }}</a>
         <span class="separator">&gt;</span>
-        <span class="current">{{ $business->business_name ?? 'VCEC - Vinayak Computer Education Center' }}</span>
+        <a href="{{ url('/courses?state=' . urlencode($displayState)) }}">{{ $displayState }}</a>
+        <span class="separator">&gt;</span>
+        <a href="{{ url('/courses?city=' . urlencode($displayCity)) }}">{{ $displayCity }}</a>
+        <span class="separator">&gt;</span>
+        <span class="current">{{ $business->business_name ?? 'Prarthna Paramedical Institute' }}</span>
     </div>
 
-    <!-- 1. TOP PANORAMIC HERO BANNER -->
-    <div class="store-hero-banner">
+    @php
+        $isVcec = stripos($business->business_name ?? '', 'vcec') !== false;
+        $hasCustomCover = !empty($business->cover_image) && !str_contains($business->cover_image, 'unsplash.com');
+    @endphp
+
+    @if($isVcec || $hasCustomCover)
+    <!-- 1. TOP PANORAMIC HERO BANNER (Shown for VCEC or when custom banner is uploaded) -->
+    <div class="store-hero-banner" @if($hasCustomCover) style="background: linear-gradient(rgba(10, 25, 47, 0.7), rgba(10, 25, 47, 0.85)), url('{{ $business->cover_image }}') center/cover no-repeat;" @endif>
         <div class="hero-banner-row">
             <!-- Left Header -->
             <div class="hero-left-content">
-                <h1 class="hero-main-title">Skills for a Brighter Tomorrow</h1>
+                <h1 class="hero-main-title">{{ $business->tagline ?? ($isVcec ? 'Skills for a Brighter Tomorrow' : $business->business_name) }}</h1>
                 <div class="hero-subtitle">
-                    Computer Courses | Digital Marketing | Tally | Programming | AI Tools | Web Development | Career Guidance
+                    {{ $isVcec ? 'Computer Courses | Digital Marketing | Tally | Programming | AI Tools | Web Development | Career Guidance' : ($business->description ? \Illuminate\Support\Str::limit(strip_tags($business->description), 120) : 'Quality Education | Certified Training | Experienced Faculty') }}
                 </div>
                 <div class="hero-highlights-row">
                     <span class="hero-hl-item"><i class="fa-solid fa-desktop"></i> Live Classes</span>
@@ -1014,7 +1032,7 @@
 
             <!-- Center Photo -->
             <div class="hero-center-photo">
-                <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80" alt="VCEC Institute Lab Training">
+                <img src="{{ $business->cover_image ?: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80' }}" alt="{{ $business->business_name }}">
             </div>
 
             <!-- Right Brand -->
@@ -1039,6 +1057,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <!-- 2. STORE PROFILE HEADER -->
     <div class="store-profile-card">
@@ -1049,7 +1068,7 @@
                     <img src="{{ $business->logo }}" alt="{{ $business->business_name }}" class="w-100 h-100 rounded-3 object-fit-cover">
                 @else
                     <i class="fa-solid fa-graduation-cap"></i>
-                    <span class="store-avatar-title">{{ $business->business_name ? strtoupper(substr($business->business_name, 0, 4)) : 'VCEC' }}</span>
+                    <span class="store-avatar-title">{{ $business->business_name ? strtoupper(substr($business->business_name, 0, 4)) : 'INST' }}</span>
                     <span class="store-avatar-sub">{{ strtoupper($business->category ?? 'EDUCATION') }}</span>
                 @endif
             </div>
@@ -1057,33 +1076,39 @@
             <!-- Center Info -->
             <div class="store-info-content">
                 <div class="store-title-row">
-                    <h2 class="store-name-title">{{ $business->business_name ?? 'VCEC – Vinayak Computer Education Center' }}</h2>
+                    <h2 class="store-name-title">{{ $business->business_name ?? 'Prarthna Paramedical Institute' }}</h2>
                     <span class="badge-verified-seller"><i class="fa-solid fa-circle-check"></i> Verified Seller</span>
                     <span class="badge-top-rated"><i class="fa-solid fa-star me-1"></i>Top Rated</span>
                 </div>
 
                 <div class="store-metrics-row">
-                    <span class="store-rating-span">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star-half-stroke"></i>
-                        <span class="ms-1 text-dark">4.8</span>
-                    </span>
-                    <span>(420 reviews)</span>
-                    <span>&bull;</span>
-                    <span><i class="fa-solid fa-user-graduate text-primary me-1"></i> 10,000+ Students Trained</span>
-                    <span>&bull;</span>
-                    <span><i class="fa-solid fa-code-branch text-primary me-1"></i> 3 Branches</span>
+                    @if($business->rating > 0)
+                        <span class="store-rating-span">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($business->rating >= $i)
+                                    <i class="fa-solid fa-star"></i>
+                                @elseif($business->rating >= $i - 0.5)
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                @else
+                                    <i class="fa-regular fa-star text-muted"></i>
+                                @endif
+                            @endfor
+                            <span class="ms-1 text-dark">{{ number_format($business->rating, 1) }}</span>
+                        </span>
+                        <span>({{ $business->reviews_count }} {{ $business->reviews_count === 1 ? 'review' : 'reviews' }})</span>
+                    @else
+                        <span class="fw-semibold text-muted">0</span>
+                    @endif
                     <span>&bull;</span>
                     <span><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $business->city ? ($business->city . ($business->state ? ', ' . $business->state : '')) : 'Ahmedabad, Gujarat' }}</span>
-                    <span>&bull;</span>
-                    <span><i class="fa-solid fa-calendar-check text-muted me-1"></i> Since 2012</span>
+                    @if(!empty($business->features['year_established']))
+                        <span>&bull;</span>
+                        <span><i class="fa-solid fa-calendar-check text-muted me-1"></i> Since {{ $business->features['year_established'] }}</span>
+                    @endif
                 </div>
 
                 <p class="store-desc-para">
-                    {{ $business->description ?? 'VCEC is an ISO 21001:2018 certified computer education institute offering practical and job-oriented training in computer courses, coding, digital marketing, tally, programming, AI and more.' }}
+                    {{ $business->description ?? ($business->business_name . ' offers premier coaching, training, and certification programs in ' . ($business->city ?: 'Ahmedabad') . ', ' . ($business->state ?: 'Gujarat') . '. Check courses, fees, contact details, reviews and admission inquiries.') }}
                 </p>
             </div>
 

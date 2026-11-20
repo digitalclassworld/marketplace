@@ -255,32 +255,38 @@ class HomeController extends Controller
                 // 1. Direct match on slug
                 $business = BusinessListing::where('slug', $targetSlug)->first();
 
-                // 2. Slug without trailing id or with trailing id (e.g. prarthna-paramedical-institute matching prarthna-paramedical-institute-1234)
+                // 2. Slug without trailing id: targetSlug is "prarthna-paramedical-institute", match "prarthna-paramedical-institute-11696"
                 if (!$business) {
-                    $business = BusinessListing::where('slug', 'like', $targetSlug . '-%')->first();
+                    $business = BusinessListing::where('slug', 'like', $targetSlug . '-%')
+                        ->orderByRaw("CASE WHEN status = 'approved' THEN 1 ELSE 2 END")
+                        ->orderBy('id', 'asc')
+                        ->first();
                 }
 
-                // 3. Match by business name derived from slug
-                if (!$business) {
-                    $nameWords = explode('-', $targetSlug);
-                    $nameGuess = implode(' ', $nameWords);
-                    $business = BusinessListing::where('business_name', 'like', "%{$nameGuess}%")->first();
+                // 3. Match clean slug if targetSlug had an ID like "prarthna-paramedical-institute-11696"
+                if (!$business && preg_match('/^(.*?)-\d+$/', $targetSlug, $matches)) {
+                    $stripped = $matches[1];
+                    $business = BusinessListing::where('slug', $stripped)
+                        ->orWhere('slug', 'like', $stripped . '-%')
+                        ->first();
                 }
 
-                // 4. Match with category constraint
-                if (!$business && $category) {
-                    $catWords = str_replace('-', ' ', $category);
-                    $business = BusinessListing::where(function($q) use ($targetSlug, $nameWords) {
-                        $q->where('slug', 'like', "%{$targetSlug}%");
-                        foreach ($nameWords as $word) {
-                            if (strlen($word) > 2) {
+                // 4. Match by business name derived from slug
+                if (!$business) {
+                    $cleanName = str_replace('-', ' ', preg_replace('/-\d+$/', '', $targetSlug));
+                    $business = BusinessListing::where('business_name', 'like', "%{$cleanName}%")->first();
+                }
+
+                // 5. Match with category constraint or keyword search
+                if (!$business) {
+                    $nameWords = array_filter(explode('-', preg_replace('/-\d+$/', '', $targetSlug)), fn($w) => strlen($w) > 2);
+                    if (!empty($nameWords)) {
+                        $business = BusinessListing::where(function($q) use ($nameWords) {
+                            foreach ($nameWords as $word) {
                                 $q->orWhere('business_name', 'like', "%{$word}%");
                             }
-                        }
-                    })->where(function($q) use ($catWords) {
-                        $q->where('category', 'like', "%{$catWords}%")
-                          ->orWhere('sub_category', 'like', "%{$catWords}%");
-                    })->first();
+                        })->first();
+                    }
                 }
             }
 
@@ -293,6 +299,18 @@ class HomeController extends Controller
                 $canPreview = (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->id === ($business->seller->user_id ?? null)));
                 if (!$canPreview) {
                     abort(404, 'This business listing is currently pending admin review and is not publicly available yet.');
+                }
+            }
+
+            // Canonical 301 redirect: If user visits an old URL (e.g. with -11696 or non-canonical category like educational-institute),
+            // seamlessly redirect to the exact target format: /business-listing/coaching/prarthna-paramedical-institute
+            if ($business && $request->isMethod('get') && !$request->ajax()) {
+                $canonicalCategory = $business->category_slug;
+                $canonicalSlug = $business->clean_slug;
+                $expectedPath = 'business-listing/' . $canonicalCategory . '/' . $canonicalSlug;
+                
+                if (trim($request->path(), '/') !== $expectedPath) {
+                    return redirect()->to(url($expectedPath), 301);
                 }
             }
         } catch (\Throwable $e) {

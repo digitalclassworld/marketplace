@@ -83,14 +83,34 @@ class BusinessListing extends Model
 
     public function getCategorySlugAttribute(): string
     {
-        $cat = $this->category ?: ($this->sub_category ?: 'coaching');
+        $cat = strtolower(trim($this->category ?: ($this->sub_category ?: 'coaching')));
+        // In the legacy platform (digitalclassworld.com), educational/coaching institutes are under /business-listing/coaching/
+        if (
+            str_contains($cat, 'education') ||
+            str_contains($cat, 'coach') ||
+            str_contains($cat, 'class') ||
+            str_contains($cat, 'tutor') ||
+            str_contains($cat, 'tuition') ||
+            str_contains($cat, 'institute') ||
+            str_contains($cat, 'school') ||
+            str_contains($cat, 'college') ||
+            str_contains($cat, 'academy') ||
+            str_contains($cat, 'academic') ||
+            empty($cat)
+        ) {
+            return 'coaching';
+        }
+
         $slug = \Illuminate\Support\Str::slug($cat);
         return !empty($slug) ? $slug : 'coaching';
     }
 
     public function getCleanSlugAttribute(): string
     {
-        return $this->slug ?: \Illuminate\Support\Str::slug($this->business_name);
+        $raw = $this->slug ?: \Illuminate\Support\Str::slug($this->business_name);
+        // Strip legacy trailing database ID (e.g. "prarthna-paramedical-institute-11696" -> "prarthna-paramedical-institute")
+        $clean = preg_replace('/-\d+$/', '', $raw);
+        return !empty($clean) ? $clean : $raw;
     }
 
     public function getUrlAttribute(): string
