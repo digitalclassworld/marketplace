@@ -27,6 +27,7 @@ class Product extends Model
         'cover_image',
         'video_url',
         'gallery',
+        'is_featured',
         'status',
         'rejection_reason',
         'approved_at',
@@ -39,6 +40,7 @@ class Product extends Model
         'stock_quantity' => 'integer',
         'weight_grams' => 'integer',
         'gallery' => 'array',
+        'is_featured' => 'boolean',
         'approved_at' => 'datetime',
     ];
 
