@@ -122,11 +122,13 @@ class AdminDashboardController extends Controller
                 $avgRating = (float) Review::whereIn('status', ['Approved', 'approved'])->avg('rating');
             }
         }
-        if ($avgRating == 0 && Schema::hasTable('courses')) {
+        if ($avgRating == 0 && Schema::hasTable('courses') && Schema::hasColumn('courses', 'rating')) {
             $ratedCourses = Course::where('rating', '>', 0);
             if ($ratedCourses->count() > 0) {
                 $avgRating = (float) $ratedCourses->avg('rating');
-                $reviewsCount += (int) $ratedCourses->sum('reviews_count');
+                if (Schema::hasColumn('courses', 'reviews_count')) {
+                    $reviewsCount += (int) $ratedCourses->sum('reviews_count');
+                }
             }
         }
         if ($avgRating == 0) {
