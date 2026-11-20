@@ -4,72 +4,161 @@
 
 @section('styles')
 <style>
-    /* Metric Cards (12 Cards in 6-column layout) */
-    .metric-grid-card {
+    /* =========================================================================
+       SUPER ADMIN DASHBOARD - MODERN EXECUTIVE SAAS DESIGN
+       ========================================================================= */
+
+    /* Hero KPI Cards */
+    .hero-kpi-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.25rem 1.35rem;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 140px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    .hero-kpi-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08);
+        border-color: #cbd5e1;
+    }
+    .hero-kpi-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: transparent;
+        transition: background 0.2s ease;
+    }
+    .hero-kpi-card.card-blue:hover::after { background: #2563eb; }
+    .hero-kpi-card.card-emerald:hover::after { background: #10b981; }
+    .hero-kpi-card.card-purple:hover::after { background: #8b5cf6; }
+    .hero-kpi-card.card-amber:hover::after { background: #f59e0b; }
+
+    .hero-icon-box {
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
-        padding: 0.9rem 1rem;
-        transition: transform 0.15s, box-shadow 0.15s;
-        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .hero-kpi-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+
+    .hero-kpi-value {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+
+    .hero-growth-badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.2rem 0.55rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .hero-kpi-subtext {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.65rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+
+    /* Secondary Quick-Metric Strip */
+    .metric-strip {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 0.85rem 1.25rem;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+    }
+    .metric-strip-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #1e293b;
+        transition: all 0.15s ease;
+    }
+    .metric-strip-item:hover {
+        background: #f1f5f9;
+        color: #0066ff;
+    }
+    .metric-strip-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .metric-strip-label {
+        font-size: 0.72rem;
+        color: #64748b;
+        font-weight: 600;
+        margin-bottom: 1px;
+    }
+    .metric-strip-val {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1;
+    }
+
+    /* Chart Containers */
+    .chart-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
-    .metric-grid-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    }
-
-    .metric-icon-box {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        flex-shrink: 0;
-    }
-
-    .kpi-title {
-        font-size: 0.725rem;
-        color: #64748b;
-        font-weight: 600;
-        margin-bottom: 2px;
-        white-space: nowrap;
-    }
-
-    .kpi-value {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.2;
-    }
-
-    .kpi-growth-pill {
-        font-size: 0.65rem;
-        font-weight: 700;
-        border-radius: 999px;
-        padding: 0.15rem 0.45rem;
-        display: inline-flex;
-        align-items: center;
-        margin-left: 0.35rem;
-    }
-
-    .kpi-subtext {
-        font-size: 0.68rem;
-        color: #94a3b8;
-        margin-top: 4px;
-        white-space: nowrap;
+    .chart-canvas-wrapper {
+        position: relative;
+        width: 100%;
+        height: 250px;
     }
 
     /* Quick Action Button Tile */
     .quick-action-tile {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 0.65rem 0.35rem;
+        border-radius: 12px;
+        padding: 0.75rem 0.4rem;
         text-align: center;
         text-decoration: none;
         color: #1e293b;
@@ -77,22 +166,22 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.35rem;
+        gap: 0.4rem;
         transition: all 0.2s ease;
         height: 100%;
     }
     .quick-action-tile:hover {
         background: #ffffff;
-        border-color: #0066ff;
-        color: #0066ff;
-        box-shadow: 0 2px 8px rgba(0, 102, 255, 0.15);
+        border-color: #2563eb;
+        color: #2563eb;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
         transform: translateY(-2px);
     }
     .quick-action-tile i {
-        font-size: 1.15rem;
+        font-size: 1.2rem;
     }
     .quick-action-tile span {
-        font-size: 0.68rem;
+        font-size: 0.72rem;
         font-weight: 600;
         line-height: 1.2;
         color: inherit;
@@ -100,12 +189,35 @@
 
     /* Grow Platform Promo Box */
     .grow-platform-box {
-        background: radial-gradient(circle at 100% 0%, #e0e7ff 0%, #ede9fe 60%, #ffffff 100%);
-        border: 1px solid #c7d2fe;
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+        color: #ffffff;
         border-radius: 14px;
-        padding: 1.15rem;
+        padding: 1.25rem;
         position: relative;
         overflow: hidden;
+    }
+    .grow-platform-box h6 {
+        color: #ffffff;
+        font-weight: 700;
+    }
+    .grow-platform-box p {
+        color: #c7d2fe;
+        font-size: 0.78rem;
+    }
+
+    /* Legend Pills */
+    .chart-legend-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #475569;
+    }
+    .chart-legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
     }
 </style>
 @endsection
@@ -113,19 +225,19 @@
 @section('content')
 <div class="container-fluid px-0">
 
-    <!-- Greeting Section with Pending Approvals CTA Button -->
+    <!-- Top Greeting Section & Pending Requests Button -->
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
         <div>
-            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.65rem; letter-spacing: -0.02em;">
+            <h2 class="fw-bold text-dark mb-1" style="font-size: 1.7rem; letter-spacing: -0.02em;">
                 Welcome Back, {{ explode(' ', Auth::user()->name ?? 'Super Admin')[0] }} 👋
             </h2>
-            <p class="text-secondary small mb-0">Here's what's happening on Digital Class Marketplace today.</p>
+            <p class="text-secondary small mb-0">Here's your live marketplace performance and database usage overview.</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <!-- PENDING REQUESTS BUTTON -->
-            <button type="button" class="btn btn-warning text-dark fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2 position-relative" data-bs-toggle="modal" data-bs-target="#pendingRequestsModal" style="border-radius: 10px; border: 1px solid #f59e0b; background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);">
+            <button type="button" class="btn btn-warning text-dark fw-bold px-3 py-2 shadow-sm d-flex align-items-center gap-2 position-relative" data-bs-toggle="modal" data-bs-target="#pendingRequestsModal" style="border-radius: 12px; border: 1px solid #f59e0b; background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);">
                 <i class="fa-solid fa-clock-rotate-left fs-6 text-dark"></i>
-                <span style="font-size: 0.85rem;">Pending Requests</span>
+                <span style="font-size: 0.88rem;">Pending Approvals</span>
                 <span class="badge bg-danger text-white rounded-pill px-2 py-1" style="font-size: 0.72rem;">
                     {{ $totalPendingCount }}
                 </span>
@@ -133,284 +245,218 @@
         </div>
     </div>
 
-    <!-- ================= 12 KPI METRICS (2 ROWS OF 6 CARDS) ================= -->
-    <!-- Row 1: Users, Sellers, Courses, Services, Products, Business Listings -->
-    <div class="row g-2 mb-2">
-        <!-- 1. Total Users -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.users.index') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Total Users</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['total_users'] }}</span>
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['users_growth'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-subtext">{{ $kpis['users_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- 2. Total Sellers -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.sellers.index') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                            <i class="fa-solid fa-store"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Total Sellers</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['total_sellers'] }}</span>
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['sellers_growth'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-subtext">{{ $kpis['sellers_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- 3. Total Courses -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.catalog.courses') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Total Courses</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['total_courses'] }}</span>
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['courses_growth'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-subtext">{{ $kpis['courses_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- 4. Total Services -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.catalog.services') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                            <i class="fa-solid fa-briefcase"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Total Services</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['total_services'] }}</span>
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['services_growth'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-subtext">{{ $kpis['services_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- 5. Total Products -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.catalog.products') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
-                            <i class="fa-solid fa-box-open"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Total Products</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['total_products'] }}</span>
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['products_growth'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-subtext">{{ $kpis['products_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- 6. Business Listings -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.catalog.listings') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(234, 179, 8, 0.1); color: #eab308;">
-                            <i class="fa-solid fa-building"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Business Listings</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['business_listings'] }}</span>
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['listings_growth'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-subtext">{{ $kpis['listings_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <!-- Row 2: Total Orders, Revenue, Payout Due, New Leads, App Downloads, Rating -->
-    <div class="row g-2 mb-4">
-        <!-- 7. Total Orders -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.orders.index') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Total Orders</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['total_orders'] }}</span>
-                                <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['orders_growth'] }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-subtext">{{ $kpis['orders_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- 8. Total Revenue -->
-        <div class="col-xl-2 col-md-4 col-6">
+    <!-- =========================================================================
+         TIER 1: 4 HERO EXECUTIVE KPI CARDS (SPACIOUS 4-COLUMN GRID)
+         ========================================================================= -->
+    <div class="row g-3 mb-3">
+        <!-- 1. Total Revenue -->
+        <div class="col-xl-3 col-md-6 col-12">
             <a href="{{ route('admin.financial.payments') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <div class="hero-kpi-card card-emerald">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="hero-kpi-label">Total Revenue</div>
+                            <div class="hero-kpi-value text-success">{{ $kpis['total_revenue'] }}</div>
+                        </div>
+                        <div class="hero-icon-box" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
                             <i class="fa-solid fa-indian-rupee-sign"></i>
                         </div>
-                        <div>
-                            <div class="kpi-title">Total Revenue</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['total_revenue'] }}</span>
-                                @if(!empty($kpis['revenue_growth']) && $kpis['revenue_growth'] !== '0%')
-                                    <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['revenue_growth'] }}</span>
-                                @endif
-                            </div>
-                        </div>
                     </div>
-                    <div class="kpi-subtext">{{ $kpis['revenue_sub'] }}</div>
+                    <div class="hero-kpi-subtext">
+                        <span class="hero-growth-badge bg-success-subtle text-success">
+                            <i class="fa-solid fa-arrow-trend-up"></i> {{ $kpis['revenue_growth'] }}
+                        </span>
+                        <span>{{ $kpis['revenue_sub'] }}</span>
+                    </div>
                 </div>
             </a>
         </div>
 
-        <!-- 9. Payout Due to Sellers -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.financial.payouts') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                            <i class="fa-solid fa-wallet"></i>
-                        </div>
+        <!-- 2. Active Users & Community -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <a href="{{ route('admin.users.index') }}" class="text-decoration-none d-block">
+                <div class="hero-kpi-card card-blue">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="kpi-title">Payout Due to Sellers</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['payout_due'] }}</span>
-                                @if(!empty($kpis['payout_growth']) && $kpis['payout_growth'] !== '0%')
-                                    <span class="kpi-growth-pill {{ str_contains($kpis['payout_growth'], '↓') || str_contains($kpis['payout_growth'], '-') ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success' }}">{{ $kpis['payout_growth'] }}</span>
-                                @endif
-                            </div>
+                            <div class="hero-kpi-label">Total Users</div>
+                            <div class="hero-kpi-value">{{ $kpis['total_users'] }}</div>
+                        </div>
+                        <div class="hero-icon-box" style="background: rgba(37, 99, 235, 0.12); color: #2563eb;">
+                            <i class="fa-solid fa-users"></i>
                         </div>
                     </div>
-                    <div class="kpi-subtext">{{ $kpis['payout_sub'] }}</div>
+                    <div class="hero-kpi-subtext">
+                        <span class="hero-growth-badge bg-primary-subtle text-primary">
+                            <i class="fa-solid fa-user-plus"></i> {{ $kpis['users_growth'] }}
+                        </span>
+                        <span>{{ $kpis['users_sub'] }}</span>
+                    </div>
                 </div>
             </a>
         </div>
 
-        <!-- 10. New Leads -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.leads.index') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(0, 102, 255, 0.1); color: #0066ff;">
-                            <i class="fa-regular fa-file-lines"></i>
-                        </div>
+        <!-- 3. Seller Network -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <a href="{{ route('admin.sellers.index') }}" class="text-decoration-none d-block">
+                <div class="hero-kpi-card card-purple">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="kpi-title">New Leads</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['new_leads'] }}</span>
-                                @if(!empty($kpis['leads_growth']) && $kpis['leads_growth'] !== '0%')
-                                    <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['leads_growth'] }}</span>
-                                @endif
-                            </div>
+                            <div class="hero-kpi-label">Total Sellers</div>
+                            <div class="hero-kpi-value">{{ $kpis['total_sellers'] }}</div>
+                        </div>
+                        <div class="hero-icon-box" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
+                            <i class="fa-solid fa-store"></i>
                         </div>
                     </div>
-                    <div class="kpi-subtext">{{ $kpis['leads_sub'] }}</div>
+                    <div class="hero-kpi-subtext">
+                        <span class="hero-growth-badge bg-purple-subtle text-purple" style="background: #f3e8ff; color: #7c3aed;">
+                            <i class="fa-solid fa-shop"></i> {{ $kpis['sellers_growth'] }}
+                        </span>
+                        <span>{{ $kpis['sellers_sub'] }}</span>
+                    </div>
                 </div>
             </a>
         </div>
 
-        <!-- 11. App Downloads -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.app.index') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                            <i class="fa-solid fa-download"></i>
-                        </div>
+        <!-- 4. Marketplace Catalog & Offerings -->
+        <div class="col-xl-3 col-md-6 col-12">
+            <a href="{{ route('admin.catalog.listings') }}" class="text-decoration-none d-block">
+                <div class="hero-kpi-card card-amber">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <div class="kpi-title">App Downloads</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['app_downloads'] }}</span>
-                                @if(!empty($kpis['downloads_growth']) && $kpis['downloads_growth'] !== '0%')
-                                    <span class="kpi-growth-pill bg-success-subtle text-success">{{ $kpis['downloads_growth'] }}</span>
-                                @endif
-                            </div>
+                            <div class="hero-kpi-label">Business Listings</div>
+                            <div class="hero-kpi-value">{{ $kpis['business_listings'] }}</div>
+                        </div>
+                        <div class="hero-icon-box" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                            <i class="fa-solid fa-building"></i>
                         </div>
                     </div>
-                    <div class="kpi-subtext">{{ $kpis['downloads_sub'] }}</div>
-                </div>
-            </a>
-        </div>
-
-        <!-- 12. Average Rating -->
-        <div class="col-xl-2 col-md-4 col-6">
-            <a href="{{ route('admin.reviews.index') }}" class="text-decoration-none d-block">
-                <div class="metric-grid-card">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                            <i class="fa-solid fa-star"></i>
-                        </div>
-                        <div>
-                            <div class="kpi-title">Average Rating</div>
-                            <div class="d-flex align-items-center">
-                                <span class="kpi-value">{{ $kpis['average_rating'] }}</span>
-                            </div>
-                        </div>
+                    <div class="hero-kpi-subtext">
+                        <span class="hero-growth-badge bg-warning-subtle text-warning-emphasis">
+                            ★ {{ $kpis['average_rating'] }} Rating
+                        </span>
+                        <span>{{ $kpis['listings_sub'] }}</span>
                     </div>
-                    <div class="kpi-subtext">{{ $kpis['rating_sub'] }}</div>
                 </div>
             </a>
         </div>
     </div>
 
-    <!-- ================= MIDDLE ROW: REVENUE CHART, GROWTH CHART, QUICK ACTIONS ================= -->
+    <!-- =========================================================================
+         TIER 2: SECONDARY QUICK-METRIC STRIP (DETAILED BREAKDOWN AT A GLANCE)
+         ========================================================================= -->
+    <div class="metric-strip mb-4">
+        <div class="row g-2 align-items-center">
+            <!-- Courses -->
+            <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1">
+                <a href="{{ route('admin.catalog.courses') }}" class="metric-strip-item">
+                    <div class="metric-strip-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <div class="metric-strip-label">Courses</div>
+                        <div class="metric-strip-val">{{ $kpis['total_courses'] }}</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Services -->
+            <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1 border-start-md">
+                <a href="{{ route('admin.catalog.services') }}" class="metric-strip-item">
+                    <div class="metric-strip-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div>
+                        <div class="metric-strip-label">Services</div>
+                        <div class="metric-strip-val">{{ $kpis['total_services'] }}</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Products -->
+            <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1 border-start-md">
+                <a href="{{ route('admin.catalog.products') }}" class="metric-strip-item">
+                    <div class="metric-strip-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <div>
+                        <div class="metric-strip-label">Products</div>
+                        <div class="metric-strip-val">{{ $kpis['total_products'] }}</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Orders -->
+            <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1 border-start-md">
+                <a href="{{ route('admin.coming-soon', 'orders') }}" class="metric-strip-item">
+                    <div class="metric-strip-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+                    <div>
+                        <div class="metric-strip-label">Orders</div>
+                        <div class="metric-strip-val">{{ $kpis['total_orders'] }}</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Leads -->
+            <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1 border-start-md">
+                <a href="{{ route('admin.leads.index') }}" class="metric-strip-item">
+                    <div class="metric-strip-icon" style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                        <i class="fa-regular fa-file-lines"></i>
+                    </div>
+                    <div>
+                        <div class="metric-strip-label">Leads</div>
+                        <div class="metric-strip-val">{{ $kpis['new_leads'] }}</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Payout Due -->
+            <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1 border-start-md">
+                <a href="{{ route('admin.financial.payouts') }}" class="metric-strip-item">
+                    <div class="metric-strip-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                    </div>
+                    <div>
+                        <div class="metric-strip-label">Payout Due</div>
+                        <div class="metric-strip-val">{{ $kpis['payout_due'] }}</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- App Installs -->
+            <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1 border-start-md">
+                <a href="{{ route('admin.app.index') }}" class="metric-strip-item">
+                    <div class="metric-strip-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </div>
+                    <div>
+                        <div class="metric-strip-label">App Installs</div>
+                        <div class="metric-strip-val">{{ $kpis['app_downloads'] }}</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         MIDDLE ROW: REVENUE OVERVIEW CHART, GROWTH CHART, QUICK ACTIONS
+         ========================================================================= -->
     <div class="row g-3 mb-4">
-        <!-- 1. Revenue Overview (Stacked Bar + Commission Line) -->
+        <!-- 1. Revenue Overview Chart (Stacked Bar + Commission Spline) -->
         <div class="col-xl-5 col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Revenue Overview</h6>
+            <div class="chart-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0" style="font-size: 1rem;">Revenue Overview</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Courses, Services, Products &amp; Platform Commission</small>
+                    </div>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-light border py-1 px-2 text-secondary small dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-sm btn-light border py-1 px-2.5 text-secondary small dropdown-toggle fw-semibold rounded-3" type="button" data-bs-toggle="dropdown">
                             Last 12 Months
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end small">
+                        <ul class="dropdown-menu dropdown-menu-end small shadow-sm">
                             <li><a class="dropdown-item active" href="#">Last 12 Months</a></li>
                             <li><a class="dropdown-item" href="#">Last 6 Months</a></li>
                             <li><a class="dropdown-item" href="#">This Year (2026)</a></li>
@@ -418,30 +464,42 @@
                     </div>
                 </div>
 
-                <!-- Legends matching screenshot -->
-                <div class="d-flex align-items-center gap-3 mb-2 small" style="font-size: 0.75rem;">
-                    <span class="d-flex align-items-center gap-1"><span class="badge rounded-circle p-1" style="background: #0066ff;"></span> Courses</span>
-                    <span class="d-flex align-items-center gap-1"><span class="badge rounded-circle p-1" style="background: #10b981;"></span> Services</span>
-                    <span class="d-flex align-items-center gap-1"><span class="badge rounded-circle p-1" style="background: #f59e0b;"></span> Products</span>
-                    <span class="d-flex align-items-center gap-1"><span class="badge rounded-circle p-1" style="background: #8b5cf6;"></span> Commission</span>
+                <!-- Clean Color Legends -->
+                <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                    <span class="chart-legend-pill">
+                        <span class="chart-legend-dot" style="background: #2563eb;"></span> Courses
+                    </span>
+                    <span class="chart-legend-pill">
+                        <span class="chart-legend-dot" style="background: #10b981;"></span> Services
+                    </span>
+                    <span class="chart-legend-pill">
+                        <span class="chart-legend-dot" style="background: #f59e0b;"></span> Products
+                    </span>
+                    <span class="chart-legend-pill">
+                        <span class="chart-legend-dot" style="background: #8b5cf6;"></span> Commission (15%)
+                    </span>
                 </div>
 
-                <div class="flex-grow-1 position-relative" style="min-height: 230px;">
+                <!-- Canvas with proper height & fallback -->
+                <div class="chart-canvas-wrapper">
                     <canvas id="revenueOverviewChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Users & Sellers Growth (Dual Line Chart) -->
+        <!-- 2. Users & Sellers Growth (Dual Curve Line Chart) -->
         <div class="col-xl-4 col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Users & Sellers Growth</h6>
+            <div class="chart-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0" style="font-size: 1rem;">Users &amp; Sellers Growth</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Total registered community trajectory</small>
+                    </div>
                     <div class="dropdown">
-                        <button class="btn btn-sm btn-light border py-1 px-2 text-secondary small dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-sm btn-light border py-1 px-2.5 text-secondary small dropdown-toggle fw-semibold rounded-3" type="button" data-bs-toggle="dropdown">
                             Last 6 Months
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end small">
+                        <ul class="dropdown-menu dropdown-menu-end small shadow-sm">
                             <li><a class="dropdown-item active" href="#">Last 6 Months</a></li>
                             <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
                             <li><a class="dropdown-item" href="#">This Year</a></li>
@@ -449,23 +507,28 @@
                     </div>
                 </div>
 
-                <!-- Legends matching screenshot -->
-                <div class="d-flex align-items-center gap-3 mb-2 small" style="font-size: 0.75rem;">
-                    <span class="d-flex align-items-center gap-1"><span class="badge rounded-circle p-1" style="background: #0066ff;"></span> Users</span>
-                    <span class="d-flex align-items-center gap-1"><span class="badge rounded-circle p-1" style="background: #10b981;"></span> Sellers</span>
+                <!-- Clean Legends -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="chart-legend-pill">
+                        <span class="chart-legend-dot" style="background: #2563eb;"></span> Users ({{ $kpis['total_users'] }})
+                    </span>
+                    <span class="chart-legend-pill">
+                        <span class="chart-legend-dot" style="background: #10b981;"></span> Sellers ({{ $kpis['total_sellers'] }})
+                    </span>
                 </div>
 
-                <div class="flex-grow-1 position-relative" style="min-height: 230px;">
+                <!-- Canvas with proper height & fallback -->
+                <div class="chart-canvas-wrapper">
                     <canvas id="growthLineChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Quick Actions & Grow Platform Widget -->
+        <!-- 3. Quick Actions & Growth Promo -->
         <div class="col-xl-3 col-lg-12">
             <div class="d-flex flex-column gap-3 h-100">
                 <!-- Quick Actions Grid (8 items in 4x2) -->
-                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                <div class="chart-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Quick Actions</h6>
                         <a href="{{ route('admin.sellers.index') }}" class="small text-primary text-decoration-none fw-semibold">Manage</a>
@@ -474,21 +537,21 @@
                         <!-- Add Seller -->
                         <div class="col-3">
                             <a href="{{ route('admin.sellers.pending') }}" class="quick-action-tile">
-                                <i class="fa-solid fa-store text-primary"></i>
+                                <i class="fa-solid fa-store" style="color: #2563eb;"></i>
                                 <span>Add Seller</span>
                             </a>
                         </div>
                         <!-- Add Course -->
                         <div class="col-3">
                             <a href="{{ route('admin.catalog.courses') }}" class="quick-action-tile">
-                                <i class="fa-solid fa-graduation-cap text-purple" style="color: #8b5cf6;"></i>
+                                <i class="fa-solid fa-graduation-cap" style="color: #8b5cf6;"></i>
                                 <span>Add Course</span>
                             </a>
                         </div>
                         <!-- Add Service -->
                         <div class="col-3">
                             <a href="{{ route('admin.catalog.services') }}" class="quick-action-tile">
-                                <i class="fa-solid fa-briefcase text-warning"></i>
+                                <i class="fa-solid fa-briefcase" style="color: #f59e0b;"></i>
                                 <span>Add Service</span>
                             </a>
                         </div>
@@ -502,47 +565,47 @@
                         <!-- Add Business -->
                         <div class="col-3">
                             <a href="{{ route('admin.catalog.listings') }}" class="quick-action-tile">
-                                <i class="fa-solid fa-building text-warning"></i>
+                                <i class="fa-solid fa-building" style="color: #0ea5e9;"></i>
                                 <span>Add Business</span>
                             </a>
                         </div>
                         <!-- Send Notification -->
                         <div class="col-3">
                             <a href="#" class="quick-action-tile" onclick="alert('Notification composer opened.'); return false;">
-                                <i class="fa-solid fa-bell text-success"></i>
-                                <span>Send Notification</span>
+                                <i class="fa-solid fa-bell" style="color: #10b981;"></i>
+                                <span>Notify</span>
                             </a>
                         </div>
                         <!-- Create Banner -->
                         <div class="col-3">
                             <a href="{{ route('admin.promotions.index') }}" class="quick-action-tile">
-                                <i class="fa-solid fa-image text-info"></i>
-                                <span>Create Banner</span>
+                                <i class="fa-solid fa-image" style="color: #6366f1;"></i>
+                                <span>Banner</span>
                             </a>
                         </div>
                         <!-- Generate Report -->
                         <div class="col-3">
-                            <a href="#" class="quick-action-tile" onclick="alert('Generating comprehensive platform report...'); return false;">
-                                <i class="fa-solid fa-chart-simple text-success"></i>
-                                <span>Generate Report</span>
+                            <a href="#" class="quick-action-tile" onclick="alert('Exporting system report...'); return false;">
+                                <i class="fa-solid fa-chart-pie" style="color: #14b8a6;"></i>
+                                <span>Report</span>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Grow Your Platform Card (Matching Screenshot Rocket) -->
+                <!-- Grow Platform Promo Card -->
                 <div class="grow-platform-box flex-grow-1 d-flex flex-column justify-content-between">
                     <div>
-                        <div class="d-flex align-items-center justify-content-between mb-1">
-                            <h6 class="fw-bold text-dark mb-0">Grow Your Platform</h6>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="mb-0">Grow Your Platform</h6>
                             <span class="fs-4">🚀</span>
                         </div>
-                        <p class="text-secondary small mb-3" style="font-size: 0.75rem; line-height: 1.35;">
-                            Run promotions, launch campaigns and get more sellers & users on Digital Class.
+                        <p class="mb-3">
+                            Launch seasonal promotions, banners and marketing campaigns to boost user engagement and transactions.
                         </p>
                     </div>
-                    <a href="{{ route('admin.promotions.index') }}" class="btn btn-dark btn-sm rounded-3 fw-bold w-100 py-1.5" style="background: #0f172a;">
-                        Create Campaign &rarr;
+                    <a href="{{ route('admin.promotions.index') }}" class="btn btn-light btn-sm rounded-3 fw-bold w-100 py-2 text-dark shadow-sm">
+                        Create Promotion &rarr;
                     </a>
                 </div>
             </div>
@@ -550,7 +613,7 @@
     </div>
 
     <!-- =========================================================================
-         ALL PLATFORM USERS & MEMBERS (ACTIVE & NON-ACTIVE) - 100% REAL DATABASE
+         RECENT PLATFORM REGISTRATIONS (REAL DATABASE RECORDS, INSTANT RENDER)
          ========================================================================= -->
     <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 pb-3 border-bottom mb-3">
@@ -558,43 +621,40 @@
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 1.15rem;">
                         <i class="fa-solid fa-users text-primary"></i>
-                        All Platform Users &amp; Members
+                        Recent Platform Registrations
                     </h5>
-                    <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.75rem;">
-                        {{ count($allPlatformUsers) }} Total Users
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.75rem;">
+                        {{ $kpis['total_users'] }} Total Registered
                     </span>
                 </div>
                 <p class="text-muted small mb-0">
-                    Live database records of all registered accounts across all roles (Active, Inactive, Students, Sellers, Institutes, Super Admin).
+                    Showing latest registered platform members across all roles.
                 </p>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-3">
-                    <i class="fa-solid fa-up-right-from-square me-1"></i> Full User Manager
+                <a href="{{ route('admin.users.index') }}" class="btn btn-primary btn-sm rounded-pill fw-bold px-3 py-1.5 shadow-sm">
+                    <i class="fa-solid fa-up-right-from-square me-1"></i> View All {{ $kpis['total_users'] }} Users &rarr;
                 </a>
             </div>
         </div>
 
-        <!-- Filter Pills & Search Bar -->
+        <!-- Filter Pills & Quick Search -->
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-3">
             <div class="d-flex flex-wrap gap-1.5" id="userFilterButtons">
                 <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold active user-filter-btn" data-filter="all">
-                    All ({{ count($allPlatformUsers) }})
+                    All Recent
                 </button>
                 <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="active">
-                    <i class="fa-solid fa-circle-check text-success me-1"></i> Active ({{ $allPlatformUsers->where('status', 'Active')->count() }})
-                </button>
-                <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="inactive">
-                    <i class="fa-solid fa-circle-xmark text-secondary me-1"></i> Inactive ({{ $allPlatformUsers->where('status', 'Inactive')->count() }})
+                    <i class="fa-solid fa-circle-check text-success me-1"></i> Active
                 </button>
                 <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="pending">
-                    <i class="fa-solid fa-clock text-warning me-1"></i> Pending ({{ $allPlatformUsers->where('status', 'Pending Approval')->count() }})
+                    <i class="fa-solid fa-clock text-warning me-1"></i> Pending
                 </button>
                 <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="sellers">
-                    <i class="fa-solid fa-store text-info me-1"></i> Sellers/Institutes ({{ $allPlatformUsers->whereIn('type', ['Seller', 'Institute'])->count() }})
+                    <i class="fa-solid fa-store text-info me-1"></i> Sellers/Institutes
                 </button>
                 <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary fw-semibold user-filter-btn" data-filter="students">
-                    <i class="fa-solid fa-graduation-cap text-purple me-1"></i> Students ({{ $allPlatformUsers->where('type', 'Student')->count() }})
+                    <i class="fa-solid fa-graduation-cap text-purple me-1"></i> Students
                 </button>
             </div>
             <div style="min-width: 260px;">
@@ -602,17 +662,17 @@
                     <span class="input-group-text bg-light border-end-0 text-muted">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </span>
-                    <input type="text" id="dashboardUserSearchInput" class="form-control border-start-0 ps-0" placeholder="Search by name, email, phone, ID...">
+                    <input type="text" id="dashboardUserSearchInput" class="form-control border-start-0 ps-0" placeholder="Filter by name, email, phone...">
                 </div>
             </div>
         </div>
 
-        <!-- Users Table -->
+        <!-- Table -->
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="dashboardUsersTable" style="font-size: 0.825rem;">
                 <thead class="bg-light text-muted" style="border-bottom: 2px solid #e2e8f0;">
                     <tr>
-                        <th style="width: 45px;">#</th>
+                        <th style="width: 50px;">ID</th>
                         <th>User Identity</th>
                         <th>Contact Phone</th>
                         <th>Role / Account Type</th>
@@ -637,10 +697,10 @@
                             <td class="text-muted fw-bold">#{{ $userItem['id'] }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <img src="{{ $userItem['avatar'] }}" alt="{{ $userItem['name'] }}" class="rounded-circle shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
+                                    <img src="{{ $userItem['avatar'] }}" alt="{{ $userItem['name'] }}" class="rounded-circle shadow-sm" style="width: 34px; height: 34px; object-fit: cover;">
                                     <div class="overflow-hidden">
-                                        <div class="fw-bold text-dark text-truncate" style="max-width: 170px;">{{ $userItem['name'] }}</div>
-                                        <small class="text-muted text-truncate d-block" style="font-size: 0.725rem; max-width: 170px;">{{ $userItem['email'] }}</small>
+                                        <div class="fw-bold text-dark text-truncate" style="max-width: 180px;">{{ $userItem['name'] }}</div>
+                                        <small class="text-muted text-truncate d-block" style="font-size: 0.725rem; max-width: 180px;">{{ $userItem['email'] }}</small>
                                     </div>
                                 </div>
                             </td>
@@ -699,7 +759,9 @@
         </div>
     </div>
 
-    <!-- ================= BOTTOM ROW: RECENT ORDERS, RECENT SELLERS, RECENT ACTIVITIES ================= -->
+    <!-- =========================================================================
+         BOTTOM ROW: RECENT ORDERS, RECENT SELLERS, RECENT ACTIVITIES
+         ========================================================================= -->
     <div class="row g-3">
         <!-- 1. Recent Orders -->
         <div class="col-xl-4 col-lg-6">
@@ -721,7 +783,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($recentOrders as $order)
+                            @forelse($recentOrders as $order)
                                 <tr style="border-bottom: 1px solid #f8fafc;">
                                     <td class="text-muted fw-bold">{{ $order['id'] }}</td>
                                     <td>
@@ -741,7 +803,11 @@
                                     </td>
                                     <td class="text-end text-muted">{{ $order['date'] }}</td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-3 text-muted">No recent orders.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -762,12 +828,12 @@
                                 <th>#</th>
                                 <th>Store Name</th>
                                 <th>Type</th>
-                                <th>Joined On</th>
+                                <th>Joined</th>
                                 <th class="text-end">Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($recentSellers as $seller)
+                            @forelse($recentSellers as $seller)
                                 @php $sellerShowUrl = route('admin.sellers.show', $seller['seller_id'] ?? $seller['id']); @endphp
                                 <tr style="border-bottom: 1px solid #f8fafc; cursor: pointer; transition: background 0.15s ease;" onclick="window.location='{{ $sellerShowUrl }}'" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                                     <td class="text-muted fw-bold">{{ $seller['id'] }}</td>
@@ -791,7 +857,11 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-3 text-muted">No recent sellers.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -803,10 +873,10 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Recent Activities</h6>
-                    <a href="#" class="small text-primary text-decoration-none fw-semibold" onclick="alert('All system logs: 12,850 events logged.'); return false;">View All &rarr;</a>
+                    <a href="#" class="small text-primary text-decoration-none fw-semibold" onclick="alert('Viewing recent system activity stream.'); return false;">Activity Log</a>
                 </div>
                 <div class="d-flex flex-column gap-3">
-                    @foreach($recentActivities as $act)
+                    @forelse($recentActivities as $act)
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-2.5">
                                 <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: {{ $act['bg'] }}; color: {{ $act['color'] }}; font-size: 0.85rem; flex-shrink: 0;">
@@ -819,14 +889,16 @@
                             </div>
                             <span class="text-muted small" style="font-size: 0.7rem; white-space: nowrap;">{{ $act['time'] }}</span>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="text-center py-3 text-muted small">No recent activity.</div>
+                    @endforelse
                 </div>
             </div>
         </div>
     </div>
 
     <!-- =========================================================================
-         PENDING APPROVALS CENTRAL MODAL (Pop-Up)
+         PENDING APPROVALS CENTRAL MODAL
          ========================================================================= -->
     <div class="modal fade" id="pendingRequestsModal" tabindex="-1" aria-labelledby="pendingRequestsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -837,85 +909,60 @@
                             <i class="fa-solid fa-clock-rotate-left text-warning"></i>
                             Pending Approvals Central
                             <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 0.75rem;">
-                                {{ $totalPendingCount }} Pending Requests
+                                {{ $totalPendingCount }} Pending
                             </span>
                         </h5>
-                        <p class="text-muted small mb-0">Review and approve or reject incoming sellers, courses, services, businesses, and products before publication.</p>
+                        <p class="text-muted small mb-0">Review and approve or reject incoming sellers, courses, services, businesses, and products.</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body p-4">
-                    <!-- Nav Pills Tabs -->
                     <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3" id="pendingTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="sellers-tab" data-bs-toggle="pill" data-bs-target="#tab-sellers" type="button" role="tab">
-                                <i class="fa-solid fa-store text-primary"></i>
-                                <span>Sellers</span>
-                                <span class="badge {{ $pendingSellers->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
-                                    {{ $pendingSellers->count() }}
-                                </span>
+                            <button class="nav-link active rounded-pill px-3 py-1.5 fw-bold" id="sellers-tab" data-bs-toggle="pill" data-bs-target="#tab-sellers" type="button" role="tab">
+                                <i class="fa-solid fa-store me-1"></i> Sellers ({{ $pendingSellers->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="courses-tab" data-bs-toggle="pill" data-bs-target="#tab-courses" type="button" role="tab">
-                                <i class="fa-solid fa-graduation-cap text-purple"></i>
-                                <span>Courses</span>
-                                <span class="badge {{ $pendingCourses->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
-                                    {{ $pendingCourses->count() }}
-                                </span>
+                            <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="courses-tab" data-bs-toggle="pill" data-bs-target="#tab-courses" type="button" role="tab">
+                                <i class="fa-solid fa-graduation-cap me-1"></i> Courses ({{ $pendingCourses->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="services-tab" data-bs-toggle="pill" data-bs-target="#tab-services" type="button" role="tab">
-                                <i class="fa-solid fa-briefcase text-warning"></i>
-                                <span>Services</span>
-                                <span class="badge {{ $pendingServices->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
-                                    {{ $pendingServices->count() }}
-                                </span>
+                            <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="services-tab" data-bs-toggle="pill" data-bs-target="#tab-services" type="button" role="tab">
+                                <i class="fa-solid fa-briefcase me-1"></i> Services ({{ $pendingServices->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="listings-tab" data-bs-toggle="pill" data-bs-target="#tab-listings" type="button" role="tab">
-                                <i class="fa-solid fa-building text-info"></i>
-                                <span>Business Listings</span>
-                                <span class="badge {{ $pendingListings->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
-                                    {{ $pendingListings->count() }}
-                                </span>
+                            <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="listings-tab" data-bs-toggle="pill" data-bs-target="#tab-listings" type="button" role="tab">
+                                <i class="fa-solid fa-building me-1"></i> Businesses ({{ $pendingListings->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold small px-3 py-2 d-flex align-items-center gap-2" id="products-tab" data-bs-toggle="pill" data-bs-target="#tab-products" type="button" role="tab">
-                                <i class="fa-solid fa-box-open text-success"></i>
-                                <span>Products</span>
-                                <span class="badge {{ $pendingProducts->count() > 0 ? 'bg-danger' : 'bg-secondary' }} rounded-pill">
-                                    {{ $pendingProducts->count() }}
-                                </span>
+                            <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="products-tab" data-bs-toggle="pill" data-bs-target="#tab-products" type="button" role="tab">
+                                <i class="fa-solid fa-box-open me-1"></i> Products ({{ $pendingProducts->count() }})
                             </button>
                         </li>
                     </ul>
 
-                    <!-- Tab Contents -->
                     <div class="tab-content" id="pendingTabsContent">
-                        
-                        <!-- ================= 1. SELLERS ================= -->
+                        <!-- Sellers Tab -->
                         <div class="tab-pane fade show active" id="tab-sellers" role="tabpanel">
                             @if($pendingSellers->isEmpty())
-                                <div class="text-center py-5">
-                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
-                                    <h6 class="fw-bold text-dark">No Pending Seller Applications</h6>
-                                    <p class="text-muted small">All seller registrations have been approved and activated.</p>
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-regular fa-circle-check fs-2 text-success mb-2 d-block"></i>
+                                    <strong>No pending seller applications!</strong>
                                 </div>
                             @else
                                 <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
-                                        <thead class="table-light">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="bg-light">
                                             <tr>
-                                                <th>Seller / Applicant</th>
+                                                <th>Applicant</th>
                                                 <th>Business Name</th>
-                                                <th>Contact Details</th>
-                                                <th>Account Type</th>
-                                                <th>Applied On</th>
+                                                <th>Type</th>
+                                                <th>Applied Date</th>
                                                 <th class="text-end">Actions</th>
                                             </tr>
                                         </thead>
@@ -923,44 +970,25 @@
                                             @foreach($pendingSellers as $ps)
                                                 <tr>
                                                     <td>
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <img src="{{ $ps->user?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($ps->user?->name ?? 'Seller') }}" 
-                                                                 class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;">
-                                                            <div>
-                                                                <div class="fw-bold text-dark">{{ $ps->user?->name ?? 'Seller #' . $ps->id }}</div>
-                                                                <small class="text-muted font-monospace">{{ $ps->seller_code }}</small>
-                                                            </div>
-                                                        </div>
+                                                        <div class="fw-bold">{{ $ps->user?->name ?? 'Unknown' }}</div>
+                                                        <small class="text-muted">{{ $ps->user?->email }}</small>
                                                     </td>
-                                                    <td>
-                                                        <span class="fw-semibold text-dark">{{ $ps->businessDetail?->business_name ?? '—' }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="text-dark">{{ $ps->user?->email }}</div>
-                                                        <small class="text-muted">{{ $ps->user?->phone ?? '—' }}</small>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-light text-dark border">{{ $ps->account_type }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <small class="text-muted">{{ $ps->created_at ? $ps->created_at->format('d M Y, h:i A') : 'Recent' }}</small>
-                                                    </td>
+                                                    <td>{{ $ps->businessDetail?->business_name ?? 'N/A' }}</td>
+                                                    <td><span class="badge bg-light text-dark border">{{ $ps->account_type }}</span></td>
+                                                    <td class="text-muted small">{{ $ps->created_at ? $ps->created_at->format('d M Y') : 'Recent' }}</td>
                                                     <td class="text-end">
                                                         <form action="{{ route('admin.sellers.approve', $ps->id) }}" method="POST" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Seller">
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold">
                                                                 <i class="fa-solid fa-check me-1"></i> Approve
                                                             </button>
                                                         </form>
-                                                        <form action="{{ route('admin.sellers.reject', $ps->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this seller application?');">
+                                                        <form action="{{ route('admin.sellers.reject', $ps->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this seller?');">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Seller">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
                                                                 <i class="fa-solid fa-xmark me-1"></i> Reject
                                                             </button>
                                                         </form>
-                                                        <a href="{{ route('admin.sellers.show', $ps->id) }}" class="btn btn-light border btn-sm px-2 py-1 ms-1" title="View Profile">
-                                                            <i class="fa-regular fa-eye"></i>
-                                                        </a>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -970,24 +998,21 @@
                             @endif
                         </div>
 
-                        <!-- ================= 2. COURSES ================= -->
+                        <!-- Courses Tab -->
                         <div class="tab-pane fade" id="tab-courses" role="tabpanel">
                             @if($pendingCourses->isEmpty())
-                                <div class="text-center py-5">
-                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
-                                    <h6 class="fw-bold text-dark">No Pending Courses</h6>
-                                    <p class="text-muted small">All courses are currently reviewed and published.</p>
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-regular fa-circle-check fs-2 text-success mb-2 d-block"></i>
+                                    <strong>No pending courses to review!</strong>
                                 </div>
                             @else
                                 <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
-                                        <thead class="table-light">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="bg-light">
                                             <tr>
                                                 <th>Course Title</th>
-                                                <th>Instructor / Seller</th>
-                                                <th>Category</th>
+                                                <th>Instructor</th>
                                                 <th>Price</th>
-                                                <th>Submitted</th>
                                                 <th class="text-end">Actions</th>
                                             </tr>
                                         </thead>
@@ -995,40 +1020,21 @@
                                             @foreach($pendingCourses as $pc)
                                                 <tr>
                                                     <td>
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <img src="{{ $pc->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=80&auto=format&fit=crop&q=80' }}" 
-                                                                 class="rounded border" style="width: 44px; height: 32px; object-fit: cover;">
-                                                            <div>
-                                                                <div class="fw-bold text-dark">{{ $pc->title }}</div>
-                                                                <small class="text-muted">{{ $pc->level }} &bull; {{ $pc->language }}</small>
-                                                            </div>
-                                                        </div>
+                                                        <div class="fw-bold">{{ $pc->title }}</div>
+                                                        <small class="text-muted">{{ $pc->category }}</small>
                                                     </td>
-                                                    <td>
-                                                        <span class="text-dark fw-semibold">{{ $pc->seller?->businessDetail?->business_name ?? $pc->seller?->user?->name ?? 'Seller' }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-light text-primary border">{{ $pc->category }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="fw-bold text-dark">₹{{ number_format($pc->price) }}</span>
-                                                        @if($pc->discount_price)
-                                                            <small class="text-muted text-decoration-line-through d-block">₹{{ number_format($pc->discount_price) }}</small>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        <small class="text-muted">{{ $pc->created_at ? $pc->created_at->format('d M Y') : 'Recent' }}</small>
-                                                    </td>
+                                                    <td>{{ $pc->seller?->businessDetail?->business_name ?? $pc->seller?->user?->name ?? 'Seller' }}</td>
+                                                    <td class="fw-bold">₹{{ number_format($pc->price) }}</td>
                                                     <td class="text-end">
                                                         <form action="{{ route('admin.catalog.courses.approve', $pc->id) }}" method="POST" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve & Publish">
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold">
                                                                 <i class="fa-solid fa-check me-1"></i> Approve
                                                             </button>
                                                         </form>
                                                         <form action="{{ route('admin.catalog.courses.reject', $pc->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this course?');">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Course">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
                                                                 <i class="fa-solid fa-xmark me-1"></i> Reject
                                                             </button>
                                                         </form>
@@ -1041,24 +1047,21 @@
                             @endif
                         </div>
 
-                        <!-- ================= 3. SERVICES ================= -->
+                        <!-- Services Tab -->
                         <div class="tab-pane fade" id="tab-services" role="tabpanel">
                             @if($pendingServices->isEmpty())
-                                <div class="text-center py-5">
-                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
-                                    <h6 class="fw-bold text-dark">No Pending Services</h6>
-                                    <p class="text-muted small">All services have been reviewed.</p>
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-regular fa-circle-check fs-2 text-success mb-2 d-block"></i>
+                                    <strong>No pending services to review!</strong>
                                 </div>
                             @else
                                 <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
-                                        <thead class="table-light">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="bg-light">
                                             <tr>
-                                                <th>Service Title</th>
-                                                <th>Provider / Seller</th>
-                                                <th>Category</th>
-                                                <th>Price</th>
-                                                <th>Delivery</th>
+                                                <th>Service</th>
+                                                <th>Provider</th>
+                                                <th>Pricing</th>
                                                 <th class="text-end">Actions</th>
                                             </tr>
                                         </thead>
@@ -1066,31 +1069,21 @@
                                             @foreach($pendingServices as $psv)
                                                 <tr>
                                                     <td>
-                                                        <div class="fw-bold text-dark">{{ $psv->title }}</div>
-                                                        <small class="text-muted">{{ Str::limit($psv->short_description, 50) }}</small>
+                                                        <div class="fw-bold">{{ $psv->title }}</div>
+                                                        <small class="text-muted">{{ $psv->category }}</small>
                                                     </td>
-                                                    <td>
-                                                        <span class="text-dark fw-semibold">{{ $psv->seller?->businessDetail?->business_name ?? $psv->seller?->user?->name ?? 'Provider' }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-light text-warning border">{{ $psv->category }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="fw-bold text-dark">₹{{ number_format($psv->price) }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <small class="text-muted">{{ $psv->delivery_days }} days</small>
-                                                    </td>
+                                                    <td>{{ $psv->seller?->businessDetail?->business_name ?? $psv->seller?->user?->name ?? 'Seller' }}</td>
+                                                    <td class="fw-bold">₹{{ number_format($psv->price) }}</td>
                                                     <td class="text-end">
                                                         <form action="{{ route('admin.catalog.services.approve', $psv->id) }}" method="POST" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Service">
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold">
                                                                 <i class="fa-solid fa-check me-1"></i> Approve
                                                             </button>
                                                         </form>
                                                         <form action="{{ route('admin.catalog.services.reject', $psv->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this service?');">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Service">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
                                                                 <i class="fa-solid fa-xmark me-1"></i> Reject
                                                             </button>
                                                         </form>
@@ -1103,24 +1096,21 @@
                             @endif
                         </div>
 
-                        <!-- ================= 4. BUSINESS LISTINGS ================= -->
+                        <!-- Businesses Tab -->
                         <div class="tab-pane fade" id="tab-listings" role="tabpanel">
                             @if($pendingListings->isEmpty())
-                                <div class="text-center py-5">
-                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
-                                    <h6 class="fw-bold text-dark">No Pending Business Listings</h6>
-                                    <p class="text-muted small">All business directory listings have been approved.</p>
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-regular fa-circle-check fs-2 text-success mb-2 d-block"></i>
+                                    <strong>No pending business listings!</strong>
                                 </div>
                             @else
                                 <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
-                                        <thead class="table-light">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="bg-light">
                                             <tr>
                                                 <th>Business Name</th>
-                                                <th>Category</th>
-                                                <th>City & Location</th>
-                                                <th>Contact</th>
-                                                <th>Plan</th>
+                                                <th>Owner</th>
+                                                <th>City</th>
                                                 <th class="text-end">Actions</th>
                                             </tr>
                                         </thead>
@@ -1128,38 +1118,21 @@
                                             @foreach($pendingListings as $pl)
                                                 <tr>
                                                     <td>
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            @if($pl->logo)
-                                                                <img src="{{ $pl->logo }}" class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;">
-                                                            @endif
-                                                            <div>
-                                                                <div class="fw-bold text-dark">{{ $pl->business_name }}</div>
-                                                                <small class="text-muted">{{ $pl->sub_category ?: $pl->category }}</small>
-                                                            </div>
-                                                        </div>
+                                                        <div class="fw-bold">{{ $pl->business_name }}</div>
+                                                        <small class="text-muted">{{ $pl->category }}</small>
                                                     </td>
-                                                    <td>
-                                                        <span class="badge bg-light text-dark border">{{ $pl->category }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-dark">{{ $pl->city ?? 'Ahmedabad' }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="text-dark small">{{ $pl->phone }}</div>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-primary-subtle text-primary">{{ $pl->plan_name ?: 'Free' }}</span>
-                                                    </td>
+                                                    <td>{{ $pl->seller?->user?->name ?? 'Owner' }}</td>
+                                                    <td>{{ $pl->city ?? 'N/A' }}</td>
                                                     <td class="text-end">
                                                         <form action="{{ route('admin.catalog.listings.approve', $pl->id) }}" method="POST" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Listing">
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold">
                                                                 <i class="fa-solid fa-check me-1"></i> Approve
                                                             </button>
                                                         </form>
                                                         <form action="{{ route('admin.catalog.listings.reject', $pl->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this business listing?');">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Listing">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
                                                                 <i class="fa-solid fa-xmark me-1"></i> Reject
                                                             </button>
                                                         </form>
@@ -1172,22 +1145,20 @@
                             @endif
                         </div>
 
-                        <!-- ================= 5. PRODUCTS ================= -->
+                        <!-- Products Tab -->
                         <div class="tab-pane fade" id="tab-products" role="tabpanel">
                             @if($pendingProducts->isEmpty())
-                                <div class="text-center py-5">
-                                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
-                                    <h6 class="fw-bold text-dark">No Pending Products</h6>
-                                    <p class="text-muted small">All products have been reviewed and published.</p>
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-regular fa-circle-check fs-2 text-success mb-2 d-block"></i>
+                                    <strong>No pending physical/digital products!</strong>
                                 </div>
                             @else
                                 <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
-                                        <thead class="table-light">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="bg-light">
                                             <tr>
-                                                <th>Product Title</th>
+                                                <th>Product</th>
                                                 <th>Seller</th>
-                                                <th>Category</th>
                                                 <th>Price</th>
                                                 <th class="text-end">Actions</th>
                                             </tr>
@@ -1196,27 +1167,21 @@
                                             @foreach($pendingProducts as $pp)
                                                 <tr>
                                                     <td>
-                                                        <div class="fw-bold text-dark">{{ $pp->title }}</div>
+                                                        <div class="fw-bold">{{ $pp->title }}</div>
+                                                        <small class="text-muted">{{ $pp->category }}</small>
                                                     </td>
-                                                    <td>
-                                                        <span class="text-dark">{{ $pp->seller?->businessDetail?->business_name ?? $pp->seller?->user?->name ?? 'Seller' }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-light text-success border">{{ $pp->category }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="fw-bold text-dark">₹{{ number_format($pp->price) }}</span>
-                                                    </td>
+                                                    <td>{{ $pp->seller?->businessDetail?->business_name ?? $pp->seller?->user?->name ?? 'Seller' }}</td>
+                                                    <td class="fw-bold">₹{{ number_format($pp->price) }}</td>
                                                     <td class="text-end">
                                                         <form action="{{ route('admin.catalog.products.approve', $pp->id) }}" method="POST" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold" title="Approve Product">
+                                                            <button type="submit" class="btn btn-success btn-sm px-2 py-1 fw-bold">
                                                                 <i class="fa-solid fa-check me-1"></i> Approve
                                                             </button>
                                                         </form>
                                                         <form action="{{ route('admin.catalog.products.reject', $pp->id) }}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Reject this product?');">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1" title="Reject Product">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm px-2 py-1">
                                                                 <i class="fa-solid fa-xmark me-1"></i> Reject
                                                             </button>
                                                         </form>
@@ -1228,7 +1193,6 @@
                                 </div>
                             @endif
                         </div>
-
                     </div>
                 </div>
 
@@ -1249,152 +1213,206 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Revenue Overview Chart (Stacked Bar + Commission Spline Line)
-    const ctxRevenue = document.getElementById('revenueOverviewChart');
-    if (ctxRevenue) {
-        new Chart(ctxRevenue, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [
-                    {
-                        label: 'Courses',
-                        data: {!! json_encode($chartCourses) !!},
-                        backgroundColor: '#0066ff',
-                        borderRadius: 4,
-                        stack: 'combined',
-                    },
-                    {
-                        label: 'Services',
-                        data: {!! json_encode($chartServices) !!},
-                        backgroundColor: '#10b981',
-                        borderRadius: 4,
-                        stack: 'combined',
-                    },
-                    {
-                        label: 'Products',
-                        data: {!! json_encode($chartProducts) !!},
-                        backgroundColor: '#f59e0b',
-                        borderRadius: 4,
-                        stack: 'combined',
-                    },
-                    {
-                        label: 'Commission',
-                        data: {!! json_encode($chartCommission) !!},
-                        type: 'line',
-                        borderColor: '#8b5cf6',
-                        backgroundColor: '#8b5cf6',
-                        borderWidth: 2.5,
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
-                        tension: 0.35,
-                        fill: false,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ₹' + (context.parsed.y * 100000).toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 10 }, color: '#94a3b8' }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        max: 10,
-                        grid: { color: '#f1f5f9' },
-                        ticks: {
-                            font: { size: 10 },
-                            color: '#94a3b8',
-                            callback: function(val) {
-                                return '₹' + val + 'L';
-                            }
-                        }
-                    }
-                }
-            }
-        });
+
+    // Helper: Format Rupee Currency
+    function formatRupee(val) {
+        if (val >= 100000) {
+            return '₹' + (val / 100000).toFixed(1) + 'L';
+        } else if (val >= 1000) {
+            return '₹' + (val / 1000).toFixed(0) + 'k';
+        }
+        return '₹' + val;
     }
 
-    // 2. Users & Sellers Growth Line Chart
-    const ctxGrowth = document.getElementById('growthLineChart');
-    if (ctxGrowth) {
-        new Chart(ctxGrowth, {
-            type: 'line',
-            data: {
-                labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-                datasets: [
-                    {
-                        label: 'Users',
-                        data: {!! json_encode($usersGrowthPoints) !!},
-                        borderColor: '#0066ff',
-                        backgroundColor: 'rgba(0, 102, 255, 0.05)',
-                        borderWidth: 2.5,
-                        pointRadius: 3.5,
-                        pointBackgroundColor: '#0066ff',
-                        tension: 0.35,
-                        fill: true,
+    // Ensure Chart.js is loaded
+    function renderDashboardCharts() {
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js library not ready yet, retrying in 200ms...');
+            setTimeout(renderDashboardCharts, 200);
+            return;
+        }
+
+        // =========================================================================
+        // 1. REVENUE OVERVIEW CHART (Stacked Bars for Offerings + Smooth Line for Commission)
+        // =========================================================================
+        try {
+            const ctxRev = document.getElementById('revenueOverviewChart');
+            if (ctxRev) {
+                new Chart(ctxRev, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [
+                            {
+                                label: 'Courses',
+                                data: {!! json_encode($chartCourses) !!},
+                                backgroundColor: '#2563eb',
+                                borderRadius: 4,
+                                stack: 'offerings',
+                            },
+                            {
+                                label: 'Services',
+                                data: {!! json_encode($chartServices) !!},
+                                backgroundColor: '#10b981',
+                                borderRadius: 4,
+                                stack: 'offerings',
+                            },
+                            {
+                                label: 'Products',
+                                data: {!! json_encode($chartProducts) !!},
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 4,
+                                stack: 'offerings',
+                            },
+                            {
+                                label: 'Commission (15%)',
+                                data: {!! json_encode($chartCommission) !!},
+                                type: 'line',
+                                borderColor: '#8b5cf6',
+                                backgroundColor: '#8b5cf6',
+                                borderWidth: 2.5,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                                tension: 0.35,
+                                fill: false,
+                            }
+                        ]
                     },
-                    {
-                        label: 'Sellers',
-                        data: {!! json_encode($sellersGrowthPoints) !!},
-                        borderColor: '#10b981',
-                        backgroundColor: 'transparent',
-                        borderWidth: 2.5,
-                        pointRadius: 3.5,
-                        pointBackgroundColor: '#10b981',
-                        tension: 0.35,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.y.toLocaleString();
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                titleFont: { size: 12, weight: 'bold' },
+                                bodyFont: { size: 11 },
+                                padding: 10,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ' + context.dataset.label + ': ₹' + Number(context.parsed.y).toLocaleString('en-IN');
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                grid: { display: false },
+                                ticks: { font: { size: 10, family: 'Plus Jakarta Sans' }, color: '#94a3b8' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9', borderDash: [3, 3] },
+                                ticks: {
+                                    font: { size: 10, family: 'Plus Jakarta Sans' },
+                                    color: '#94a3b8',
+                                    callback: function(val) {
+                                        return formatRupee(val);
+                                    }
+                                }
                             }
                         }
                     }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 10 }, color: '#94a3b8' }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        max: 150000,
-                        grid: { color: '#f1f5f9' },
-                        ticks: {
-                            font: { size: 10 },
-                            color: '#94a3b8',
-                            callback: function(val) {
-                                if (val >= 1000) return (val / 1000) + 'K';
-                                return val;
-                            }
-                        }
-                    }
-                }
+                });
             }
-        });
+        } catch (errRev) {
+            console.error('Failed to initialize Revenue Overview chart:', errRev);
+        }
+
+        // =========================================================================
+        // 2. USERS & SELLERS GROWTH (Smooth Dual Curves with Soft Area Fill)
+        // =========================================================================
+        try {
+            const ctxGrowth = document.getElementById('growthLineChart');
+            if (ctxGrowth) {
+                new Chart(ctxGrowth, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                        datasets: [
+                            {
+                                label: 'Users',
+                                data: {!! json_encode($usersGrowthPoints) !!},
+                                borderColor: '#2563eb',
+                                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                                borderWidth: 2.5,
+                                pointRadius: 3.5,
+                                pointBackgroundColor: '#2563eb',
+                                tension: 0.35,
+                                fill: true,
+                            },
+                            {
+                                label: 'Sellers',
+                                data: {!! json_encode($sellersGrowthPoints) !!},
+                                borderColor: '#10b981',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2.5,
+                                pointRadius: 3.5,
+                                pointBackgroundColor: '#10b981',
+                                tension: 0.35,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                titleFont: { size: 12, weight: 'bold' },
+                                bodyFont: { size: 11 },
+                                padding: 10,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ' + context.dataset.label + ': ' + Number(context.parsed.y).toLocaleString('en-IN');
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { size: 10, family: 'Plus Jakarta Sans' }, color: '#94a3b8' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9', borderDash: [3, 3] },
+                                ticks: {
+                                    font: { size: 10, family: 'Plus Jakarta Sans' },
+                                    color: '#94a3b8',
+                                    callback: function(val) {
+                                        if (val >= 1000) return (val / 1000).toFixed(0) + 'k';
+                                        return val;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (errGrowth) {
+            console.error('Failed to initialize Growth Line chart:', errGrowth);
+        }
     }
 
-    // 3. All Platform Users Live Filter & Search
+    // Launch chart rendering
+    renderDashboardCharts();
+
+    // =========================================================================
+    // 3. RECENT USERS FILTER & SEARCH INTERACTIVITY
+    // =========================================================================
     const userSearchInput = document.getElementById('dashboardUserSearchInput');
     const filterButtons = document.querySelectorAll('.user-filter-btn');
     const userRows = document.querySelectorAll('.dashboard-user-row');

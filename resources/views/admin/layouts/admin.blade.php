@@ -20,8 +20,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome 6.5.1 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <!-- Chart.js (Local first, CDN fallbacks) -->
+    <script src="{{ asset('js/chart.umd.min.js') }}"></script>
+    <script>
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>');
+        }
+    </script>
+    <script>
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"><\/script>');
+        }
+    </script>
 
     <style>
         :root {

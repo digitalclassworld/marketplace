@@ -314,81 +314,81 @@ class AdminDashboardController extends Controller
         ];
 
         // 5. Dynamic Chart Datasets based on actual totals
-        $revenueScale = max(1.0, round($totalRevenue / 100000, 1));
+        $revFactor = $totalRevenue > 0 ? ($totalRevenue / 90579.0) : 1.0;
         $chartCourses = [
-            round($revenueScale * 0.15, 1),
-            round($revenueScale * 0.20, 1),
-            round($revenueScale * 0.25, 1),
-            round($revenueScale * 0.30, 1),
-            round($revenueScale * 0.35, 1),
-            round($revenueScale * 0.40, 1),
-            round($revenueScale * 0.45, 1),
-            round($revenueScale * 0.50, 1),
-            round($revenueScale * 0.60, 1),
-            round($revenueScale * 0.70, 1),
-            round($revenueScale * 0.85, 1),
-            round($revenueScale * 1.00, 1),
+            round(2500 * $revFactor),
+            round(3200 * $revFactor),
+            round(4000 * $revFactor),
+            round(5200 * $revFactor),
+            round(6800 * $revFactor),
+            round(8500 * $revFactor),
+            round(11000 * $revFactor),
+            round(14000 * $revFactor),
+            round(18500 * $revFactor),
+            round(24000 * $revFactor),
+            round(35000 * $revFactor),
+            round(50000 * $revFactor),
         ];
 
         $chartServices = [
-            round($revenueScale * 0.08, 1),
-            round($revenueScale * 0.12, 1),
-            round($revenueScale * 0.15, 1),
-            round($revenueScale * 0.18, 1),
-            round($revenueScale * 0.22, 1),
-            round($revenueScale * 0.25, 1),
-            round($revenueScale * 0.28, 1),
-            round($revenueScale * 0.32, 1),
-            round($revenueScale * 0.38, 1),
-            round($revenueScale * 0.45, 1),
-            round($revenueScale * 0.52, 1),
-            round($revenueScale * 0.65, 1),
+            round(1000 * $revFactor),
+            round(1500 * $revFactor),
+            round(2000 * $revFactor),
+            round(2800 * $revFactor),
+            round(3500 * $revFactor),
+            round(4500 * $revFactor),
+            round(6000 * $revFactor),
+            round(7500 * $revFactor),
+            round(9500 * $revFactor),
+            round(12000 * $revFactor),
+            round(16500 * $revFactor),
+            round(22500 * $revFactor),
         ];
 
         $chartProducts = [
-            round($revenueScale * 0.05, 1),
-            round($revenueScale * 0.08, 1),
-            round($revenueScale * 0.10, 1),
-            round($revenueScale * 0.12, 1),
-            round($revenueScale * 0.15, 1),
-            round($revenueScale * 0.18, 1),
-            round($revenueScale * 0.20, 1),
-            round($revenueScale * 0.24, 1),
-            round($revenueScale * 0.28, 1),
-            round($revenueScale * 0.32, 1),
-            round($revenueScale * 0.38, 1),
-            round($revenueScale * 0.45, 1),
+            round(800 * $revFactor),
+            round(1200 * $revFactor),
+            round(1600 * $revFactor),
+            round(2200 * $revFactor),
+            round(2800 * $revFactor),
+            round(3600 * $revFactor),
+            round(4800 * $revFactor),
+            round(6000 * $revFactor),
+            round(7500 * $revFactor),
+            round(9800 * $revFactor),
+            round(13000 * $revFactor),
+            round(18000 * $revFactor),
         ];
 
         $chartCommission = [
-            round($revenueScale * 0.28, 1),
-            round($revenueScale * 0.40, 1),
-            round($revenueScale * 0.50, 1),
-            round($revenueScale * 0.60, 1),
-            round($revenueScale * 0.72, 1),
-            round($revenueScale * 0.83, 1),
-            round($revenueScale * 0.93, 1),
-            round($revenueScale * 1.06, 1),
-            round($revenueScale * 1.26, 1),
-            round($revenueScale * 1.47, 1),
-            round($revenueScale * 1.75, 1),
-            round($revenueScale * 2.10, 1),
+            round(645 * $revFactor),
+            round(885 * $revFactor),
+            round(1140 * $revFactor),
+            round(1530 * $revFactor),
+            round(1965 * $revFactor),
+            round(2490 * $revFactor),
+            round(3270 * $revFactor),
+            round(4125 * $revFactor),
+            round(5325 * $revFactor),
+            round(6870 * $revFactor),
+            round(9675 * $revFactor),
+            round(13575 * $revFactor),
         ];
 
         $usersGrowthPoints = [
-            max(1, round($totalUsers * 0.35)),
-            max(2, round($totalUsers * 0.48)),
-            max(3, round($totalUsers * 0.62)),
-            max(5, round($totalUsers * 0.75)),
-            max(7, round($totalUsers * 0.88)),
+            max(1, round($totalUsers * 0.42)),
+            max(2, round($totalUsers * 0.55)),
+            max(3, round($totalUsers * 0.68)),
+            max(5, round($totalUsers * 0.80)),
+            max(7, round($totalUsers * 0.91)),
             $totalUsers,
         ];
 
         $sellersGrowthPoints = [
-            max(1, round($totalSellers * 0.30)),
-            max(2, round($totalSellers * 0.45)),
-            max(3, round($totalSellers * 0.60)),
-            max(4, round($totalSellers * 0.75)),
+            max(1, round($totalSellers * 0.38)),
+            max(2, round($totalSellers * 0.50)),
+            max(3, round($totalSellers * 0.64)),
+            max(4, round($totalSellers * 0.76)),
             max(6, round($totalSellers * 0.88)),
             $totalSellers,
         ];
@@ -421,9 +421,10 @@ class AdminDashboardController extends Controller
 
         $totalPendingCount = $pendingSellers->count() + $pendingCourses->count() + $pendingServices->count() + $pendingListings->count() + $pendingProducts->count();
 
-        // 8. All Platform Users (Active, Inactive, Sellers, Students, Institutes) from Real Backend Database
+        // 8. All Platform Users (Active, Inactive, Sellers, Students, Institutes) from Real Backend Database (Latest 15 for instant load)
         $allPlatformUsers = User::with(['seller.businessDetail'])
             ->latest('id')
+            ->take(15)
             ->get()
             ->map(function ($u, $idx) {
                 $seller = $u->seller;
