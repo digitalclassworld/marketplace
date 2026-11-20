@@ -623,25 +623,27 @@
                     <i class="fa-solid fa-bars fs-5 text-secondary"></i>
                 </button>
 
-                <!-- Global Search -->
-                <div class="position-relative">
-                    <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.85rem;"></i>
-                    <input type="text" class="admin-search-input" placeholder="Search users, sellers, courses, services, products, orders...">
-                </div>
+                <!-- Global Search Form -->
+                <form method="GET" action="{{ request()->routeIs('admin.users.*') ? route('admin.users.index') : (request()->routeIs('admin.sellers.*') ? route('admin.sellers.index') : (request()->routeIs('admin.catalog.courses*') ? route('admin.catalog.courses') : (request()->routeIs('admin.catalog.products*') ? route('admin.catalog.products') : (request()->routeIs('admin.catalog.services*') ? route('admin.catalog.services') : route('admin.catalog.listings'))))) }}" class="m-0">
+                    <div class="position-relative">
+                        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.85rem;"></i>
+                        <input type="text" name="q" value="{{ request('q') ?: request('search') }}" class="admin-search-input" placeholder="Search users, sellers, courses, services, products, orders...">
+                    </div>
+                </form>
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <!-- All Users Filter (Matching Screenshot) -->
+                <!-- All Users Filter -->
                 <div class="dropdown d-none d-md-block">
                     <button class="admin-top-filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <span>All Users</span>
+                        <span>{{ request('tab') ? ucfirst(request('tab')) : 'All Users' }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
-                        <li><a class="dropdown-item active" href="{{ route('admin.users.index') }}"><i class="fa-solid fa-users me-2 text-primary"></i> All Users</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'students']) }}"><i class="fa-solid fa-graduation-cap me-2 text-info"></i> Students</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'professionals']) }}"><i class="fa-solid fa-briefcase me-2 text-warning"></i> Professionals</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'institutes']) }}"><i class="fa-solid fa-school me-2 text-primary"></i> Institutes</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.users.index', ['tab' => 'sellers']) }}"><i class="fa-solid fa-store me-2 text-success"></i> Sellers</a></li>
+                        <li><a class="dropdown-item {{ !request('tab') || request('tab') === 'all' ? 'active' : '' }}" href="{{ route('admin.users.index') }}"><i class="fa-solid fa-users me-2 text-primary"></i> All Users</a></li>
+                        <li><a class="dropdown-item {{ request('tab') === 'students' ? 'active' : '' }}" href="{{ route('admin.users.index', ['tab' => 'students']) }}"><i class="fa-solid fa-graduation-cap me-2 text-info"></i> Students</a></li>
+                        <li><a class="dropdown-item {{ request('tab') === 'professionals' ? 'active' : '' }}" href="{{ route('admin.users.index', ['tab' => 'professionals']) }}"><i class="fa-solid fa-briefcase me-2 text-warning"></i> Professionals</a></li>
+                        <li><a class="dropdown-item {{ request('tab') === 'institutes' ? 'active' : '' }}" href="{{ route('admin.users.index', ['tab' => 'institutes']) }}"><i class="fa-solid fa-school me-2 text-primary"></i> Institutes</a></li>
+                        <li><a class="dropdown-item {{ request('tab') === 'sellers' ? 'active' : '' }}" href="{{ route('admin.users.index', ['tab' => 'sellers']) }}"><i class="fa-solid fa-store me-2 text-success"></i> Sellers</a></li>
                     </ul>
                 </div>
 
@@ -649,14 +651,15 @@
                 <div class="dropdown d-none d-md-block">
                     <button class="admin-top-filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="fa-solid fa-location-dot text-primary"></i>
-                        <span>All Locations</span>
+                        <span>{{ request('city') && request('city') !== 'all' ? request('city') : 'All Locations' }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
-                        <li><a class="dropdown-item active" href="#">All Locations</a></li>
-                        <li><a class="dropdown-item" href="#">Ahmedabad, Gujarat</a></li>
-                        <li><a class="dropdown-item" href="#">Surat, Gujarat</a></li>
-                        <li><a class="dropdown-item" href="#">Mumbai, Maharashtra</a></li>
-                        <li><a class="dropdown-item" href="#">Delhi NCR</a></li>
+                        <li><a class="dropdown-item {{ !request('city') || request('city') === 'all' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['city' => null]) }}"><i class="fa-solid fa-globe me-2 text-muted"></i> All Locations</a></li>
+                        <li><a class="dropdown-item {{ request('city') === 'Ahmedabad' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['city' => 'Ahmedabad']) }}"><i class="fa-solid fa-city me-2 text-primary"></i> Ahmedabad, Gujarat</a></li>
+                        <li><a class="dropdown-item {{ request('city') === 'Surat' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['city' => 'Surat']) }}"><i class="fa-solid fa-city me-2 text-primary"></i> Surat, Gujarat</a></li>
+                        <li><a class="dropdown-item {{ request('city') === 'Vadodara' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['city' => 'Vadodara']) }}"><i class="fa-solid fa-city me-2 text-primary"></i> Vadodara, Gujarat</a></li>
+                        <li><a class="dropdown-item {{ request('city') === 'Rajkot' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['city' => 'Rajkot']) }}"><i class="fa-solid fa-city me-2 text-primary"></i> Rajkot, Gujarat</a></li>
+                        <li><a class="dropdown-item {{ request('city') === 'Mumbai' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['city' => 'Mumbai']) }}"><i class="fa-solid fa-city me-2 text-primary"></i> Mumbai, Maharashtra</a></li>
                     </ul>
                 </div>
 

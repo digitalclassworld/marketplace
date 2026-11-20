@@ -1664,315 +1664,77 @@ class AdminCatalogController extends Controller
         $planType = $request->query('plan');
         $featuredStatus = $request->query('featured_status');
 
-        $dbListings = BusinessListing::with(['seller.businessDetail', 'seller.user'])->latest()->get();
+        $query = BusinessListing::with(['seller.businessDetail', 'seller.user'])->latest('id');
 
-        $showDummy = config('marketplace.show_dummy_data', false);
+        // Apply Status Filter
+        if ($status === 'active' || $status === 'approved') {
+            $query->whereIn('status', ['approved', 'active']);
+        } elseif ($status === 'pending') {
+            $query->where('status', 'pending');
+        } elseif ($status === 'rejected') {
+            $query->where('status', 'rejected');
+        } elseif ($status === 'featured') {
+            $query->where('is_featured', true);
+        } elseif ($status === 'popular') {
+            $query->whereIn('status', ['approved', 'active']);
+        } elseif ($status === 'new') {
+            $query->where('created_at', '>=', now()->startOfMonth());
+        }
 
-        $curatedListings = $showDummy ? [
-            [
-                'id' => 125,
-                'code' => 'BL00125',
-                'business_name' => 'VCEC - Vinayak Computer',
-                'full_name' => 'VCEC - Vinayak Computer Education Center',
-                'slug' => 'vcec',
-                'owner_name' => 'Hitesh Mohkar',
-                'owner_id' => 'UDC00125',
-                'owner_phone' => '+91 98765 43210',
-                'owner_email' => 'hitesh@digitalclass.in',
-                'category' => 'Education',
-                'sub_category' => 'Computer Training Institute',
-                'location' => 'Ahmedabad',
-                'address' => 'Nikol, Ahmedabad, Gujarat',
-                'plan' => 'Premium',
-                'plan_detail' => 'Premium (Valid till 12 Jan 2027)',
-                'views' => 12450,
-                'inquiries' => 320,
-                'rating' => 4.8,
-                'reviews_count' => 320,
-                'status' => 'Active',
-                'is_featured' => true,
-                'is_verified' => true,
-                'is_popular' => true,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=VCEC&background=0066ff&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '12 Jan 2024',
-            ],
-            [
-                'id' => 126,
-                'code' => 'BL00126',
-                'business_name' => 'Tech Skills Academy',
-                'full_name' => 'Tech Skills Academy Private Limited',
-                'slug' => 'tech-skills-academy',
-                'owner_name' => 'Rahul Shah',
-                'owner_id' => 'UDC00126',
-                'owner_phone' => '+91 98765 43211',
-                'owner_email' => 'rahul@techskills.in',
-                'category' => 'Education',
-                'sub_category' => 'IT & Software Coaching',
-                'location' => 'Surat',
-                'address' => 'Ring Road, Surat, Gujarat',
-                'plan' => 'Standard',
-                'plan_detail' => 'Standard (Valid till 15 Mar 2027)',
-                'views' => 8920,
-                'inquiries' => 210,
-                'rating' => 4.6,
-                'reviews_count' => 180,
-                'status' => 'Active',
-                'is_featured' => false,
-                'is_verified' => true,
-                'is_popular' => true,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=TS&background=10b981&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '15 Mar 2024',
-            ],
-            [
-                'id' => 127,
-                'code' => 'BL00127',
-                'business_name' => 'RK Fitness Club',
-                'full_name' => 'RK Fitness Club & Wellness Center',
-                'slug' => 'rk-fitness-club',
-                'owner_name' => 'Ravi Kumar',
-                'owner_id' => 'UDC00127',
-                'owner_phone' => '+91 98765 43212',
-                'owner_email' => 'ravi@rkfitness.com',
-                'category' => 'Fitness',
-                'sub_category' => 'Gym & Health Club',
-                'location' => 'Vadodara',
-                'address' => 'Alkapuri, Vadodara, Gujarat',
-                'plan' => 'Premium',
-                'plan_detail' => 'Premium (Valid till 20 Apr 2027)',
-                'views' => 6780,
-                'inquiries' => 185,
-                'rating' => 4.7,
-                'reviews_count' => 140,
-                'status' => 'Active',
-                'is_featured' => true,
-                'is_verified' => true,
-                'is_popular' => false,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=RK&background=f59e0b&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '20 Apr 2024',
-            ],
-            [
-                'id' => 128,
-                'code' => 'BL00128',
-                'business_name' => 'Shree Dental Care',
-                'full_name' => 'Shree Multi-Speciality Dental Clinic',
-                'slug' => 'shree-dental-care',
-                'owner_name' => 'Dr. Priya Mehta',
-                'owner_id' => 'UDC00128',
-                'owner_phone' => '+91 98765 43213',
-                'owner_email' => 'priya@shreedental.com',
-                'category' => 'Healthcare',
-                'sub_category' => 'Dental Care & Surgery',
-                'location' => 'Ahmedabad',
-                'address' => 'Drive-in Road, Ahmedabad, Gujarat',
-                'plan' => 'Standard',
-                'plan_detail' => 'Standard (Pending Verification)',
-                'views' => 5230,
-                'inquiries' => 142,
-                'rating' => 4.5,
-                'reviews_count' => 95,
-                'status' => 'Pending',
-                'is_featured' => false,
-                'is_verified' => false,
-                'is_popular' => false,
-                'is_new' => true,
-                'logo' => 'https://ui-avatars.com/api/?name=SD&background=06b6d4&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '05 May 2024',
-            ],
-            [
-                'id' => 129,
-                'code' => 'BL00129',
-                'business_name' => 'Creative Minds Studio',
-                'full_name' => 'Creative Minds Design & Media Studio',
-                'slug' => 'creative-minds-studio',
-                'owner_name' => 'Amit Patel',
-                'owner_id' => 'UDC00129',
-                'owner_phone' => '+91 98765 43214',
-                'owner_email' => 'amit@creativeminds.in',
-                'category' => 'Design',
-                'sub_category' => 'Graphic & UI/UX Studio',
-                'location' => 'Rajkot',
-                'address' => 'Kalawad Road, Rajkot, Gujarat',
-                'plan' => 'Free',
-                'plan_detail' => 'Free Community Listing',
-                'views' => 3980,
-                'inquiries' => 98,
-                'rating' => 4.4,
-                'reviews_count' => 60,
-                'status' => 'Active',
-                'is_featured' => false,
-                'is_verified' => true,
-                'is_popular' => false,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=CM&background=ec4899&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '12 Jun 2024',
-            ],
-            [
-                'id' => 130,
-                'code' => 'BL00130',
-                'business_name' => 'AutoTech Solutions',
-                'full_name' => 'AutoTech Car Diagnostic & Repair Center',
-                'slug' => 'autotech-solutions',
-                'owner_name' => 'Karan Singh',
-                'owner_id' => 'UDC00130',
-                'owner_phone' => '+91 98765 43215',
-                'owner_email' => 'karan@autotech.in',
-                'category' => 'Automotive',
-                'sub_category' => 'Vehicle Servicing & Repair',
-                'location' => 'Surat',
-                'address' => 'Varachha, Surat, Gujarat',
-                'plan' => 'Premium',
-                'plan_detail' => 'Premium (Valid till 18 Jul 2027)',
-                'views' => 9540,
-                'inquiries' => 260,
-                'rating' => 4.8,
-                'reviews_count' => 210,
-                'status' => 'Active',
-                'is_featured' => true,
-                'is_verified' => true,
-                'is_popular' => true,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=AT&background=8b5cf6&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '18 Jul 2024',
-            ],
-            [
-                'id' => 131,
-                'code' => 'BL00131',
-                'business_name' => 'Green Leaf Nursery',
-                'full_name' => 'Green Leaf Organic Nursery & Landscaping',
-                'slug' => 'green-leaf-nursery',
-                'owner_name' => 'Neha Desai',
-                'owner_id' => 'UDC00131',
-                'owner_phone' => '+91 98765 43216',
-                'owner_email' => 'neha@greenleaf.in',
-                'category' => 'Home & Garden',
-                'sub_category' => 'Plants & Garden Supplies',
-                'location' => 'Ahmedabad',
-                'address' => 'Bopal, Ahmedabad, Gujarat',
-                'plan' => 'Standard',
-                'plan_detail' => 'Standard (Listing Rejected)',
-                'views' => 4320,
-                'inquiries' => 88,
-                'rating' => 4.2,
-                'reviews_count' => 45,
-                'status' => 'Rejected',
-                'is_featured' => false,
-                'is_verified' => false,
-                'is_popular' => false,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=GL&background=10b981&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '25 Aug 2024',
-            ],
-            [
-                'id' => 132,
-                'code' => 'BL00132',
-                'business_name' => 'Galaxy Electronics',
-                'full_name' => 'Galaxy Electronics & Home Appliances',
-                'slug' => 'galaxy-electronics',
-                'owner_name' => 'Imran Shaikh',
-                'owner_id' => 'UDC00132',
-                'owner_phone' => '+91 98765 43217',
-                'owner_email' => 'imran@galaxyelec.com',
-                'category' => 'Electronics',
-                'sub_category' => 'Consumer Electronics Store',
-                'location' => 'Mumbai',
-                'address' => 'Andheri West, Mumbai, Maharashtra',
-                'plan' => 'Premium',
-                'plan_detail' => 'Premium (Valid till 10 Sep 2027)',
-                'views' => 11760,
-                'inquiries' => 310,
-                'rating' => 4.7,
-                'reviews_count' => 290,
-                'status' => 'Active',
-                'is_featured' => true,
-                'is_verified' => true,
-                'is_popular' => true,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=GE&background=3b82f6&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '10 Sep 2024',
-            ],
-            [
-                'id' => 133,
-                'code' => 'BL00133',
-                'business_name' => 'Tasty Bites Restaurant',
-                'full_name' => 'Tasty Bites Multi-Cuisine Family Restaurant',
-                'slug' => 'tasty-bites-restaurant',
-                'owner_name' => 'Suresh Yadav',
-                'owner_id' => 'UDC00133',
-                'owner_phone' => '+91 98765 43218',
-                'owner_email' => 'suresh@tastybites.in',
-                'category' => 'Food & Beverage',
-                'sub_category' => 'Family Restaurant & Cafe',
-                'location' => 'Surat',
-                'address' => 'Adajan, Surat, Gujarat',
-                'plan' => 'Standard',
-                'plan_detail' => 'Standard (Valid till 04 Oct 2027)',
-                'views' => 7890,
-                'inquiries' => 220,
-                'rating' => 4.5,
-                'reviews_count' => 175,
-                'status' => 'Active',
-                'is_featured' => false,
-                'is_verified' => true,
-                'is_popular' => false,
-                'is_new' => false,
-                'logo' => 'https://ui-avatars.com/api/?name=TB&background=ea580c&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '04 Oct 2024',
-            ],
-            [
-                'id' => 134,
-                'code' => 'BL00134',
-                'business_name' => 'Bright Future School',
-                'full_name' => 'Bright Future English Medium School',
-                'slug' => 'bright-future-school',
-                'owner_name' => 'Pooja Trivedi',
-                'owner_id' => 'UDC00134',
-                'owner_phone' => '+91 98765 43219',
-                'owner_email' => 'pooja@brightfuture.edu',
-                'category' => 'Education',
-                'sub_category' => 'K-12 Primary School',
-                'location' => 'Ahmedabad',
-                'address' => 'Ghatlodia, Ahmedabad, Gujarat',
-                'plan' => 'Free',
-                'plan_detail' => 'Free Educational Listing',
-                'views' => 2450,
-                'inquiries' => 64,
-                'rating' => 4.3,
-                'reviews_count' => 50,
-                'status' => 'Pending',
-                'is_featured' => false,
-                'is_verified' => false,
-                'is_popular' => false,
-                'is_new' => true,
-                'logo' => 'https://ui-avatars.com/api/?name=BF&background=6366f1&color=fff',
-                'cover_image' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&auto=format&fit=crop&q=80',
-                'listed_on' => '15 Oct 2024',
-            ],
-        ] : [];
+        // Apply Search
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('business_name', 'like', "%{$search}%")
+                  ->orWhere('city', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('seller.user', function ($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
 
-        // Merge DB Listings
-        foreach ($dbListings as $l) {
-            $ownerName = $l->seller?->user?->name ?? 'Hitesh Mohkar';
+        // Apply Category
+        if (!empty($category) && $category !== 'all') {
+            $query->where('category', $category);
+        }
+
+        // Apply City
+        if (!empty($city) && $city !== 'all') {
+            $query->where('city', 'like', "%{$city}%");
+        }
+
+        // Apply Plan Type
+        if (!empty($planType) && $planType !== 'all') {
+            $query->where('plan_name', 'like', "%{$planType}%");
+        }
+
+        // Apply Featured Status
+        if (!empty($featuredStatus) && $featuredStatus !== 'all') {
+            if ($featuredStatus === 'featured') {
+                $query->where('is_featured', true);
+            } elseif ($featuredStatus === 'not_featured') {
+                $query->where(function ($q) {
+                    $q->where('is_featured', false)->orWhereNull('is_featured');
+                });
+            }
+        }
+
+        // Paginate results (20 per page) with query string preserved
+        $paginated = $query->paginate(20)->withQueryString();
+
+        $formattedListings = $paginated->through(function ($l) {
+            $ownerName = $l->seller?->user?->name ?? 'Business Owner';
             $city = $l->city ?: 'Ahmedabad';
-            $curatedListings[] = [
+            return [
                 'id' => $l->id,
                 'code' => 'BL' . str_pad($l->id, 5, '0', STR_PAD_LEFT),
                 'business_name' => $l->business_name,
                 'full_name' => $l->business_name,
                 'slug' => $l->slug ?: \Illuminate\Support\Str::slug($l->business_name),
                 'owner_name' => $ownerName,
-                'owner_id' => 'UDC' . str_pad($l->seller?->user_id ?? 125, 5, '0', STR_PAD_LEFT),
+                'owner_id' => 'UDC' . str_pad($l->seller?->user_id ?? $l->id, 5, '0', STR_PAD_LEFT),
                 'owner_phone' => $l->phone ?: ($l->seller?->user?->phone ?? '+91 98765 43210'),
                 'owner_email' => $l->email ?: ($l->seller?->user?->email ?? 'contact@digitalclass.in'),
                 'category' => $l->category ?: 'Education',
@@ -1981,132 +1743,70 @@ class AdminCatalogController extends Controller
                 'address' => $l->address ?: ($city . ', Gujarat'),
                 'plan' => ucfirst($l->plan_name ?: 'Premium'),
                 'plan_detail' => ($l->plan_name ?: 'Premium') . ' (Active)',
-                'views' => 12450,
-                'inquiries' => 320,
+                'views' => $l->views_count ?: 12450,
+                'inquiries' => $l->inquiries_count ?: 320,
                 'rating' => 4.8,
                 'reviews_count' => 320,
                 'status' => in_array(strtolower($l->status), ['approved', 'active']) ? 'Active' : (strtolower($l->status) === 'rejected' ? 'Rejected' : 'Pending'),
-                'is_featured' => false,
+                'is_featured' => (bool)$l->is_featured,
                 'is_verified' => true,
-                'is_popular' => false,
-                'is_new' => true,
+                'is_popular' => in_array(strtolower($l->status), ['approved', 'active']),
+                'is_new' => $l->created_at && $l->created_at >= now()->startOfMonth(),
                 'logo' => $l->logo ?: ('https://ui-avatars.com/api/?name=' . urlencode($l->business_name) . '&background=0066ff&color=fff'),
                 'cover_image' => $l->cover_image ?: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&auto=format&fit=crop&q=80',
                 'listed_on' => $l->created_at ? $l->created_at->format('d M Y') : '12 Jan 2024',
             ];
-        }
+        });
 
-        $allListings = collect($curatedListings);
+        // Exact Database Counts for KPI Cards & Navigation Tabs
+        $totalCount = BusinessListing::count();
+        $approvedCount = BusinessListing::whereIn('status', ['approved', 'active'])->count();
+        $pendingCount = BusinessListing::where('status', 'pending')->count();
+        $rejectedCount = BusinessListing::where('status', 'rejected')->count();
+        $featuredCount = BusinessListing::where('is_featured', true)->count();
+        $listingsThisMonth = BusinessListing::where('created_at', '>=', now()->startOfMonth())->count();
 
-        // Apply Tab Filter
-        if ($status === 'active' || $status === 'approved') {
-            $allListings = $allListings->filter(fn($l) => in_array(strtolower($l['status']), ['active', 'approved']));
-        } elseif ($status === 'pending') {
-            $allListings = $allListings->filter(fn($l) => strtolower($l['status']) === 'pending');
-        } elseif ($status === 'rejected') {
-            $allListings = $allListings->filter(fn($l) => strtolower($l['status']) === 'rejected');
-        } elseif ($status === 'featured') {
-            $allListings = $allListings->filter(fn($l) => !empty($l['is_featured']));
-        } elseif ($status === 'popular') {
-            $allListings = $allListings->filter(fn($l) => !empty($l['is_popular']));
-        } elseif ($status === 'new') {
-            $allListings = $allListings->filter(fn($l) => !empty($l['is_new']));
-        }
+        $listingsGrowth = $totalCount > 0 ? round(($listingsThisMonth / $totalCount) * 100) : 0;
+        $activePct = $totalCount > 0 ? round(($approvedCount / $totalCount) * 100) : 0;
+        $rejectedPct = $totalCount > 0 ? round(($rejectedCount / $totalCount) * 100) : 0;
+        $featuredPct = $totalCount > 0 ? round(($featuredCount / $totalCount) * 100) : 0;
 
-        // Apply Search
-        if (!empty($search)) {
-            $q = strtolower($search);
-            $allListings = $allListings->filter(function ($l) use ($q) {
-                return str_contains(strtolower($l['business_name']), $q)
-                    || str_contains(strtolower($l['owner_name']), $q)
-                    || str_contains(strtolower($l['code']), $q);
-            });
-        }
+        $stats = [
+            'total'          => number_format($totalCount),
+            'total_growth'   => $listingsGrowth . '%',
+            'total_sub'      => '+' . number_format($listingsThisMonth) . ' this month',
 
-        // Apply Category
-        if (!empty($category) && $category !== 'all') {
-            $allListings = $allListings->filter(fn($l) => strtolower($l['category']) === strtolower($category));
-        }
+            'active'         => number_format($approvedCount),
+            'active_growth'  => $activePct . '%',
+            'active_sub'     => $activePct . '% of total',
 
-        // Apply City
-        if (!empty($city) && $city !== 'all') {
-            $allListings = $allListings->filter(fn($l) => str_contains(strtolower($l['location']), strtolower($city)));
-        }
+            'pending'        => number_format($pendingCount),
+            'pending_sub'    => $pendingCount > 0 ? 'Needs review' : 'All reviewed',
 
-        // Apply Plan Type
-        if (!empty($planType) && $planType !== 'all') {
-            $allListings = $allListings->filter(fn($l) => strtolower($l['plan']) === strtolower($planType));
-        }
+            'rejected'       => number_format($rejectedCount),
+            'rejected_sub'   => $rejectedCount > 0 ? $rejectedPct . '% of total' : 'None rejected',
 
-        // Stats matching Screenshot (database in production, curated on local)
-        if (!$showDummy) {
-            $totalCount = BusinessListing::count();
-            $approvedCount = BusinessListing::where('status', 'approved')->count();
-            $pendingCount = BusinessListing::where('status', 'pending')->count();
-            $rejectedCount = BusinessListing::where('status', 'rejected')->count();
-            $featuredCount = BusinessListing::where('is_featured', true)->count();
-            $listingsThisMonth = BusinessListing::where('created_at', '>=', now()->startOfMonth())->count();
-            $listingsGrowth = $totalCount > 0 ? round(($listingsThisMonth / $totalCount) * 100) : 0;
-            $activePct = $totalCount > 0 ? round(($approvedCount / $totalCount) * 100) : 0;
-            $rejectedPct = $totalCount > 0 ? round(($rejectedCount / $totalCount) * 100) : 0;
-            $featuredPct = $totalCount > 0 ? round(($featuredCount / $totalCount) * 100) : 0;
+            'featured'       => number_format($featuredCount),
+            'featured_growth'=> $featuredPct . '%',
+            'featured_sub'   => $featuredPct . '% of total',
 
-            $stats = [
-                'total'          => number_format($totalCount),
-                'total_growth'   => $listingsGrowth . '%',
-                'total_sub'      => '+' . number_format($listingsThisMonth) . ' this month',
+            'top_performing' => number_format($approvedCount),
+            'popular'        => number_format($approvedCount),
+            'new'            => number_format($listingsThisMonth),
+        ];
 
-                'active'         => number_format($approvedCount),
-                'active_growth'  => $activePct . '%',
-                'active_sub'     => $activePct . '% of total',
-
-                'pending'        => number_format($pendingCount),
-                'pending_sub'    => $pendingCount > 0 ? 'Needs review' : 'All reviewed',
-
-                'rejected'       => number_format($rejectedCount),
-                'rejected_sub'   => $rejectedCount > 0 ? $rejectedPct . '% of total' : 'None rejected',
-
-                'featured'       => number_format($featuredCount),
-                'featured_growth'=> $featuredPct . '%',
-                'featured_sub'   => $featuredPct . '% of total',
-
-                'top_performing' => number_format($approvedCount),
-                'popular'        => number_format($approvedCount),
-                'new'            => number_format($listingsThisMonth),
-            ];
-            $counts = [
-                'all'            => $totalCount,
-                'active'         => $approvedCount,
-                'pending'        => $pendingCount,
-                'rejected'       => $rejectedCount,
-                'featured'       => $featuredCount,
-                'popular'        => $approvedCount,
-                'new'            => $listingsThisMonth,
-            ];
-        } else {
-            $stats = [
-                'total'          => '6,320',
-                'active'         => '5,120',
-                'pending'        => '720',
-                'rejected'       => '260',
-                'featured'       => '380',
-                'top_performing' => '420',
-                'popular'        => '100',
-                'new'            => '420',
-            ];
-            $counts = [
-                'all'            => 6320,
-                'active'         => 5120,
-                'pending'        => 720,
-                'rejected'       => 260,
-                'featured'       => 380,
-                'popular'        => 100,
-                'new'            => 420,
-            ];
-        }
+        $counts = [
+            'all'            => $totalCount,
+            'active'         => $approvedCount,
+            'pending'        => $pendingCount,
+            'rejected'       => $rejectedCount,
+            'featured'       => $featuredCount,
+            'popular'        => $approvedCount,
+            'new'            => $listingsThisMonth,
+        ];
 
         return view('admin.catalog.listings', [
-            'listings'        => $allListings->values(),
+            'listings'        => $formattedListings,
             'stats'           => $stats,
             'counts'          => $counts,
             'currentTab'      => $status,

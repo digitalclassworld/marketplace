@@ -175,109 +175,117 @@
         </div>
     @endif
 
-    <!-- 6 KPI Metrics Cards matching Screenshot 2 -->
+    <!-- 6 KPI Metrics Cards (Workable & Clickable) -->
     <div class="row g-3 mb-4">
         <!-- Card 1: Total Listings -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="listing-kpi-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted small fw-medium">Total Listings</span>
-                    <div class="kpi-icon-circle kpi-icon-yellow">
-                        <i class="fa-solid fa-building"></i>
+            <a href="{{ route('admin.catalog.listings', array_merge(request()->except(['status', 'page']), ['status' => 'all'])) }}" class="text-decoration-none d-block h-100">
+                <div class="listing-kpi-card h-100 {{ (!request('status') || request('status') === 'all') && !request('tab') ? 'border-primary shadow-sm bg-light-subtle' : '' }}">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-medium">Total Listings</span>
+                        <div class="kpi-icon-circle kpi-icon-yellow">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-4 fw-bold text-dark">{{ $stats['total'] ?? '0' }}</span>
+                        <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['total_growth'] ?? '0%' }}</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['total_sub'] ?? '+0 this month' }}</div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['total'] ?? '0' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['total_growth'] ?? '0%' }}</span>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['total_sub'] ?? '+0 this month' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 2: Active Listings -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="listing-kpi-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted small fw-medium">Active Listings</span>
-                    <div class="kpi-icon-circle kpi-icon-green">
-                        <i class="fa-solid fa-check"></i>
+            <a href="{{ route('admin.catalog.listings', array_merge(request()->except(['status', 'page']), ['status' => 'active'])) }}" class="text-decoration-none d-block h-100">
+                <div class="listing-kpi-card h-100 {{ request('status') === 'active' || request('status') === 'approved' ? 'border-success shadow-sm bg-light-subtle' : '' }}">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-medium">Active Listings</span>
+                        <div class="kpi-icon-circle kpi-icon-green">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-4 fw-bold text-dark">{{ $stats['active'] ?? '0' }}</span>
+                        <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['active_growth'] ?? '0%' }}</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['active_sub'] ?? '0% of total' }}</div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['active'] ?? '0' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['active_growth'] ?? '0%' }}</span>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['active_sub'] ?? '0% of total' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 3: Pending Approval -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="listing-kpi-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted small fw-medium">Pending Approval</span>
-                    <div class="kpi-icon-circle kpi-icon-amber">
-                        <i class="fa-regular fa-clock"></i>
+            <a href="{{ route('admin.catalog.listings', array_merge(request()->except(['status', 'page']), ['status' => 'pending'])) }}" class="text-decoration-none d-block h-100">
+                <div class="listing-kpi-card h-100 {{ request('status') === 'pending' ? 'border-warning shadow-sm bg-light-subtle' : '' }}">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-medium">Pending Approval</span>
+                        <div class="kpi-icon-circle kpi-icon-amber">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-4 fw-bold text-dark">{{ $stats['pending'] ?? '0' }}</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['pending_sub'] ?? 'All reviewed' }}</div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['pending'] ?? '0' }}</span>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['pending_sub'] ?? 'All reviewed' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 4: Rejected Listings -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="listing-kpi-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted small fw-medium">Rejected Listings</span>
-                    <div class="kpi-icon-circle kpi-icon-red">
-                        <i class="fa-solid fa-ban"></i>
+            <a href="{{ route('admin.catalog.listings', array_merge(request()->except(['status', 'page']), ['status' => 'rejected'])) }}" class="text-decoration-none d-block h-100">
+                <div class="listing-kpi-card h-100 {{ request('status') === 'rejected' ? 'border-danger shadow-sm bg-light-subtle' : '' }}">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-medium">Rejected Listings</span>
+                        <div class="kpi-icon-circle kpi-icon-red">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-4 fw-bold text-dark">{{ $stats['rejected'] ?? '0' }}</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['rejected_sub'] ?? 'None rejected' }}</div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['rejected'] ?? '0' }}</span>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['rejected_sub'] ?? 'None rejected' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 5: Featured Listings -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="listing-kpi-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted small fw-medium">Featured Listings</span>
-                    <div class="kpi-icon-circle kpi-icon-purple">
-                        <i class="fa-solid fa-star"></i>
+            <a href="{{ route('admin.catalog.listings', array_merge(request()->except(['status', 'page']), ['status' => 'featured'])) }}" class="text-decoration-none d-block h-100">
+                <div class="listing-kpi-card h-100 {{ request('status') === 'featured' ? 'border-purple shadow-sm bg-light-subtle' : '' }}" style="{{ request('status') === 'featured' ? 'border-color: #8b5cf6 !important;' : '' }}">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-medium">Featured Listings</span>
+                        <div class="kpi-icon-circle kpi-icon-purple">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-4 fw-bold text-dark">{{ $stats['featured'] ?? '0' }}</span>
+                        <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['featured_growth'] ?? '0%' }}</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['featured_sub'] ?? '0% of total' }}</div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['featured'] ?? '0' }}</span>
-                    <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['featured_growth'] ?? '0%' }}</span>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['featured_sub'] ?? '0% of total' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 6: Top Performing -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="listing-kpi-card h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-muted small fw-medium">Top Performing</span>
-                    <div class="kpi-icon-circle kpi-icon-yellow">
-                        <i class="fa-solid fa-star"></i>
+            <a href="{{ route('admin.catalog.listings', array_merge(request()->except(['status', 'page']), ['status' => 'popular'])) }}" class="text-decoration-none d-block h-100">
+                <div class="listing-kpi-card h-100 {{ request('status') === 'popular' ? 'border-primary shadow-sm bg-light-subtle' : '' }}">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted small fw-medium">Top Performing</span>
+                        <div class="kpi-icon-circle kpi-icon-yellow">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
                     </div>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="fs-4 fw-bold text-dark">{{ $stats['top_performing'] ?? '0' }}</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">Active in catalog</div>
                 </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['top_performing'] ?? '0' }}</span>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">Active in catalog</div>
-            </div>
-        </div>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">Based on views & inquiries</div>
-            </div>
+            </a>
         </div>
     </div>
 
@@ -565,20 +573,14 @@
                     </table>
                 </div>
 
-                <!-- Footer Pagination Bar -->
-                <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light small">
-                    <span class="text-muted">Showing 1 to {{ count($listings) }} of {{ number_format($counts['all'] ?? 6320) }} listings</span>
-                    <nav>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">4</a></li>
-                            <li class="page-item"><a class="page-link" href="#">5</a></li>
-                            <li class="page-item"><a class="page-link" href="#">›</a></li>
-                        </ul>
-                    </nav>
+                <!-- Real Laravel Pagination Bar -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center p-3 border-top bg-light small gap-2">
+                    <span class="text-muted">
+                        Showing {{ $listings->firstItem() ?? 0 }} to {{ $listings->lastItem() ?? 0 }} of {{ number_format($listings->total()) }} listings
+                    </span>
+                    <div>
+                        {{ $listings->links('pagination::bootstrap-5') }}
+                    </div>
                 </div>
             </div>
         </div>
