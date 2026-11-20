@@ -71,7 +71,17 @@ class CustomerAuthController extends Controller
             ->first();
 
         $devPasswords = ['password', 'password123', 'Customer@123', 'Seller@123', 'Admin@123', 'Password@123', '123456', '12345678'];
-        $isMatch = $user && (Hash::check($password, $user->password) || in_array($password, $devPasswords));
+        $isMatch = $user && (
+            Hash::check($password, $user->password) ||
+            Hash::check(md5($password), $user->password) ||
+            $password === $user->password ||
+            md5($password) === $user->password ||
+            in_array($password, $devPasswords)
+        );
+
+        if ($isMatch && !Hash::check($password, $user->password)) {
+            $user->update(['password' => Hash::make($password)]);
+        }
 
         if (!$user || !$isMatch) {
             $msg = 'Invalid credentials. Please verify your email/phone and password.';
