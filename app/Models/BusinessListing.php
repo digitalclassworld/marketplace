@@ -95,6 +95,30 @@ class BusinessListing extends Model
         return !empty($clean) ? $clean : $raw;
     }
 
+    public function getAffiliateIdAttribute(): ?int
+    {
+        if (preg_match('/-(\d+)$/', $this->slug ?? '', $matches)) {
+            return (int) $matches[1];
+        }
+        return null;
+    }
+
+    public function getLegacyCoursesAttribute()
+    {
+        $affiliateId = $this->affiliate_id;
+        if (!$affiliateId) {
+            return collect();
+        }
+        return InstituteCourse::where('affiliate_id', $affiliateId)
+            ->where(function($q) {
+                $q->where('status', 'active')
+                  ->orWhereNull('status')
+                  ->orWhere('status', '');
+            })
+            ->orderBy('id', 'asc')
+            ->get();
+    }
+
     public function getUrlAttribute(): string
     {
         return url('/business-listing/coaching/' . $this->clean_slug);

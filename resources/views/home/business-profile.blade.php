@@ -614,14 +614,23 @@
     }
     .course-card-thumb-wrap {
         position: relative;
-        height: 110px;
-        background: #0f172a;
+        height: 140px;
+        background: #ffffff;
         overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #f1f5f9;
     }
     .course-card-thumb-wrap img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        background: #ffffff;
+        transition: transform 0.25s ease;
+    }
+    .course-store-card:hover .course-card-thumb-wrap img {
+        transform: scale(1.04);
     }
     .btn-card-heart {
         position: absolute;
@@ -1233,7 +1242,7 @@
                     @foreach($courses as $c)
                         <a href="{{ route('course.show', $c['slug'] ?? 'digital-marketing-complete-course-2026') }}" class="course-store-card">
                             <div class="course-card-thumb-wrap">
-                                <img src="{{ $c['thumbnail'] }}" alt="{{ $c['title'] }}">
+                                <img src="{{ $c['thumbnail'] }}" alt="{{ $c['title'] }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80';">
                                 <button type="button" class="btn-card-heart" onclick="event.preventDefault(); toggleCourseHeart(this);">
                                     <i class="fa-regular fa-heart"></i>
                                 </button>
@@ -1247,9 +1256,15 @@
                                     <i class="fa-regular fa-clock me-1"></i> {{ $c['duration'] }} &bull; {{ $c['mode'] }}
                                 </div>
                                 <div class="course-price-row">
-                                    <span class="course-current-price">₹{{ number_format($c['price']) }}</span>
-                                    <span class="course-mrp-price">₹{{ number_format($c['original_price']) }}</span>
-                                    <span class="course-discount-pill">{{ $c['discount'] }}</span>
+                                    @if(($c['price'] ?? 0) > 0)
+                                        <span class="course-current-price">₹{{ number_format($c['price']) }}</span>
+                                        @if(($c['original_price'] ?? 0) > ($c['price'] ?? 0))
+                                            <span class="course-mrp-price">₹{{ number_format($c['original_price']) }}</span>
+                                            <span class="course-discount-pill">{{ $c['discount'] }}</span>
+                                        @endif
+                                    @else
+                                        <span class="course-current-price text-primary" style="font-size: 0.85rem;">Inquire for Fees</span>
+                                    @endif
                                 </div>
                             </div>
                         </a>

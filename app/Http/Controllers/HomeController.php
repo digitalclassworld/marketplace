@@ -432,58 +432,94 @@ class HomeController extends Controller
             $domain = 'academic';
         }
 
-        // Domain-specific Courses, Services, Categories
+        // Dynamic Retrieval of Authentic Institute Courses from Legacy Database & Catalog
+        $affiliateId = $business->affiliate_id;
+        $realCourses = collect();
+        $sellerCourses = collect();
+
+        if ($business->seller_id) {
+            try {
+                $sellerCourses = \App\Models\Course::where('seller_id', $business->seller_id)
+                    ->whereIn('status', ['approved', 'active', 'published'])
+                    ->get();
+            } catch (\Throwable $e) {}
+        }
+
+        if ($affiliateId) {
+            try {
+                $realCourses = \App\Models\InstituteCourse::where('affiliate_id', $affiliateId)
+                    ->where(function($q) {
+                        $q->where('status', 'active')
+                          ->orWhereNull('status')
+                          ->orWhere('status', '');
+                    })
+                    ->orderBy('id', 'asc')
+                    ->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Institute courses query failed: ' . $e->getMessage());
+            }
+        }
+
+        $courses = [];
+
+        // 1. Map newly created seller courses
+        foreach ($sellerCourses as $sc) {
+            $courses[] = [
+                'id' => $sc->id,
+                'title' => $sc->title,
+                'slug' => $sc->slug,
+                'duration' => $sc->duration ?? '3 Months',
+                'mode' => $sc->level ?? 'Online/Offline',
+                'rating' => 4.9,
+                'reviews_count' => 120,
+                'price' => (float)($sc->discount_price > 0 ? $sc->discount_price : $sc->price),
+                'original_price' => (float)$sc->price,
+                'discount' => $sc->discount_price > 0 ? round((($sc->price - $sc->discount_price) / $sc->price) * 100) . '% OFF' : '25% OFF',
+                'thumbnail' => $sc->thumbnail_url ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80',
+                'description' => $sc->short_description ?? '',
+                'is_legacy' => false,
+            ];
+        }
+
+        // 2. Map authentic legacy courses from dc_affiliate_institute_course
+        foreach ($realCourses as $rc) {
+            $price = $rc->price;
+            $origPrice = $rc->original_price;
+            $discStr = $rc->discount_percentage;
+            if (empty($discStr) && $origPrice > $price && $origPrice > 0) {
+                $discStr = round((($origPrice - $price) / $origPrice) * 100) . '% OFF';
+            }
+
+            $courses[] = [
+                'id' => $rc->id,
+                'title' => $rc->course_name,
+                'slug' => $rc->slug,
+                'duration' => $rc->duration ?: '3 Months',
+                'mode' => 'Offline/Online',
+                'rating' => round(4.7 + (($rc->id % 4) * 0.1), 1),
+                'reviews_count' => 45 + (($rc->id * 7) % 150),
+                'price' => $price,
+                'original_price' => $origPrice,
+                'discount' => $discStr ?: 'Special Offer',
+                'thumbnail' => $rc->thumbnail_url,
+                'description' => $rc->course_desc ?? '',
+                'is_legacy' => true,
+            ];
+        }
+
+        // Dynamic categories from real courses if present
+        $sidebarCategories = [];
+        if (!empty($courses)) {
+            $sidebarCategories[] = ['name' => 'All', 'count' => count($courses), 'active' => true];
+            foreach ($courses as $c) {
+                $sidebarCategories[] = ['name' => $c['title'], 'count' => 1, 'active' => false];
+            }
+        }
+
+        // Domain-specific Courses (fallback) & Services
         switch ($domain) {
             case 'dance':
-                if (stripos($cleanSlug, 'dance-ka-fever') !== false) {
-                    $courses = [
-                        [
-                            'id' => 1,
-                            'title' => 'Folk dance',
-                            'slug' => 'folk-dance',
-                            'duration' => '3 Months',
-                            'mode' => 'Offline',
-                            'rating' => 4.9,
-                            'reviews_count' => 120,
-                            'price' => 2999,
-                            'original_price' => 4500,
-                            'discount' => '33% OFF',
-                            'thumbnail' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/course/913/course-thumbnail1665414050.jpeg',
-                        ],
-                        [
-                            'id' => 2,
-                            'title' => 'Classical Dance',
-                            'slug' => 'classical-dance',
-                            'duration' => '6 Months',
-                            'mode' => 'Offline',
-                            'rating' => 5.0,
-                            'reviews_count' => 180,
-                            'price' => 4999,
-                            'original_price' => 7500,
-                            'discount' => '33% OFF',
-                            'thumbnail' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/course/913/course-thumbnail1665413791.jpeg',
-                        ],
-                        [
-                            'id' => 3,
-                            'title' => 'Western Dance',
-                            'slug' => 'western-dance',
-                            'duration' => '2 Months',
-                            'mode' => 'Offline',
-                            'rating' => 4.8,
-                            'reviews_count' => 140,
-                            'price' => 3499,
-                            'original_price' => 5000,
-                            'discount' => '30% OFF',
-                            'thumbnail' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/course/320/course-thumbnail1665413823.jpeg',
-                        ],
-                    ];
-                    $sidebarCategories = [
-                        ['name' => 'All', 'count' => 3, 'active' => true],
-                        ['name' => 'Folk Dance', 'count' => 1, 'active' => false],
-                        ['name' => 'Classical Dance', 'count' => 1, 'active' => false],
-                        ['name' => 'Western Dance', 'count' => 1, 'active' => false],
-                    ];
-                } else {
+                if (empty($courses)) {
                     $courses = [
                         [
                             'id' => 1,
@@ -538,8 +574,10 @@ class HomeController extends Controller
                             'thumbnail' => 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&auto=format&fit=crop&q=80',
                         ],
                     ];
+                }
+                if (empty($sidebarCategories)) {
                     $sidebarCategories = [
-                        ['name' => 'All', 'count' => 18, 'active' => true],
+                        ['name' => 'All', 'count' => count($courses), 'active' => true],
                         ['name' => 'Bollywood Dance', 'count' => 6, 'active' => false],
                         ['name' => 'Classical Dance', 'count' => 4, 'active' => false],
                         ['name' => 'Hip-Hop & Western', 'count' => 4, 'active' => false],
@@ -557,432 +595,456 @@ class HomeController extends Controller
                 break;
 
             case 'medical':
-                $courses = [
-                    [
-                        'id' => 1,
-                        'title' => 'Paramedical & General Duty Assistant (GDA)',
-                        'slug' => 'paramedical-general-duty-assistant-gda',
-                        'duration' => '6 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 160,
-                        'price' => 14999,
-                        'original_price' => 21999,
-                        'discount' => '32% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 2,
-                        'title' => 'Medical Lab Technology (DMLT) Certification',
-                        'slug' => 'medical-lab-technology-dmlt-certification',
-                        'duration' => '1 Year',
-                        'mode' => 'Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 210,
-                        'price' => 24999,
-                        'original_price' => 34999,
-                        'discount' => '29% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 3,
-                        'title' => 'NEET Medical Entrance Preparation',
-                        'slug' => 'neet-medical-entrance-preparation',
-                        'duration' => '1 Year',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 310,
-                        'price' => 29999,
-                        'original_price' => 45000,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 4,
-                        'title' => 'Hospital Administration & Healthcare Management',
-                        'slug' => 'hospital-administration-healthcare-management',
-                        'duration' => '6 Months',
-                        'mode' => 'Online',
-                        'rating' => 4.7,
-                        'reviews_count' => 125,
-                        'price' => 18999,
-                        'original_price' => 26999,
-                        'discount' => '30% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&auto=format&fit=crop&q=80',
-                    ],
-                ];
+                if (empty($courses)) {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'Paramedical & General Duty Assistant (GDA)',
+                            'slug' => 'paramedical-general-duty-assistant-gda',
+                            'duration' => '6 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 160,
+                            'price' => 14999,
+                            'original_price' => 21999,
+                            'discount' => '32% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'Medical Lab Technology (DMLT) Certification',
+                            'slug' => 'medical-lab-technology-dmlt-certification',
+                            'duration' => '1 Year',
+                            'mode' => 'Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 210,
+                            'price' => 24999,
+                            'original_price' => 34999,
+                            'discount' => '29% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'NEET Medical Entrance Preparation',
+                            'slug' => 'neet-medical-entrance-preparation',
+                            'duration' => '1 Year',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 310,
+                            'price' => 29999,
+                            'original_price' => 45000,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 4,
+                            'title' => 'Hospital Administration & Healthcare Management',
+                            'slug' => 'hospital-administration-healthcare-management',
+                            'duration' => '6 Months',
+                            'mode' => 'Online',
+                            'rating' => 4.7,
+                            'reviews_count' => 125,
+                            'price' => 18999,
+                            'original_price' => 26999,
+                            'discount' => '30% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&auto=format&fit=crop&q=80',
+                        ],
+                    ];
+                }
                 $services = [
                     ['title' => 'MBBS / BDS Admission Guidance & Counseling', 'starting_price' => 4999, 'thumbnail' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Paramedical & Nursing Career Consultation', 'starting_price' => 999, 'thumbnail' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Overseas Medical University Admission Support', 'starting_price' => 2999, 'thumbnail' => 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Clinical Internship & Hospital Placement', 'starting_price' => 3499, 'thumbnail' => 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&auto=format&fit=crop&q=80'],
                 ];
-                $sidebarCategories = [
-                    ['name' => 'All', 'count' => 16, 'active' => true],
-                    ['name' => 'Paramedical Courses', 'count' => 5, 'active' => false],
-                    ['name' => 'Medical Lab (DMLT)', 'count' => 3, 'active' => false],
-                    ['name' => 'NEET Medical Prep', 'count' => 4, 'active' => false],
-                    ['name' => 'Nursing & Caregiving', 'count' => 3, 'active' => false],
-                    ['name' => 'Hospital Administration', 'count' => 2, 'active' => false],
-                    ['name' => 'Admission Guidance', 'count' => 4, 'active' => false],
-                ];
+                if (empty($sidebarCategories)) {
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 16, 'active' => true],
+                        ['name' => 'Paramedical Courses', 'count' => 5, 'active' => false],
+                        ['name' => 'Medical Lab (DMLT)', 'count' => 3, 'active' => false],
+                        ['name' => 'NEET Medical Prep', 'count' => 4, 'active' => false],
+                        ['name' => 'Nursing & Caregiving', 'count' => 3, 'active' => false],
+                        ['name' => 'Hospital Administration', 'count' => 2, 'active' => false],
+                        ['name' => 'Admission Guidance', 'count' => 4, 'active' => false],
+                    ];
+                }
                 break;
 
             case 'music':
-                $courses = [
-                    [
-                        'id' => 1,
-                        'title' => 'Indian Classical & Vocal Singing Masterclass',
-                        'slug' => 'indian-classical-vocal-singing-masterclass',
-                        'duration' => '3 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 130,
-                        'price' => 4999,
-                        'original_price' => 7999,
-                        'discount' => '38% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 2,
-                        'title' => 'Acoustic & Electric Guitar Training',
-                        'slug' => 'acoustic-electric-guitar-training',
-                        'duration' => '2 Months',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 175,
-                        'price' => 3999,
-                        'original_price' => 5999,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 3,
-                        'title' => 'Keyboard & Piano Comprehensive Course',
-                        'slug' => 'keyboard-piano-comprehensive-course',
-                        'duration' => '3 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 110,
-                        'price' => 4499,
-                        'original_price' => 6499,
-                        'discount' => '31% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1520523839898-507127051c20?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 4,
-                        'title' => 'Music Production & Audio Engineering',
-                        'slug' => 'music-production-audio-engineering',
-                        'duration' => '4 Months',
-                        'mode' => 'Online',
-                        'rating' => 4.7,
-                        'reviews_count' => 90,
-                        'price' => 14999,
-                        'original_price' => 22999,
-                        'discount' => '35% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&auto=format&fit=crop&q=80',
-                    ],
-                ];
+                if (empty($courses)) {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'Indian Classical & Vocal Singing Masterclass',
+                            'slug' => 'indian-classical-vocal-singing-masterclass',
+                            'duration' => '3 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 130,
+                            'price' => 4999,
+                            'original_price' => 7999,
+                            'discount' => '38% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'Acoustic & Electric Guitar Training',
+                            'slug' => 'acoustic-electric-guitar-training',
+                            'duration' => '2 Months',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 175,
+                            'price' => 3999,
+                            'original_price' => 5999,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'Keyboard & Piano Comprehensive Course',
+                            'slug' => 'keyboard-piano-comprehensive-course',
+                            'duration' => '3 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 110,
+                            'price' => 4499,
+                            'original_price' => 6499,
+                            'discount' => '31% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1520523839898-507127051c20?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 4,
+                            'title' => 'Music Production & Audio Engineering',
+                            'slug' => 'music-production-audio-engineering',
+                            'duration' => '4 Months',
+                            'mode' => 'Online',
+                            'rating' => 4.7,
+                            'reviews_count' => 90,
+                            'price' => 14999,
+                            'original_price' => 22999,
+                            'discount' => '35% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&auto=format&fit=crop&q=80',
+                        ],
+                    ];
+                }
                 $services = [
                     ['title' => 'Studio Recording & Track Production', 'starting_price' => 4999, 'thumbnail' => 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Private Vocal Coaching Session', 'starting_price' => 1499, 'thumbnail' => 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Instrument Repair & Tuning Service', 'starting_price' => 799, 'thumbnail' => 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Live Performance Band for Events', 'starting_price' => 9999, 'thumbnail' => 'https://images.unsplash.com/photo-1520523839898-507127051c20?w=400&auto=format&fit=crop&q=80'],
                 ];
-                $sidebarCategories = [
-                    ['name' => 'All', 'count' => 15, 'active' => true],
-                    ['name' => 'Vocal Singing', 'count' => 5, 'active' => false],
-                    ['name' => 'Guitar Classes', 'count' => 4, 'active' => false],
-                    ['name' => 'Keyboard & Piano', 'count' => 3, 'active' => false],
-                    ['name' => 'Music Production', 'count' => 3, 'active' => false],
-                    ['name' => 'Services', 'count' => 4, 'active' => false],
-                ];
+                if (empty($sidebarCategories)) {
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 15, 'active' => true],
+                        ['name' => 'Vocal Singing', 'count' => 5, 'active' => false],
+                        ['name' => 'Guitar Classes', 'count' => 4, 'active' => false],
+                        ['name' => 'Keyboard & Piano', 'count' => 3, 'active' => false],
+                        ['name' => 'Music Production', 'count' => 3, 'active' => false],
+                        ['name' => 'Services', 'count' => 4, 'active' => false],
+                    ];
+                }
                 break;
 
             case 'language':
-                $courses = [
-                    [
-                        'id' => 1,
-                        'title' => 'Spoken English & Fluency Masterclass',
-                        'slug' => 'spoken-english-fluency-masterclass',
-                        'duration' => '2 Months',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 280,
-                        'price' => 3999,
-                        'original_price' => 5999,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 2,
-                        'title' => 'IELTS Academic & General Comprehensive Prep',
-                        'slug' => 'ielts-academic-general-prep',
-                        'duration' => '2.5 Months',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 320,
-                        'price' => 8999,
-                        'original_price' => 12999,
-                        'discount' => '31% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 3,
-                        'title' => 'Business English & Corporate Communication',
-                        'slug' => 'business-english-corporate-communication',
-                        'duration' => '1.5 Months',
-                        'mode' => 'Online',
-                        'rating' => 4.7,
-                        'reviews_count' => 140,
-                        'price' => 4999,
-                        'original_price' => 7499,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 4,
-                        'title' => 'Personality Development & Public Speaking',
-                        'slug' => 'personality-development-public-speaking',
-                        'duration' => '1 Month',
-                        'mode' => 'Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 195,
-                        'price' => 2999,
-                        'original_price' => 4499,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&auto=format&fit=crop&q=80',
-                    ],
-                ];
+                if (empty($courses)) {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'Spoken English & Fluency Masterclass',
+                            'slug' => 'spoken-english-fluency-masterclass',
+                            'duration' => '2 Months',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 280,
+                            'price' => 3999,
+                            'original_price' => 5999,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'IELTS Academic & General Comprehensive Prep',
+                            'slug' => 'ielts-academic-general-prep',
+                            'duration' => '2.5 Months',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 320,
+                            'price' => 8999,
+                            'original_price' => 12999,
+                            'discount' => '31% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'Business English & Corporate Communication',
+                            'slug' => 'business-english-corporate-communication',
+                            'duration' => '1.5 Months',
+                            'mode' => 'Online',
+                            'rating' => 4.7,
+                            'reviews_count' => 140,
+                            'price' => 4999,
+                            'original_price' => 7499,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 4,
+                            'title' => 'Personality Development & Public Speaking',
+                            'slug' => 'personality-development-public-speaking',
+                            'duration' => '1 Month',
+                            'mode' => 'Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 195,
+                            'price' => 2999,
+                            'original_price' => 4499,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&auto=format&fit=crop&q=80',
+                        ],
+                    ];
+                }
                 $services = [
                     ['title' => 'IELTS / TOEFL Mock Test & Score Evaluation', 'starting_price' => 999, 'thumbnail' => 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Study Abroad & Student Visa Consultation', 'starting_price' => 1999, 'thumbnail' => 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Interview Preparation & Resume Review', 'starting_price' => 799, 'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Grammar & Accent Neutralization Training', 'starting_price' => 1499, 'thumbnail' => 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&auto=format&fit=crop&q=80'],
                 ];
-                $sidebarCategories = [
-                    ['name' => 'All', 'count' => 17, 'active' => true],
-                    ['name' => 'Spoken English', 'count' => 5, 'active' => false],
-                    ['name' => 'IELTS / TOEFL', 'count' => 4, 'active' => false],
-                    ['name' => 'Business English', 'count' => 3, 'active' => false],
-                    ['name' => 'Public Speaking', 'count' => 2, 'active' => false],
-                    ['name' => 'Services', 'count' => 4, 'active' => false],
-                ];
+                if (empty($sidebarCategories)) {
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 17, 'active' => true],
+                        ['name' => 'Spoken English', 'count' => 5, 'active' => false],
+                        ['name' => 'IELTS / TOEFL', 'count' => 4, 'active' => false],
+                        ['name' => 'Business English', 'count' => 3, 'active' => false],
+                        ['name' => 'Public Speaking', 'count' => 2, 'active' => false],
+                        ['name' => 'Services', 'count' => 4, 'active' => false],
+                    ];
+                }
                 break;
 
             case 'commerce':
-                $courses = [
-                    [
-                        'id' => 1,
-                        'title' => 'CA Foundation & Intermediate Coaching',
-                        'slug' => 'ca-foundation-intermediate-coaching',
-                        'duration' => '6 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 220,
-                        'price' => 18999,
-                        'original_price' => 28000,
-                        'discount' => '32% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 2,
-                        'title' => 'Tally Prime with GST & Practical Accounting',
-                        'slug' => 'tally-prime-gst-practical-accounting',
-                        'duration' => '2 Months',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 310,
-                        'price' => 4999,
-                        'original_price' => 7999,
-                        'discount' => '38% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 3,
-                        'title' => 'Income Tax, TDS & Balance Sheet Finalization',
-                        'slug' => 'income-tax-tds-balance-sheet',
-                        'duration' => '2.5 Months',
-                        'mode' => 'Online',
-                        'rating' => 4.7,
-                        'reviews_count' => 140,
-                        'price' => 7999,
-                        'original_price' => 11999,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 4,
-                        'title' => 'Stock Market, Trading & Wealth Management',
-                        'slug' => 'stock-market-trading-wealth-management',
-                        'duration' => '1.5 Months',
-                        'mode' => 'Online',
-                        'rating' => 4.8,
-                        'reviews_count' => 190,
-                        'price' => 6999,
-                        'original_price' => 9999,
-                        'discount' => '30% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&auto=format&fit=crop&q=80',
-                    ],
-                ];
+                if (empty($courses)) {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'CA Foundation & Intermediate Coaching',
+                            'slug' => 'ca-foundation-intermediate-coaching',
+                            'duration' => '6 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 220,
+                            'price' => 18999,
+                            'original_price' => 28000,
+                            'discount' => '32% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'Tally Prime with GST & Practical Accounting',
+                            'slug' => 'tally-prime-gst-practical-accounting',
+                            'duration' => '2 Months',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 310,
+                            'price' => 4999,
+                            'original_price' => 7999,
+                            'discount' => '38% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'Income Tax, TDS & Balance Sheet Finalization',
+                            'slug' => 'income-tax-tds-balance-sheet',
+                            'duration' => '2.5 Months',
+                            'mode' => 'Online',
+                            'rating' => 4.7,
+                            'reviews_count' => 140,
+                            'price' => 7999,
+                            'original_price' => 11999,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 4,
+                            'title' => 'Stock Market, Trading & Wealth Management',
+                            'slug' => 'stock-market-trading-wealth-management',
+                            'duration' => '1.5 Months',
+                            'mode' => 'Online',
+                            'rating' => 4.8,
+                            'reviews_count' => 190,
+                            'price' => 6999,
+                            'original_price' => 9999,
+                            'discount' => '30% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&auto=format&fit=crop&q=80',
+                        ],
+                    ];
+                }
                 $services = [
                     ['title' => 'GST Registration & Monthly Return Filing', 'starting_price' => 1499, 'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Business Accounting & Bookkeeping Support', 'starting_price' => 2999, 'thumbnail' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Income Tax Return (ITR) Filing Consultation', 'starting_price' => 999, 'thumbnail' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Audit & Financial Feasibility Report', 'starting_price' => 4999, 'thumbnail' => 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&auto=format&fit=crop&q=80'],
                 ];
-                $sidebarCategories = [
-                    ['name' => 'All', 'count' => 16, 'active' => true],
-                    ['name' => 'CA / CS Coaching', 'count' => 4, 'active' => false],
-                    ['name' => 'Tally Prime & GST', 'count' => 4, 'active' => false],
-                    ['name' => 'Income Tax & TDS', 'count' => 3, 'active' => false],
-                    ['name' => 'Stock Market Trading', 'count' => 2, 'active' => false],
-                    ['name' => 'Services', 'count' => 4, 'active' => false],
-                ];
+                if (empty($sidebarCategories)) {
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 16, 'active' => true],
+                        ['name' => 'CA / CS Coaching', 'count' => 4, 'active' => false],
+                        ['name' => 'Tally Prime & GST', 'count' => 4, 'active' => false],
+                        ['name' => 'Income Tax & TDS', 'count' => 3, 'active' => false],
+                        ['name' => 'Stock Market Trading', 'count' => 2, 'active' => false],
+                        ['name' => 'Services', 'count' => 4, 'active' => false],
+                    ];
+                }
                 break;
 
             case 'academic':
-                $courses = [
-                    [
-                        'id' => 1,
-                        'title' => 'Class 10 Board Exam Complete Crash Course',
-                        'slug' => 'class-10-board-exam-complete-course',
-                        'duration' => '3 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 250,
-                        'price' => 6999,
-                        'original_price' => 9999,
-                        'discount' => '30% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 2,
-                        'title' => 'Class 11-12 Science (Physics, Chem, Maths)',
-                        'slug' => 'class-11-12-science-coaching',
-                        'duration' => '1 Year',
-                        'mode' => 'Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 190,
-                        'price' => 24999,
-                        'original_price' => 35000,
-                        'discount' => '29% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 3,
-                        'title' => 'JEE Main & Advanced Foundation Batch',
-                        'slug' => 'jee-main-advanced-foundation-batch',
-                        'duration' => '1 Year',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 340,
-                        'price' => 34999,
-                        'original_price' => 49999,
-                        'discount' => '30% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 4,
-                        'title' => 'Class 8-9 Foundation (Maths & Science Booster)',
-                        'slug' => 'class-8-9-foundation-maths-science',
-                        'duration' => '6 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.7,
-                        'reviews_count' => 110,
-                        'price' => 9999,
-                        'original_price' => 14999,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80',
-                    ],
-                ];
+                if (empty($courses)) {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'Class 10 Board Exam Complete Crash Course',
+                            'slug' => 'class-10-board-exam-complete-course',
+                            'duration' => '3 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 250,
+                            'price' => 6999,
+                            'original_price' => 9999,
+                            'discount' => '30% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'Class 11-12 Science (Physics, Chem, Maths)',
+                            'slug' => 'class-11-12-science-coaching',
+                            'duration' => '1 Year',
+                            'mode' => 'Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 190,
+                            'price' => 24999,
+                            'original_price' => 35000,
+                            'discount' => '29% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'JEE Main & Advanced Foundation Batch',
+                            'slug' => 'jee-main-advanced-foundation-batch',
+                            'duration' => '1 Year',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 340,
+                            'price' => 34999,
+                            'original_price' => 49999,
+                            'discount' => '30% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 4,
+                            'title' => 'Class 8-9 Foundation (Maths & Science Booster)',
+                            'slug' => 'class-8-9-foundation-maths-science',
+                            'duration' => '6 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.7,
+                            'reviews_count' => 110,
+                            'price' => 9999,
+                            'original_price' => 14999,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80',
+                        ],
+                    ];
+                }
                 $services = [
                     ['title' => '1-on-1 Home & Online Private Tutoring', 'starting_price' => 1999, 'thumbnail' => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Weekly Chapter Test Series & Progress Report', 'starting_price' => 999, 'thumbnail' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Career Counseling & Stream Selection (After 10th)', 'starting_price' => 799, 'thumbnail' => 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Doubt Clearing & Exam Strategy Sessions', 'starting_price' => 1499, 'thumbnail' => 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80'],
                 ];
-                $sidebarCategories = [
-                    ['name' => 'All', 'count' => 16, 'active' => true],
-                    ['name' => 'Board Exam Prep', 'count' => 5, 'active' => false],
-                    ['name' => 'Science (PCM/PCB)', 'count' => 4, 'active' => false],
-                    ['name' => 'JEE / NEET Foundation', 'count' => 3, 'active' => false],
-                    ['name' => 'School Tuitions (8-10th)', 'count' => 3, 'active' => false],
-                    ['name' => 'Tutoring Services', 'count' => 4, 'active' => false],
-                ];
+                if (empty($sidebarCategories)) {
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 16, 'active' => true],
+                        ['name' => 'Board Exam Prep', 'count' => 5, 'active' => false],
+                        ['name' => 'Science (PCM/PCB)', 'count' => 4, 'active' => false],
+                        ['name' => 'JEE / NEET Foundation', 'count' => 3, 'active' => false],
+                        ['name' => 'School Tuitions (8-10th)', 'count' => 3, 'active' => false],
+                        ['name' => 'Tutoring Services', 'count' => 4, 'active' => false],
+                    ];
+                }
                 break;
 
             default: // computer & IT
-                $courses = [
-                    [
-                        'id' => 1,
-                        'title' => 'Digital Marketing Complete Course',
-                        'slug' => 'digital-marketing-complete-course-2026',
-                        'duration' => '2 Months',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 320,
-                        'price' => 12999,
-                        'original_price' => 18999,
-                        'discount' => '31% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 2,
-                        'title' => 'Tally Prime with GST',
-                        'slug' => 'tally-prime-with-gst',
-                        'duration' => '1.5 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.7,
-                        'reviews_count' => 180,
-                        'price' => 4999,
-                        'original_price' => 6999,
-                        'discount' => '29% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 3,
-                        'title' => 'Full Stack Web Development Course',
-                        'slug' => 'full-stack-web-development-course',
-                        'duration' => '3 Months',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.6,
-                        'reviews_count' => 150,
-                        'price' => 14999,
-                        'original_price' => 22999,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 4,
-                        'title' => 'AI Tools, ChatGPT & Python Coding',
-                        'slug' => 'ai-tools-chatgpt-python-coding',
-                        'duration' => '1.5 Months',
-                        'mode' => 'Online',
-                        'rating' => 4.8,
-                        'reviews_count' => 210,
-                        'price' => 5999,
-                        'original_price' => 8999,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80',
-                    ],
-                ];
+                if (empty($courses)) {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'Digital Marketing Complete Course',
+                            'slug' => 'digital-marketing-complete-course-2026',
+                            'duration' => '2 Months',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 320,
+                            'price' => 12999,
+                            'original_price' => 18999,
+                            'discount' => '31% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'Tally Prime with GST',
+                            'slug' => 'tally-prime-with-gst',
+                            'duration' => '1.5 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.7,
+                            'reviews_count' => 180,
+                            'price' => 4999,
+                            'original_price' => 6999,
+                            'discount' => '29% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'Full Stack Web Development Course',
+                            'slug' => 'full-stack-web-development-course',
+                            'duration' => '3 Months',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.6,
+                            'reviews_count' => 150,
+                            'price' => 14999,
+                            'original_price' => 22999,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 4,
+                            'title' => 'AI Tools, ChatGPT & Python Coding',
+                            'slug' => 'ai-tools-chatgpt-python-coding',
+                            'duration' => '1.5 Months',
+                            'mode' => 'Online',
+                            'rating' => 4.8,
+                            'reviews_count' => 210,
+                            'price' => 5999,
+                            'original_price' => 8999,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80',
+                        ],
+                    ];
+                }
                 $services = [
                     ['title' => 'Website Development for Institute', 'starting_price' => 4999, 'thumbnail' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Social Media Management', 'starting_price' => 2499, 'thumbnail' => 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Graphics & Banner Design', 'starting_price' => 999, 'thumbnail' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Resume Making', 'starting_price' => 499, 'thumbnail' => 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&auto=format&fit=crop&q=80'],
                 ];
-                $sidebarCategories = [
-                    ['name' => 'All', 'count' => 24, 'active' => true],
-                    ['name' => 'Computer Courses', 'count' => 24, 'active' => false],
-                    ['name' => 'Digital Marketing', 'count' => 8, 'active' => false],
-                    ['name' => 'Programming & Development', 'count' => 6, 'active' => false],
-                    ['name' => 'Tally & Accounting', 'count' => 5, 'active' => false],
-                    ['name' => 'Designing Courses', 'count' => 4, 'active' => false],
-                    ['name' => 'AI Tools & Productivity', 'count' => 6, 'active' => false],
-                    ['name' => 'Services', 'count' => 5, 'active' => false],
-                ];
+                if (empty($sidebarCategories)) {
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 24, 'active' => true],
+                        ['name' => 'Computer Courses', 'count' => 24, 'active' => false],
+                        ['name' => 'Digital Marketing', 'count' => 8, 'active' => false],
+                        ['name' => 'Programming & Development', 'count' => 6, 'active' => false],
+                        ['name' => 'Tally & Accounting', 'count' => 5, 'active' => false],
+                        ['name' => 'Designing Courses', 'count' => 4, 'active' => false],
+                        ['name' => 'AI Tools & Productivity', 'count' => 6, 'active' => false],
+                        ['name' => 'Services', 'count' => 5, 'active' => false],
+                    ];
+                }
                 break;
         }
 
@@ -2943,6 +3005,74 @@ class HomeController extends Controller
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Database connection failed on courseShow: ' . $e->getMessage());
+        }
+
+        if (!$course) {
+            // Check in InstituteCourse (authentic institute courses)
+            $instCourse = null;
+            if (preg_match('/-(\d+)$/', $slug, $matches)) {
+                $instCourse = \App\Models\InstituteCourse::find($matches[1]);
+            }
+            if (!$instCourse) {
+                $cleanTitle = str_replace('-', ' ', preg_replace('/-\d+$/', '', $slug));
+                $instCourse = \App\Models\InstituteCourse::where('course_name', 'like', "%{$cleanTitle}%")->first();
+            }
+
+            if ($instCourse) {
+                $business = \App\Models\BusinessListing::where('slug', 'like', "%-{$instCourse->affiliate_id}")->first();
+                $bName = $business->business_name ?? 'Institute Faculty';
+                $bCity = $business->city ?? 'Ahmedabad';
+
+                $price = $instCourse->price;
+                $origPrice = $instCourse->original_price;
+
+                $course = (object) [
+                    'id' => $instCourse->id,
+                    'title' => $instCourse->course_name,
+                    'slug' => $instCourse->slug,
+                    'category' => $business->category ?? 'Coaching Institute',
+                    'language' => $instCourse->course_language ?: 'English / Hindi',
+                    'level' => 'All Levels',
+                    'duration' => $instCourse->duration ?: '3 Months',
+                    'short_description' => $instCourse->course_desc ? \Illuminate\Support\Str::limit(strip_tags($instCourse->course_desc), 180) : ($instCourse->course_name . ' certification program offered by ' . $bName . ' in ' . $bCity . '.'),
+                    'description' => $instCourse->course_desc ?: ($instCourse->course_name . ' comprehensive course with live training, practical sessions and completion certificate.'),
+                    'thumbnail' => $instCourse->thumbnail_url,
+                    'cover_image' => $instCourse->thumbnail_url,
+                    'price' => $origPrice,
+                    'discount_price' => $price,
+                    'access_type' => 'Full Lifetime Access',
+                    'certificate_included' => true,
+                    'qa_enabled' => true,
+                    'status' => 'published',
+                    'seller_id' => $business->seller_id ?? null,
+                    'created_at' => $instCourse->created_at ?: now(),
+                    'updated_at' => now(),
+                    'badge' => 'Verified',
+                    'rating' => 4.9,
+                    'reviews_count' => 145,
+                    'students_count' => 1250,
+                    'instructor_name' => $instCourse->name_of_instructor ?: $bName,
+                    'instructor_avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                    'instructor_category' => 'Senior Academic',
+                    'meta_description' => $instCourse->course_name . ' coaching and certification course at ' . $bName,
+                    'meta_keywords' => $instCourse->course_name . ', coaching institute, digital class',
+                    'seller' => (object) [
+                        'user' => (object) [
+                            'name' => $bName,
+                        ],
+                        'businessDetail' => (object) [
+                            'company_name' => $bName,
+                            'phone' => $business->phone ?? '',
+                            'address' => $business->address ?? '',
+                            'city' => $bCity,
+                            'state' => $business->state ?? 'Gujarat',
+                        ],
+                    ],
+                    'contents' => collect(),
+                    'is_institute_course' => true,
+                    'institute_url' => $business ? $business->url : null,
+                ];
+            }
         }
 
         if (!$course) {
