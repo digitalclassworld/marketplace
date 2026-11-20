@@ -639,7 +639,7 @@
                 </p>
 
                 <!-- Search Box -->
-                <form action="{{ route('home') }}" method="GET" class="hero-search-box d-flex align-items-center">
+                <form action="{{ route('businesses') }}" method="GET" class="hero-search-box d-flex align-items-center">
                     <div class="d-flex align-items-center flex-grow-1 px-2">
                         <i class="fa-solid fa-magnifying-glass text-muted me-2"></i>
                         <input type="text" name="search" value="{{ $searchQuery }}" class="hero-search-input flex-grow-1" placeholder="Search by business name, category or location">
@@ -674,13 +674,13 @@
                 <!-- Popular Searches Pills -->
                 <div class="popular-pills">
                     <span class="text-muted fw-bold me-1">Popular Searches:</span>
-                    <a href="{{ route('home', ['search' => 'Computer Classes']) }}" class="popular-pill">Computer Classes</a>
-                    <a href="{{ route('home', ['category' => 'Coaching Institute']) }}" class="popular-pill">Coaching Institute</a>
-                    <a href="{{ route('home', ['search' => 'Tuition Classes']) }}" class="popular-pill">Tuition Classes</a>
-                    <a href="{{ route('home', ['search' => 'Laptop Repair']) }}" class="popular-pill">Laptop Repair</a>
-                    <a href="{{ route('home', ['category' => 'Gym & Fitness']) }}" class="popular-pill">Gym</a>
-                    <a href="{{ route('home', ['search' => 'Dance Class']) }}" class="popular-pill">Dance Class</a>
-                    <a href="{{ route('home', ['category' => 'Play School']) }}" class="popular-pill">Play School</a>
+                    <a href="{{ route('businesses', ['search' => 'Computer Classes']) }}" class="popular-pill">Computer Classes</a>
+                    <a href="{{ route('businesses', ['category' => 'Coaching Institute']) }}" class="popular-pill">Coaching Institute</a>
+                    <a href="{{ route('businesses', ['search' => 'Tuition Classes']) }}" class="popular-pill">Tuition Classes</a>
+                    <a href="{{ route('businesses', ['search' => 'Laptop Repair']) }}" class="popular-pill">Laptop Repair</a>
+                    <a href="{{ route('businesses', ['category' => 'Gym & Fitness']) }}" class="popular-pill">Gym</a>
+                    <a href="{{ route('businesses', ['search' => 'Dance Class']) }}" class="popular-pill">Dance Class</a>
+                    <a href="{{ route('businesses', ['category' => 'Play School']) }}" class="popular-pill">Play School</a>
                 </div>
             </div>
 
@@ -754,7 +754,7 @@
                     $catParam = ($cat['name'] === 'All Businesses' || $cat['slug'] === 'all') ? '' : $cat['slug'];
                     $catQuery = array_merge(request()->query(), ['category' => $catParam]);
                     if (empty($catParam)) unset($catQuery['category']);
-                    $catUrl = route('home', $catQuery);
+                    $catUrl = route('businesses', $catQuery);
                 @endphp
                 <a href="{{ $catUrl }}"
                    class="cat-pill-btn {{ $isCatActive ? 'active' : '' }}">
@@ -777,7 +777,7 @@
                  LEFT COLUMN: FILTERS SIDEBAR
                  ========================================== -->
             <div class="col-xl-2 col-lg-3 col-md-4">
-                <form id="homeFilterForm" action="{{ route('home') }}" method="GET" class="filter-card mb-3">
+                <form id="homeFilterForm" action="{{ route('businesses') }}" method="GET" class="filter-card mb-3">
                     @if($searchQuery)
                         <input type="hidden" name="search" value="{{ $searchQuery }}">
                     @endif
@@ -787,7 +787,7 @@
                         <div class="fw-bold text-dark" style="font-size: 0.875rem;">
                             <i class="fa-solid fa-sliders me-1 text-primary"></i> Filters
                         </div>
-                        <a href="{{ route('home') }}" class="text-decoration-none small text-primary fw-semibold">Clear All</a>
+                        <a href="{{ route('businesses') }}" class="text-decoration-none small text-primary fw-semibold">Clear All</a>
                     </div>
 
                     <!-- Location Selector -->
@@ -1032,13 +1032,13 @@
                                 </p>
                             </div>
                             <div class="d-flex flex-wrap gap-1">
-                                <a href="{{ route('home', ['category' => 'Coaching Institute']) }}" class="badge bg-white text-dark text-decoration-none px-2 py-1" style="font-size: 0.65rem;">
+                                <a href="{{ route('businesses', ['category' => 'Coaching Institute']) }}" class="badge bg-white text-dark text-decoration-none px-2 py-1" style="font-size: 0.65rem;">
                                     <i class="fa-solid fa-school text-primary me-1"></i> Institutes
                                 </a>
-                                <a href="{{ route('home', ['category' => 'Retail Shops']) }}" class="badge bg-white text-dark text-decoration-none px-2 py-1" style="font-size: 0.65rem;">
+                                <a href="{{ route('businesses', ['category' => 'Retail Shops']) }}" class="badge bg-white text-dark text-decoration-none px-2 py-1" style="font-size: 0.65rem;">
                                     <i class="fa-solid fa-bag-shopping text-warning me-1"></i> Shops
                                 </a>
-                                <a href="{{ route('home', ['category' => 'Computer Training']) }}" class="badge bg-white text-dark text-decoration-none px-2 py-1" style="font-size: 0.65rem;">
+                                <a href="{{ route('businesses', ['category' => 'Computer Training']) }}" class="badge bg-white text-dark text-decoration-none px-2 py-1" style="font-size: 0.65rem;">
                                     <i class="fa-solid fa-laptop text-info me-1"></i> Training Centers
                                 </a>
                             </div>
@@ -1176,7 +1176,7 @@
                             <i class="fa-solid fa-magnifying-glass fs-1 text-muted mb-3"></i>
                             <h5 class="fw-bold text-dark">No businesses found matching your criteria</h5>
                             <p class="text-muted small">Try broadening your search term or clearing the filters.</p>
-                            <a href="{{ route('home') }}" class="btn btn-primary btn-sm px-4">Reset All Filters</a>
+                            <a href="{{ route('businesses') }}" class="btn btn-primary btn-sm px-4">Reset All Filters</a>
                         </div>
                     @endforelse
                 </div>

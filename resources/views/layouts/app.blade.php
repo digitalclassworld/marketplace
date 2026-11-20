@@ -507,7 +507,7 @@
                 </ul>
 
                 <!-- Center Search Input with Modern Pill -->
-                <form action="{{ route('home') }}" method="GET" class="flex-grow-1 mx-xl-3 my-2 my-xl-0" style="max-width: 460px;">
+                <form action="{{ request()->routeIs('businesses') ? route('businesses') : (request()->routeIs('courses*') ? route('courses') : (request()->routeIs('services*') ? route('services') : (request()->routeIs('products*') ? route('products') : route('home')))) }}" method="GET" class="flex-grow-1 mx-xl-3 my-2 my-xl-0" style="max-width: 460px;">
                     <div class="dc-nav-search-wrap">
                         <i class="fa-solid fa-magnifying-glass text-muted me-2" style="font-size: 0.85rem;"></i>
                         <input type="text" name="search" value="{{ request('search') }}" class="dc-nav-search-input" placeholder="Search courses, businesses, products, services...">
@@ -534,18 +534,21 @@
                             </li>
                             <li><hr class="dropdown-divider my-1"></li>
                             <li class="dropdown-header small text-muted fw-bold py-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">POPULAR CITIES</li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'All Locations' ? 'active' : '' }}" href="{{ route('home', ['city' => 'All Locations']) }}"><i class="fa-solid fa-globe me-1.5 text-secondary"></i> All India</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ (!request('city') || request('city') === 'Ahmedabad') ? 'active' : '' }}" href="{{ route('home', ['city' => 'Ahmedabad']) }}">Ahmedabad</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Surat' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Surat']) }}">Surat</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Vadodara' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Vadodara']) }}">Vadodara</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Rajkot' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Rajkot']) }}">Rajkot</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Gandhinagar' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Gandhinagar']) }}">Gandhinagar</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Mumbai' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Mumbai']) }}">Mumbai</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Delhi NCR' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Delhi NCR']) }}">Delhi NCR</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Bengaluru' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Bengaluru']) }}">Bengaluru</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Pune' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Pune']) }}">Pune</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Jaipur' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Jaipur']) }}">Jaipur</a></li>
-                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Indore' ? 'active' : '' }}" href="{{ route('home', ['city' => 'Indore']) }}">Indore</a></li>
+                            @php
+                                $navCityTarget = request()->routeIs('businesses') ? 'businesses' : 'home';
+                            @endphp
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'All Locations' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'All Locations']) }}"><i class="fa-solid fa-globe me-1.5 text-secondary"></i> All India</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ (!request('city') || request('city') === 'Ahmedabad') ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Ahmedabad']) }}">Ahmedabad</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Surat' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Surat']) }}">Surat</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Vadodara' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Vadodara']) }}">Vadodara</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Rajkot' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Rajkot']) }}">Rajkot</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Gandhinagar' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Gandhinagar']) }}">Gandhinagar</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Mumbai' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Mumbai']) }}">Mumbai</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Delhi NCR' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Delhi NCR']) }}">Delhi NCR</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Bengaluru' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Bengaluru']) }}">Bengaluru</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Pune' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Pune']) }}">Pune</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Jaipur' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Jaipur']) }}">Jaipur</a></li>
+                            <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Indore' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Indore']) }}">Indore</a></li>
                         </ul>
                     </div>
 
@@ -2122,7 +2125,8 @@
             navigator.geolocation.getCurrentPosition(function(pos) {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
-                const url = new URL("{{ route('home') }}", window.location.origin);
+                const targetBase = window.location.pathname.startsWith('/businesses') ? "{{ route('businesses') }}" : "{{ route('home') }}";
+                const url = new URL(targetBase, window.location.origin);
                 url.searchParams.set('lat', lat);
                 url.searchParams.set('lng', lng);
                 url.searchParams.set('city', 'Near Me');
