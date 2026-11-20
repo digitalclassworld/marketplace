@@ -493,7 +493,7 @@
                         <a class="nav-link dc-nav-link {{ request()->routeIs('products') ? 'active-marketplace-tab' : '' }}" href="{{ route('products') }}">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link dc-nav-link {{ request()->routeIs('home') || request()->routeIs('business.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('home') }}">Businesses</a>
+                        <a class="nav-link dc-nav-link {{ request()->routeIs('businesses') || request()->routeIs('business.*') ? 'active-marketplace-tab' : '' }}" href="{{ route('businesses') }}">Businesses</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dc-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -818,7 +818,7 @@
                 <div class="col-lg-2 col-md-3 col-6">
                     <div class="dc-footer-title">Marketplace</div>
                     <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
-                        <li><a href="{{ route('home') }}">Local Businesses</a></li>
+                        <li><a href="{{ route('businesses') }}">Local Businesses</a></li>
                         <li><a href="{{ route('courses') }}">Online Courses</a></li>
                         <li><a href="{{ route('products') }}">Shop Products</a></li>
                         <li><a href="{{ route('services') }}">Hire Services</a></li>

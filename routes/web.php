@@ -58,6 +58,7 @@ Route::get('/service/{slug}', [HomeController::class, 'serviceShow'])->name('ser
 Route::post('/service/{slug}/book', [HomeController::class, 'serviceBook'])->name('service.book');
 Route::post('/service/{slug}/quote', [HomeController::class, 'serviceQuote'])->name('service.quote');
 Route::get('/products', [HomeController::class, 'products'])->name('products');
+Route::get('/businesses', [HomeController::class, 'businesses'])->name('businesses');
 Route::get('/product/{slug}', [HomeController::class, 'productShow'])->name('product.show');
 Route::get('/course/{slug}', [HomeController::class, 'courseShow'])->name('course.show');
 Route::post('/course/{slug}/enroll', [HomeController::class, 'courseEnroll'])->name('course.enroll');

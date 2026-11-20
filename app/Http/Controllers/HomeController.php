@@ -16,7 +16,105 @@ class HomeController extends Controller
     /**
      * Display the dynamic public homepage matching the Local Businesses & Institutes design.
      */
+    /**
+     * Display the dynamic public homepage matching the Marketplace multi-vertical design:
+     * 1. Hero with search, categories, quick stats
+     * 2. Promotional Banners
+     * 3. Online Courses with "View All ->"
+     * 4. Professional Services with "View All ->"
+     * 5. Featured Products with "View All ->"
+     * 6. Popular Businesses with "View All ->"
+     * 7. Marketplace Value Props & Stats Ribbon
+     */
     public function index(Request $request): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $featuredCourses   = collect();
+        $featuredServices  = collect();
+        $featuredProducts  = collect();
+        $popularBusinesses = collect();
+
+        $totalCourses    = 0;
+        $totalServices   = 0;
+        $totalProducts   = 0;
+        $totalBusinesses = 0;
+
+        try {
+            if (Schema::hasTable('courses')) {
+                $totalCourses = Course::whereIn('status', ['approved', 'active', 'published'])->count();
+                $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
+                    ->latest()
+                    ->take(8)
+                    ->get();
+            }
+
+            if (Schema::hasTable('services')) {
+                $totalServices = Service::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published'])->count();
+                $featuredServices = Service::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
+                    ->latest()
+                    ->take(6)
+                    ->get();
+            }
+
+            if (Schema::hasTable('products')) {
+                $totalProducts = Product::whereIn('status', ['approved', 'active', 'published'])->count();
+                $featuredProducts = Product::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
+                    ->latest()
+                    ->take(6)
+                    ->get();
+            }
+
+            if (Schema::hasTable('business_listings')) {
+                $totalBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])->count();
+                $popularBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
+                    ->orderByDesc('rating')
+                    ->take(6)
+                    ->get();
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Catalog load failed on marketplace index: ' . $e->getMessage());
+        }
+
+        // Horizontal category pills matching the mockup
+        $categoryPills = [
+            ['name' => 'Online Courses',       'icon' => 'fa-solid fa-graduation-cap',   'url' => route('courses')],
+            ['name' => 'Professional Services','icon' => 'fa-solid fa-briefcase',        'url' => route('services')],
+            ['name' => 'Products',             'icon' => 'fa-solid fa-box-open',         'url' => route('products')],
+            ['name' => 'Businesses',           'icon' => 'fa-solid fa-building-columns', 'url' => route('businesses')],
+            ['name' => 'Digital Marketing',    'icon' => 'fa-solid fa-bullhorn',         'url' => route('courses', ['category' => 'Digital Marketing'])],
+            ['name' => 'IT & Software',        'icon' => 'fa-solid fa-code',             'url' => route('courses', ['category' => 'Web Development'])],
+            ['name' => 'Design & Creative',    'icon' => 'fa-solid fa-palette',          'url' => route('services', ['category' => 'Design'])],
+            ['name' => 'Tally & Accounting',   'icon' => 'fa-solid fa-calculator',       'url' => route('courses', ['category' => 'Tally'])],
+            ['name' => 'Coaching Institutes',  'icon' => 'fa-solid fa-chalkboard-user',  'url' => route('businesses', ['category' => 'Coaching Institute'])],
+            ['name' => 'Health & Wellness',    'icon' => 'fa-solid fa-heart-pulse',      'url' => route('businesses', ['category' => 'Gym & Fitness'])],
+        ];
+
+        return view('home.index', compact(
+            'seller',
+            'featuredCourses',
+            'featuredServices',
+            'featuredProducts',
+            'popularBusinesses',
+            'totalCourses',
+            'totalServices',
+            'totalProducts',
+            'totalBusinesses',
+            'categoryPills'
+        ));
+    }
+
+    /**
+     * Dedicated Local Businesses & Institutes Directory page with full filters, city selection and map.
+     */
+    public function businesses(Request $request): View
     {
         $seller = null;
         if (Auth::check() && Auth::user()->isSeller()) {
@@ -152,7 +250,6 @@ class HomeController extends Controller
                 }
             }
 
-            // Also load seller uploaded courses, services and products for homepage showcase
             if (Schema::hasTable('courses')) {
                 $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
@@ -177,7 +274,7 @@ class HomeController extends Controller
                     ->get();
             }
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('Database connection failed on homepage: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('Database connection failed on businesses page: ' . $e->getMessage());
             $businesses = collect();
         }
 
@@ -210,7 +307,7 @@ class HomeController extends Controller
             ['name' => 'Restaurant & Food',  'count' => \App\Models\BusinessListing::where('category', 'like', '%Restaurant%')->count()],
         ];
 
-        return view('home.index', [
+        return view('home.businesses', [
             'seller'                => $seller,
             'businesses'            => $businesses,
             'featuredCourses'       => $featuredCourses,
