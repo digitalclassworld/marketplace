@@ -64,11 +64,26 @@ Route::post('/course/{slug}/enroll', [HomeController::class, 'courseEnroll'])->n
 Route::post('/course/{slug}/review', [HomeController::class, 'courseReview'])->name('course.review');
 Route::get('/course/{slug}/certificate', [CertificateController::class, 'forCourse'])->name('course.certificate');
 Route::get('/certificate/{code?}', [CertificateController::class, 'show'])->name('certificate.show');
-Route::get('/business/{slug?}', [HomeController::class, 'businessProfile'])->name('business.show');
-Route::get('/sellers/{slug?}', [HomeController::class, 'businessProfile'])->name('sellers.show');
-Route::get('/instructor/{slug?}', [HomeController::class, 'businessProfile'])->name('instructor.profile');
+// Business Directory Listing Public Profile matching target SEO format:
+// e.g. /business-listing/coaching/prarthna-paramedical-institute
+Route::get('/business-listing/{category}/{slug}', [HomeController::class, 'businessProfile'])->name('business.show');
+Route::get('/business-listing/{slug}', [HomeController::class, 'businessProfile'])->name('business.show.single');
+
+// Legacy 301 redirects from /business/{slug} and /sellers/{slug} to /business-listing/{category}/{slug}
+Route::get('/business/{slug?}', [HomeController::class, 'businessProfileLegacyRedirect']);
+Route::get('/sellers/{slug?}', [HomeController::class, 'businessProfileLegacyRedirect'])->name('sellers.show');
+Route::get('/instructor/{slug?}', [HomeController::class, 'businessProfileLegacyRedirect'])->name('instructor.profile');
+
+Route::post('/business-listing/{category}/{slug}/enquiry', [HomeController::class, 'submitEnquiry']);
+Route::post('/business-listing/{slug}/enquiry', [HomeController::class, 'submitEnquiry']);
 Route::post('/business/{slug?}/enquiry', [HomeController::class, 'submitEnquiry'])->name('business.enquiry');
+
+Route::post('/business-listing/{category}/{slug}/demo', [HomeController::class, 'bookDemo']);
+Route::post('/business-listing/{slug}/demo', [HomeController::class, 'bookDemo']);
 Route::post('/business/{slug?}/demo', [HomeController::class, 'bookDemo'])->name('business.demo');
+
+Route::post('/business-listing/{category}/{slug}/review', [HomeController::class, 'submitReview']);
+Route::post('/business-listing/{slug}/review', [HomeController::class, 'submitReview']);
 Route::post('/business/{slug?}/review', [HomeController::class, 'submitReview'])->name('business.review');
 
 // High-Converting SEO Landing Pages & XML Sitemap

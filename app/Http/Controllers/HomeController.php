@@ -232,10 +232,18 @@ class HomeController extends Controller
     }
 
     /**
-     * Display the public Business Profile page matching the VCEC UI design.
+     * Display the public Business Profile page matching /business-listing/{category}/{slug}
      */
-    public function businessProfile(Request $request, $slug = null): View
+    public function businessProfile(Request $request, $categoryOrSlug = null, $slug = null): View
     {
+        $category = null;
+        if ($slug !== null) {
+            $category = $categoryOrSlug;
+            $targetSlug = $slug;
+        } else {
+            $targetSlug = $categoryOrSlug;
+        }
+
         $seller = null;
         if (Auth::check() && Auth::user()->isSeller()) {
             $seller = Auth::user()->seller;
@@ -243,20 +251,48 @@ class HomeController extends Controller
 
         $business = null;
         try {
-            if (Schema::hasTable('business_listings')) {
-                if ($slug) {
-                    $business = BusinessListing::where('slug', $slug)->first();
-                }
+            if (Schema::hasTable('business_listings') && $targetSlug) {
+                // 1. Direct match on slug
+                $business = BusinessListing::where('slug', $targetSlug)->first();
+
+                // 2. Slug without trailing id or with trailing id (e.g. prarthna-paramedical-institute matching prarthna-paramedical-institute-1234)
                 if (!$business) {
-                    $business = BusinessListing::where('business_name', 'like', '%VCEC%')->first()
-                             ?? BusinessListing::whereIn('status', ['approved', 'active', 'published'])->first();
+                    $business = BusinessListing::where('slug', 'like', $targetSlug . '-%')->first();
                 }
 
-                if ($business && !in_array(strtolower($business->status), ['approved', 'active', 'published'])) {
-                    $canPreview = (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->id === ($business->seller->user_id ?? null)));
-                    if (!$canPreview) {
-                        abort(404, 'This business listing is currently pending admin review and is not publicly available yet.');
-                    }
+                // 3. Match by business name derived from slug
+                if (!$business) {
+                    $nameWords = explode('-', $targetSlug);
+                    $nameGuess = implode(' ', $nameWords);
+                    $business = BusinessListing::where('business_name', 'like', "%{$nameGuess}%")->first();
+                }
+
+                // 4. Match with category constraint
+                if (!$business && $category) {
+                    $catWords = str_replace('-', ' ', $category);
+                    $business = BusinessListing::where(function($q) use ($targetSlug, $nameWords) {
+                        $q->where('slug', 'like', "%{$targetSlug}%");
+                        foreach ($nameWords as $word) {
+                            if (strlen($word) > 2) {
+                                $q->orWhere('business_name', 'like', "%{$word}%");
+                            }
+                        }
+                    })->where(function($q) use ($catWords) {
+                        $q->where('category', 'like', "%{$catWords}%")
+                          ->orWhere('sub_category', 'like', "%{$catWords}%");
+                    })->first();
+                }
+            }
+
+            if (!$business) {
+                $business = BusinessListing::where('business_name', 'like', '%VCEC%')->first()
+                         ?? BusinessListing::whereIn('status', ['approved', 'active', 'published'])->first();
+            }
+
+            if ($business && !in_array(strtolower($business->status), ['approved', 'active', 'published'])) {
+                $canPreview = (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->id === ($business->seller->user_id ?? null)));
+                if (!$canPreview) {
+                    abort(404, 'This business listing is currently pending admin review and is not publicly available yet.');
                 }
             }
         } catch (\Throwable $e) {
@@ -430,6 +466,31 @@ class HomeController extends Controller
             'filterTypes'       => $filterTypes,
             'filterModes'       => $filterModes,
         ]);
+    }
+
+    /**
+     * Legacy 301 redirect: /business/{slug} or /sellers/{slug} -> /business-listing/{category}/{slug}
+     */
+    public function businessProfileLegacyRedirect(Request $request, $slug = null): \Illuminate\Http\RedirectResponse
+    {
+        if (!$slug) {
+            return redirect()->route('courses');
+        }
+
+        try {
+            $business = BusinessListing::where('slug', $slug)
+                ->orWhere('slug', 'like', $slug . '-%')
+                ->orWhere('business_name', 'like', '%' . str_replace('-', ' ', $slug) . '%')
+                ->first();
+
+            if ($business && $business->url) {
+                return redirect()->to($business->url, 301);
+            }
+        } catch (\Throwable $e) {
+            // fallback
+        }
+
+        return redirect()->to('/business-listing/coaching/' . $slug, 301);
     }
 
     /**

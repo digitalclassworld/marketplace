@@ -81,6 +81,23 @@ class BusinessListing extends Model
         return $this->status === 'rejected';
     }
 
+    public function getCategorySlugAttribute(): string
+    {
+        $cat = $this->category ?: ($this->sub_category ?: 'coaching');
+        $slug = \Illuminate\Support\Str::slug($cat);
+        return !empty($slug) ? $slug : 'coaching';
+    }
+
+    public function getCleanSlugAttribute(): string
+    {
+        return $this->slug ?: \Illuminate\Support\Str::slug($this->business_name);
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return url('/business-listing/' . $this->category_slug . '/' . $this->clean_slug);
+    }
+
     public function getRatingAttribute(): float
     {
         return isset($this->features['rating']) ? (float)$this->features['rating'] : 0.0;

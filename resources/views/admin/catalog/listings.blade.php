@@ -526,8 +526,12 @@
                                                 <i class="fa-solid fa-ellipsis"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                @php
+                                                    $listingCatSlug = \Illuminate\Support\Str::slug($category ?: 'coaching') ?: 'coaching';
+                                                    $businessUrl = url("/business-listing/{$listingCatSlug}/{$slug}");
+                                                @endphp
                                                 <li>
-                                                    <a class="dropdown-item small" href="{{ url('/business/' . $slug) }}" target="_blank">
+                                                    <a class="dropdown-item small" href="{{ $businessUrl }}" target="_blank">
                                                         <i class="fa-solid fa-arrow-up-right-from-square me-2 text-primary"></i> View Public Listing
                                                     </a>
                                                 </li>
@@ -553,7 +557,7 @@
                                                     </li>
                                                 @endif
                                                 <li>
-                                                    <a class="dropdown-item small" href="{{ url('/business/' . $slug) }}" target="_blank">
+                                                    <a class="dropdown-item small" href="{{ $businessUrl }}" target="_blank">
                                                         <i class="fa-regular fa-pen-to-square me-2 text-muted"></i> Edit Listing
                                                     </a>
                                                 </li>
@@ -617,10 +621,10 @@
 
                 <!-- Action Buttons: View Listing | Edit Listing | ... -->
                 <div class="d-flex gap-2 mb-3">
-                    <a id="inspViewListingBtn" href="{{ url('/business/vcec') }}" target="_blank" class="btn btn-primary btn-sm flex-fill fw-medium">
+                    <a id="inspViewListingBtn" href="{{ url('/business-listing/coaching/vcec') }}" target="_blank" class="btn btn-primary btn-sm flex-fill fw-medium">
                         View Listing
                     </a>
-                    <a id="inspEditListingBtn" href="{{ url('/business/vcec') }}" class="btn btn-outline-secondary btn-sm flex-fill fw-medium">
+                    <a id="inspEditListingBtn" href="{{ url('/business-listing/coaching/vcec') }}" class="btn btn-outline-secondary btn-sm flex-fill fw-medium">
                         Edit Listing
                     </a>
                     <button class="btn btn-outline-secondary btn-sm px-2">
@@ -848,11 +852,14 @@
         }
 
         // Action buttons
+        const catSlug = (l.category || 'coaching').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'coaching';
+        const listingUrl = `/business-listing/${catSlug}/${l.slug || ''}`;
+
         const viewListingBtn = document.getElementById('inspViewListingBtn');
-        if (viewListingBtn) viewListingBtn.href = `/business/${l.slug || ''}`;
+        if (viewListingBtn) viewListingBtn.href = listingUrl;
 
         const editListingBtn = document.getElementById('inspEditListingBtn');
-        if (editListingBtn) editListingBtn.href = `/business/${l.slug || ''}`;
+        if (editListingBtn) editListingBtn.href = listingUrl;
 
         // Tabs counts
         const rvTab = document.getElementById('inspReviewsTab');

@@ -1114,7 +1114,7 @@
                                             <img src="{{ $b->logo }}" alt="Logo" class="rounded-circle border" style="width: 22px; height: 22px; object-fit: cover; flex-shrink: 0; margin-top: 1px;">
                                         @endif
                                         <h4 class="business-card-title mb-0" title="{{ $b->business_name }}">
-                                            <a href="{{ route('business.show', $b->slug) }}" class="text-dark text-decoration-none">
+                                            <a href="{{ $b->url }}" class="text-dark text-decoration-none">
                                                 {{ $b->business_name }}
                                             </a>
                                         </h4>
@@ -1164,7 +1164,7 @@
                                        class="btn-card-action btn-card-wa">
                                         <i class="fa-brands fa-whatsapp"></i> WhatsApp
                                     </a>
-                                    <a href="{{ route('business.show', $b->slug) }}" class="btn-card-action btn-card-view">
+                                    <a href="{{ $b->url }}" class="btn-card-action btn-card-view">
                                         View
                                     </a>
                                 </div>

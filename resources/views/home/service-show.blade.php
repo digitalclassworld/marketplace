@@ -811,7 +811,7 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                            <a href="{{ route('business.show', 'vcec') }}" class="btn btn-outline-secondary btn-sm px-3 fw-bold">View Profile</a>
+                            <a href="{{ url('/business-listing/coaching/vcec') }}" class="btn btn-outline-secondary btn-sm px-3 fw-bold">View Profile</a>
                             <button type="button" class="btn btn-primary btn-sm px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#contactSellerModal">
                                 Contact Seller
                             </button>
