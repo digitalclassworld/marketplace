@@ -565,12 +565,11 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-book-open fa-3x mb-3 text-secondary"></i>
-                                    <h5>No Courses Listed Currently</h5>
-                                    <p class="small">Contact the institute directly for upcoming batch admissions and syllabus details.</p>
+                                <div class="text-center py-5">
+                                    <div class="fs-4 fw-bold text-secondary mb-2">Data Not Updated</div>
+                                    <p class="small text-muted mb-3">Courses and syllabus have not been updated by the institute yet.</p>
                                     <button type="button" class="btn btn-primary btn-sm px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#inquiryModal">
-                                        Send Course Inquiry
+                                        <i class="fa-solid fa-envelope me-1"></i> Send Course Inquiry
                                     </button>
                                 </div>
                             @endif
@@ -663,10 +662,9 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-images fa-3x mb-3 text-secondary"></i>
-                                    <h5>No Photos Available Yet</h5>
-                                    <p class="small">Photos will be displayed here once uploaded by the institute administration.</p>
+                                <div class="text-center py-5">
+                                    <div class="fs-4 fw-bold text-secondary mb-2">Data Not Updated</div>
+                                    <p class="small text-muted">Photos have not been updated by the institute yet.</p>
                                 </div>
                             @endif
                         </div>
@@ -747,10 +745,9 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-chalkboard-user fa-3x mb-3 text-secondary"></i>
-                                    <h5>Experienced & Certified Faculty</h5>
-                                    <p class="small">{{ $business->business_name }} instructors are industry professionals with deep domain expertise.</p>
+                                <div class="text-center py-5">
+                                    <div class="fs-4 fw-bold text-secondary mb-2">Data Not Updated</div>
+                                    <p class="small text-muted">Faculty profiles have not been updated by the institute yet.</p>
                                 </div>
                             @endif
                         </div>
@@ -774,10 +771,9 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-trophy fa-3x mb-3 text-secondary"></i>
-                                    <h5>Proven Track Record & Student Success</h5>
-                                    <p class="small">Our students consistently achieve outstanding results in exams and career placements.</p>
+                                <div class="text-center py-5">
+                                    <div class="fs-4 fw-bold text-secondary mb-2">Data Not Updated</div>
+                                    <p class="small text-muted">Portfolio items have not been updated by the institute yet.</p>
                                 </div>
                             @endif
                         </div>
@@ -799,10 +795,9 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-newspaper fa-3x mb-3 text-secondary"></i>
-                                    <h5>No Articles Published Yet</h5>
-                                    <p class="small">Latest educational articles, tips, and institute announcements will appear here.</p>
+                                <div class="text-center py-5">
+                                    <div class="fs-4 fw-bold text-secondary mb-2">Data Not Updated</div>
+                                    <p class="small text-muted">Articles and news have not been updated by the institute yet.</p>
                                 </div>
                             @endif
                         </div>
