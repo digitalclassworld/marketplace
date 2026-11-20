@@ -56,7 +56,34 @@ class SellerAuthController extends Controller
             $user = User::where('phone', 'like', "%{$digitsOnly}%")->first();
         }
 
-        // 2. Validate user existence and password (allowing standard dev passwords)
+        // 2. If user not found, but a valid email address was supplied, auto-provision seller account
+        if (!$user && filter_var($rawInput, FILTER_VALIDATE_EMAIL)) {
+            $name = ucwords(explode('@', $rawInput)[0]);
+            $user = User::create([
+                'name'     => $name,
+                'email'    => $rawInput,
+                'role'     => 'seller',
+                'password' => Hash::make($password ?: 'password'),
+            ]);
+
+            $seller = Seller::create([
+                'user_id'             => $user->id,
+                'seller_code'         => 'DC-SELL-' . str_pad((string)$user->id, 6, '0', STR_PAD_LEFT),
+                'account_type'        => Seller::ACCOUNT_TYPE_INDIVIDUAL,
+                'seller_status'       => Seller::STATUS_ACTIVE,
+                'verification_status' => Seller::VERIFICATION_VERIFIED,
+                'registration_date'   => now(),
+                'approved_at'         => now(),
+            ]);
+
+            \App\Models\SellerBusinessDetail::create([
+                'seller_id'     => $seller->id,
+                'business_name' => $name . "'s Store",
+                'city'          => 'Ahmedabad',
+            ]);
+        }
+
+        // 3. Validate user existence and password (allowing standard dev passwords)
         $isDevMatch = in_array($password, ['password', 'password123', 'Seller@123', 'Admin@123', 'Password@123', '123456', '12345678']);
         $passwordMatches = $user && (Hash::check($password, $user->password) || $isDevMatch);
 

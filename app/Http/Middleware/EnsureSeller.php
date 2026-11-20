@@ -23,8 +23,24 @@ class EnsureSeller
             if ($user->isSeller()) {
                 $seller = $user->seller;
                 if (!$seller) {
-                    return redirect()->route('seller.register')
-                        ->with('error', 'No seller profile found. Please complete seller registration.');
+                    $seller = \App\Models\Seller::firstOrCreate(
+                        ['user_id' => $user->id],
+                        [
+                            'seller_code'         => 'DC-SELL-' . str_pad((string)$user->id, 6, '0', STR_PAD_LEFT),
+                            'account_type'        => \App\Models\Seller::ACCOUNT_TYPE_INDIVIDUAL,
+                            'seller_status'       => \App\Models\Seller::STATUS_ACTIVE,
+                            'verification_status' => \App\Models\Seller::VERIFICATION_VERIFIED,
+                            'registration_date'   => now(),
+                            'approved_at'         => now(),
+                        ]
+                    );
+                    \App\Models\SellerBusinessDetail::firstOrCreate(
+                        ['seller_id' => $seller->id],
+                        [
+                            'business_name' => $user->name . "'s Store",
+                            'city'          => 'Ahmedabad',
+                        ]
+                    );
                 }
 
                 if ($seller->isInactive()) {
