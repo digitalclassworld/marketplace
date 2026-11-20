@@ -152,11 +152,31 @@ class BusinessListing extends Model
 
     public function getDisplayImageAttribute(): string
     {
-        $img = $this->cover_image ?: ($this->logo ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500&auto=format&fit=crop&q=80');
-        if (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) {
-            return $img;
+        if (!empty($this->cover_image)) {
+            $img = $this->cover_image;
+            return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
         }
-        return asset($img);
+
+        if (!empty($this->logo)) {
+            $img = $this->logo;
+            return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
+        }
+
+        // Known legacy logos
+        $clean = $this->clean_slug;
+        $legacyLogos = [
+            'kalashraya'                     => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/6068/institute-logo1738392221.png',
+            'legend-dance-academy'           => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/5544/institute-logo1736487363.jpg',
+            'g-k-dance-academy'              => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/5540/institute-logo1736485988.jpg',
+            'shree-aurbindo-miera-academy'   => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/5551/institute-logo1736486898.jfif',
+            'medhaavee-mandir-public-school' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/school/school_icon/14134/school-logo1731148257.jpg',
+        ];
+
+        if (isset($legacyLogos[$clean])) {
+            return $legacyLogos[$clean];
+        }
+
+        return asset('images/camera_placeholder.png');
     }
 
     public static array $cityCoordinates = [

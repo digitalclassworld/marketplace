@@ -338,74 +338,124 @@ class HomeController extends Controller
         // Domain-specific Courses, Services, Categories
         switch ($domain) {
             case 'dance':
-                $courses = [
-                    [
-                        'id' => 1,
-                        'title' => 'Bollywood & Contemporary Dance Masterclass',
-                        'slug' => 'bollywood-contemporary-dance-masterclass',
-                        'duration' => '2 Months',
-                        'mode' => 'Online/Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 180,
-                        'price' => 3999,
-                        'original_price' => 5999,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 2,
-                        'title' => 'Classical Dance (Kathak & Bharatnatyam)',
-                        'slug' => 'classical-dance-kathak-bharatnatyam',
-                        'duration' => '3 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.8,
-                        'reviews_count' => 140,
-                        'price' => 4999,
-                        'original_price' => 7499,
-                        'discount' => '33% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 3,
-                        'title' => 'Western Dance & Hip-Hop Foundation',
-                        'slug' => 'western-dance-hip-hop-foundation',
-                        'duration' => '1.5 Months',
-                        'mode' => 'Offline',
-                        'rating' => 4.7,
-                        'reviews_count' => 95,
-                        'price' => 3499,
-                        'original_price' => 4999,
-                        'discount' => '30% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1535525153412-5a42439a210d?w=400&auto=format&fit=crop&q=80',
-                    ],
-                    [
-                        'id' => 4,
-                        'title' => 'Folk & Garba Festive Workshop',
-                        'slug' => 'folk-garba-festive-workshop',
-                        'duration' => '1 Month',
-                        'mode' => 'Offline',
-                        'rating' => 4.9,
-                        'reviews_count' => 210,
-                        'price' => 2499,
-                        'original_price' => 3999,
-                        'discount' => '38% OFF',
-                        'thumbnail' => 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&auto=format&fit=crop&q=80',
-                    ],
-                ];
+                if (stripos($cleanSlug, 'dance-ka-fever') !== false) {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'Folk dance',
+                            'slug' => 'folk-dance',
+                            'duration' => '3 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 120,
+                            'price' => 2999,
+                            'original_price' => 4500,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/course/913/course-thumbnail1665414050.jpeg',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'Classical Dance',
+                            'slug' => 'classical-dance',
+                            'duration' => '6 Months',
+                            'mode' => 'Offline',
+                            'rating' => 5.0,
+                            'reviews_count' => 180,
+                            'price' => 4999,
+                            'original_price' => 7500,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/course/913/course-thumbnail1665413791.jpeg',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'Western Dance',
+                            'slug' => 'western-dance',
+                            'duration' => '2 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 140,
+                            'price' => 3499,
+                            'original_price' => 5000,
+                            'discount' => '30% OFF',
+                            'thumbnail' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/course/320/course-thumbnail1665413823.jpeg',
+                        ],
+                    ];
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 3, 'active' => true],
+                        ['name' => 'Folk Dance', 'count' => 1, 'active' => false],
+                        ['name' => 'Classical Dance', 'count' => 1, 'active' => false],
+                        ['name' => 'Western Dance', 'count' => 1, 'active' => false],
+                    ];
+                } else {
+                    $courses = [
+                        [
+                            'id' => 1,
+                            'title' => 'Bollywood & Contemporary Dance Masterclass',
+                            'slug' => 'bollywood-contemporary-dance-masterclass',
+                            'duration' => '2 Months',
+                            'mode' => 'Online/Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 180,
+                            'price' => 3999,
+                            'original_price' => 5999,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 2,
+                            'title' => 'Classical Dance (Kathak & Bharatnatyam)',
+                            'slug' => 'classical-dance-kathak-bharatnatyam',
+                            'duration' => '3 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.8,
+                            'reviews_count' => 140,
+                            'price' => 4999,
+                            'original_price' => 7499,
+                            'discount' => '33% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 3,
+                            'title' => 'Western Dance & Hip-Hop Foundation',
+                            'slug' => 'western-dance-hip-hop-foundation',
+                            'duration' => '1.5 Months',
+                            'mode' => 'Offline',
+                            'rating' => 4.7,
+                            'reviews_count' => 95,
+                            'price' => 3499,
+                            'original_price' => 4999,
+                            'discount' => '30% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1535525153412-5a42439a210d?w=400&auto=format&fit=crop&q=80',
+                        ],
+                        [
+                            'id' => 4,
+                            'title' => 'Folk & Garba Festive Workshop',
+                            'slug' => 'folk-garba-festive-workshop',
+                            'duration' => '1 Month',
+                            'mode' => 'Offline',
+                            'rating' => 4.9,
+                            'reviews_count' => 210,
+                            'price' => 2499,
+                            'original_price' => 3999,
+                            'discount' => '38% OFF',
+                            'thumbnail' => 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&auto=format&fit=crop&q=80',
+                        ],
+                    ];
+                    $sidebarCategories = [
+                        ['name' => 'All', 'count' => 18, 'active' => true],
+                        ['name' => 'Bollywood Dance', 'count' => 6, 'active' => false],
+                        ['name' => 'Classical Dance', 'count' => 4, 'active' => false],
+                        ['name' => 'Hip-Hop & Western', 'count' => 4, 'active' => false],
+                        ['name' => 'Folk & Garba', 'count' => 3, 'active' => false],
+                        ['name' => 'Fitness & Zumba', 'count' => 2, 'active' => false],
+                        ['name' => 'Choreography Services', 'count' => 4, 'active' => false],
+                    ];
+                }
                 $services = [
                     ['title' => 'Wedding & Sangeet Choreography', 'starting_price' => 4999, 'thumbnail' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Private One-on-One Dance Training', 'starting_price' => 1999, 'thumbnail' => 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Annual Function & School Choreography', 'starting_price' => 7999, 'thumbnail' => 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=80'],
                     ['title' => 'Dance Studio Rental for Practice', 'starting_price' => 999, 'thumbnail' => 'https://images.unsplash.com/photo-1535525153412-5a42439a210d?w=400&auto=format&fit=crop&q=80'],
-                ];
-                $sidebarCategories = [
-                    ['name' => 'All', 'count' => 18, 'active' => true],
-                    ['name' => 'Bollywood Dance', 'count' => 6, 'active' => false],
-                    ['name' => 'Classical Dance', 'count' => 4, 'active' => false],
-                    ['name' => 'Hip-Hop & Western', 'count' => 4, 'active' => false],
-                    ['name' => 'Folk & Garba', 'count' => 3, 'active' => false],
-                    ['name' => 'Fitness & Zumba', 'count' => 2, 'active' => false],
-                    ['name' => 'Choreography Services', 'count' => 4, 'active' => false],
                 ];
                 break;
 
@@ -839,60 +889,90 @@ class HomeController extends Controller
                 break;
         }
 
-        // 1. Related / Suggested Institutes (Exact Category / Domain match)
+        // 1. Related / Suggested Institutes (Strict category / educational domain matching)
         $relatedInstitutes = collect();
         try {
-            $catKeywords = match($domain) {
-                'dance'    => ['dance', 'dancing', 'kala'],
-                'medical'  => ['medic', 'paramedic', 'nurs', 'health', 'ayush', 'pharm'],
-                'music'    => ['music', 'vocal', 'guitar', 'piano', 'singing', 'audio'],
-                'language' => ['english', 'spoken', 'ielts', 'language'],
-                'commerce' => ['commerce', 'account', 'finance', 'tally', 'tax'],
-                'academic' => ['tuition', 'school', 'class', 'science', 'academic'],
-                default    => ['computer', 'it', 'tech', 'software', 'programming'],
-            };
+            $category = trim($business->category ?? '');
 
-            $relatedQuery = BusinessListing::where('id', '!=', $business->id)
-                ->whereIn('status', ['approved', 'active']);
-
-            $relatedQuery->where(function($q) use ($catKeywords, $business) {
-                if (!empty($business->category)) {
-                    $q->where('category', 'like', "%{$business->category}%");
-                }
-                foreach ($catKeywords as $kw) {
-                    $q->orWhere('category', 'like', "%{$kw}%")
-                      ->orWhere('sub_category', 'like', "%{$kw}%")
-                      ->orWhere('business_name', 'like', "%{$kw}%");
-                }
-            });
-
-            // Prioritize same city first, then top IDs
-            $relatedInstitutes = $relatedQuery->orderByRaw("CASE WHEN city = ? THEN 1 ELSE 2 END", [$business->city ?: 'Ahmedabad'])
-                ->orderBy('id', 'desc')
-                ->take(4)
-                ->get();
-
-            // Fallback fill if fewer than 4 found
-            if ($relatedInstitutes->count() < 4) {
-                $excludeIds = $relatedInstitutes->pluck('id')->push($business->id)->toArray();
-                $more = BusinessListing::whereNotIn('id', $excludeIds)
+            // Priority 1: Exact category match if specific (e.g. 'Dancing', 'Medical', 'Music', 'Spoken English', 'IT & Software', 'Account & Finance')
+            if (!empty($category) && !in_array(strtolower($category), ['educational institute', 'coaching institute'])) {
+                $relatedInstitutes = BusinessListing::where('id', '!=', $business->id)
+                    ->where('category', $category)
                     ->whereIn('status', ['approved', 'active'])
-                    ->orderByRaw("CASE WHEN city = ? THEN 1 ELSE 2 END", [$business->city ?: 'Ahmedabad'])
-                    ->take(4 - $relatedInstitutes->count())
+                    ->orderBy('id', 'desc')
+                    ->take(4)
                     ->get();
-                $relatedInstitutes = $relatedInstitutes->merge($more);
+            }
+
+            // Priority 2: If fewer than 4 or generic category, match domain keywords
+            if ($relatedInstitutes->count() < 4) {
+                $needed = 4 - $relatedInstitutes->count();
+                $excludeIds = $relatedInstitutes->pluck('id')->push($business->id)->toArray();
+
+                $domainKeywords = match($domain) {
+                    'dance'    => ['dance', 'dancing', 'choreograph', 'nritya'],
+                    'medical'  => ['medic', 'paramedic', 'nurs', 'health', 'ayush', 'pharm'],
+                    'music'    => ['music', 'vocal', 'guitar', 'piano', 'singing'],
+                    'language' => ['english', 'spoken', 'ielts', 'toefl', 'foreign language'],
+                    'commerce' => ['commerce', 'account', 'finance', 'tally', 'tax'],
+                    'academic' => ['tuition', 'school', 'academy', 'science', 'maths'],
+                    default    => ['computer', 'software', 'technology', 'programming'],
+                };
+
+                $moreQuery = BusinessListing::whereNotIn('id', $excludeIds)
+                    ->whereIn('status', ['approved', 'active'])
+                    ->where(function($q) use ($domainKeywords) {
+                        foreach ($domainKeywords as $kw) {
+                            $q->orWhere('category', 'like', "%{$kw}%")
+                              ->orWhere('sub_category', 'like', "%{$kw}%")
+                              ->orWhere('business_name', 'like', "%{$kw}%");
+                        }
+                    })
+                    ->where('business_name', 'not like', '%boutique%')
+                    ->where('business_name', 'not like', '%salon%')
+                    ->where('business_name', 'not like', '%restaurant%')
+                    ->where('business_name', 'not like', '%repair%')
+                    ->where('business_name', 'not like', '%dry clean%')
+                    ->where('business_name', 'not like', '%fitness%')
+                    ->where('business_name', 'not like', '%shopping%')
+                    ->orderBy('id', 'desc')
+                    ->take($needed)
+                    ->get();
+
+                $relatedInstitutes = $relatedInstitutes->merge($moreQuery);
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Related institutes query failed: ' . $e->getMessage());
         }
 
-        // 2. More Institutes from City
+        // 2. More Institutes from City (Strictly real educational institutes / academies)
         $cityInstitutes = collect();
         try {
             $excludeIds = $relatedInstitutes->pluck('id')->push($business->id)->toArray();
             $cityInstitutes = BusinessListing::whereNotIn('id', $excludeIds)
                 ->where('city', $business->city ?: 'Ahmedabad')
                 ->whereIn('status', ['approved', 'active'])
+                ->where(function($q) {
+                    $q->whereIn('category', [
+                        'Dancing', 'Music', 'Medical', 'Academic', 'Coaching Institute', 
+                        'Educational Institute', 'IT & Software', 'Computer Institute', 
+                        'Spoken English', 'Account & Finance'
+                    ])
+                    ->orWhere('business_name', 'like', '%academy%')
+                    ->orWhere('business_name', 'like', '%institute%')
+                    ->orWhere('business_name', 'like', '%classes%')
+                    ->orWhere('business_name', 'like', '%school%')
+                    ->orWhere('business_name', 'like', '%college%')
+                    ->orWhere('business_name', 'like', '%education%');
+                })
+                ->where('business_name', 'not like', '%boutique%')
+                ->where('business_name', 'not like', '%salon%')
+                ->where('business_name', 'not like', '%restaurant%')
+                ->where('business_name', 'not like', '%repair%')
+                ->where('business_name', 'not like', '%dry clean%')
+                ->where('business_name', 'not like', '%fitness%')
+                ->where('business_name', 'not like', '%shopping%')
+                ->orderBy('id', 'desc')
                 ->take(6)
                 ->get();
         } catch (\Throwable $e) {

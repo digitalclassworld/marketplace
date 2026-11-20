@@ -589,10 +589,10 @@
         text-decoration: underline;
     }
 
-    /* 4 COURSES GRID */
+    /* COURSES GRID */
     .courses-grid-4 {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
         gap: 0.85rem;
         margin-bottom: 2rem;
     }
@@ -1137,11 +1137,10 @@
     <div class="store-nav-tabs-bar">
         <a href="#home" class="store-tab-link active">Home</a>
         <a href="#all" class="store-tab-link">All</a>
-        <a href="#courses" class="store-tab-link">Courses (12)</a>
-        <a href="#services" class="store-tab-link">Our Services (5)</a>
-        <a href="#products" class="store-tab-link">Products (8)</a>
-        <a href="#about" class="store-tab-link">About VCEC</a>
-        <a href="#reviews" class="store-tab-link">Student Reviews (420)</a>
+        <a href="#courses" class="store-tab-link">Courses ({{ count($courses) }})</a>
+        <a href="#services" class="store-tab-link">Our Services ({{ count($services) }})</a>
+        <a href="#about" class="store-tab-link">About {{ $business->business_name ? explode(' ', $business->business_name)[0] : 'Institute' }}</a>
+        <a href="#reviews" class="store-tab-link">Student Reviews ({{ $business->reviews_count ?: 0 }})</a>
     </div>
 
     <!-- 4. LOWER 3-COLUMN CONTENT GRID -->
@@ -1295,12 +1294,12 @@
                 <div class="row g-2">
                     @foreach($cityInstitutes as $cInst)
                         @php
-                            $cImg = $cInst->logo ?: ($cInst->cover_image ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=300&auto=format&fit=crop&q=80');
+                            $cImg = $cInst->display_image;
                         @endphp
                         <div class="col-md-4 col-sm-6">
                             <div class="card h-100 border rounded-3 p-2.5 bg-white shadow-sm hover-shadow transition">
                                 <div class="d-flex align-items-center gap-2 mb-2">
-                                    <img src="{{ $cImg }}" alt="{{ $cInst->business_name }}" class="rounded border object-fit-cover" style="width: 42px; height: 42px; background: #fff;">
+                                    <img src="{{ $cImg }}" alt="{{ $cInst->business_name }}" class="rounded border object-fit-contain p-1" style="width: 42px; height: 42px; background: #f8fafc;" onerror="this.onerror=null;this.src='{{ asset('images/camera_placeholder.png') }}';">
                                     <div class="overflow-hidden flex-grow-1">
                                         <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.82rem;" title="{{ $cInst->business_name }}">{{ $cInst->business_name }}</h6>
                                         <div class="text-muted small text-truncate" style="font-size: 0.7rem;">
@@ -1376,12 +1375,12 @@
                 <div class="related-institutes-list">
                     @foreach($relatedInstitutes as $rel)
                         @php
-                            $relImg = $rel->logo ?: ($rel->cover_image ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=200&auto=format&fit=crop&q=80');
+                            $relImg = $rel->display_image;
                             $relCleanName = $rel->business_name;
                         @endphp
                         <div class="card mb-2 border rounded-3 p-2 bg-light bg-opacity-50">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <img src="{{ $relImg }}" alt="{{ $relCleanName }}" class="rounded border object-fit-cover" style="width: 44px; height: 44px; background: #fff;">
+                                <img src="{{ $relImg }}" alt="{{ $relCleanName }}" class="rounded border object-fit-contain p-1" style="width: 44px; height: 44px; background: #fff;" onerror="this.onerror=null;this.src='{{ asset('images/camera_placeholder.png') }}';">
                                 <div class="overflow-hidden flex-grow-1">
                                     <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.84rem;" title="{{ $relCleanName }}">{{ $relCleanName }}</h6>
                                     <div class="text-muted small text-truncate" style="font-size: 0.72rem;">
@@ -1537,7 +1536,7 @@
             icon.classList.remove('fa-regular');
             icon.classList.add('fa-solid');
             btn.innerHTML = '<i class="fa-solid fa-heart text-danger"></i> Following';
-            showLiveStoreToast('Following VCEC', 'You will receive notifications for new courses and offers!');
+            showLiveStoreToast('Following {{ addslashes($business->business_name) }}', 'You will receive notifications for new courses and updates!');
         } else {
             icon.classList.remove('fa-solid');
             icon.classList.add('fa-regular');
@@ -1549,7 +1548,7 @@
     function shareStoreProfile() {
         if (navigator.share) {
             navigator.share({
-                title: 'VCEC - Vinayak Computer Education Center',
+                title: '{{ addslashes($business->business_name) }}',
                 url: window.location.href,
             }).catch(() => {});
         } else {
@@ -1604,7 +1603,7 @@
         e.preventDefault();
         const modal = bootstrap.Modal.getInstance(document.getElementById('contactSellerModal'));
         if (modal) modal.hide();
-        showLiveStoreToast('Inquiry Sent', 'Thank you! VCEC counselor will contact you shortly.');
+        showLiveStoreToast('Inquiry Sent', 'Thank you! {{ addslashes($business->business_name) }} counselor will contact you shortly.');
     }
 
     function handleQuoteSubmit(e) {
