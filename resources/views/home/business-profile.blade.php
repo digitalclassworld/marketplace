@@ -1283,9 +1283,43 @@
                     @endforeach
                 </div>
             </div>
+
+            <!-- MORE INSTITUTES FROM CITY (Matching digitalclassworld.com) -->
+            @if(!empty($cityInstitutes) && $cityInstitutes->count() > 0)
+            <div class="mb-4">
+                <div class="section-header-row">
+                    <h3 class="section-main-heading">More Institutes from {{ $business->city ?: 'Ahmedabad' }}</h3>
+                    <a href="{{ url('/courses?city=' . urlencode($business->city ?: 'Ahmedabad')) }}" class="view-all-link">View All &rarr;</a>
+                </div>
+
+                <div class="row g-2">
+                    @foreach($cityInstitutes as $cInst)
+                        @php
+                            $cImg = $cInst->logo ?: ($cInst->cover_image ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=300&auto=format&fit=crop&q=80');
+                        @endphp
+                        <div class="col-md-4 col-sm-6">
+                            <div class="card h-100 border rounded-3 p-2.5 bg-white shadow-sm hover-shadow transition">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <img src="{{ $cImg }}" alt="{{ $cInst->business_name }}" class="rounded border object-fit-cover" style="width: 42px; height: 42px; background: #fff;">
+                                    <div class="overflow-hidden flex-grow-1">
+                                        <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.82rem;" title="{{ $cInst->business_name }}">{{ $cInst->business_name }}</h6>
+                                        <div class="text-muted small text-truncate" style="font-size: 0.7rem;">
+                                            <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $cInst->area ? $cInst->area . ', ' : '' }}{{ $cInst->city ?: 'Ahmedabad' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{{ $cInst->url }}" class="btn btn-sm btn-outline-secondary w-100 py-1 fw-semibold mt-auto" style="font-size: 0.72rem;">
+                                    View Institute &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
         </div>
 
-        <!-- C. RIGHT SIDEBAR: CONTACT, BRANCHES, CUSTOM TRAINING -->
+        <!-- C. RIGHT SIDEBAR: CONTACT, RELATED INSTITUTES, BRANCHES -->
         <div class="store-right-col">
             <!-- Get In Touch Box -->
             <div class="right-sidebar-box">
@@ -1301,7 +1335,7 @@
                 <ul class="contact-info-list">
                     <li class="contact-info-item">
                         <i class="fa-solid fa-phone"></i>
-                        <a href="tel:+919876543210" class="text-decoration-none text-dark fw-semibold">+91 98765 43210</a>
+                        <a href="tel:{{ $business->phone ?: '+919876543210' }}" class="text-decoration-none text-dark fw-semibold">{{ $business->phone ?: '+91 98765 43210' }}</a>
                     </li>
                     <li class="contact-info-item whatsapp">
                         <i class="fa-brands fa-whatsapp"></i>
@@ -1331,11 +1365,44 @@
                 </button>
             </div>
 
+            <!-- RELATED INSTITUTES BOX (Matching digitalclassworld.com) -->
+            @if(!empty($relatedInstitutes) && $relatedInstitutes->count() > 0)
+            <div class="right-sidebar-box">
+                <div class="right-box-header">
+                    <h4 class="right-box-title">Related Institutes</h4>
+                    <a href="{{ url('/courses?category=coaching') }}" class="view-all-link">View All &rarr;</a>
+                </div>
+
+                <div class="related-institutes-list">
+                    @foreach($relatedInstitutes as $rel)
+                        @php
+                            $relImg = $rel->logo ?: ($rel->cover_image ?: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=200&auto=format&fit=crop&q=80');
+                            $relCleanName = $rel->business_name;
+                        @endphp
+                        <div class="card mb-2 border rounded-3 p-2 bg-light bg-opacity-50">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <img src="{{ $relImg }}" alt="{{ $relCleanName }}" class="rounded border object-fit-cover" style="width: 44px; height: 44px; background: #fff;">
+                                <div class="overflow-hidden flex-grow-1">
+                                    <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.84rem;" title="{{ $relCleanName }}">{{ $relCleanName }}</h6>
+                                    <div class="text-muted small text-truncate" style="font-size: 0.72rem;">
+                                        <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $rel->city ?: 'Ahmedabad' }}
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="{{ $rel->url }}" class="btn btn-sm btn-outline-primary w-100 fw-semibold py-1" style="font-size: 0.74rem;">
+                                View More &rarr;
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <!-- Our Branches Box -->
             <div class="right-sidebar-box">
                 <div class="right-box-header">
-                    <h4 class="right-box-title">Our Branches (Visit Our Branch)</h4>
-                    <a href="javascript:void(0)" onclick="openBranchesModal()" class="view-all-link">View All &rarr;</a>
+                    <h4 class="right-box-title">{{ count($branches) > 1 ? 'Our Branches' : 'Campus Location' }}</h4>
+                    <a href="javascript:void(0)" onclick="openBranchesModal()" class="view-all-link">View Details &rarr;</a>
                 </div>
 
                 <div class="branches-list-wrap">
@@ -1359,21 +1426,18 @@
                 <div class="custom-training-icon">
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
-                <div class="custom-training-title">Need a Custom Training?</div>
+                <div class="custom-training-title">Interested in Learning?</div>
                 <div class="custom-training-desc">
-                    Get customized courses for your institute, company or team.
+                    Get in touch with {{ $business->business_name }} for admissions, syllabus and fees.
                 </div>
                 <div class="d-flex flex-column gap-2">
-                    <button type="button" class="btn-custom-quote border-0" onclick="openCustomTrainingModal()">
-                        Request a Quote &rarr;
+                    <button type="button" class="btn-custom-quote border-0" onclick="openContactModal()">
+                        Inquire Now &rarr;
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="openContactModal()" style="font-size: 0.72rem;">
                         <i class="fa-solid fa-chalkboard-user me-1"></i> Book a Free Demo Class
                     </button>
                 </div>
-            </div>
-                    Request a Quote &rarr;
-                </button>
             </div>
         </div>
     </div>
@@ -1385,12 +1449,12 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold text-dark">
-                    <i class="fa-solid fa-comment-dots text-primary me-2"></i> Contact VCEC Instructor
+                    <i class="fa-solid fa-comment-dots text-primary me-2"></i> Contact {{ $business->business_name }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
-                <p class="text-muted small mb-3">Send a direct inquiry to the VCEC admissions and instructor desk.</p>
+                <p class="text-muted small mb-3">Send a direct inquiry to {{ $business->business_name }} desk.</p>
                 <form onsubmit="handleInquirySubmit(event)">
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Your Name</label>
@@ -1403,17 +1467,18 @@
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Interested Course / Service</label>
                         <select class="form-select" id="inquiryCourseSelect">
-                            <option>Digital Marketing Complete Course</option>
-                            <option>Tally Prime with GST</option>
-                            <option>Web Development Course</option>
-                            <option>AI Tools & ChatGPT</option>
-                            <option>Website Development for Institute</option>
-                            <option>Other Custom Training</option>
+                            @foreach($courses as $c)
+                                <option value="{{ $c['title'] }}">{{ $c['title'] }}</option>
+                            @endforeach
+                            @foreach($services as $s)
+                                <option value="{{ $s['title'] }}">{{ $s['title'] }}</option>
+                            @endforeach
+                            <option value="General Admission Inquiry">General Admission Inquiry</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Message / Questions</label>
-                        <textarea class="form-control" rows="3" placeholder="Tell us what you would like to learn..."></textarea>
+                        <textarea class="form-control" rows="3" placeholder="Tell us what you would like to inquire about..."></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: var(--dc-blue); border: none;">
                         Send Inquiry
