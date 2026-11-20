@@ -991,14 +991,10 @@
         <a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a>
         <span class="separator">&gt;</span>
         @php
-            $displayCategory = !empty($business->category) ? $business->category : 'Coaching Institutes';
-            if (stripos($displayCategory, 'institute') === false && stripos($displayCategory, 'classes') === false && stripos($displayCategory, 'school') === false) {
-                $displayCategory = rtrim($displayCategory, 's') . ' Institutes';
-            }
             $displayState = $business->state ?: 'Gujarat';
             $displayCity = $business->city ?: 'Ahmedabad';
         @endphp
-        <a href="{{ url('/courses?category=' . urlencode($business->category_slug ?? 'coaching')) }}">{{ $displayCategory }}</a>
+        <a href="{{ url('/courses?category=coaching') }}">Coaching Institutes</a>
         <span class="separator">&gt;</span>
         <a href="{{ url('/courses?state=' . urlencode($displayState)) }}">{{ $displayState }}</a>
         <span class="separator">&gt;</span>

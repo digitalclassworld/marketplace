@@ -527,7 +527,7 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                                 @php
-                                                    $businessUrl = $l['url'] ?? url("/business-listing/" . ($l['category_slug'] ?? 'coaching') . "/" . ($l['clean_slug'] ?? $slug));
+                                                    $businessUrl = $l['url'] ?? url("/business-listing/coaching/" . ($l['clean_slug'] ?? $slug));
                                                 @endphp
                                                 <li>
                                                     <a class="dropdown-item small" href="{{ $businessUrl }}" target="_blank">
@@ -851,7 +851,7 @@
         }
 
         // Action buttons
-        const listingUrl = l.url || `/business-listing/${l.category_slug || 'coaching'}/${l.clean_slug || (l.slug || '').replace(/-\d+$/, '')}`;
+        const listingUrl = l.url || `/business-listing/coaching/${l.clean_slug || (l.slug || '').replace(/-\d+$/, '')}`;
 
         const viewListingBtn = document.getElementById('inspViewListingBtn');
         if (viewListingBtn) viewListingBtn.href = listingUrl;
