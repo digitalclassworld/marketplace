@@ -436,6 +436,11 @@ class HomeController extends Controller
         $affiliateId = $business->affiliate_id;
         $realCourses = collect();
         $sellerCourses = collect();
+        $galleryImages = collect();
+        $staffMembers = collect();
+        $portfolios = collect();
+        $articles = collect();
+        $affiliate = null;
 
         if ($business->seller_id) {
             try {
@@ -447,6 +452,8 @@ class HomeController extends Controller
 
         if ($affiliateId) {
             try {
+                $affiliate = \Illuminate\Support\Facades\DB::table('dc_affiliate')->where('id', $affiliateId)->first();
+
                 $realCourses = \App\Models\InstituteCourse::where('affiliate_id', $affiliateId)
                     ->where(function($q) {
                         $q->where('status', 'active')
@@ -455,8 +462,33 @@ class HomeController extends Controller
                     })
                     ->orderBy('id', 'asc')
                     ->get();
+
+                $galleryImages = \Illuminate\Support\Facades\DB::table('dc_affiliate_gallery')
+                    ->where('affiliate_id', $affiliateId)
+                    ->where(function($q) {
+                        $q->where('status', 'active')
+                          ->orWhereNull('status')
+                          ->orWhere('status', '');
+                    })
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                $staffMembers = \Illuminate\Support\Facades\DB::table('dc_affiliate_staff')
+                    ->where('affiliate_id', $affiliateId)
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                $portfolios = \Illuminate\Support\Facades\DB::table('dc_affiliate_portfolio')
+                    ->where('affiliate_id', $affiliateId)
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                $articles = \Illuminate\Support\Facades\DB::table('dc_affiliate_articals')
+                    ->where('affiliate_id', $affiliateId)
+                    ->orderBy('id', 'asc')
+                    ->get();
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Institute courses query failed: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning('Institute tab data query failed: ' . $e->getMessage());
             }
         }
 
@@ -1226,6 +1258,11 @@ class HomeController extends Controller
             'sidebarCategories' => $sidebarCategories,
             'filterTypes'       => $filterTypes,
             'filterModes'       => $filterModes,
+            'galleryImages'     => $galleryImages,
+            'staffMembers'      => $staffMembers,
+            'portfolios'        => $portfolios,
+            'articles'          => $articles,
+            'affiliate'         => $affiliate,
         ]);
     }
 

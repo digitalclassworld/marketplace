@@ -1,1688 +1,943 @@
 @extends('layouts.app')
 
-@php
-    $bName = $business->business_name ?? 'Educational Institute';
-    $bCity = $business->city ?? 'Ahmedabad';
-    $bCategory = $business->category ?? 'Educational Institute';
-    $bDesc = strip_tags($business->description ?? ($bName . ' offers premier coaching, training, and certification programs in ' . $bCity . '. Check courses, fees, contact details, reviews and admission inquiries.'));
-    $bDescTruncated = \Illuminate\Support\Str::limit($bDesc, 160);
-    $bKeywords = $bName . ', ' . $bCategory . ' in ' . $bCity . ', best classes in ' . $bCity . ', coaching institute ' . $bCity . ', tuition center near me, digital class';
-    $bLogo = $business->logo ?: asset('images/default-business.jpg');
-@endphp
+@section('title', ($business->business_name ?? 'Institute') . ' - Courses, Fees & Admission')
 
-@section('title', $bName . ' - ' . $bCategory . ' in ' . $bCity . ' | Digital Class')
-@section('meta_description', $bDescTruncated)
-@section('meta_keywords', $bKeywords)
-@section('og_image', $bLogo)
-@section('og_type', 'business.business')
-
-@push('schema')
-<script type="application/ld+json">
-{!! json_encode([
-  '@context' => 'https://schema.org',
-  '@type' => 'EducationalOrganization',
-  'name' => $bName,
-  'description' => $bDescTruncated,
-  'url' => url()->current(),
-  'logo' => $bLogo,
-  'telephone' => $business->phone ?? '+91',
-  'email' => $business->email ?? '',
-  'address' => [
-    '@type' => 'PostalAddress',
-    'streetAddress' => $business->address ?? '',
-    'addressLocality' => $bCity,
-    'addressRegion' => $business->state ?? 'Gujarat',
-    'postalCode' => $business->pincode ?? '',
-    'addressCountry' => 'IN',
-  ],
-], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-</script>
-@endpush
+@section('meta_description', Str::limit(strip_tags($business->description ?? ($business->business_name . ' coaching institute')), 160))
 
 @section('styles')
 <style>
-    :root {
-        --dc-blue: #0066cc;
-        --dc-blue-hover: #0052a3;
-        --dc-text-dark: #0f172a;
-        --dc-text-muted: #64748b;
-        --dc-border: #e2e8f0;
-        --dc-green: #16a34a;
-        --dc-bg-light: #f8fafc;
-    }
-
-    body {
+    /* Legacy-matched authentic institute profile styling */
+    .institute-profile-wrapper {
         background-color: #f8fafc;
-        color: var(--dc-text-dark);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        min-height: calc(100vh - 120px);
     }
-
-    /* Breadcrumbs */
-    .profile-breadcrumbs {
-        padding: 0.75rem 0;
-        font-size: 0.82rem;
+    .profile-breadcrumb {
+        font-size: 0.85rem;
         color: #64748b;
     }
-    .profile-breadcrumbs a {
-        color: #475569;
+    .profile-breadcrumb a {
+        color: #0284c7;
         text-decoration: none;
-        transition: color 0.2s ease;
+        transition: color 0.15s;
     }
-    .profile-breadcrumbs a:hover {
-        color: var(--dc-blue);
+    .profile-breadcrumb a:hover {
+        color: #0369a1;
+        text-decoration: underline;
     }
-    .profile-breadcrumbs span.separator {
+    .profile-breadcrumb .sep {
         margin: 0 0.4rem;
         color: #94a3b8;
     }
-    .profile-breadcrumbs span.current {
-        color: #0f172a;
-        font-weight: 500;
-    }
 
-    /* TOP PANORAMIC HERO BANNER */
-    .store-hero-banner {
-        background: linear-gradient(135deg, #0a192f 0%, #172a45 40%, #0d213f 100%);
+    /* Main Header Card */
+    .institute-header-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
-        overflow: hidden;
-        color: #ffffff;
-        position: relative;
-        padding: 1.5rem 2rem;
-        margin-bottom: 1.25rem;
-        border: 1px solid #1e293b;
-        box-shadow: 0 10px 25px rgba(10, 25, 47, 0.15);
+        padding: 1.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
-    .hero-banner-row {
+    .institute-logo-box {
+        width: 190px;
+        height: 160px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #ffffff;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 1.5rem;
-    }
-    .hero-left-content {
-        flex: 1.2;
-    }
-    .hero-main-title {
-        font-size: 1.75rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        line-height: 1.15;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        color: #ffffff;
-    }
-    .hero-subtitle {
-        font-size: 0.85rem;
-        color: #93c5fd;
-        margin-bottom: 1rem;
-        font-weight: 500;
-        line-height: 1.4;
-    }
-    .hero-highlights-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.25rem;
-        font-size: 0.78rem;
-        color: #e2e8f0;
-    }
-    .hero-hl-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-    }
-    .hero-hl-item i {
-        color: #38bdf8;
-    }
-
-    .hero-center-photo {
-        flex: 1;
-        max-width: 320px;
-        height: 140px;
-        border-radius: 10px;
-        overflow: hidden;
-        border: 2px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    .hero-center-photo img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .hero-right-brand {
-        flex: 0.9;
-        text-align: right;
-        border-left: 1px solid rgba(255, 255, 255, 0.15);
-        padding-left: 1.5rem;
-    }
-    .hero-brand-name {
-        font-size: 2rem;
-        font-weight: 900;
-        letter-spacing: 0.05em;
-        line-height: 1;
-        color: #ffffff;
-    }
-    .hero-brand-sub {
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.15em;
-        color: #94a3b8;
-        margin-bottom: 0.25rem;
-    }
-    .hero-brand-tagline {
-        font-size: 0.82rem;
-        color: #38bdf8;
-        font-style: italic;
+        justify-content: center;
+        padding: 10px;
         margin-bottom: 0.85rem;
     }
-    .hero-stats-row {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
-        font-size: 0.75rem;
+    .institute-logo-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
     }
-    .hero-stat-box {
-        text-align: center;
-        background: rgba(255, 255, 255, 0.08);
-        padding: 0.35rem 0.65rem;
+    .btn-send-inquiry {
+        background-color: #0097a7;
+        color: #ffffff;
+        border: none;
         border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .hero-stat-number {
-        font-weight: 800;
+        font-weight: 700;
         font-size: 0.9rem;
-        color: #38bdf8;
-        display: block;
-    }
-    .hero-stat-label {
-        font-size: 0.68rem;
-        color: #cbd5e1;
-    }
-
-    /* STORE PROFILE HEADER */
-    .store-profile-card {
-        background: #ffffff;
-        border: 1px solid var(--dc-border);
-        border-radius: 12px;
-        padding: 1.25rem 1.5rem;
-        margin-bottom: 1.25rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    }
-    .store-profile-flex {
-        display: flex;
-        gap: 1.25rem;
-        align-items: flex-start;
-    }
-    .store-avatar-box {
-        width: 90px;
-        height: 90px;
-        border-radius: 12px;
-        border: 2px solid #0066cc;
-        background: #ffffff;
-        display: flex;
-        flex-direction: column;
+        padding: 0.65rem 1rem;
+        width: 190px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.35rem;
-        flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.08);
+        gap: 0.5rem;
+        transition: background-color 0.15s;
     }
-    .store-avatar-box i {
+    .btn-send-inquiry:hover {
+        background-color: #00838f;
+        color: #ffffff;
+    }
+    .institute-title {
         font-size: 1.75rem;
-        color: #0066cc;
-    }
-    .store-avatar-title {
-        font-size: 1rem;
-        font-weight: 900;
-        color: #0066cc;
-        line-height: 1;
-        margin-top: 0.2rem;
-    }
-    .store-avatar-sub {
-        font-size: 0.45rem;
-        font-weight: 700;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .store-info-content {
-        flex: 1;
-    }
-    .store-title-row {
-        display: flex;
-        align-items: center;
-        gap: 0.65rem;
-        flex-wrap: wrap;
-        margin-bottom: 0.35rem;
-    }
-    .store-name-title {
-        font-size: 1.35rem;
         font-weight: 800;
         color: #0f172a;
+        line-height: 1.25;
         margin: 0;
     }
-    .badge-verified-seller {
-        background: #0284c7;
-        color: #ffffff;
-        font-size: 0.68rem;
-        font-weight: 700;
-        padding: 0.2rem 0.6rem;
-        border-radius: 12px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-    .badge-top-rated {
-        background: #f59e0b;
-        color: #ffffff;
-        font-size: 0.68rem;
-        font-weight: 700;
-        padding: 0.2rem 0.6rem;
-        border-radius: 12px;
-    }
-
-    .store-metrics-row {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        font-size: 0.78rem;
-        color: #475569;
-        margin-bottom: 0.5rem;
-    }
-    .store-rating-span {
-        color: #f59e0b;
-        font-weight: 700;
-    }
-    .store-desc-para {
-        font-size: 0.8rem;
-        color: #64748b;
-        line-height: 1.45;
-        margin: 0;
-        max-width: 780px;
-    }
-
-    /* Store Actions */
-    .store-actions-col {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.65rem;
-        flex-shrink: 0;
-    }
-    .action-btns-group {
-        display: flex;
-        gap: 0.5rem;
-    }
-    .btn-store-action {
+    .btn-claim-business {
+        border: 1px solid #cbd5e1;
         background: #ffffff;
-        border: 1px solid var(--dc-border);
         color: #334155;
         font-size: 0.78rem;
         font-weight: 600;
-        padding: 0.45rem 0.85rem;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .btn-store-action:hover {
-        background: #f1f5f9;
-        color: #0f172a;
-    }
-    .btn-contact-seller {
-        background: var(--dc-blue);
-        color: #ffffff;
-        border: 1px solid var(--dc-blue);
-        font-size: 0.78rem;
-        font-weight: 700;
-        padding: 0.45rem 1rem;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .btn-contact-seller:hover {
-        background: var(--dc-blue-hover);
-        color: #ffffff;
-    }
-
-    /* 4 Trust Highlights Below Actions */
-    .store-trust-badges-row {
-        display: flex;
-        gap: 1.25rem;
-        font-size: 0.72rem;
-        color: #334155;
-        font-weight: 600;
-        padding-top: 0.85rem;
-        border-top: 1px solid #f1f5f9;
-        margin-top: 0.85rem;
-    }
-    .trust-badge-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-    }
-    .trust-badge-item i {
-        color: #10b981;
-    }
-
-    /* STORE NAVIGATION TABS */
-    .store-nav-tabs-bar {
-        background: #ffffff;
-        border: 1px solid var(--dc-border);
-        border-radius: 8px;
-        padding: 0 1rem;
-        margin-bottom: 1.5rem;
-        display: flex;
-        gap: 2rem;
-        overflow-x: auto;
-    }
-    .store-tab-link {
-        padding: 0.75rem 0.25rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #64748b;
+        padding: 0.35rem 0.75rem;
+        border-radius: 4px;
+        transition: all 0.15s;
         text-decoration: none;
-        position: relative;
         white-space: nowrap;
-        cursor: pointer;
     }
-    .store-tab-link:hover {
-        color: var(--dc-blue);
+    .btn-claim-business:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        color: #0f172a;
     }
-    .store-tab-link.active {
-        color: var(--dc-blue);
-    }
-    .store-tab-link.active::after {
-        content: '';
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        height: 2.5px;
-        background: var(--dc-blue);
-        border-radius: 2px 2px 0 0;
-    }
-
-    /* 3-COLUMN LAYOUT */
-    .storefront-grid {
-        display: grid;
-        grid-template-columns: 240px 1fr 310px;
-        gap: 1.25rem;
-        align-items: flex-start;
-    }
-
-    /* LEFT SIDEBAR */
-    .sidebar-search-box {
-        background: #ffffff;
-        border: 1px solid var(--dc-border);
-        border-radius: 8px;
-        padding: 0.45rem 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-    .sidebar-search-box input {
-        border: none;
-        outline: none;
-        font-size: 0.8rem;
-        width: 100%;
+    .institute-category-sub {
+        font-size: 0.95rem;
+        font-weight: 700;
         color: #1e293b;
+        margin: 0.35rem 0 0.5rem;
     }
-    .sidebar-panel-card {
-        background: #ffffff;
-        border: 1px solid var(--dc-border);
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    .sidebar-card-title {
-        font-size: 0.85rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 0.75rem;
-    }
-    .category-radio-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .category-radio-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.35rem 0;
-        font-size: 0.78rem;
+    .institute-tagline {
+        font-size: 0.875rem;
         color: #475569;
-        cursor: pointer;
-        transition: color 0.15s;
+        line-height: 1.5;
+        margin-bottom: 0.65rem;
     }
-    .category-radio-item:hover, .category-radio-item.active {
-        color: var(--dc-blue);
-        font-weight: 600;
-    }
-    .category-radio-item input[type="radio"] {
-        margin-right: 0.5rem;
-    }
-    .category-count-badge {
-        color: #94a3b8;
-        font-size: 0.72rem;
-    }
-
-    /* CENTER AREA: SLIDER BANNER */
-    .middle-slider-banner {
-        background: linear-gradient(135deg, #0e1e38 0%, #172a45 100%);
-        border-radius: 12px;
-        overflow: hidden;
-        color: #ffffff;
-        position: relative;
-        padding: 1.5rem 1.75rem;
-        margin-bottom: 1.5rem;
-        min-height: 190px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .slider-content-left {
-        max-width: 58%;
-        z-index: 2;
-    }
-    .slider-title {
-        font-size: 1.45rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: -0.01em;
-        line-height: 1.15;
+    .institute-meta-item {
+        font-size: 0.875rem;
+        color: #1e293b;
         margin-bottom: 0.35rem;
-        color: #ffffff;
-    }
-    .slider-subtitle {
-        font-size: 0.78rem;
-        color: #cbd5e1;
-        margin-bottom: 0.75rem;
-    }
-    .slider-icons-list {
         display: flex;
-        flex-wrap: wrap;
-        gap: 0.85rem;
-        font-size: 0.7rem;
-        color: #93c5fd;
-        margin-bottom: 0.85rem;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
-    .slider-btn-explore {
-        background: #f97316;
-        color: #ffffff;
-        font-size: 0.78rem;
-        font-weight: 700;
-        padding: 0.45rem 1rem;
-        border-radius: 6px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        transition: background 0.2s;
-    }
-    .slider-btn-explore:hover {
-        background: #ea580c;
-        color: #ffffff;
-    }
-    .slider-photo-right {
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 42%;
-        overflow: hidden;
-    }
-    .slider-photo-right img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top center;
-    }
-    .slider-arrow-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.85);
-        color: #0f172a;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 0.75rem;
-        border: none;
-        z-index: 3;
-    }
-    .slider-arrow-prev { left: 8px; }
-    .slider-arrow-next { right: 8px; }
-
-    /* FEATURED COURSES & SERVICES HEADINGS */
-    .section-header-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.85rem;
-    }
-    .section-main-heading {
-        font-size: 1.05rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0;
-    }
-    .view-all-link {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: var(--dc-blue);
+    .institute-meta-item a {
         text-decoration: none;
     }
-    .view-all-link:hover {
+    .institute-meta-item a:hover {
         text-decoration: underline;
     }
 
-    /* COURSES GRID */
-    .courses-grid-4 {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 0.85rem;
-        margin-bottom: 2rem;
-    }
-    .course-store-card {
-        background: #ffffff;
-        border: 1px solid var(--dc-border);
-        border-radius: 10px;
-        overflow: hidden;
-        transition: transform 0.2s, box-shadow 0.2s;
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        flex-direction: column;
-    }
-    .course-store-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-        color: inherit;
-    }
-    .course-card-thumb-wrap {
-        position: relative;
-        height: 140px;
-        background: #ffffff;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-bottom: 1px solid #f1f5f9;
-    }
-    .course-card-thumb-wrap img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        background: #ffffff;
-        transition: transform 0.25s ease;
-    }
-    .course-store-card:hover .course-card-thumb-wrap img {
-        transform: scale(1.04);
-    }
-    .btn-card-heart {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.9);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #ef4444;
-        cursor: pointer;
-        border: none;
-        font-size: 0.7rem;
-    }
-    .course-card-body {
-        padding: 0.75rem;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-    }
-    .course-card-title {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #0f172a;
-        line-height: 1.25;
-        margin-bottom: 0.35rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        min-height: 32px;
-    }
-    .course-rating-row {
-        font-size: 0.7rem;
-        color: #f59e0b;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-    .course-meta-text {
-        font-size: 0.68rem;
-        color: #64748b;
-        margin-bottom: 0.45rem;
-    }
-    .course-price-row {
-        margin-top: auto;
-        display: flex;
-        align-items: baseline;
-        gap: 0.35rem;
-        flex-wrap: wrap;
-    }
-    .course-current-price {
-        font-size: 0.92rem;
-        font-weight: 800;
-        color: #0f172a;
-    }
-    .course-mrp-price {
-        font-size: 0.72rem;
-        color: #94a3b8;
-        text-decoration: line-through;
-    }
-    .course-discount-pill {
-        background: #dcfce7;
-        color: #15803d;
-        font-size: 0.65rem;
-        font-weight: 700;
-        padding: 0.1rem 0.35rem;
-        border-radius: 4px;
-        margin-left: auto;
-    }
-
-    /* 4 SERVICES GRID */
-    .services-grid-4 {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.85rem;
-        margin-bottom: 2rem;
-    }
-    .service-store-card {
-        background: #ffffff;
-        border: 1px solid var(--dc-border);
-        border-radius: 10px;
-        overflow: hidden;
-        transition: transform 0.2s, box-shadow 0.2s;
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
-    .service-store-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-        color: inherit;
-    }
-    .service-card-thumb-wrap {
-        height: 105px;
-        background: #f1f5f9;
-        overflow: hidden;
-        position: relative;
-    }
-    .service-card-thumb-wrap img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .service-card-body {
-        padding: 0.75rem;
-    }
-    .service-card-title {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 0.35rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .service-price-start {
-        font-size: 0.7rem;
-        color: #64748b;
-    }
-    .service-price-amount {
-        font-size: 0.88rem;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    /* RIGHT SIDEBAR */
-    .right-sidebar-box {
-        background: #ffffff;
-        border: 1px solid var(--dc-border);
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    .right-box-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.75rem;
-    }
-    .right-box-title {
-        font-size: 0.85rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0;
-    }
-    .open-status-pill {
-        background: #dcfce7;
-        color: #15803d;
-        font-size: 0.7rem;
-        font-weight: 700;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
+    /* Social Share Buttons */
+    .share-pill {
         display: inline-flex;
         align-items: center;
-        gap: 0.3rem;
-        margin-bottom: 0.65rem;
-    }
-    .contact-info-list {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 0.75rem 0;
-    }
-    .contact-info-item {
-        font-size: 0.75rem;
-        color: #334155;
-        margin-bottom: 0.45rem;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    .contact-info-item i {
-        color: var(--dc-blue);
-        margin-top: 2px;
-    }
-    .contact-info-item.whatsapp i {
-        color: #25d366;
-    }
-    .contact-info-item.whatsapp a {
-        color: #16a34a;
-        font-weight: 700;
+        gap: 0.35rem;
+        color: #ffffff !important;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 4px;
         text-decoration: none;
+        transition: opacity 0.15s;
     }
+    .share-pill:hover {
+        opacity: 0.9;
+    }
+    .share-fb { background-color: #3b5998; }
+    .share-tw { background-color: #000000; }
+    .share-pin { background-color: #bd081c; }
+    .share-wa { background-color: #25d366; }
+    .share-in { background-color: #0077b5; }
 
-    /* Mini Map */
-    .minimap-preview-wrap {
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid var(--dc-border);
-        position: relative;
-        height: 105px;
-        background: #e2e8f0;
-        margin-bottom: 0.5rem;
-    }
-    .minimap-preview-wrap img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .minimap-pin {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -100%);
-        color: #ef4444;
-        font-size: 1.5rem;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    }
-    .btn-directions-map {
+    /* Navigation Tabs */
+    .institute-tabs-bar {
         background: #ffffff;
-        border: 1px solid var(--dc-border);
-        color: var(--dc-blue);
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 0.35rem 0.75rem;
-        border-radius: 6px;
-        text-decoration: none;
-        display: block;
-        text-align: center;
-        transition: background 0.15s;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.35rem 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
-    .btn-directions-map:hover {
-        background: #eff6ff;
+    .institute-tabs-bar .nav-link {
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 6px;
+        border: none;
+        background: transparent;
+        transition: all 0.15s;
+    }
+    .institute-tabs-bar .nav-link:hover {
+        background-color: #f1f5f9;
+        color: #0f172a;
+    }
+    .institute-tabs-bar .nav-link.active {
+        background-color: #e0f2fe;
+        color: #0284c7;
+        font-weight: 700;
     }
 
-    /* Branches List */
-    .branches-list-wrap {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+    /* Tab Content Section */
+    .tab-content-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
-    .branch-list-item {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f1f5f9;
+    .section-accent-header {
+        position: relative;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+    }
+    .section-accent-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: #0066ff;
+        border-radius: 2px;
+    }
+
+    /* Course Cards */
+    .course-card-authentic {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.15s, box-shadow 0.15s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .course-card-authentic:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+    .course-thumb-box {
+        height: 150px;
+        background: #f8fafc;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        font-size: 0.75rem;
+        justify-content: center;
+        padding: 10px;
+        border-bottom: 1px solid #f1f5f9;
     }
-    .branch-list-item:last-child {
+    .course-thumb-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .course-body-authentic {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .course-title-authentic {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.4rem;
+        line-height: 1.35;
+    }
+
+    /* Sidebar Related Institutes */
+    .sidebar-widget-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .sidebar-widget-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .related-institute-item {
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    .related-institute-item:last-child {
         border-bottom: none;
         padding-bottom: 0;
+        margin-bottom: 0;
     }
-    .branch-name-title {
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 0.1rem;
-    }
-    .branch-phone-text {
-        font-size: 0.68rem;
-        color: #64748b;
-    }
-    .branch-open-badge {
-        background: #dcfce7;
-        color: #15803d;
-        font-size: 0.65rem;
-        font-weight: 700;
-        padding: 0.15rem 0.45rem;
-        border-radius: 4px;
-    }
-
-    /* Custom Training Orange Card */
-    .custom-training-card {
-        background: #fff7ed;
-        border: 1px solid #ffedd5;
-        border-radius: 10px;
-        padding: 1rem;
-        text-align: center;
-    }
-    .custom-training-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: #fdba74;
-        color: #c2410c;
-        display: inline-flex;
+    .related-logo-box {
+        width: 120px;
+        height: 90px;
+        margin: 0 auto 0.5rem;
+        display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
+        padding: 6px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #ffffff;
+    }
+    .related-logo-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .related-name {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #0f172a;
         margin-bottom: 0.5rem;
     }
-    .custom-training-title {
-        font-size: 0.85rem;
-        font-weight: 800;
-        color: #9a3412;
-        margin-bottom: 0.25rem;
-    }
-    .custom-training-desc {
-        font-size: 0.72rem;
-        color: #c2410c;
-        line-height: 1.35;
-        margin-bottom: 0.75rem;
-    }
-    .btn-custom-quote {
-        background: #ea580c;
-        color: #ffffff;
-        font-size: 0.75rem;
-        font-weight: 700;
-        padding: 0.45rem 1rem;
-        border-radius: 6px;
-        text-decoration: none;
+    .btn-view-more {
+        background-color: #00a65a;
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 0.82rem;
+        padding: 0.4rem 1rem;
+        border-radius: 4px;
         display: inline-block;
-        transition: background 0.15s;
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+        transition: background-color 0.15s;
     }
-    .btn-custom-quote:hover {
-        background: #c2410c;
-        color: #ffffff;
+    .btn-view-more:hover {
+        background-color: #008d4c;
     }
 
-    /* Responsive */
-    @media (max-width: 1199px) {
-        .storefront-grid {
-            grid-template-columns: 220px 1fr;
-        }
-        .right-sidebar-box {
-            grid-column: span 2;
-        }
-        .courses-grid-4, .services-grid-4 {
-            grid-template-columns: repeat(2, 1fr);
-        }
+    /* Gallery Grid */
+    .gallery-img-box {
+        height: 180px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: transform 0.15s;
     }
-    @media (max-width: 991px) {
-        .hero-banner-row {
+    .gallery-img-box:hover {
+        transform: scale(1.02);
+    }
+    .gallery-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+        .institute-header-flex {
             flex-direction: column;
             text-align: center;
         }
-        .hero-right-brand {
-            border-left: none;
-            padding-left: 0;
-            text-align: center;
+        .institute-logo-box, .btn-send-inquiry {
+            margin: 0 auto 1rem;
         }
-        .hero-stats-row {
+        .institute-meta-item {
             justify-content: center;
-        }
-        .store-profile-flex {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        .store-title-row {
-            justify-content: center;
-        }
-        .store-metrics-row {
-            justify-content: center;
-        }
-        .store-actions-col {
-            align-items: center;
-            width: 100%;
-        }
-        .store-trust-badges-row {
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .storefront-grid {
-            grid-template-columns: 1fr;
         }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container py-3">
-    <!-- Breadcrumbs matching legacy digitalclassworld.com -->
-    <div class="profile-breadcrumbs">
-        <a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a>
-        <span class="separator">&gt;</span>
-        @php
-            $displayState = $business->state ?: 'Gujarat';
-            $displayCity = $business->city ?: 'Ahmedabad';
-        @endphp
-        <a href="{{ url('/courses?category=coaching') }}">Coaching Institutes</a>
-        <span class="separator">&gt;</span>
-        <a href="{{ url('/courses?state=' . urlencode($displayState)) }}">{{ $displayState }}</a>
-        <span class="separator">&gt;</span>
-        <a href="{{ url('/courses?city=' . urlencode($displayCity)) }}">{{ $displayCity }}</a>
-        <span class="separator">&gt;</span>
-        <span class="current">{{ $business->business_name ?? 'Prarthna Paramedical Institute' }}</span>
-    </div>
-
-    @php
-        $isVcec = stripos($business->business_name ?? '', 'vcec') !== false;
-        $hasCustomCover = !empty($business->cover_image) && !str_contains($business->cover_image, 'unsplash.com');
-    @endphp
-
-    @if($isVcec || $hasCustomCover)
-    <!-- 1. TOP PANORAMIC HERO BANNER (Shown for VCEC or when custom banner is uploaded) -->
-    <div class="store-hero-banner" @if($hasCustomCover) style="background: linear-gradient(rgba(10, 25, 47, 0.7), rgba(10, 25, 47, 0.85)), url('{{ $business->cover_image }}') center/cover no-repeat;" @endif>
-        <div class="hero-banner-row">
-            <!-- Left Header -->
-            <div class="hero-left-content">
-                <h1 class="hero-main-title">{{ $business->tagline ?? ($isVcec ? 'Skills for a Brighter Tomorrow' : $business->business_name) }}</h1>
-                <div class="hero-subtitle">
-                    {{ $isVcec ? 'Computer Courses | Digital Marketing | Tally | Programming | AI Tools | Web Development | Career Guidance' : ($business->description ? \Illuminate\Support\Str::limit(strip_tags($business->description), 120) : 'Quality Education | Certified Training | Experienced Faculty') }}
-                </div>
-                <div class="hero-highlights-row">
-                    <span class="hero-hl-item"><i class="fa-solid fa-desktop"></i> Live Classes</span>
-                    <span class="hero-hl-item"><i class="fa-solid fa-certificate"></i> Certified Courses</span>
-                    <span class="hero-hl-item"><i class="fa-solid fa-laptop-code"></i> Practical Training</span>
-                    <span class="hero-hl-item"><i class="fa-solid fa-handshake"></i> Placement Support</span>
-                </div>
-            </div>
-
-            <!-- Center Photo -->
-            <div class="hero-center-photo">
-                <img src="{{ $business->cover_image ?: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&auto=format&fit=crop&q=80' }}" alt="{{ $business->business_name }}">
-            </div>
-
-            <!-- Right Brand -->
-            <div class="hero-right-brand">
-                <div class="hero-brand-name">{{ $business->business_name ? explode(' ', $business->business_name)[0] : 'VCEC' }}</div>
-                <div class="hero-brand-sub">{{ strtoupper($business->category ?? 'EDUCATION') }}</div>
-                <div class="hero-brand-tagline">{{ $business->tagline ?? 'Learn | Practice | Grow' }}</div>
-                <div class="hero-stats-row">
-                    <div class="hero-stat-box">
-                        <span class="hero-stat-number"><i class="fa-solid fa-users fa-xs me-1"></i>10000+</span>
-                        <span class="hero-stat-label">Students Trained</span>
-                    </div>
-                    <div class="hero-stat-box">
-                        <span class="hero-stat-number"><i class="fa-solid fa-building fa-xs me-1"></i>3</span>
-                        <span class="hero-stat-label">Branches</span>
-                    </div>
-                    <div class="hero-stat-box">
-                        <span class="hero-stat-number"><i class="fa-solid fa-award fa-xs me-1"></i>15+</span>
-                        <span class="hero-stat-label">Certified Courses</span>
-                    </div>
-                </div>
-            </div>
+<div class="institute-profile-wrapper py-3">
+    <div class="container">
+        <!-- 1. BREADCRUMBS -->
+        <div class="profile-breadcrumb mb-3">
+            <a href="{{ route('home') }}"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="sep">&gt;</span>
+            <a href="{{ route('businesses') }}">Coaching Institutes</a>
+            <span class="sep">&gt;</span>
+            @php
+                $displayState = $business->state ?: 'Gujarat';
+                $displayCity = $business->city ?: 'Ahmedabad';
+            @endphp
+            <a href="{{ route('businesses', ['state' => $displayState]) }}">{{ $displayState }}</a>
+            <span class="sep">&gt;</span>
+            <a href="{{ route('businesses', ['city' => $displayCity]) }}">{{ $displayCity }}</a>
+            <span class="sep">&gt;</span>
+            <span class="text-dark fw-bold">{{ $business->business_name }}</span>
         </div>
-    </div>
-    @endif
 
-    <!-- 2. STORE PROFILE HEADER -->
-    <div class="store-profile-card">
-        <div class="store-profile-flex">
-            <!-- Left Logo -->
-            <div class="store-avatar-box">
-                @if(!empty($business->logo))
-                    <img src="{{ $business->logo }}" alt="{{ $business->business_name }}" class="w-100 h-100 rounded-3 object-fit-cover">
-                @else
-                    <i class="fa-solid fa-graduation-cap"></i>
-                    <span class="store-avatar-title">{{ $business->business_name ? strtoupper(substr($business->business_name, 0, 4)) : 'INST' }}</span>
-                    <span class="store-avatar-sub">{{ strtoupper($business->category ?? 'EDUCATION') }}</span>
-                @endif
-            </div>
-
-            <!-- Center Info -->
-            <div class="store-info-content">
-                <div class="store-title-row">
-                    <h2 class="store-name-title">{{ $business->business_name ?? 'Prarthna Paramedical Institute' }}</h2>
-                    <span class="badge-verified-seller"><i class="fa-solid fa-circle-check"></i> Verified Seller</span>
-                    <span class="badge-top-rated"><i class="fa-solid fa-star me-1"></i>Top Rated</span>
+        <!-- 2. MAIN INSTITUTE HEADER CARD -->
+        <div class="institute-header-card mb-4">
+            <div class="d-flex institute-header-flex align-items-start gap-4">
+                <!-- Left Column: Logo & Send Inquiry Button -->
+                <div class="flex-shrink-0 text-center">
+                    <div class="institute-logo-box">
+                        @if(!empty($business->logo))
+                            <img src="{{ $business->logo }}" alt="{{ $business->business_name }}" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                        @else
+                            <div class="text-center text-muted">
+                                <i class="fa-solid fa-building-columns fa-3x mb-2 text-primary"></i>
+                                <div class="fw-bold small">{{ Str::limit($business->business_name, 15) }}</div>
+                            </div>
+                        @endif
+                    </div>
+                    <button type="button" class="btn btn-send-inquiry" data-bs-toggle="modal" data-bs-target="#inquiryModal">
+                        <i class="fa-solid fa-circle-info"></i> Send Inquiry
+                    </button>
                 </div>
 
-                <div class="store-metrics-row">
-                    @if($business->rating > 0)
-                        <span class="store-rating-span">
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($business->rating >= $i)
-                                    <i class="fa-solid fa-star"></i>
-                                @elseif($business->rating >= $i - 0.5)
-                                    <i class="fa-solid fa-star-half-stroke"></i>
-                                @else
-                                    <i class="fa-regular fa-star text-muted"></i>
-                                @endif
-                            @endfor
-                            <span class="ms-1 text-dark">{{ number_format($business->rating, 1) }}</span>
+                <!-- Right Column: Details & Social Share -->
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
+                        <h1 class="institute-title">{{ $business->business_name }}</h1>
+                        <button type="button" class="btn-claim-business" data-bs-toggle="modal" data-bs-target="#claimModal">
+                            Claim This Business
+                        </button>
+                    </div>
+
+                    <!-- Category & Subcategory -->
+                    <div class="institute-category-sub">
+                        {{ $business->category ?? 'Coaching Institute' }}
+                        @if(!empty($business->sub_category))
+                            ({{ $business->sub_category }})
+                        @endif
+                    </div>
+
+                    <!-- Tagline / Short Description -->
+                    <div class="institute-tagline">
+                        {{ $business->tagline ?: Str::limit(strip_tags($business->description), 160) }}
+                    </div>
+
+                    <!-- Address -->
+                    <div class="institute-meta-item">
+                        <i class="fa-solid fa-location-dot text-danger mt-1"></i>
+                        <span>
+                            {{ $business->address ?: ($business->city . ', ' . $business->state . ' India') }}
+                            <span class="text-danger ms-1">📍</span>
                         </span>
-                        <span>({{ $business->reviews_count }} {{ $business->reviews_count === 1 ? 'review' : 'reviews' }})</span>
-                    @else
-                        <span class="fw-semibold text-muted">0</span>
+                    </div>
+
+                    <!-- Phone Number -->
+                    @if(!empty($business->phone))
+                        <div class="institute-meta-item">
+                            <i class="fa-solid fa-phone mt-1" style="color: #e91e63;"></i>
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $business->phone) }}" class="fw-bold text-dark">
+                                {{ $business->phone }}
+                            </a>
+                        </div>
                     @endif
-                    <span>&bull;</span>
-                    <span><i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $business->city ? ($business->city . ($business->state ? ', ' . $business->state : '')) : 'Ahmedabad, Gujarat' }}</span>
-                    @if(!empty($business->features['year_established']))
-                        <span>&bull;</span>
-                        <span><i class="fa-solid fa-calendar-check text-muted me-1"></i> Since {{ $business->features['year_established'] }}</span>
+
+                    <!-- Email -->
+                    @if(!empty($business->email))
+                        <div class="institute-meta-item">
+                            <i class="fa-solid fa-envelope text-info mt-1"></i>
+                            <a href="mailto:{{ $business->email }}" class="text-secondary">
+                                {{ $business->email }}
+                            </a>
+                        </div>
                     @endif
-                </div>
 
-                <p class="store-desc-para">
-                    {{ $business->description ?? ($business->business_name . ' offers premier coaching, training, and certification programs in ' . ($business->city ?: 'Ahmedabad') . ', ' . ($business->state ?: 'Gujarat') . '. Check courses, fees, contact details, reviews and admission inquiries.') }}
-                </p>
-            </div>
+                    <!-- Website URL -->
+                    @if(!empty($business->website) && strtolower($business->website) !== 'n/a')
+                        <div class="institute-meta-item">
+                            <i class="fa-solid fa-globe text-primary mt-1"></i>
+                            <a href="{{ Str::startsWith($business->website, 'http') ? $business->website : 'https://' . $business->website }}" target="_blank" rel="noopener" class="text-primary">
+                                {{ $business->website }}
+                            </a>
+                        </div>
+                    @endif
 
-            <!-- Right Actions -->
-            <div class="store-actions-col">
-                <div class="action-btns-group">
-                    <button type="button" class="btn-store-action" onclick="toggleFollowStore(this)">
-                        <i class="fa-regular fa-heart text-danger"></i> Follow Store
-                    </button>
-                    <button type="button" class="btn-store-action" onclick="shareStoreProfile()">
-                        <i class="fa-solid fa-share-nodes"></i> Share
-                    </button>
-                    <button type="button" class="btn-contact-seller" onclick="openContactModal()">
-                        <i class="fa-solid fa-comment-dots"></i> Contact Seller
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4 Quality Trust Badges -->
-        <div class="store-trust-badges-row">
-            <span class="trust-badge-item"><i class="fa-solid fa-shield-halved"></i> High Quality Training</span>
-            <span class="trust-badge-item"><i class="fa-solid fa-chalkboard-user"></i> Expert Faculty</span>
-            <span class="trust-badge-item"><i class="fa-solid fa-laptop-code"></i> Practical Approach</span>
-            <span class="trust-badge-item"><i class="fa-solid fa-certificate"></i> Certificate Provided</span>
-        </div>
-    </div>
-
-    <!-- 3. STORE NAVIGATION TABS -->
-    <div class="store-nav-tabs-bar">
-        <a href="#home" class="store-tab-link active">Home</a>
-        <a href="#all" class="store-tab-link">All</a>
-        <a href="#courses" class="store-tab-link">Courses ({{ count($courses) }})</a>
-        <a href="#services" class="store-tab-link">Our Services ({{ count($services) }})</a>
-        <a href="#about" class="store-tab-link">About {{ $business->business_name ? explode(' ', $business->business_name)[0] : 'Institute' }}</a>
-        <a href="#reviews" class="store-tab-link">Student Reviews ({{ $business->reviews_count ?: 0 }})</a>
-    </div>
-
-    <!-- 4. LOWER 3-COLUMN CONTENT GRID -->
-    <div class="storefront-grid">
-        <!-- A. LEFT SIDEBAR: SEARCH & CATEGORIES -->
-        <div class="store-sidebar-col">
-            <!-- Search Inside Store -->
-            <div class="sidebar-search-box">
-                <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                <input type="text" id="storeSearchInput" placeholder="Search in this store..." onkeyup="filterStoreItems(this.value)">
-            </div>
-
-            <!-- Browse by Category -->
-            <div class="sidebar-panel-card">
-                <div class="sidebar-card-title">Browse by Category</div>
-                <div class="category-radio-list">
-                    @foreach($sidebarCategories as $cat)
-                        <label class="category-radio-item {{ $cat['active'] ? 'active' : '' }}">
-                            <span>
-                                <input type="radio" name="store_cat" value="{{ $cat['name'] }}" {{ $cat['active'] ? 'checked' : '' }} onchange="selectStoreCategory('{{ $cat['name'] }}')">
-                                {{ $cat['name'] }}
-                            </span>
-                            <span class="category-count-badge">{{ $cat['count'] }}</span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Custom Filter -->
-            <div class="sidebar-panel-card">
-                <div class="sidebar-card-title">Custom Filter</div>
-                <div class="small fw-bold text-dark mb-2">Type</div>
-                @foreach($filterTypes as $fType)
-                    <div class="d-flex align-items-center justify-content-between small text-muted mb-1">
-                        <label class="d-flex align-items-center gap-2 m-0 cursor-pointer">
-                            <input type="checkbox" class="form-check-input m-0"> {{ $fType['name'] }}
-                        </label>
-                        <span class="category-count-badge">({{ $fType['count'] }})</span>
-                    </div>
-                @endforeach
-
-                <div class="small fw-bold text-dark mt-3 mb-2">Mode</div>
-                @foreach($filterModes as $fMode)
-                    <div class="d-flex align-items-center justify-content-between small text-muted mb-1">
-                        <label class="d-flex align-items-center gap-2 m-0 cursor-pointer">
-                            <input type="checkbox" class="form-check-input m-0"> {{ $fMode['name'] }}
-                        </label>
-                        <span class="category-count-badge">({{ $fMode['count'] }})</span>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- B. CENTER AREA: SLIDER BANNER & CARDS -->
-        <div class="store-center-col">
-            <!-- Middle Banner Slider -->
-            <div class="middle-slider-banner">
-                <button type="button" class="slider-arrow-btn slider-arrow-prev" onclick="prevBannerSlide()"><i class="fa-solid fa-chevron-left"></i></button>
-                <button type="button" class="slider-arrow-btn slider-arrow-next" onclick="nextBannerSlide()"><i class="fa-solid fa-chevron-right"></i></button>
-
-                <div class="slider-content-left">
-                    <h3 class="slider-title">Learn Today<br>Build Your Tomorrow</h3>
-                    <div class="slider-subtitle">Practical Courses | Expert Faculty | Live Projects | Certification</div>
-                    
-                    <div class="slider-icons-list">
-                        <span><i class="fa-solid fa-desktop me-1"></i> Computer Courses</span>
-                        <span><i class="fa-solid fa-bullhorn me-1"></i> Digital Marketing</span>
-                        <span><i class="fa-solid fa-calculator me-1"></i> Tally & Accounting</span>
-                        <span><i class="fa-solid fa-code me-1"></i> Web & App Development</span>
-                        <span><i class="fa-solid fa-brain me-1"></i> AI Tools</span>
-                        <span><i class="fa-solid fa-compass me-1"></i> Career Guidance</span>
-                    </div>
-
-                    <a href="#courses" class="slider-btn-explore">Explore Our Courses &rarr;</a>
-                </div>
-
-                <div class="slider-photo-right">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80" alt="VCEC Student Success">
-                </div>
-            </div>
-
-            <!-- FEATURED COURSES SECTION -->
-            <div class="mb-4" id="courses">
-                <div class="section-header-row">
-                    <h3 class="section-main-heading">Featured & Popular Courses</h3>
-                    <a href="{{ route('courses') }}" class="view-all-link">View All &rarr;</a>
-                </div>
-
-                <div class="courses-grid-4">
-                    @foreach($courses as $c)
-                        <a href="{{ route('course.show', $c['slug'] ?? 'digital-marketing-complete-course-2026') }}" class="course-store-card">
-                            <div class="course-card-thumb-wrap">
-                                <img src="{{ $c['thumbnail'] }}" alt="{{ $c['title'] }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80';">
-                                <button type="button" class="btn-card-heart" onclick="event.preventDefault(); toggleCourseHeart(this);">
-                                    <i class="fa-regular fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="course-card-body">
-                                <div class="course-card-title">{{ $c['title'] }}</div>
-                                <div class="course-rating-row">
-                                    <i class="fa-solid fa-star"></i> {{ $c['rating'] }} <span class="text-muted fw-normal">({{ $c['reviews_count'] }})</span>
-                                </div>
-                                <div class="course-meta-text">
-                                    <i class="fa-regular fa-clock me-1"></i> {{ $c['duration'] }} &bull; {{ $c['mode'] }}
-                                </div>
-                                <div class="course-price-row">
-                                    @if(($c['price'] ?? 0) > 0)
-                                        <span class="course-current-price">₹{{ number_format($c['price']) }}</span>
-                                        @if(($c['original_price'] ?? 0) > ($c['price'] ?? 0))
-                                            <span class="course-mrp-price">₹{{ number_format($c['original_price']) }}</span>
-                                            <span class="course-discount-pill">{{ $c['discount'] }}</span>
-                                        @endif
-                                    @else
-                                        <span class="course-current-price text-primary" style="font-size: 0.85rem;">Inquire for Fees</span>
-                                    @endif
-                                </div>
-                            </div>
+                    <!-- Social Share Buttons -->
+                    <div class="d-flex align-items-center gap-2 mt-3 pt-2 border-top flex-wrap">
+                        <span class="fw-bold text-dark small me-1">Share on</span>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" target="_blank" rel="noopener" class="share-pill share-fb">
+                            <i class="fa-brands fa-facebook-f"></i> Share
                         </a>
-                    @endforeach
+                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($business->business_name) }}" target="_blank" rel="noopener" class="share-pill share-tw">
+                            <i class="fa-brands fa-x-twitter"></i> Post
+                        </a>
+                        <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url()->current()) }}&description={{ urlencode($business->business_name) }}" target="_blank" rel="noopener" class="share-pill share-pin">
+                            <i class="fa-brands fa-pinterest"></i> Pin
+                        </a>
+                        <a href="https://api.whatsapp.com/send?text={{ urlencode($business->business_name . ' - ' . url()->current()) }}" target="_blank" rel="noopener" class="share-pill share-wa">
+                            <i class="fa-brands fa-whatsapp"></i> Share
+                        </a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}" target="_blank" rel="noopener" class="share-pill share-in">
+                            <i class="fa-brands fa-linkedin-in"></i> Share
+                        </a>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- OUR SERVICES SECTION -->
-            <div class="mb-4" id="services">
-                <div class="section-header-row">
-                    <h3 class="section-main-heading">Our Services</h3>
-                    <a href="javascript:void(0)" onclick="openContactModal()" class="view-all-link">View All &rarr;</a>
-                </div>
+        <!-- 3. NAVIGATION TABS BAR -->
+        <div class="institute-tabs-bar mb-4">
+            <ul class="nav nav-pills border-0 gap-1 w-100" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @if(count($courses) == 0) active @endif" id="overview-tab" data-bs-toggle="pill" data-bs-target="#tab-overview" type="button" role="tab">Overview</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @if(count($courses) > 0) active @endif" id="courses-tab" data-bs-toggle="pill" data-bs-target="#tab-courses" type="button" role="tab">
+                        Courses @if(count($courses) > 0)<span class="badge rounded-pill bg-primary ms-1">{{ count($courses) }}</span>@endif
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="gallery-tab" data-bs-toggle="pill" data-bs-target="#tab-gallery" type="button" role="tab">
+                        Gallary @if(count($galleryImages) > 0)<span class="badge rounded-pill bg-secondary ms-1">{{ count($galleryImages) }}</span>@endif
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="faqs-tab" data-bs-toggle="pill" data-bs-target="#tab-faqs" type="button" role="tab">FAQ's</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="faculty-tab" data-bs-toggle="pill" data-bs-target="#tab-faculty" type="button" role="tab">
+                        Faculty @if(count($staffMembers) > 0)<span class="badge rounded-pill bg-secondary ms-1">{{ count($staffMembers) }}</span>@endif
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="portfolio-tab" data-bs-toggle="pill" data-bs-target="#tab-portfolio" type="button" role="tab">
+                        Portfolio @if(count($portfolios) > 0)<span class="badge rounded-pill bg-secondary ms-1">{{ count($portfolios) }}</span>@endif
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="blogs-tab" data-bs-toggle="pill" data-bs-target="#tab-blogs" type="button" role="tab">
+                        Blogs @if(count($articles) > 0)<span class="badge rounded-pill bg-secondary ms-1">{{ count($articles) }}</span>@endif
+                    </button>
+                </li>
+            </ul>
+        </div>
 
-                <div class="services-grid-4">
-                    @foreach($services as $srv)
-                        <div class="service-store-card" onclick="openServiceInquiry('{{ addslashes($srv['title']) }}')" style="cursor: pointer;">
-                            <div class="service-card-thumb-wrap">
-                                <img src="{{ $srv['thumbnail'] }}" alt="{{ $srv['title'] }}">
-                                <button type="button" class="btn-card-heart" onclick="event.stopPropagation(); toggleCourseHeart(this);">
-                                    <i class="fa-regular fa-heart"></i>
-                                </button>
+        <!-- 4. TWO-COLUMN MAIN BODY (Tabs Content Left + Related Institutes Right) -->
+        <div class="row g-4">
+            <!-- Left Main Column (approx 72%) -->
+            <div class="col-lg-8">
+                <div class="tab-content" id="profileTabsContent">
+
+                    <!-- TAB: COURSES -->
+                    <div class="tab-pane fade @if(count($courses) > 0) show active @endif" id="tab-courses" role="tabpanel">
+                        <div class="tab-content-card">
+                            <h2 class="section-accent-header">Courses</h2>
+                            @if(!empty($courses) && count($courses) > 0)
+                                <div class="row row-cols-1 row-cols-md-2 g-3">
+                                    @foreach($courses as $course)
+                                        <div class="col">
+                                            <div class="course-card-authentic">
+                                                <div class="course-thumb-box">
+                                                    @if(!empty($course['thumbnail']))
+                                                        <img src="{{ $course['thumbnail'] }}" alt="{{ $course['title'] }}" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                                    @else
+                                                        <div class="text-center text-primary">
+                                                            <i class="fa-solid fa-graduation-cap fa-3x mb-1"></i>
+                                                            <div class="fw-bold small">{{ $course['title'] }}</div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="course-body-authentic">
+                                                    <h3 class="course-title-authentic">{{ $course['title'] }}</h3>
+                                                    <div class="d-flex align-items-center gap-2 small text-muted mb-2">
+                                                        <span><i class="fa-regular fa-clock text-primary me-1"></i> {{ $course['duration'] ?? '3 Months' }}</span>
+                                                        <span>&bull;</span>
+                                                        <span><i class="fa-solid fa-chalkboard-user text-success me-1"></i> {{ $course['mode'] ?? 'Offline/Online' }}</span>
+                                                    </div>
+                                                    @if(!empty($course['description']))
+                                                        <p class="small text-muted mb-3" style="line-height: 1.4;">
+                                                            {{ Str::limit(strip_tags($course['description']), 100) }}
+                                                        </p>
+                                                    @endif
+                                                    <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                                                        <div class="fw-bold text-dark">
+                                                            @if(!empty($course['price']) && $course['price'] > 0)
+                                                                ₹{{ number_format($course['price']) }}
+                                                            @else
+                                                                <span class="badge bg-success-subtle text-success">Free / Inquire</span>
+                                                            @endif
+                                                        </div>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#inquiryModal" onclick="document.getElementById('inquiryCourseField').value='{{ addslashes($course['title']) }}'">
+                                                            Inquire Now
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-book-open fa-3x mb-3 text-secondary"></i>
+                                    <h5>No Courses Listed Currently</h5>
+                                    <p class="small">Contact the institute directly for upcoming batch admissions and syllabus details.</p>
+                                    <button type="button" class="btn btn-primary btn-sm px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#inquiryModal">
+                                        Send Course Inquiry
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- TAB: OVERVIEW -->
+                    <div class="tab-pane fade @if(count($courses) == 0) show active @endif" id="tab-overview" role="tabpanel">
+                        <div class="tab-content-card">
+                            <h2 class="section-accent-header">About {{ $business->business_name }}</h2>
+                            <div class="institute-full-description mb-4 text-secondary" style="font-size: 0.92rem; line-height: 1.7; white-space: pre-line;">
+                                {{ $business->description ?: ($business->business_name . ' is an educational coaching institute dedicated to quality guidance and training in ' . ($business->city ?: 'Ahmedabad') . ', ' . ($business->state ?: 'Gujarat') . '.') }}
                             </div>
-                            <div class="service-card-body">
-                                <div class="service-card-title" title="{{ $srv['title'] }}">{{ $srv['title'] }}</div>
-                                <div class="service-price-start">Starting from</div>
-                                <div class="service-price-amount">₹{{ number_format($srv['starting_price']) }}</div>
+
+                            <!-- Key Information Overview Table -->
+                            <h3 class="h5 fw-bold text-dark mb-3">Key Information</h3>
+                            <div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Category</div>
+                                        <div class="fw-bold text-dark">{{ $business->category ?? 'Coaching Institute' }}</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Specialization / Subcategory</div>
+                                        <div class="fw-bold text-dark">{{ $business->sub_category ?: 'General' }}</div>
+                                    </div>
+                                </div>
+                                @if(!empty($affiliate->since))
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Established Year</div>
+                                        <div class="fw-bold text-dark">{{ $affiliate->since }}</div>
+                                    </div>
+                                </div>
+                                @endif
+                                @if(!empty($affiliate->total_students))
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Students Enrolled</div>
+                                        <div class="fw-bold text-dark">{{ $affiliate->total_students }}</div>
+                                    </div>
+                                </div>
+                                @endif
+                                @if(!empty($affiliate->language_known))
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Languages of Instruction</div>
+                                        <div class="fw-bold text-dark">{{ $affiliate->language_known }}</div>
+                                    </div>
+                                </div>
+                                @endif
+                                @if(!empty($affiliate->payment_mode))
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Payment Modes</div>
+                                        <div class="fw-bold text-dark">{{ $affiliate->payment_mode }}</div>
+                                    </div>
+                                </div>
+                                @endif
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Location</div>
+                                        <div class="fw-bold text-dark">{{ $business->city ?: 'Ahmedabad' }}, {{ $business->state ?: 'Gujarat' }}</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="p-3 border rounded-3 bg-light">
+                                        <div class="text-muted small">Verification</div>
+                                        <div class="fw-bold text-success"><i class="fa-solid fa-circle-check"></i> Verified Profile</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-            </div>
+                    </div>
 
-            <!-- MORE INSTITUTES FROM CITY (Matching digitalclassworld.com) -->
-            @if(!empty($cityInstitutes) && $cityInstitutes->count() > 0)
-            <div class="mb-4">
-                <div class="section-header-row">
-                    <h3 class="section-main-heading">More Institutes from {{ $business->city ?: 'Ahmedabad' }}</h3>
-                    <a href="{{ url('/courses?city=' . urlencode($business->city ?: 'Ahmedabad')) }}" class="view-all-link">View All &rarr;</a>
-                </div>
+                    <!-- TAB: GALLERY -->
+                    <div class="tab-pane fade" id="tab-gallery" role="tabpanel">
+                        <div class="tab-content-card">
+                            <h2 class="section-accent-header">Photo Gallery</h2>
+                            @if(!empty($galleryImages) && count($galleryImages) > 0)
+                                <div class="row row-cols-2 row-cols-md-3 g-3">
+                                    @foreach($galleryImages as $img)
+                                        <div class="col">
+                                            <div class="gallery-img-box" onclick="window.open('{{ $img->image }}', '_blank')">
+                                                <img src="{{ $img->image }}" alt="{{ $business->business_name }} Photo" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-images fa-3x mb-3 text-secondary"></i>
+                                    <h5>No Photos Available Yet</h5>
+                                    <p class="small">Photos will be displayed here once uploaded by the institute administration.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
 
-                <div class="row g-2">
-                    @foreach($cityInstitutes as $cInst)
-                        @php
-                            $cImg = $cInst->display_image;
-                        @endphp
-                        <div class="col-md-4 col-sm-6">
-                            <div class="card h-100 border rounded-3 p-2.5 bg-white shadow-sm hover-shadow transition">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <img src="{{ $cImg }}" alt="{{ $cInst->business_name }}" class="rounded border object-fit-contain p-1" style="width: 42px; height: 42px; background: #f8fafc;" onerror="this.onerror=null;this.src='{{ asset('images/camera_placeholder.png') }}';">
-                                    <div class="overflow-hidden flex-grow-1">
-                                        <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.82rem;" title="{{ $cInst->business_name }}">{{ $cInst->business_name }}</h6>
-                                        <div class="text-muted small text-truncate" style="font-size: 0.7rem;">
-                                            <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $cInst->area ? $cInst->area . ', ' : '' }}{{ $cInst->city ?: 'Ahmedabad' }}
+                    <!-- TAB: FAQS -->
+                    <div class="tab-pane fade" id="tab-faqs" role="tabpanel">
+                        <div class="tab-content-card">
+                            <h2 class="section-accent-header">Frequently Asked Questions</h2>
+                            <div class="accordion" id="faqAccordion">
+                                <div class="accordion-item border-0 mb-3 rounded-3 shadow-sm overflow-hidden">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                            How do I enroll in courses at {{ $business->business_name }}?
+                                        </button>
+                                    </h2>
+                                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body text-secondary small">
+                                            You can click the <strong>"Send Inquiry"</strong> button above, or call {{ $business->phone ?: 'the institute' }} directly to check batch timings, admission requirements, and registration procedure.
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ $cInst->url }}" class="btn btn-sm btn-outline-secondary w-100 py-1 fw-semibold mt-auto" style="font-size: 0.72rem;">
-                                    View Institute &rarr;
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
-        </div>
-
-        <!-- C. RIGHT SIDEBAR: CONTACT, RELATED INSTITUTES, BRANCHES -->
-        <div class="store-right-col">
-            <!-- Get In Touch Box -->
-            <div class="right-sidebar-box">
-                <div class="right-box-header">
-                    <h4 class="right-box-title">Get in Touch</h4>
-                    <a href="javascript:void(0)" onclick="openContactModal()" class="view-all-link">View All &rarr;</a>
-                </div>
-
-                <div class="open-status-pill">
-                    <i class="fa-solid fa-circle fa-2xs"></i> Open Now &nbsp;9:00 AM - 8:00 PM (Mon - Sun)
-                </div>
-
-                <ul class="contact-info-list">
-                    <li class="contact-info-item">
-                        <i class="fa-solid fa-phone"></i>
-                        <a href="tel:{{ $business->phone ?: '+919876543210' }}" class="text-decoration-none text-dark fw-semibold">{{ $business->phone ?: '+91 98765 43210' }}</a>
-                    </li>
-                    <li class="contact-info-item whatsapp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $business->whatsapp_number ?: ($business->phone ?: '919173860404')) }}?text={{ urlencode('Hi ' . $business->business_name . ', I am interested in your classes/services.') }}" target="_blank">Chat on WhatsApp</a>
-                    </li>
-                    <li class="contact-info-item">
-                        <i class="fa-solid fa-envelope"></i>
-                        <a href="mailto:{{ $business->email ?: ($business->seller?->user?->email ?: 'support@digitalclassworldin.com') }}" class="text-decoration-none text-dark">{{ $business->email ?: ($business->seller?->user?->email ?: 'support@digitalclassworldin.com') }}</a>
-                    </li>
-                    <li class="contact-info-item align-items-start">
-                        <i class="fa-solid fa-location-dot text-danger mt-1"></i>
-                        <div>
-                            <div class="fw-semibold text-dark">{{ $business->address ?: (($business->city ?? 'Ahmedabad') . ($business->state ? ', ' . $business->state : '')) }}</div>
-                            @if(!empty($business->landmark))
-                                <div class="small text-muted"><i class="fa-solid fa-map-pin text-primary me-1"></i> Landmark: {{ $business->landmark }}</div>
-                            @endif
-                            @if(!empty($business->area))
-                                <div class="small text-muted"><i class="fa-solid fa-city text-secondary me-1"></i> Area: {{ $business->area }}</div>
-                            @endif
-                            <div class="small text-muted">{{ $business->city ?? 'Ahmedabad' }}{{ $business->state ? ', ' . $business->state : '' }}{{ $business->pincode ? ' - ' . $business->pincode : '' }}</div>
-                        </div>
-                    </li>
-                </ul>
-
-                <button type="button" class="btn-directions-map w-100 d-flex align-items-center justify-content-center gap-1.5 mt-2" onclick="openDirectionsMap()">
-                    <i class="fa-solid fa-arrow-up-right-from-square text-primary"></i> <span>Open in Google Maps</span>
-                </button>
-            </div>
-
-            <!-- RELATED INSTITUTES BOX (Matching digitalclassworld.com) -->
-            @if(!empty($relatedInstitutes) && $relatedInstitutes->count() > 0)
-            <div class="right-sidebar-box">
-                <div class="right-box-header">
-                    <h4 class="right-box-title">Related Institutes</h4>
-                    <a href="{{ url('/courses?category=coaching') }}" class="view-all-link">View All &rarr;</a>
-                </div>
-
-                <div class="related-institutes-list">
-                    @foreach($relatedInstitutes as $rel)
-                        @php
-                            $relImg = $rel->display_image;
-                            $relCleanName = $rel->business_name;
-                        @endphp
-                        <div class="card mb-2 border rounded-3 p-2 bg-light bg-opacity-50">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <img src="{{ $relImg }}" alt="{{ $relCleanName }}" class="rounded border object-fit-contain p-1" style="width: 44px; height: 44px; background: #fff;" onerror="this.onerror=null;this.src='{{ asset('images/camera_placeholder.png') }}';">
-                                <div class="overflow-hidden flex-grow-1">
-                                    <h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.84rem;" title="{{ $relCleanName }}">{{ $relCleanName }}</h6>
-                                    <div class="text-muted small text-truncate" style="font-size: 0.72rem;">
-                                        <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ $rel->city ?: 'Ahmedabad' }}
+                                <div class="accordion-item border-0 mb-3 rounded-3 shadow-sm overflow-hidden">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                            Are demo classes offered before admission?
+                                        </button>
+                                    </h2>
+                                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body text-secondary small">
+                                            Yes, demo sessions and counseling consultations are available. Please submit an inquiry with your preferred course to schedule your session.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item border-0 mb-3 rounded-3 shadow-sm overflow-hidden">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                            What are the accepted payment methods?
+                                        </button>
+                                    </h2>
+                                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body text-secondary small">
+                                            {{ $affiliate->payment_mode ?? 'Cash, UPI, Debit/Credit Card, and Online Net Banking' }} are generally accepted for course fee installments.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <a href="{{ $rel->url }}" class="btn btn-sm btn-outline-primary w-100 fw-semibold py-1" style="font-size: 0.74rem;">
-                                View More &rarr;
-                            </a>
                         </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
+                    </div>
 
-            <!-- Our Branches Box -->
-            <div class="right-sidebar-box">
-                <div class="right-box-header">
-                    <h4 class="right-box-title">{{ count($branches) > 1 ? 'Our Branches' : 'Campus Location' }}</h4>
-                    <a href="javascript:void(0)" onclick="openBranchesModal()" class="view-all-link">View Details &rarr;</a>
-                </div>
-
-                <div class="branches-list-wrap">
-                    @foreach($branches as $b)
-                        <div class="branch-list-item">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-location-dot {{ $b['is_head'] ? 'text-danger' : 'text-primary' }}"></i>
-                                <div>
-                                    <div class="branch-name-title">{{ $b['name'] }}</div>
-                                    <div class="branch-phone-text">{{ $b['phone'] }}</div>
+                    <!-- TAB: FACULTY -->
+                    <div class="tab-pane fade" id="tab-faculty" role="tabpanel">
+                        <div class="tab-content-card">
+                            <h2 class="section-accent-header">Faculty & Instructors</h2>
+                            @if(!empty($staffMembers) && count($staffMembers) > 0)
+                                <div class="row row-cols-1 row-cols-md-2 g-3">
+                                    @foreach($staffMembers as $staff)
+                                        <div class="col">
+                                            <div class="p-3 border rounded-3 bg-white d-flex align-items-center gap-3">
+                                                <div class="flex-shrink-0">
+                                                    @if(!empty($staff->profile))
+                                                        <img src="{{ $staff->profile }}" class="rounded-circle" style="width: 55px; height: 55px; object-fit: cover;">
+                                                    @else
+                                                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; font-weight: bold; font-size: 1.2rem;">
+                                                            {{ strtoupper(substr($staff->name ?? 'F', 0, 1)) }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark">{{ $staff->name }}</div>
+                                                    <div class="small text-muted">{{ $staff->designation ?? 'Faculty Instructor' }}</div>
+                                                    @if(!empty($staff->experience))
+                                                        <div class="small text-secondary">{{ $staff->experience }} Experience</div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-chalkboard-user fa-3x mb-3 text-secondary"></i>
+                                    <h5>Experienced & Certified Faculty</h5>
+                                    <p class="small">{{ $business->business_name }} instructors are industry professionals with deep domain expertise.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- TAB: PORTFOLIO -->
+                    <div class="tab-pane fade" id="tab-portfolio" role="tabpanel">
+                        <div class="tab-content-card">
+                            <h2 class="section-accent-header">Portfolio & Achievements</h2>
+                            @if(!empty($portfolios) && count($portfolios) > 0)
+                                <div class="row row-cols-1 row-cols-md-2 g-3">
+                                    @foreach($portfolios as $p)
+                                        <div class="col">
+                                            <div class="p-3 border rounded-3 bg-white">
+                                                <div class="fw-bold text-dark">{{ $p->title }}</div>
+                                                @if(!empty($p->total_number))
+                                                    <div class="badge bg-primary-subtle text-primary mt-1">{{ $p->total_number }}</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-trophy fa-3x mb-3 text-secondary"></i>
+                                    <h5>Proven Track Record & Student Success</h5>
+                                    <p class="small">Our students consistently achieve outstanding results in exams and career placements.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- TAB: BLOGS -->
+                    <div class="tab-pane fade" id="tab-blogs" role="tabpanel">
+                        <div class="tab-content-card">
+                            <h2 class="section-accent-header">Articles & Updates</h2>
+                            @if(!empty($articles) && count($articles) > 0)
+                                <div class="row row-cols-1 g-3">
+                                    @foreach($articles as $art)
+                                        <div class="col">
+                                            <div class="p-3 border rounded-3 bg-white">
+                                                <h4 class="h6 fw-bold text-dark mb-1">{{ $art->title }}</h4>
+                                                <p class="small text-muted mb-0">{{ Str::limit(strip_tags($art->description ?? ''), 140) }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-newspaper fa-3x mb-3 text-secondary"></i>
+                                    <h5>No Articles Published Yet</h5>
+                                    <p class="small">Latest educational articles, tips, and institute announcements will appear here.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Related Institutes + Quick Inquiry (approx 28%) -->
+            <div class="col-lg-4">
+                <!-- Related Institutes Widget -->
+                <div class="sidebar-widget-card">
+                    <h3 class="sidebar-widget-title">Related Institutes</h3>
+                    @if(!empty($relatedInstitutes) && count($relatedInstitutes) > 0)
+                        @foreach($relatedInstitutes as $rel)
+                            <div class="related-institute-item">
+                                <div class="related-logo-box">
+                                    @if(!empty($rel->logo))
+                                        <img src="{{ $rel->logo }}" alt="{{ $rel->business_name }}" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                    @else
+                                        <i class="fa-solid fa-graduation-cap fa-2x text-primary"></i>
+                                    @endif
+                                </div>
+                                <div class="related-name">{{ $rel->business_name }}</div>
+                                <a href="{{ $rel->url ?: url('/business-listing/coaching/' . $rel->clean_slug) }}" class="btn-view-more">
+                                    View More
+                                </a>
                             </div>
-                            <span class="branch-open-badge">{{ $b['status'] }}</span>
+                        @endforeach
+                    @else
+                        <div class="text-center text-muted py-3 small">
+                            Explore other certified coaching institutes in {{ $displayCity }}.
                         </div>
-                    @endforeach
+                    @endif
                 </div>
-            </div>
 
-            <!-- Need a Custom Training? Card -->
-            <div class="custom-training-card">
-                <div class="custom-training-icon">
-                    <i class="fa-solid fa-calendar-days"></i>
-                </div>
-                <div class="custom-training-title">Interested in Learning?</div>
-                <div class="custom-training-desc">
-                    Get in touch with {{ $business->business_name }} for admissions, syllabus and fees.
-                </div>
-                <div class="d-flex flex-column gap-2">
-                    <button type="button" class="btn-custom-quote border-0" onclick="openContactModal()">
-                        Inquire Now &rarr;
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="openContactModal()" style="font-size: 0.72rem;">
-                        <i class="fa-solid fa-chalkboard-user me-1"></i> Book a Free Demo Class
-                    </button>
+                <!-- Instant Inquiry Widget -->
+                <div class="sidebar-widget-card">
+                    <h3 class="sidebar-widget-title">Send Instant Inquiry</h3>
+                    <form action="{{ route('business.enquiry') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="business_id" value="{{ $business->id }}">
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold mb-1">Your Full Name</label>
+                            <input type="text" name="name" class="form-control form-control-sm" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold mb-1">Contact Phone</label>
+                            <input type="tel" name="phone" class="form-control form-control-sm" placeholder="Enter 10-digit mobile number" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold mb-1">Select Course / Topic</label>
+                            <input type="text" name="course" id="inquiryCourseField" class="form-control form-control-sm" placeholder="e.g. {{ $courses[0]['title'] ?? $business->category }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold mb-1">Message / Question</label>
+                            <textarea name="message" rows="3" class="form-control form-control-sm" placeholder="Ask about fees, upcoming batch, duration, etc."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 btn-sm fw-bold py-2 rounded-2">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Submit Inquiry
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- CONTACT SELLER MODAL -->
-<div class="modal fade" id="contactSellerModal" tabindex="-1" aria-hidden="true">
+<!-- Modal: Send Inquiry -->
+<div class="modal fade" id="inquiryModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
-            <div class="modal-header border-0 pb-0">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light">
                 <h5 class="modal-title fw-bold text-dark">
-                    <i class="fa-solid fa-comment-dots text-primary me-2"></i> Contact {{ $business->business_name }}
+                    <i class="fa-solid fa-envelope-open-text text-primary me-2"></i> Inquiry for {{ $business->business_name }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
-                <p class="text-muted small mb-3">Send a direct inquiry to {{ $business->business_name }} desk.</p>
-                <form onsubmit="handleInquirySubmit(event)">
+            <form action="{{ route('business.enquiry') }}" method="POST">
+                @csrf
+                <input type="hidden" name="business_id" value="{{ $business->id }}">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Your Name</label>
-                        <input type="text" class="form-control" required placeholder="Full Name">
+                        <label class="form-label fw-bold small">Your Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter your full name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Mobile Number</label>
-                        <input type="tel" class="form-control" required placeholder="+91 98765 43210">
+                        <label class="form-label fw-bold small">Mobile Phone Number *</label>
+                        <input type="tel" name="phone" class="form-control" placeholder="Enter 10-digit mobile number" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Interested Course / Service</label>
-                        <select class="form-select" id="inquiryCourseSelect">
-                            @foreach($courses as $c)
-                                <option value="{{ $c['title'] }}">{{ $c['title'] }}</option>
-                            @endforeach
-                            @foreach($services as $s)
-                                <option value="{{ $s['title'] }}">{{ $s['title'] }}</option>
-                            @endforeach
-                            <option value="General Admission Inquiry">General Admission Inquiry</option>
-                        </select>
+                        <label class="form-label fw-bold small">Interested Course / Program</label>
+                        <input type="text" name="course" class="form-control" placeholder="Course name (e.g. {{ $courses[0]['title'] ?? $business->category }})">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Message / Questions</label>
-                        <textarea class="form-control" rows="3" placeholder="Tell us what you would like to inquire about..."></textarea>
+                        <label class="form-label fw-bold small">Message / Query</label>
+                        <textarea name="message" class="form-control" rows="3" placeholder="Tell us what you are looking for (batch timings, fees, demo class)"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: var(--dc-blue); border: none;">
-                        Send Inquiry
-                    </button>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Send Inquiry Now</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- CUSTOM TRAINING QUOTE MODAL -->
-<div class="modal fade" id="trainingQuoteModal" tabindex="-1" aria-hidden="true">
+<!-- Modal: Claim This Business -->
+<div class="modal fade" id="claimModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
-            <div class="modal-header border-0 pb-0">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light">
                 <h5 class="modal-title fw-bold text-dark">
-                    <i class="fa-solid fa-graduation-cap text-warning me-2"></i> Custom Institute / Corporate Training
+                    <i class="fa-solid fa-award text-warning me-2"></i> Claim {{ $business->business_name }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
-                <p class="text-muted small mb-3">Get tailored batch training programs designed for schools, colleges or corporate companies.</p>
-                <form onsubmit="handleQuoteSubmit(event)">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Organization / Institute Name</label>
-                        <input type="text" class="form-control" required placeholder="e.g. ABC Institute / Tech Corp">
-                    </div>
-                    <div class="row g-2 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Contact Person</label>
-                            <input type="text" class="form-control" required placeholder="Full Name">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold">Phone</label>
-                            <input type="tel" class="form-control" required placeholder="+91 98765 43210">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Estimated Students / Participants</label>
-                        <input type="number" min="5" value="25" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: #ea580c; border: none;">
-                        Submit Quotation Request
-                    </button>
-                </form>
-            </div>
+            <form action="{{ route('seller.register') }}" method="GET">
+                <div class="modal-body p-4">
+                    <p class="text-secondary small mb-3">
+                        Are you the owner, director, or authorized manager of <strong>{{ $business->business_name }}</strong>?
+                    </p>
+                    <p class="text-secondary small mb-0">
+                        Create a verified Seller / Institute account to manage this profile, update course details, upload photos, and receive student inquiries directly to your dashboard.
+                    </p>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <a href="{{ route('seller.register') }}" class="btn btn-success btn-sm px-4 fw-bold">
+                        Continue to Claim &rarr;
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-<!-- JAVASCRIPT INTERACTIONS -->
-<script>
-    function toggleFollowStore(btn) {
-        const icon = btn.querySelector('i');
-        if (icon.classList.contains('fa-regular')) {
-            icon.classList.remove('fa-regular');
-            icon.classList.add('fa-solid');
-            btn.innerHTML = '<i class="fa-solid fa-heart text-danger"></i> Following';
-            showLiveStoreToast('Following {{ addslashes($business->business_name) }}', 'You will receive notifications for new courses and updates!');
-        } else {
-            icon.classList.remove('fa-solid');
-            icon.classList.add('fa-regular');
-            btn.innerHTML = '<i class="fa-regular fa-heart text-danger"></i> Follow Store';
-            showLiveStoreToast('Unfollowed', 'Store unfollowed.');
-        }
-    }
-
-    function shareStoreProfile() {
-        if (navigator.share) {
-            navigator.share({
-                title: '{{ addslashes($business->business_name) }}',
-                url: window.location.href,
-            }).catch(() => {});
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            showLiveStoreToast('Link Copied', 'Store profile link copied to clipboard!');
-        }
-    }
-
-    function toggleCourseHeart(btn) {
-        const icon = btn.querySelector('i');
-        if (icon.classList.contains('fa-regular')) {
-            icon.classList.remove('fa-regular');
-            icon.classList.add('fa-solid');
-            icon.style.color = '#ef4444';
-            showLiveStoreToast('Saved to Wishlist', 'Course added to your wishlist!');
-        } else {
-            icon.classList.remove('fa-solid');
-            icon.classList.add('fa-regular');
-            icon.style.color = '';
-            showLiveStoreToast('Removed', 'Course removed from wishlist.');
-        }
-    }
-
-    function openContactModal() {
-        const modal = new bootstrap.Modal(document.getElementById('contactSellerModal'));
-        modal.show();
-    }
-
-    function openCustomTrainingModal() {
-        const modal = new bootstrap.Modal(document.getElementById('trainingQuoteModal'));
-        modal.show();
-    }
-
-    function openServiceInquiry(serviceTitle) {
-        const select = document.getElementById('inquiryCourseSelect');
-        if (select) {
-            select.value = serviceTitle;
-        }
-        openContactModal();
-    }
-
-    function openDirectionsMap() {
-        const query = encodeURIComponent("{{ addslashes($business->map_location ?: trim(($business->business_name ?? '') . ' ' . ($business->address ?? '') . ' ' . ($business->city ?? ''))) }}");
-        window.open('https://www.google.com/maps/search/?api=1&query=' + query, '_blank');
-    }
-
-    function openBranchesModal() {
-        openContactModal();
-    }
-
-    function handleInquirySubmit(e) {
-        e.preventDefault();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('contactSellerModal'));
-        if (modal) modal.hide();
-        showLiveStoreToast('Inquiry Sent', 'Thank you! {{ addslashes($business->business_name) }} counselor will contact you shortly.');
-    }
-
-    function handleQuoteSubmit(e) {
-        e.preventDefault();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('trainingQuoteModal'));
-        if (modal) modal.hide();
-        showLiveStoreToast('Quotation Request Received', 'Our institutional team will send the syllabus and pricing.');
-    }
-
-    function filterStoreItems(query) {
-        query = query.toLowerCase().trim();
-        const cards = document.querySelectorAll('.course-store-card, .service-store-card');
-        cards.forEach(card => {
-            const text = card.innerText.toLowerCase();
-            if (query === '' || text.includes(query)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-
-    function selectStoreCategory(catName) {
-        const input = document.getElementById('storeSearchInput');
-        if (catName === 'All') {
-            filterStoreItems('');
-        } else {
-            filterStoreItems(catName);
-        }
-    }
-
-    function prevBannerSlide() {
-        showLiveStoreToast('Slide Changed', 'Previous course highlight displayed.');
-    }
-
-    function nextBannerSlide() {
-        showLiveStoreToast('Slide Changed', 'Next course highlight displayed.');
-    }
-
-    function showLiveStoreToast(title, message) {
-        let toastEl = document.getElementById('storefrontToast');
-        if (!toastEl) {
-            toastEl = document.createElement('div');
-            toastEl.id = 'storefrontToast';
-            toastEl.style.position = 'fixed';
-            toastEl.style.bottom = '24px';
-            toastEl.style.right = '24px';
-            toastEl.style.zIndex = '9999';
-            toastEl.style.background = '#0f172a';
-            toastEl.style.color = '#ffffff';
-            toastEl.style.padding = '0.75rem 1.25rem';
-            toastEl.style.borderRadius = '10px';
-            toastEl.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
-            toastEl.style.fontSize = '0.85rem';
-            toastEl.style.transition = 'all 0.3s ease';
-            document.body.appendChild(toastEl);
-        }
-        toastEl.innerHTML = `<strong>${title}</strong>: ${message}`;
-        toastEl.style.opacity = '1';
-        toastEl.style.transform = 'translateY(0)';
-        setTimeout(() => {
-            toastEl.style.opacity = '0';
-            toastEl.style.transform = 'translateY(10px)';
-        }, 2800);
-    }
-</script>
 @endsection

@@ -113,3 +113,4 @@ class InstituteCourse extends Model
         return \Illuminate\Support\Str::slug($this->course_name) . '-' . $this->id;
     }
 }
+
