@@ -4,231 +4,438 @@
 
 @section('styles')
 <style>
-    .display-heading {
-        font-family: var(--dc-font-heading);
-        font-weight: 700;
-        letter-spacing: -0.025em;
-    }
-
-    /* Step Navigation Header */
-    .wizard-steps-container {
-        display: flex;
-        align-items: center;
+    /* Course Add Process Theme Styles */
+    .process-hero-banner {
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 14px;
-        padding: 0.65rem 0.85rem;
-        margin-bottom: 1.5rem;
-        overflow-x: auto;
-        white-space: nowrap;
-        gap: 0.5rem;
-    }
-    .wizard-step-item {
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
         display: flex;
         align-items: center;
-        gap: 0.6rem;
-        padding: 0.5rem 0.85rem;
-        border-radius: 10px;
-        color: #1e293b;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        flex-shrink: 0;
+        gap: 1.25rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
     }
-    .wizard-step-item:hover {
-        background-color: #f1f5f9;
-    }
-    .wizard-step-item.active {
-        background-color: #eff6ff;
-        color: #0066ff;
-        font-weight: 700;
-    }
-    .wizard-step-item.completed {
-        color: #0f766e;
-    }
-    .wizard-step-num {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #e2e8f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.85rem;
-        font-weight: 800;
-        color: #0f172a;
-        flex-shrink: 0;
-    }
-    .wizard-step-item.active .wizard-step-num {
-        background: #0066ff;
+    .process-hero-icon {
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
         color: #ffffff;
-        box-shadow: 0 2px 4px rgba(0, 102, 255, 0.25);
-    }
-    .wizard-step-item.completed .wizard-step-num {
-        background: #10b981;
-        color: #ffffff;
-    }
-    .wizard-step-title {
-        font-size: 0.925rem;
-        font-weight: 700;
-        line-height: 1.25;
-        color: #0f172a;
-        display: block;
-    }
-    .wizard-step-item.active .wizard-step-title {
-        color: #0066ff;
-    }
-    .wizard-step-item.completed .wizard-step-title {
-        color: #0f766e;
-    }
-    .wizard-step-sub {
-        font-size: 0.775rem;
-        color: #475569;
-        display: block;
-        font-weight: 500;
-        line-height: 1.2;
-    }
-    .wizard-step-item.active .wizard-step-sub {
-        color: #0284c7;
-        font-weight: 600;
-    }
-    .wizard-step-item.completed .wizard-step-sub {
-        color: #059669;
-    }
-
-    /* Option Selection Cards (Step 1) */
-    .type-select-card {
-        border: 2px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 1rem 1.25rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        background: #ffffff;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 0.85rem;
-    }
-    .type-select-card:hover {
-        border-color: #cbd5e1;
-        background: #f8fafc;
-    }
-    .type-select-card.selected {
-        border-color: #0066ff;
-        background: #f0f7ff;
-    }
-    .type-icon-box {
-        width: 44px;
-        height: 44px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.6rem;
         flex-shrink: 0;
-    }
-
-    /* Pricing Plan Cards (Step 6) */
-    .pricing-plan-card {
-        border: 2px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 1.5rem 1.25rem;
-        background: #ffffff;
-        position: relative;
-        transition: all 0.2s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        cursor: pointer;
-    }
-    .pricing-plan-card:hover {
-        border-color: #cbd5e1;
-    }
-    .pricing-plan-card.selected {
-        border-color: #0066ff;
-        background: #f8faff;
-        box-shadow: 0 8px 24px -8px rgba(0, 102, 255, 0.2);
-    }
-
-    .pricing-plan-card .btn-plan-action {
-        width: 100%;
-        font-weight: 700;
-        font-size: 0.85rem;
-        padding: 0.55rem 1rem;
-        border-radius: 10px;
-        transition: all 0.2s ease;
-        border: 1.5px solid #0066ff !important;
-        background-color: transparent !important;
-        color: #0066ff !important;
-    }
-    .pricing-plan-card .btn-plan-action:hover {
-        background-color: #eff6ff !important;
-        color: #0052cc !important;
-    }
-    .pricing-plan-card.selected .btn-plan-action {
-        background-color: #0066ff !important;
-        color: #ffffff !important;
-        border-color: #0066ff !important;
         box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
     }
-    .pricing-plan-card.selected .btn-plan-action:hover {
-        background-color: #0052cc !important;
-        color: #ffffff !important;
+    .process-hero-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.01em;
+    }
+    .process-hero-sub {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0.15rem 0 0;
     }
 
-    .plan-feature-list {
-        list-style: none;
-        padding: 0;
-        margin: 0 0 1.25rem 0;
-        flex-grow: 1;
+    /* 5-Step Process Milestone Bar */
+    .milestone-steps-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
     }
-    .plan-feature-item {
+    .milestone-step-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem 0.9rem;
         display: flex;
-        align-items: flex-start;
-        gap: 0.6rem;
-        font-size: 0.84rem;
-        color: #334155;
-        font-weight: 500;
-        margin-bottom: 0.65rem;
-        line-height: 1.4;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
     }
-    .plan-feature-check {
-        width: 18px;
-        height: 18px;
+    .milestone-step-card.active {
+        border-color: #0066ff;
+        background: #eff6ff;
+        box-shadow: 0 2px 8px rgba(0, 102, 255, 0.12);
+    }
+    .milestone-step-card.completed {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    .milestone-badge {
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
-        background: #ecfdf5;
-        color: #059669;
-        display: inline-flex;
+        background: #e2e8f0;
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 0.8rem;
+        display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.65rem;
         flex-shrink: 0;
+    }
+    .milestone-step-card.active .milestone-badge {
+        background: #0066ff;
+        color: #ffffff;
+    }
+    .milestone-step-card.completed .milestone-badge {
+        background: #10b981;
+        color: #ffffff;
+    }
+    .milestone-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+    }
+    .milestone-step-card.active .milestone-title {
+        color: #0066ff;
+    }
+    .milestone-sub {
+        font-size: 0.68rem;
+        color: #64748b;
+        line-height: 1.2;
         margin-top: 2px;
     }
 
-    .font-mono-code {
-        font-family: var(--dc-font-mono) !important;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-    }
-
-    .pricing-model-card {
-        border: 2px solid #e2e8f0;
+    /* 2-Column Form Card (Left: Steps Sidebar, Right: Active Pane) */
+    .course-form-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 14px;
-        padding: 1.25rem;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    }
+    .course-form-grid {
+        display: grid;
+        grid-template-columns: 270px 1fr;
+        min-height: 600px;
+    }
+    .course-steps-sidebar {
+        background: #f8fafc;
+        border-right: 1px solid #e2e8f0;
+        padding: 1.5rem 1.25rem;
+    }
+    .steps-sidebar-heading {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .sidebar-step-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0.9rem;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-align: left;
+        margin-bottom: 0.5rem;
         cursor: pointer;
         transition: all 0.2s ease;
+    }
+    .sidebar-step-btn:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+    .sidebar-step-btn.active {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #0066ff;
+        font-weight: 700;
+    }
+    .sidebar-step-btn.completed {
+        color: #059669;
+    }
+    .sidebar-step-num {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+    .sidebar-step-btn.active .sidebar-step-num {
+        background: #0066ff;
+        color: #ffffff;
+    }
+    .sidebar-step-btn.completed .sidebar-step-num {
+        background: #10b981;
+        color: #ffffff;
+    }
+
+    /* Right Form Content Pane */
+    .course-form-content {
+        padding: 2rem 2.25rem;
         background: #ffffff;
-        position: relative;
     }
-    .pricing-model-card:hover {
-        border-color: #cbd5e1;
-        background-color: #f8fafc;
+    .pane-header-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.35rem;
     }
-    .pricing-model-card.selected {
+    .pane-header-sub {
+        font-size: 0.82rem;
+        color: #64748b;
+        margin-bottom: 1.75rem;
+    }
+
+    /* Form Fields */
+    .field-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .field-label .req {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+    .custom-input, .custom-select, .custom-textarea {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.875rem;
+        color: #0f172a;
+        width: 100%;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #ffffff;
+    }
+    .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
         border-color: #0066ff;
-        background-color: #f0f7ff;
-        box-shadow: 0 4px 14px -2px rgba(0, 102, 255, 0.15);
+        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+        outline: none;
+    }
+
+    /* Sections & Lectures Builder (Step 2) */
+    .section-block {
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        background: #ffffff;
+    }
+    .section-header {
+        background: #f8fafc;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .section-title-text {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: #0f172a;
+    }
+    .lecture-item {
+        padding: 0.65rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px dashed #f1f5f9;
+        font-size: 0.82rem;
+        color: #334155;
+    }
+    .lecture-item:last-child {
+        border-bottom: none;
+    }
+    .lecture-left {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+    .lecture-duration {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-family: monospace;
+    }
+
+    /* Live Preview Card (Step 4) */
+    .course-preview-box {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+        max-width: 360px;
+    }
+    .preview-thumb-wrap {
+        width: 100%;
+        height: 180px;
+        background: #0f172a;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .preview-thumb-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .preview-heart-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ef4444;
+        font-size: 0.85rem;
+        border: none;
+    }
+    .preview-body {
+        padding: 1rem 1.15rem;
+    }
+    .preview-title {
+        font-weight: 800;
+        font-size: 0.95rem;
+        color: #0f172a;
+        line-height: 1.3;
+        margin-bottom: 0.4rem;
+    }
+    .preview-desc {
+        font-size: 0.76rem;
+        color: #64748b;
+        line-height: 1.35;
+        margin-bottom: 0.65rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .preview-rating-row {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        color: #f59e0b;
+        margin-bottom: 0.65rem;
+    }
+    .preview-price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+    .preview-curr-price {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+    .preview-orig-price {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        text-decoration: line-through;
+    }
+    .preview-off-badge {
+        font-size: 0.68rem;
+        font-weight: 800;
+        background: #fee2e2;
+        color: #ef4444;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+    }
+
+    /* Wizard Action Buttons */
+    .wizard-actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid #f1f5f9;
+    }
+    .btn-step-back {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.55rem 1.25rem;
+        border-radius: 8px;
+        transition: all 0.15s;
+    }
+    .btn-step-back:hover {
+        background: #f8fafc;
+        color: #0f172a;
+    }
+    .btn-step-next {
+        background: #0066ff;
+        border: 1px solid #0066ff;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.55rem 1.4rem;
+        border-radius: 8px;
+        transition: all 0.15s;
+    }
+    .btn-step-next:hover {
+        background: #0052cc;
+        border-color: #0052cc;
+        color: #ffffff;
+    }
+    .btn-step-publish {
+        background: #10b981;
+        border: 1px solid #10b981;
+        color: #ffffff;
+        font-weight: 800;
+        font-size: 0.88rem;
+        padding: 0.6rem 1.6rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        transition: all 0.15s;
+    }
+    .btn-step-publish:hover {
+        background: #059669;
+        border-color: #059669;
+        color: #ffffff;
+    }
+
+    @media (max-width: 991px) {
+        .milestone-steps-row {
+            grid-template-columns: 1fr;
+        }
+        .course-form-grid {
+            grid-template-columns: 1fr;
+        }
+        .course-steps-sidebar {
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+        }
     }
 </style>
 @endsection
@@ -236,1011 +443,523 @@
 @section('content')
 <div class="container-fluid px-0">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- Top Process Hero Banner (Matching Screenshot) -->
+    <div class="process-hero-banner">
+        <div class="process-hero-icon">
+            <i class="fa-solid fa-circle-play"></i>
+        </div>
         <div>
-            <h2 class="display-heading fw-bold text-dark mb-0" style="font-size: 1.5rem;">
-                Course Add Process
-            </h2>
-            <p class="text-muted small mb-0">Upload your course and showcase it to thousands of potential learners</p>
+            <h1 class="process-hero-title">Course Add Process</h1>
+            <p class="process-hero-sub">Sell online courses like Udemy</p>
         </div>
-        <a href="{{ route('seller.courses.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill fw-semibold px-3">
-            <i class="fa-solid fa-arrow-left me-1"></i> Back to Courses
-        </a>
     </div>
 
-    <!-- Multi-Step Stepper Navigation (1 to 7) -->
-    <div class="wizard-steps-container">
-        <div class="wizard-step-item active" id="step-nav-1" onclick="goToStep(1)">
-            <div class="wizard-step-num">1</div>
+    <!-- 5-Stage Milestone Flow Bar -->
+    <div class="milestone-steps-row">
+        <!-- 1. Go to Add Course -->
+        <div class="milestone-step-card completed">
+            <div class="milestone-badge"><i class="fa-solid fa-check"></i></div>
             <div>
-                <span class="wizard-step-title">Choose Course Type</span>
-                <span class="wizard-step-sub">Select type of course</span>
+                <div class="milestone-title">1. Go to Add Course</div>
+                <div class="milestone-sub">Seller dashboard se Add Course par click kare</div>
             </div>
-            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
-        <div class="wizard-step-item" id="step-nav-2" onclick="goToStep(2)">
-            <div class="wizard-step-num">2</div>
+        <!-- 2. Basic Information -->
+        <div class="milestone-step-card active" id="milestone-step-1">
+            <div class="milestone-badge">2</div>
             <div>
-                <span class="wizard-step-title">Basic Information</span>
-                <span class="wizard-step-sub">Course basic details</span>
+                <div class="milestone-title">2. Basic Information</div>
+                <div class="milestone-sub">Course ka basic details fill kare</div>
             </div>
-            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
-        <div class="wizard-step-item" id="step-nav-3" onclick="goToStep(3)">
-            <div class="wizard-step-num">3</div>
+        <!-- 3. Upload Content -->
+        <div class="milestone-step-card" id="milestone-step-2">
+            <div class="milestone-badge">3</div>
             <div>
-                <span class="wizard-step-title">Course Curriculum</span>
-                <span class="wizard-step-sub">Syllabus & highlights</span>
+                <div class="milestone-title">3. Upload Content</div>
+                <div class="milestone-sub">Video lectures, PDFs, resources add kare</div>
             </div>
-            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
-        <div class="wizard-step-item" id="step-nav-4" onclick="goToStep(4)">
-            <div class="wizard-step-num">4</div>
+        <!-- 4. Pricing & Publish -->
+        <div class="milestone-step-card" id="milestone-step-3">
+            <div class="milestone-badge">4</div>
             <div>
-                <span class="wizard-step-title">Media & Gallery</span>
-                <span class="wizard-step-sub">Thumbnail, banner & demo</span>
+                <div class="milestone-title">4. Pricing & Publish</div>
+                <div class="milestone-sub">Price set kare aur publish kare</div>
             </div>
-            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
         </div>
 
-        <div class="wizard-step-item" id="step-nav-5" onclick="goToStep(5)">
-            <div class="wizard-step-num">5</div>
+        <!-- 5. Preview & Publish -->
+        <div class="milestone-step-card" id="milestone-step-4">
+            <div class="milestone-badge">5</div>
             <div>
-                <span class="wizard-step-title">Instructor & Support</span>
-                <span class="wizard-step-sub">Contact & institute info</span>
-            </div>
-            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
-        </div>
-
-        <div class="wizard-step-item" id="step-nav-6" onclick="goToStep(6)">
-            <div class="wizard-step-num">6</div>
-            <div>
-                <span class="wizard-step-title">Course Price</span>
-                <span class="wizard-step-sub">Free or paid pricing</span>
-            </div>
-            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
-        </div>
-
-        <div class="wizard-step-item" id="step-nav-7" onclick="goToStep(7)">
-            <div class="wizard-step-num">7</div>
-            <div>
-                <span class="wizard-step-title">Pricing & Plan</span>
-                <span class="wizard-step-sub">Enrollment & add-ons</span>
-            </div>
-            <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.75rem; color: #94a3b8;"></i>
-        </div>
-
-        <div class="wizard-step-item" id="step-nav-8" onclick="goToStep(8)">
-            <div class="wizard-step-num">8</div>
-            <div>
-                <span class="wizard-step-title">Preview & Submit</span>
-                <span class="wizard-step-sub">Submit for admin review</span>
+                <div class="milestone-title">5. Preview & Publish</div>
+                <div class="milestone-sub">Final review karke publish kare</div>
             </div>
         </div>
     </div>
 
-    @if (isset($errors) && $errors->any())
+    @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
             <strong class="d-block mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Please fix the errors below:</strong>
-            <ul class="mb-0 ps-3">
+            <ul class="mb-0 ps-3 small">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    <!-- Main Wizard Form -->
-    <form action="{{ route('seller.courses.store') }}" method="POST" id="courseWizardForm" enctype="multipart/form-data" novalidate>
+    <!-- Main Course Wizard Form -->
+    <form action="{{ route('seller.courses.store') }}" method="POST" id="courseAddForm" enctype="multipart/form-data">
         @csrf
 
-        <!-- ================= STEP 1: CHOOSE COURSE TYPE ================= -->
-        <div class="wizard-step-content" id="step-content-1">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Choose Course Type</h5>
-                    <p class="text-muted small mb-0">Select the type of course or training batch you are publishing</p>
-                </div>
+        <div class="course-form-card">
+            <div class="course-form-grid">
 
-                <input type="hidden" name="course_type" id="inputCourseType" value="Online Video Course">
+                <!-- Left Sidebar: 4 Form Steps -->
+                <div class="course-steps-sidebar">
+                    <div class="steps-sidebar-heading">
+                        <i class="fa-solid fa-layer-group text-primary"></i>
+                        <span>Add New Course</span>
+                    </div>
 
-                <!-- 1. Online Video Course -->
-                <div class="type-select-card selected" onclick="selectCourseType('Online Video Course', this)">
-                    <input type="radio" name="course_type_radio" class="form-check-input flex-shrink-0" checked>
-                    <div class="type-icon-box" style="background: #e0f2fe; color: #0284c7;">
-                        <i class="fa-solid fa-circle-play"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Online Video Masterclass</h6>
-                        <small class="text-muted">Pre-recorded HD video lessons, modules, and downloadable exercises.</small>
-                    </div>
-                </div>
-
-                <!-- 2. Live Interactive Batch -->
-                <div class="type-select-card" onclick="selectCourseType('Live Interactive Batch', this)">
-                    <input type="radio" name="course_type_radio" class="form-check-input flex-shrink-0">
-                    <div class="type-icon-box" style="background: #fef3c7; color: #d97706;">
-                        <i class="fa-solid fa-headset"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Live Interactive Cohort</h6>
-                        <small class="text-muted">Scheduled live classes, screen sharing, real-time Q&A, and mentorship.</small>
-                    </div>
-                </div>
-
-                <!-- 3. Certification Program -->
-                <div class="type-select-card" onclick="selectCourseType('Certification Program', this)">
-                    <input type="radio" name="course_type_radio" class="form-check-input flex-shrink-0">
-                    <div class="type-icon-box" style="background: #ede9fe; color: #7c3aed;">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Professional Certification Program</h6>
-                        <small class="text-muted">Structured curriculum, graded assignments, exams, and verified certificates.</small>
-                    </div>
-                </div>
-
-                <!-- 4. Study Notes & Batches -->
-                <div class="type-select-card" onclick="selectCourseType('Study Notes & Batches', this)">
-                    <input type="radio" name="course_type_radio" class="form-check-input flex-shrink-0">
-                    <div class="type-icon-box" style="background: #dcfce7; color: #16a34a;">
-                        <i class="fa-solid fa-book-open-reader"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Study Notes & Material Bundle</h6>
-                        <small class="text-muted">Downloadable PDFs, cheatsheets, source code, and question banks.</small>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(2)">
-                        Continue &rarr;
+                    <button type="button" class="sidebar-step-btn active" id="step-nav-1" onclick="goToStep(1)">
+                        <span class="sidebar-step-num">1</span>
+                        <span>Basic Information</span>
                     </button>
-                </div>
-            </div>
-        </div>
 
-        <!-- ================= STEP 2: BASIC INFORMATION ================= -->
-        <div class="wizard-step-content d-none" id="step-content-2">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Basic Information</h5>
-                    <p class="text-muted small mb-0">Add your course essential details for learners to discover</p>
-                </div>
+                    <button type="button" class="sidebar-step-btn" id="step-nav-2" onclick="goToStep(2)">
+                        <span class="sidebar-step-num">2</span>
+                        <span>Course Content</span>
+                    </button>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small">Course Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" id="inputCourseTitle" class="form-control" placeholder="e.g. Complete Digital Marketing & AI Masterclass 2026" value="{{ old('title', 'Complete Digital Marketing & AI Masterclass 2026') }}" required>
-                </div>
+                    <button type="button" class="sidebar-step-btn" id="step-nav-3" onclick="goToStep(3)">
+                        <span class="sidebar-step-num">3</span>
+                        <span>Pricing & Access</span>
+                    </button>
 
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label class="form-label fw-bold text-dark small mb-0">Short Description <span class="text-danger">*</span></label>
-                        <small class="text-muted" id="shortDescCounter">135/300</small>
-                    </div>
-                    <textarea name="short_description" id="inputShortDesc" class="form-control" rows="3" maxlength="300" placeholder="Brief summary of what students will achieve..." oninput="document.getElementById('shortDescCounter').textContent = this.value.length + '/300'">{{ old('short_description', 'Master SEO, Meta Ads, Google Ads, AI Content Marketing, and Automation with real-world live projects and industry certification.') }}</textarea>
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Course Category <span class="text-danger">*</span></label>
-                        <select name="category" id="inputCourseCategory" class="form-select" required>
-                            <option value="Digital Marketing" {{ old('category', 'Digital Marketing') == 'Digital Marketing' ? 'selected' : '' }}>Digital Marketing & Advertising</option>
-                            <option value="Web Development">Web & Full-Stack Development</option>
-                            <option value="Graphic Design">Graphic Design & UI/UX</option>
-                            <option value="Business & Finance">Business, Accounting & Tally</option>
-                            <option value="Data Science & AI">Data Science & AI Automation</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Sub Category <span class="text-danger">*</span></label>
-                        <select name="sub_category" id="inputCourseSubCategory" class="form-select">
-                            <option value="Performance Marketing & SEO" selected>Performance Marketing & SEO</option>
-                            <option value="Social Media Strategy">Social Media Strategy</option>
-                            <option value="AI Copywriting & Growth">AI Copywriting & Growth</option>
-                            <option value="Google & Meta Ads">Google & Meta Ads</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Instruction Language <span class="text-danger">*</span></label>
-                        <select name="language" class="form-select" required>
-                            <option value="English" {{ old('language', 'English') == 'English' ? 'selected' : '' }}>English</option>
-                            <option value="Hindi" {{ old('language') == 'Hindi' ? 'selected' : '' }}>Hindi</option>
-                            <option value="Hinglish" {{ old('language') == 'Hinglish' ? 'selected' : '' }}>Hinglish</option>
-                            <option value="Gujarati" {{ old('language') == 'Gujarati' ? 'selected' : '' }}>Gujarati</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Skill Level <span class="text-danger">*</span></label>
-                        <select name="level" class="form-select" required>
-                            <option value="All Levels" {{ old('level', 'All Levels') == 'All Levels' ? 'selected' : '' }}>All Levels (Beginner to Advanced)</option>
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(1)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(3)">Continue &rarr;</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= STEP 3: COURSE CURRICULUM ================= -->
-        <div class="wizard-step-content d-none" id="step-content-3">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Course Curriculum & Details</h5>
-                    <p class="text-muted small mb-0">Add complete syllabus breakdown and highlight offerings</p>
-                </div>
-
-                <!-- Sub-tabs -->
-                <ul class="nav nav-pills mb-3 border-bottom pb-2">
-                    <li class="nav-item">
-                        <button class="nav-link active py-1 px-3 small fw-semibold" type="button">Overview</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link text-secondary py-1 px-3 small fw-semibold" type="button">Modules</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link text-secondary py-1 px-3 small fw-semibold" type="button">Highlights</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link text-secondary py-1 px-3 small fw-semibold" type="button">Certification</button>
-                    </li>
-                </ul>
-
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label class="form-label fw-bold text-dark small mb-0">Detailed Curriculum Description</label>
-                        <small class="text-muted" id="descCounter">220/1000</small>
-                    </div>
-
-                    <!-- Mini rich text toolbar -->
-                    <div class="d-flex gap-1 p-1 bg-light border border-bottom-0 rounded-top" style="font-size: 0.8rem;">
-                        <button type="button" class="btn btn-sm btn-white border px-2 py-0 fw-bold">B</button>
-                        <button type="button" class="btn btn-sm btn-white border px-2 py-0 fst-italic">I</button>
-                        <button type="button" class="btn btn-sm btn-white border px-2 py-0 text-decoration-underline">U</button>
-                        <button type="button" class="btn btn-sm btn-white border px-2 py-0"><i class="fa-solid fa-list-ul"></i></button>
-                        <button type="button" class="btn btn-sm btn-white border px-2 py-0"><i class="fa-solid fa-list-ol"></i></button>
-                    </div>
-                    <textarea name="description" id="inputCourseDesc" class="form-control rounded-top-0" rows="5" maxlength="1000" placeholder="Provide complete information about modules, assignments, tools, and prerequisites..." oninput="document.getElementById('descCounter').textContent = this.value.length + '/1000'">{{ old('description', 'Complete industry-relevant Digital Marketing Masterclass designed for students, freelancers and business owners. Our mission is to make everyone digitally skilled with practical hands-on ad campaigns, SEO auditing, AI copy generation and real client case studies.') }}</textarea>
-                </div>
-
-                <!-- Key Features / Highlights -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small mb-2">Key Course Highlights</label>
-                    <div id="courseHighlightsContainer" class="d-flex flex-column gap-2">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-plus"></i></span>
-                            <input type="text" name="features[]" class="form-control" value="ISO 21001:2018 Certified Digital Certificate">
-                            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-plus"></i></span>
-                            <input type="text" name="features[]" class="form-control" value="48.5 Hours of On-Demand HD Video Lectures">
-                            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-plus"></i></span>
-                            <input type="text" name="features[]" class="form-control" value="Live Ad Campaign Budget Practice & Case Studies">
-                            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-plus"></i></span>
-                            <input type="text" name="features[]" class="form-control" value="Direct Instructor Q&A & Community Discussion">
-                            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-plus"></i></span>
-                            <input type="text" name="features[]" class="form-control" value="Placement Assistance & Freelance Client Strategy">
-                            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 fw-semibold" onclick="addCourseHighlightRow()">
-                        <i class="fa-solid fa-plus me-1"></i> Add Another Highlight
+                    <button type="button" class="sidebar-step-btn" id="step-nav-4" onclick="goToStep(4)">
+                        <span class="sidebar-step-num">4</span>
+                        <span>Preview & Publish</span>
                     </button>
                 </div>
 
-                <!-- Structured Lectures (Hidden/Pass-through for Controller) -->
-                <input type="hidden" name="sections[0][section_title]" value="1. Introduction to Digital Strategy">
-                <input type="hidden" name="sections[0][lecture_title]" value="1.1 Foundations & Growth Frameworks">
-                <input type="hidden" name="sections[0][duration]" value="14:20">
-                <input type="hidden" name="sections[1][section_title]" value="1. Introduction to Digital Strategy">
-                <input type="hidden" name="sections[1][lecture_title]" value="1.2 Setting ROAS KPIs & Audience Segmentation">
-                <input type="hidden" name="sections[1][duration]" value="18:45">
+                <!-- Right Form Content Area -->
+                <div class="course-form-content">
 
-                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(2)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(4)">Continue &rarr;</button>
-                </div>
-            </div>
-        </div>
+                    <!-- ========================================== -->
+                    <!-- STEP 1: BASIC INFORMATION                  -->
+                    <!-- ========================================== -->
+                    <div class="step-pane" id="step-pane-1">
+                        <h2 class="pane-header-title">Basic Information</h2>
+                        <p class="pane-header-sub">Provide the essential details about your course</p>
 
-        <!-- ================= STEP 4: MEDIA & GALLERY ================= -->
-        <div class="wizard-step-content d-none" id="step-content-4">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Media & Gallery</h5>
-                    <p class="text-muted small mb-0">Add thumbnail emblem, course banner, and preview video</p>
-                </div>
+                        <div class="mb-3">
+                            <label class="field-label">Course Title <span class="req">*</span></label>
+                            <input type="text"
+                                   name="title"
+                                   id="inputTitle"
+                                   class="custom-input @error('title') is-invalid @enderror"
+                                   placeholder="Complete Digital Marketing Course"
+                                   value="{{ old('title', 'Complete Digital Marketing Course') }}"
+                                   required
+                                   oninput="updateLivePreview()">
+                        </div>
 
-                <!-- Course Logo / Emblem -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small">Course Badge / Emblem <span class="text-danger">*</span></label>
-                    <div class="d-flex align-items-center gap-3">
-                        <div id="badgePreviewContainer" class="rounded-3 border d-flex flex-column align-items-center justify-content-center p-2 bg-light flex-shrink-0 position-relative overflow-hidden" style="width: 80px; height: 80px;">
-                            <img id="badgePreviewImg" src="" class="w-100 h-100 object-fit-cover rounded-2 d-none" alt="Badge Preview">
-                            <div id="badgeDefaultPlaceholder" class="text-center">
-                                <span class="fw-bold text-primary display-heading fs-4">DM</span>
-                                <small class="fw-bold text-dark d-block" style="font-size: 0.65rem;">PRO</small>
+                        <div class="mb-3">
+                            <label class="field-label">Short Description <span class="req">*</span></label>
+                            <textarea name="short_description"
+                                      id="inputShortDesc"
+                                      rows="3"
+                                      class="custom-textarea @error('short_description') is-invalid @enderror"
+                                      placeholder="Learn digital marketing from basics to advanced with practical examples."
+                                      required
+                                      oninput="updateLivePreview()">{{ old('short_description', 'Learn digital marketing from basics to advanced with practical examples.') }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="field-label">Category <span class="req">*</span></label>
+                            <select name="category" id="inputCategory" class="custom-select" required onchange="updateLivePreview()">
+                                <option value="Digital Marketing" {{ old('category') == 'Digital Marketing' ? 'selected' : '' }}>Digital Marketing</option>
+                                <option value="IT & Software" {{ old('category') == 'IT & Software' ? 'selected' : '' }}>IT & Software</option>
+                                <option value="Programming" {{ old('category') == 'Programming' ? 'selected' : '' }}>Programming & Development</option>
+                                <option value="Design & Creative" {{ old('category') == 'Design & Creative' ? 'selected' : '' }}>Design & Creative</option>
+                                <option value="Business & Finance" {{ old('category') == 'Business & Finance' ? 'selected' : '' }}>Business & Finance</option>
+                                <option value="Spoken English" {{ old('category') == 'Spoken English' ? 'selected' : '' }}>Spoken English & Languages</option>
+                                <option value="Academics" {{ old('category') == 'Academics' ? 'selected' : '' }}>Academics & Tuitions</option>
+                            </select>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="field-label">Language <span class="req">*</span></label>
+                                <select name="language" id="inputLanguage" class="custom-select" required onchange="updateLivePreview()">
+                                    <option value="Hindi" {{ old('language') == 'Hindi' ? 'selected' : '' }}>Hindi</option>
+                                    <option value="English" {{ old('language') == 'English' ? 'selected' : '' }}>English</option>
+                                    <option value="Hinglish" {{ old('language') == 'Hinglish' ? 'selected' : '' }}>Hinglish (Hindi + English)</option>
+                                    <option value="Gujarati" {{ old('language') == 'Gujarati' ? 'selected' : '' }}>Gujarati</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="p-3 border border-dashed rounded-3 flex-grow-1 text-center bg-light bg-opacity-25" 
-                             style="border-style: dashed !important; cursor: pointer; transition: all 0.2s;"
-                             onclick="document.getElementById('inputThumbnailFile').click()"
-                             id="badgeDropzone">
-                            <i class="fa-solid fa-cloud-arrow-up text-primary fs-4 mb-1" id="badgeUploadIcon"></i>
-                            <div class="fw-bold small text-dark" id="badgeUploadText">Upload Course Badge</div>
-                            <small class="text-muted d-block" id="badgeUploadSubtext">PNG, JPG, WEBP (Max 10MB) &bull; Click to Browse</small>
-                            <input type="file" id="inputThumbnailFile" name="thumbnail_file" accept="image/*" class="d-none" onchange="handleThumbnailSelect(this)">
-                            <input type="hidden" name="thumbnail" id="inputThumbnailUrl" value="{{ old('thumbnail', '') }}">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cover Image / Banner -->
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label class="form-label fw-bold text-dark small mb-0">Course Cover Banner</label>
-                        <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-semibold" onclick="document.getElementById('inputCoverFile').click()">
-                            <i class="fa-solid fa-camera me-1"></i> Change Banner
-                        </button>
-                    </div>
-                    <div id="bannerPreviewBox" class="p-4 rounded-3 text-center text-white mb-3 position-relative overflow-hidden d-flex flex-column justify-content-center align-items-center" 
-                         style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800') center/cover; min-height: 140px; cursor: pointer;"
-                         onclick="document.getElementById('inputCoverFile').click()">
-                        <span id="bannerClearBtn" class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-2" style="cursor: pointer;" onclick="event.stopPropagation(); clearBannerImage();" title="Remove custom banner"><i class="fa-solid fa-xmark"></i></span>
-                        <h5 class="display-heading fw-bold mb-0 text-white" id="bannerHeadingText">SKILL TODAY BETTER TOMORROW</h5>
-                        <small class="text-white-50" id="bannerSubtext">Course Banner Preview &bull; Click anywhere to upload</small>
-                    </div>
-                    <input type="file" id="inputCoverFile" name="cover_file" accept="image/*" class="d-none" onchange="handleCoverSelect(this)">
-                    <input type="hidden" name="cover_image" id="inputCoverUrl" value="{{ old('cover_image', '') }}">
-
-                    <!-- Gallery Thumbnails -->
-                    <div>
-                        <label class="form-label fw-semibold text-secondary small mb-2">Gallery Images (Optional)</label>
-                        <div class="d-flex flex-wrap gap-2" id="galleryContainer">
-                            <div class="rounded-2 border border-dashed d-flex flex-column align-items-center justify-content-center text-muted bg-light" 
-                                 style="width: 70px; height: 50px; cursor: pointer; font-size: 0.65rem;"
-                                 onclick="document.getElementById('inputGalleryFiles').click()"
-                                 title="Add image to gallery">
-                                <i class="fa-solid fa-plus fs-6 text-primary mb-1"></i>
-                                <span>Add More</span>
-                            </div>
-                        </div>
-                        <input type="file" id="inputGalleryFiles" name="gallery_files[]" multiple accept="image/*" class="d-none" onchange="handleGallerySelect(this)">
-                        <input type="hidden" name="gallery" id="inputGalleryJson" value="[]">
-                    </div>
-                </div>
-
-                <!-- Intro Video (Optional) -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-dark small">Course Trailer / Promo Video (Optional)</label>
-                    <div class="d-flex align-items-center gap-3">
-                        <div id="videoPreviewContainer" class="rounded-3 border overflow-hidden position-relative flex-shrink-0 bg-dark d-flex align-items-center justify-content-center" style="width: 90px; height: 60px;">
-                            <video id="videoPreviewPlayer" class="w-100 h-100 object-fit-cover d-none" controls playsinline></video>
-                            <div id="videoPreviewPlaceholder" class="text-center text-white">
-                                <i class="fa-solid fa-circle-play fs-4 text-primary"></i>
-                            </div>
-                        </div>
-                        <div class="p-3 border border-dashed rounded-3 flex-grow-1 text-center bg-light bg-opacity-25" 
-                             style="border-style: dashed !important; cursor: pointer; transition: all 0.2s;"
-                             onclick="document.getElementById('inputVideoFile').click()"
-                             id="videoDropzone">
-                            <i class="fa-solid fa-video text-primary fs-4 mb-1" id="videoUploadIcon"></i>
-                            <div class="fw-bold small text-dark" id="videoUploadText">Upload Promo Video</div>
-                            <small class="text-muted d-block" id="videoUploadSubtext">MP4, WEBM, MOV (Max 150MB) &bull; Click to Browse</small>
-                            <input type="file" id="inputVideoFile" name="video_file" accept="video/mp4,video/webm,video/quicktime,video/ogg,.mp4,.mov,.webm" class="d-none" onchange="handleVideoSelect(this)">
-                            <input type="hidden" name="video_url" id="inputVideoUrl" value="{{ old('video_url', '') }}">
-                        </div>
-                    </div>
-
-                    <!-- Direct Video URL Alternative -->
-                    <div class="mt-2">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-white text-muted"><i class="fa-brands fa-youtube me-1 text-danger"></i> Or Video URL</span>
-                            <input type="url" class="form-control" id="inputVideoUrlField" placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..." 
-                                   oninput="document.getElementById('inputVideoUrl').value = this.value">
-                        </div>
-                        <small class="text-muted" style="font-size: 0.7rem;">Enter YouTube, Vimeo, or hosted MP4 URL if you prefer not uploading a video file directly</small>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(3)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(5)">Continue &rarr;</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= STEP 5: INSTRUCTOR & SUPPORT ================= -->
-        <div class="wizard-step-content d-none" id="step-content-5">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Instructor Contact & Institute Address</h5>
-                    <p class="text-muted small mb-0">Add institute details, student contact numbers, and complete center address</p>
-                </div>
-
-                <!-- Institute / Business Name -->
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small">Institute / Academy / Class Name <span class="text-danger">*</span></label>
-                    <input type="text" name="business_name" id="inputCourseBusinessName" class="form-control" placeholder="e.g. XYZ Classes, VCEC Computer Education Center" value="{{ old('business_name', $seller->businessDetail?->business_name ?? ($seller->businessListings->first()?->business_name ?? '')) }}" required>
-                    <div class="form-text text-muted small" style="font-size: 0.73rem;">
-                        <i class="fa-solid fa-circle-info text-primary me-1"></i> This is the exact name students will search for on the marketplace (e.g. <em>XYZ class</em>).
-                    </div>
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Support Phone <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light">+91</span>
-                            <input type="text" name="phone" id="inputCoursePhone" class="form-control" placeholder="10-digit mobile number" value="{{ old('phone', $seller->businessDetail?->business_phone ?? ($seller->user?->phone ?? '9876543210')) }}" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label fw-bold text-dark small mb-0">WhatsApp Community</label>
-                            <div class="form-check form-check-inline me-0">
-                                <input class="form-check-input" type="checkbox" id="samePhoneCourse" checked onchange="document.getElementById('inputCourseWhatsapp').value = this.checked ? document.getElementById('inputCoursePhone').value : ''">
-                                <label class="form-check-label small text-muted" for="samePhoneCourse" style="font-size: 0.725rem;">Same as support phone</label>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light">+91</span>
-                            <input type="text" name="whatsapp_number" id="inputCourseWhatsapp" class="form-control" placeholder="Enter WhatsApp number" value="{{ old('whatsapp_number', $seller->businessListings->first()?->whatsapp_number ?? ($seller->businessDetail?->business_phone ?? '9876543210')) }}">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Official Email <span class="text-danger">*</span></label>
-                        <input type="email" name="email" id="inputCourseEmail" class="form-control" placeholder="support@academy.com" value="{{ old('email', $seller->businessDetail?->business_email ?? ($seller->user?->email ?? 'info@vcec.in')) }}" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Website / Portal (Optional)</label>
-                        <input type="url" name="website" id="inputCourseWebsite" class="form-control" placeholder="https://www.academy.com" value="{{ old('website', $seller->businessDetail?->website ?? '') }}">
-                    </div>
-                </div>
-
-                <!-- Structured Address Fields -->
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small">Institute / Academy Address (Building, Floor, Flat/Shop No., Street) <span class="text-danger">*</span></label>
-                    <input type="text" name="address" id="inputCourseAddress" class="form-control" placeholder="e.g. 3rd Floor, Shreeji Complex, Near Cross Road" value="{{ old('address', $seller->businessDetail?->address ?? ($seller->businessListings->first()?->address ?? '')) }}" required>
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Area / Locality <span class="text-danger">*</span></label>
-                        <input type="text" name="area" id="inputCourseArea" class="form-control" placeholder="e.g. Nikol, Bopal, Vastrapur" value="{{ old('area', $seller->businessDetail?->area ?? ($seller->businessListings->first()?->area ?? '')) }}" required>
-                        <div class="form-text text-muted" style="font-size: 0.72rem;">Area helps students find your institute when searching nearby locations.</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small">Landmark (Optional)</label>
-                        <input type="text" name="landmark" id="inputCourseLandmark" class="form-control" placeholder="e.g. Near Shreeji Complex, Opp. Metro Station" value="{{ old('landmark', $seller->businessDetail?->landmark ?? ($seller->businessListings->first()?->landmark ?? '')) }}">
-                        <div class="form-text text-muted" style="font-size: 0.72rem;">Well-known landmark for students to easily spot your premises.</div>
-                    </div>
-                </div>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-dark small">City <span class="text-danger">*</span></label>
-                        <input type="text" name="city" id="inputCourseCity" class="form-control" placeholder="e.g. Ahmedabad" value="{{ old('city', $seller->businessDetail?->city ?? ($seller->businessListings->first()?->city ?? 'Ahmedabad')) }}" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-dark small">State <span class="text-danger">*</span></label>
-                        <input type="text" name="state" id="inputCourseState" class="form-control" placeholder="e.g. Gujarat" value="{{ old('state', $seller->businessDetail?->state ?? ($seller->businessListings->first()?->state ?? 'Gujarat')) }}" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-dark small">Pincode / Zip Code <span class="text-danger">*</span></label>
-                        <input type="text" name="pincode" id="inputCoursePincode" class="form-control font-mono-code" placeholder="e.g. 382350" value="{{ old('pincode', $seller->businessDetail?->pincode ?? ($seller->businessListings->first()?->pincode ?? '382350')) }}" required>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(4)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(6)">Continue &rarr;</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= STEP 6: COURSE PRICE & ACCESS ================= -->
-        <div class="wizard-step-content d-none" id="step-content-6">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Course Price & Access</h5>
-                    <p class="text-muted small mb-0">Set whether this course is free or paid, configure regular MRP and offer pricing, and enrollment duration</p>
-                </div>
-
-                <!-- Hidden Input for Database Validation -->
-                <input type="hidden" name="is_free" id="inputIsFree" value="0">
-
-                <!-- Pricing Model Selector (Paid vs Free) -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <div class="pricing-model-card selected" id="cardModelPaid" onclick="setCoursePricingModel('paid')">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="radio" name="pricing_model_radio" id="radioModelPaid" class="form-check-input" checked>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-2 py-1" style="font-size: 0.75rem;">
-                                        <i class="fa-solid fa-tag me-1"></i> Paid Course
-                                    </span>
-                                </div>
-                                <span class="badge bg-success rounded-pill px-2 py-0.5 small fw-semibold">Recommended</span>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">Charge For Enrollment</h6>
-                            <p class="text-muted small mb-0">Monetize your course by setting a regular MRP and student offer price.</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="pricing-model-card" id="cardModelFree" onclick="setCoursePricingModel('free')">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="radio" name="pricing_model_radio" id="radioModelFree" class="form-check-input">
-                                    <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-1" style="font-size: 0.75rem;">
-                                        <i class="fa-solid fa-gift me-1"></i> Free Course
-                                    </span>
-                                </div>
-                                <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-0.5 small fw-semibold">Lead Magnet</span>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">100% Free For All Students</h6>
-                            <p class="text-muted small mb-0">Allow any registered student to enroll freely without any payment.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Paid Course Pricing Controls (Shown when Paid is selected) -->
-                <div id="paidPricingFieldsSection" class="p-3.5 rounded-4 bg-light border mb-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark small mb-1">
-                                Regular Price (MRP) <span class="text-danger">*</span>
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white fw-bold text-secondary">₹</span>
-                                <input type="number" step="0.01" min="0" name="price" id="inputCoursePrice" class="form-control font-mono-code fw-bold" placeholder="2999.00" value="2999.00" oninput="calculateLiveDiscount()">
-                            </div>
-                            <div class="form-text small text-muted">Original list price shown as crossed-out original price</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark small mb-1">
-                                Offer / Discounted Price <span class="text-danger">*</span>
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white fw-bold text-primary">₹</span>
-                                <input type="number" step="0.01" min="0" name="discount_price" id="inputCourseDiscount" class="form-control font-mono-code fw-bold text-primary" placeholder="1499.00" value="1499.00" oninput="calculateLiveDiscount()">
-                            </div>
-                            <div class="form-text small text-muted">The actual final amount the student pays to enroll</div>
-                        </div>
-
-                        <!-- Live Calculation & Savings Badge -->
-                        <div class="col-12">
-                            <div class="d-flex align-items-center justify-content-between p-2.5 rounded-3 bg-white border">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-danger rounded-pill px-2.5 py-1 fw-bold fs-7" id="liveDiscountBadge">50% OFF</span>
-                                    <span class="small text-secondary" id="liveSavingsText">Students save <strong>₹1,500.00</strong> on this course!</span>
-                                </div>
-                                <div class="small fw-semibold text-success d-flex align-items-center gap-1">
-                                    <i class="fa-solid fa-circle-check"></i> High Conversion Pricing
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Access Duration & Enrollment Details -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small mb-1">
-                            Access Duration <span class="text-danger">*</span>
-                        </label>
-                        <select name="access_type" id="inputAccessType" class="form-select fw-semibold" onchange="updateLivePricingPill()">
-                            <option value="Lifetime Access" selected>Lifetime Access (Unlimited)</option>
-                            <option value="1 Year Access">1 Year Access</option>
-                            <option value="6 Months Access">6 Months Access</option>
-                            <option value="90 Days Access">90 Days Access</option>
-                            <option value="30 Days Access">30 Days Access</option>
-                        </select>
-                        <div class="form-text small text-muted">How long enrolled students will have full access to lessons</div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-dark small mb-1">
-                            Enrollment Capacity
-                        </label>
-                        <select name="enrollment_capacity" id="inputEnrollmentCap" class="form-select fw-semibold">
-                            <option value="unlimited" selected>Unlimited Students</option>
-                            <option value="50">Limited: 50 Students</option>
-                            <option value="100">Limited: 100 Students</option>
-                            <option value="250">Limited: 250 Students</option>
-                            <option value="500">Limited: 500 Students</option>
-                        </select>
-                        <div class="form-text small text-muted">Set student seat limits (useful for live cohorts & masterclasses)</div>
-                    </div>
-                </div>
-
-                <!-- Course Inclusions & Deliverables -->
-                <div class="border rounded-4 p-3 bg-white mb-4">
-                    <label class="form-label fw-bold text-dark small mb-2 d-block">
-                        Course Inclusions & Deliverables (Included with Enrollment)
-                    </label>
-                    <div class="row g-2">
-                        <div class="col-md-4">
-                            <div class="p-2.5 rounded-3 border bg-light d-flex align-items-center justify-content-between">
-                                <div class="form-check form-switch mb-0">
-                                    <input class="form-check-input" type="checkbox" name="certificate_included" value="1" id="pricingCertIncluded" checked onchange="updateLivePricingPill()">
-                                    <label class="form-check-label small fw-semibold text-dark ms-1" for="pricingCertIncluded">
-                                        Verified Certificate
-                                    </label>
-                                </div>
-                                <i class="fa-solid fa-award text-primary"></i>
+                            <div class="col-md-6">
+                                <label class="field-label">Level <span class="req">*</span></label>
+                                <select name="level" id="inputLevel" class="custom-select" required onchange="updateLivePreview()">
+                                    <option value="Beginner" {{ old('level') == 'Beginner' ? 'selected' : '' }}>Beginner</option>
+                                    <option value="Intermediate" {{ old('level') == 'Intermediate' ? 'selected' : '' }}>Intermediate</option>
+                                    <option value="Advanced" {{ old('level') == 'Advanced' ? 'selected' : '' }}>Advanced</option>
+                                    <option value="All Levels" {{ old('level') == 'All Levels' ? 'selected' : '' }}>All Levels</option>
+                                </select>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="p-2.5 rounded-3 border bg-light d-flex align-items-center justify-content-between">
-                                <div class="form-check form-switch mb-0">
-                                    <input class="form-check-input" type="checkbox" name="qa_enabled" value="1" id="pricingQaEnabled" checked onchange="updateLivePricingPill()">
-                                    <label class="form-check-label small fw-semibold text-dark ms-1" for="pricingQaEnabled">
-                                        Instructor Q&A Support
-                                    </label>
-                                </div>
-                                <i class="fa-solid fa-comments text-success"></i>
-                            </div>
+                        <div class="mb-3">
+                            <label class="field-label">Course Thumbnail (Image URL or File Upload)</label>
+                            <input type="text"
+                                   name="thumbnail"
+                                   id="inputThumbnailUrl"
+                                   class="custom-input mb-2"
+                                   placeholder="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500"
+                                   value="{{ old('thumbnail', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80') }}"
+                                   oninput="updateLivePreview()">
+                            <input type="file" name="thumbnail_file" id="inputThumbnailFile" class="form-control form-control-sm" accept="image/*" onchange="previewUploadedThumb(this)">
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="p-2.5 rounded-3 border bg-light d-flex align-items-center justify-content-between">
-                                <div class="form-check form-switch mb-0">
-                                    <input class="form-check-input" type="checkbox" name="downloadable_resources" value="1" id="pricingResourcesIncluded" checked onchange="updateLivePricingPill()">
-                                    <label class="form-check-label small fw-semibold text-dark ms-1" for="pricingResourcesIncluded">
-                                        Downloadable Resources
-                                    </label>
-                                </div>
-                                <i class="fa-solid fa-folder-open text-warning"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Student Price Tag Preview -->
-                <div class="p-3 rounded-4 border bg-light d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-3 bg-white border p-2 text-center" style="min-width: 65px;">
-                            <span class="small text-muted d-block text-uppercase" style="font-size: 0.65rem; font-weight: 700;">Price</span>
-                            <i class="fa-solid fa-tag text-primary fs-5"></i>
-                        </div>
-                        <div>
-                            <div class="d-flex align-items-baseline gap-2">
-                                <span class="fs-4 fw-bolder text-dark font-mono-code" id="livePillHeadline">₹1,499.00</span>
-                                <span class="text-muted small text-decoration-line-through font-mono-code" id="livePillSubline">₹2,999.00</span>
-                                <span class="badge bg-danger rounded-pill px-2 py-0.5 fw-bold small" id="livePillBadge">50% OFF</span>
-                            </div>
-                            <span class="text-muted small" id="livePillDetails">Includes Lifetime Access • Certificate • Q&A Support • Resources</span>
-                        </div>
-                    </div>
-                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill small fw-semibold">
-                        <i class="fa-solid fa-eye me-1"></i> Student Checkout Preview
-                    </span>
-                </div>
-
-                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(5)">&larr; Back</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(7)">Continue to Listing Plan &rarr;</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= STEP 7: LISTING PLAN & ADD-ONS ================= -->
-        <div class="wizard-step-content d-none" id="step-content-7">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="mb-4">
-                    <h5 class="display-heading fw-bold text-dark mb-1">Pricing & Publish</h5>
-                    <p class="text-muted small mb-0">Choose a marketplace listing plan tier and directory promotion options</p>
-                </div>
-
-                <input type="hidden" name="plan_name" id="inputCoursePlanName" value="Premium Course Track">
-                <input type="hidden" name="listing_plan_price" id="inputListingPlanPrice" value="1499.00">
-
-                <div class="row g-3 mb-4">
-                    <!-- Plan 1: Free Preview -->
-                    <div class="col-md-4">
-                        <div class="pricing-plan-card" id="cardCourseFree" onclick="selectCoursePricingPlan('Free Preview Tier', 0, 0, this)">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="course_plan_radio" class="form-check-input" style="cursor: pointer;">
-                                <h6 class="fw-bold text-dark mb-0 fs-6">Free Preview Tier</h6>
-                            </div>
-                            <div class="d-flex align-items-baseline mb-3">
-                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹0</span>
-                                <span class="text-secondary small ms-2 fw-medium">/ lifetime</span>
-                            </div>
-                            <ul class="plan-feature-list">
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Access to introductory modules</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Community forum read access</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Standard video playback</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Lead generation access</span>
-                                </li>
-                            </ul>
-                            <button type="button" class="btn btn-plan-action">Select Plan</button>
+                        <div class="wizard-actions-bar">
+                            <div></div>
+                            <button type="button" class="btn-step-next" onclick="goToStep(2)">
+                                Next &rarr;
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Plan 2: Premium Course Track (Most Popular) -->
-                    <div class="col-md-4">
-                        <div class="pricing-plan-card selected" id="cardCoursePremium" onclick="selectCoursePricingPlan('Premium Course Track', 1499, 2999, this)">
-                            <span class="badge bg-primary position-absolute top-0 end-0 m-3 rounded-pill px-2.5 py-1 fw-bold shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.02em;">Most Popular</span>
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="course_plan_radio" class="form-check-input" style="cursor: pointer;" checked>
-                                <h6 class="fw-bold text-dark mb-0 fs-6">Premium Listing</h6>
-                            </div>
-                            <div class="d-flex align-items-baseline mb-3">
-                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹1,499</span>
-                                <span class="text-muted small ms-2 text-decoration-line-through fw-medium">₹2,999</span>
-                                <span class="text-secondary small ms-2 fw-medium">/ lifetime</span>
-                            </div>
-                            <ul class="plan-feature-list">
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Full lifetime course access</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>48.5 Hours of HD video lessons</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Verified completion certificate</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>45+ Downloadable resource files</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Direct instructor Q&A access</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Featured on category top shelf</span>
-                                </li>
-                            </ul>
-                            <button type="button" class="btn btn-plan-action">Selected ✓</button>
+                    <!-- ========================================== -->
+                    <!-- STEP 2: COURSE CONTENT (UPLOAD CONTENT)    -->
+                    <!-- ========================================== -->
+                    <div class="step-pane d-none" id="step-pane-2">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <h2 class="pane-header-title mb-0">Course Content</h2>
+                            <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="addNewSection()">
+                                <i class="fa-solid fa-plus me-1"></i> Add Section
+                            </button>
                         </div>
-                    </div>
+                        <p class="pane-header-sub">Video lectures, PDFs, resources add kare</p>
 
-                    <!-- Plan 3: Featured Mentorship Track -->
-                    <div class="col-md-4">
-                        <div class="pricing-plan-card" id="cardCourseFeatured" onclick="selectCoursePricingPlan('Featured Master Track', 2999, 4999, this)">
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <input type="radio" name="course_plan_radio" class="form-check-input" style="cursor: pointer;">
-                                <h6 class="fw-bold text-dark mb-0 fs-6">Featured Listing</h6>
-                            </div>
-                            <div class="d-flex align-items-baseline mb-3">
-                                <span class="fs-3 fw-bolder text-dark font-mono-code">₹2,999</span>
-                                <span class="text-muted small ms-2 text-decoration-line-through fw-medium">₹4,999</span>
-                                <span class="text-secondary small ms-2 fw-medium">/ lifetime</span>
-                            </div>
-                            <ul class="plan-feature-list">
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>All Premium features included</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>1-on-1 Project code review</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Homepage featured banner position</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Special highlight verified badge</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Career counseling & mock interviews</span>
-                                </li>
-                                <li class="plan-feature-item">
-                                    <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
-                                    <span>Dedicated student support</span>
-                                </li>
-                            </ul>
-                            <button type="button" class="btn btn-plan-action">Select Plan</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Add-on Features & Order Summary Box -->
-                <div class="row g-3 align-items-start">
-                    <div class="col-md-7">
-                        <label class="form-label fw-bold text-dark small mb-2">Add-on Features (Optional)</label>
-                        <div class="d-flex flex-column gap-2">
-                            <div class="p-3 border rounded-3 d-flex justify-content-between align-items-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="listing_addon_badge" value="1" id="courseAddon1" checked onchange="updateCourseSummary()">
-                                    <label class="form-check-label small fw-semibold text-dark" for="courseAddon1">
-                                        Verified Business Badge & Featured Status
-                                    </label>
-                                </div>
-                                <span class="fw-bold text-dark font-mono-code small">₹499 / year</span>
-                            </div>
-
-                            <div class="p-3 border rounded-3 d-flex justify-content-between align-items-center">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="listing_addon_gallery" value="1" id="courseAddon2" onchange="updateCourseSummary()">
-                                    <label class="form-check-label small fw-semibold text-dark" for="courseAddon2">
-                                        Additional Gallery Images & Assets (up to 20)
-                                    </label>
-                                </div>
-                                <span class="fw-bold text-dark font-mono-code small">₹299 / year</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-5">
-                        <div class="p-3 rounded-3 bg-light border">
-                            <h6 class="fw-bold text-dark mb-2" style="font-size: 0.85rem;">Order Summary</h6>
-                            <div class="d-flex justify-content-between py-1 small">
-                                <span class="text-muted" id="summaryCoursePlanText">Premium Listing (1 Year)</span>
-                                <span class="fw-semibold font-mono-code" id="summaryCoursePlanPrice">₹1,499</span>
-                            </div>
-                            <div class="d-flex justify-content-between py-1 small" id="summaryCourseBadgeRow">
-                                <span class="text-muted">Verified Business Badge</span>
-                                <span class="fw-semibold font-mono-code">₹499</span>
-                            </div>
-                            <div class="d-flex justify-content-between pt-2 border-top mt-2 fw-bold text-dark">
-                                <span>Total:</span>
-                                <span class="font-mono-code text-primary fs-6" id="summaryCourseTotalPrice">₹1,998</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(6)">&larr; Back to Course Price</button>
-                    <button type="button" class="btn btn-primary px-4 fw-semibold" style="background-color: #0066ff;" onclick="goToStep(8)">Continue to Preview &rarr;</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= STEP 8: PREVIEW & PUBLISH ================= -->
-        <div class="wizard-step-content d-none" id="step-content-8">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h5 class="display-heading fw-bold text-dark mb-1">Preview & Submit</h5>
-                        <p class="text-muted small mb-0">Review your course details and submit for admin approval</p>
-                    </div>
-                    <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-primary fw-semibold px-3" style="background-color: #0066ff;">Desktop View</button>
-                        <button type="button" class="btn btn-outline-secondary fw-semibold px-3">Mobile View</button>
-                    </div>
-                </div>
-
-                <!-- Full Course Directory Live Card Preview -->
-                <div class="border rounded-4 overflow-hidden mb-4 shadow-sm">
-                    <!-- Banner -->
-                    <div class="text-white text-center d-flex align-items-center justify-content-center p-4 position-relative" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800') center/cover; min-height: 160px;">
-                        <h4 class="display-heading fw-bold mb-0 text-white" style="letter-spacing: 0.04em;">SKILL TODAY BETTER TOMORROW</h4>
-                    </div>
-
-                    <!-- Header Content -->
-                    <div class="p-3 bg-white border-bottom">
-                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="rounded-3 border d-flex flex-column align-items-center justify-content-center p-2 bg-light flex-shrink-0" style="width: 60px; height: 60px;">
-                                    <span class="fw-bold text-primary display-heading fs-5" id="previewCourseLogoChar">V</span>
-                                    <small class="fw-bold text-dark" style="font-size: 0.6rem;" id="previewCourseLogoSub">VCEC</small>
-                                </div>
-                                <div>
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <h5 class="display-heading fw-bold text-dark mb-0" id="previewCourseTitle">
-                                            VCEC - Vinayak Computer Education Center
-                                        </h5>
-                                        <span class="badge bg-primary rounded-pill small px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Verified</span>
-                                        <span class="badge bg-success rounded-pill small px-2.5 py-1 font-mono-code fw-bold" id="previewCoursePriceBadge">₹1,499.00</span>
+                        <!-- Sections Container -->
+                        <div id="sectionsContainer">
+                            <!-- Section 1 -->
+                            <div class="section-block" id="section-1">
+                                <div class="section-header">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-folder text-primary"></i>
+                                        <span class="section-title-text" contenteditable="true">1. Introduction to Digital Marketing</span>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2 small mt-1">
-                                        <div class="text-warning">
-                                            <i class="fa-solid fa-star"></i>
-                                            <strong class="text-dark ms-1">4.8</strong>
+                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSection('section-1')" title="Delete section">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                                <div class="lectures-list" id="lectures-section-1">
+                                    <div class="lecture-item">
+                                        <div class="lecture-left">
+                                            <i class="fa-regular fa-circle-play text-primary"></i>
+                                            <span>1.1 What is Digital Marketing?</span>
                                         </div>
-                                        <span class="text-muted">(124 reviews)</span>
-                                        <span class="text-muted">•</span>
-                                        <span class="text-muted" id="previewCourseCategory">Computer Training Institute • Education & Training</span>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="lecture-duration">12:45</span>
+                                            <button type="button" class="btn btn-link text-muted p-0" onclick="this.closest('.lecture-item').remove()" title="Delete">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="lecture-item">
+                                        <div class="lecture-left">
+                                            <i class="fa-regular fa-circle-play text-primary"></i>
+                                            <span>1.2 Types of Digital Marketing</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="lecture-duration">10:20</span>
+                                            <button type="button" class="btn btn-link text-muted p-0" onclick="this.closest('.lecture-item').remove()" title="Delete">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="lecture-item">
+                                        <div class="lecture-left">
+                                            <i class="fa-regular fa-circle-play text-primary"></i>
+                                            <span>1.3 Career Opportunities</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="lecture-duration">15:10</span>
+                                            <button type="button" class="btn btn-link text-muted p-0" onclick="this.closest('.lecture-item').remove()" title="Delete">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-2 bg-light bg-opacity-50 border-top">
+                                    <button type="button" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none p-0" onclick="addLectureToSection('lectures-section-1')">
+                                        <i class="fa-solid fa-plus me-1"></i> Add Lecture
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Section 2 -->
+                            <div class="section-block" id="section-2">
+                                <div class="section-header">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-folder text-primary"></i>
+                                        <span class="section-title-text" contenteditable="true">2. SEO Mastery</span>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSection('section-2')" title="Delete section">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                                <div class="lectures-list" id="lectures-section-2">
+                                    <div class="lecture-item">
+                                        <div class="lecture-left">
+                                            <i class="fa-regular fa-circle-play text-primary"></i>
+                                            <span>2.1 On-Page SEO Checklist</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="lecture-duration">18:30</span>
+                                            <button type="button" class="btn btn-link text-muted p-0" onclick="this.closest('.lecture-item').remove()">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-2 bg-light bg-opacity-50 border-top">
+                                    <button type="button" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none p-0" onclick="addLectureToSection('lectures-section-2')">
+                                        <i class="fa-solid fa-plus me-1"></i> Add Lecture
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Section 3 -->
+                            <div class="section-block" id="section-3">
+                                <div class="section-header">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-folder text-primary"></i>
+                                        <span class="section-title-text" contenteditable="true">3. Social Media Marketing</span>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSection('section-3')" title="Delete section">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                                <div class="lectures-list" id="lectures-section-3">
+                                    <div class="lecture-item">
+                                        <div class="lecture-left">
+                                            <i class="fa-regular fa-circle-play text-primary"></i>
+                                            <span>3.1 Meta Ads Strategy 2026</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="lecture-duration">22:15</span>
+                                            <button type="button" class="btn btn-link text-muted p-0" onclick="this.closest('.lecture-item').remove()">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-2 bg-light bg-opacity-50 border-top">
+                                    <button type="button" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none p-0" onclick="addLectureToSection('lectures-section-3')">
+                                        <i class="fa-solid fa-plus me-1"></i> Add Lecture
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="wizard-actions-bar">
+                            <button type="button" class="btn-step-back" onclick="goToStep(1)">
+                                &larr; Back
+                            </button>
+                            <button type="button" class="btn-step-next" onclick="goToStep(3)">
+                                Next &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- STEP 3: PRICING & ACCESS (PRICING & PUBLISH) -->
+                    <!-- ========================================== -->
+                    <div class="step-pane d-none" id="step-pane-3">
+                        <h2 class="pane-header-title">Pricing & Access</h2>
+                        <p class="pane-header-sub">Price set kare aur publish kare</p>
+
+                        <!-- Free / Paid Radio -->
+                        <div class="d-flex align-items-center gap-4 mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="is_free" id="priceRadioFree" value="1" onchange="togglePaidInputs(false)">
+                                <label class="form-check-label fw-bold text-dark" for="priceRadioFree">
+                                    Free Course
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="is_free" id="priceRadioPaid" value="0" checked onchange="togglePaidInputs(true)">
+                                <label class="form-check-label fw-bold text-dark" for="priceRadioPaid">
+                                    Paid Course
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Price Inputs -->
+                        <div class="row g-3 mb-3" id="paidPriceInputsRow">
+                            <div class="col-md-6">
+                                <label class="field-label">Price (₹) <span class="req">*</span></label>
+                                <input type="number"
+                                       name="price"
+                                       id="inputPrice"
+                                       class="custom-input"
+                                       placeholder="2999"
+                                       value="{{ old('price', 2999) }}"
+                                       min="0"
+                                       step="1"
+                                       oninput="updateLivePreview()">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="field-label">Discount Price (Optional)</label>
+                                <input type="number"
+                                       name="discount_price"
+                                       id="inputDiscountPrice"
+                                       class="custom-input"
+                                       placeholder="1999"
+                                       value="{{ old('discount_price', 1999) }}"
+                                       min="0"
+                                       step="1"
+                                       oninput="updateLivePreview()">
+                            </div>
+                        </div>
+
+                        <!-- Course Access Dropdown -->
+                        <div class="mb-3">
+                            <label class="field-label">Course Access <span class="req">*</span></label>
+                            <select name="access_type" id="inputAccessType" class="custom-select" required onchange="updateLivePreview()">
+                                <option value="Lifetime Access" {{ old('access_type') == 'Lifetime Access' ? 'selected' : '' }}>Lifetime Access</option>
+                                <option value="1 Year Access" {{ old('access_type') == '1 Year Access' ? 'selected' : '' }}>1 Year Access</option>
+                                <option value="6 Months Access" {{ old('access_type') == '6 Months Access' ? 'selected' : '' }}>6 Months Access</option>
+                                <option value="3 Months Access" {{ old('access_type') == '3 Months Access' ? 'selected' : '' }}>3 Months Access</option>
+                            </select>
+                        </div>
+
+                        <!-- Feature Checkboxes -->
+                        <div class="border rounded-3 p-3 mb-3 bg-light bg-opacity-50">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="certificate_included" id="checkCertificate" value="1" checked onchange="updateLivePreview()">
+                                <label class="form-check-label fw-semibold text-dark small" for="checkCertificate">
+                                    <i class="fa-solid fa-certificate text-primary me-1"></i> Allow Certificate
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="qa_enabled" id="checkQa" value="1" checked onchange="updateLivePreview()">
+                                <label class="form-check-label fw-semibold text-dark small" for="checkQa">
+                                    <i class="fa-solid fa-comments text-success me-1"></i> Enable Discussion (Q&A)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="wizard-actions-bar">
+                            <button type="button" class="btn-step-back" onclick="goToStep(2)">
+                                &larr; Back
+                            </button>
+                            <button type="button" class="btn-step-next" onclick="goToStep(4)">
+                                Next &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- STEP 4: PREVIEW & PUBLISH                  -->
+                    <!-- ========================================== -->
+                    <div class="step-pane d-none" id="step-pane-4">
+                        <h2 class="pane-header-title">Preview & Publish</h2>
+                        <p class="pane-header-sub">Final review karke publish kare</p>
+
+                        <div class="row g-4 align-items-start">
+                            <!-- Left: Live Udemy-style Course Card -->
+                            <div class="col-lg-5 col-md-6">
+                                <div class="course-preview-box">
+                                    <div class="preview-thumb-wrap">
+                                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80" id="previewImg" alt="Course Thumbnail">
+                                        <button type="button" class="preview-heart-btn" title="Wishlist">
+                                            <i class="fa-solid fa-heart"></i>
+                                        </button>
+                                    </div>
+                                    <div class="preview-body">
+                                        <div class="preview-title" id="previewTitle">Complete Digital Marketing Course</div>
+                                        <div class="preview-desc" id="previewDesc">Learn digital marketing from basics to advanced with practical examples.</div>
+                                        <div class="preview-rating-row">
+                                            <i class="fa-solid fa-star"></i>
+                                            <span class="fw-bold text-dark">4.8</span>
+                                            <span class="text-muted">(124 reviews) &bull; 1,240 students</span>
+                                        </div>
+                                        <div class="preview-price-row">
+                                            <span class="preview-curr-price" id="previewPrice">₹1,999</span>
+                                            <span class="preview-orig-price" id="previewOrigPrice">₹2,999</span>
+                                            <span class="preview-off-badge" id="previewOffBadge">33% OFF</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="d-flex flex-wrap gap-2">
-                                <button type="button" class="btn btn-success btn-sm px-3 fw-semibold"><i class="fa-solid fa-phone me-1"></i> Contact</button>
-                                <button type="button" class="btn btn-outline-success btn-sm px-3 fw-semibold"><i class="fa-brands fa-whatsapp me-1"></i> WhatsApp</button>
-                                <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-semibold"><i class="fa-solid fa-globe me-1"></i> Website</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm px-2 fw-semibold"><i class="fa-solid fa-share-nodes"></i></button>
+                            <!-- Right: Course Specifications Summary Checklist -->
+                            <div class="col-lg-7 col-md-6">
+                                <div class="border rounded-3 p-3 bg-light bg-opacity-25">
+                                    <h6 class="fw-bold text-dark mb-3">
+                                        <i class="fa-solid fa-circle-check text-success me-1"></i> Course Specification Checklist
+                                    </h6>
+                                    <table class="table table-sm table-borderless small mb-0">
+                                        <tbody>
+                                            <tr>
+                                                <td class="text-muted" style="width: 140px;">Category:</td>
+                                                <td class="fw-bold text-dark" id="summaryCategory">Digital Marketing</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Language:</td>
+                                                <td class="fw-bold text-dark" id="summaryLanguage">Hindi</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Level:</td>
+                                                <td class="fw-bold text-dark" id="summaryLevel">Beginner</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Access:</td>
+                                                <td class="fw-bold text-dark" id="summaryAccess">Lifetime Access</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Certificate:</td>
+                                                <td class="fw-bold text-success" id="summaryCert">Included</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Discussion/Q&A:</td>
+                                                <td class="fw-bold text-primary" id="summaryQa">Enabled</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="alert alert-info py-2 px-3 small rounded-3 mt-3 mb-0">
+                                    <i class="fa-solid fa-info-circle me-1"></i>
+                                    Your course will be immediately published and visible in your seller catalog.
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Info Chips Row -->
-                        <div class="d-flex flex-wrap gap-3 mt-3 pt-3 border-top small text-secondary">
-                            <div><i class="fa-regular fa-calendar text-muted me-1"></i> Access <strong class="text-dark" id="previewCourseAccess">Lifetime Access</strong></div>
-                            <div><i class="fa-solid fa-award text-muted me-1"></i> Certificate <strong class="text-dark" id="previewCourseCert">Included</strong></div>
-                            <div><i class="fa-solid fa-location-dot text-danger me-1"></i> Location <strong class="text-dark" id="previewCourseLocation">Ahmedabad, Gujarat</strong></div>
-                            <div><i class="fa-solid fa-chart-line text-primary me-1"></i> Inquiries <strong class="text-dark">250+</strong></div>
+                        <div class="wizard-actions-bar">
+                            <button type="button" class="btn-step-back" onclick="goToStep(3)">
+                                &larr; Back
+                            </button>
+                            <button type="submit" class="btn-step-publish">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Publish Course
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Inner Nav Tabs & Content -->
-                    <div class="p-3 bg-light bg-opacity-50">
-                        <ul class="nav nav-pills mb-3">
-                            <li class="nav-item"><a class="nav-link active py-1 px-3 small fw-semibold" href="#">About</a></li>
-                            <li class="nav-item"><a class="nav-link text-secondary py-1 px-3 small fw-semibold" href="#">Services</a></li>
-                            <li class="nav-item"><a class="nav-link text-secondary py-1 px-3 small fw-semibold" href="#">Photos</a></li>
-                            <li class="nav-item"><a class="nav-link text-secondary py-1 px-3 small fw-semibold" href="#">Reviews</a></li>
-                            <li class="nav-item"><a class="nav-link text-secondary py-1 px-3 small fw-semibold" href="#">Location</a></li>
-                        </ul>
-
-                        <div class="p-3 bg-white rounded-3 border">
-                            <h6 class="fw-bold text-dark mb-2" id="previewCourseAboutHeading">About VCEC - Vinayak Computer Education Center</h6>
-                            <p class="text-muted small mb-0" id="previewCourseAbout">
-                                VCEC is a trusted computer education center providing industry-relevant courses for students, professionals and business owners. Our mission is to make everyone digitally skilled and job-ready with practical training.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mt-4 pt-3 border-top">
-                    <button type="button" class="btn btn-outline-secondary px-4 fw-semibold" onclick="goToStep(7)">&larr; Back to Plan</button>
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-success px-5 fw-bold btn-lg shadow-sm">
-                            <i class="fa-solid fa-paper-plane me-2"></i> Submit for Admin Review
-                        </button>
-                        <div class="text-muted small mt-1">
-                            <i class="fa-solid fa-shield-halved text-primary me-1"></i> Requires admin approval before going live on the marketplace
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-
     </form>
-
 </div>
 @endsection
 
@@ -1251,428 +970,185 @@
     function goToStep(step) {
         currentStep = step;
 
-        for (let i = 1; i <= 8; i++) {
-            const content = document.getElementById('step-content-' + i);
-            const nav = document.getElementById('step-nav-' + i);
-            if (content) content.classList.add('d-none');
-            if (nav) {
-                nav.classList.remove('active');
-                if (i < step) {
-                    nav.classList.add('completed');
-                } else {
-                    nav.classList.remove('completed');
-                }
-            }
-        }
+        // Update 4-step sidebar buttons
+        for (let i = 1; i <= 4; i++) {
+            const pane = document.getElementById('step-pane-' + i);
+            const btn = document.getElementById('step-nav-' + i);
+            const milestone = document.getElementById('milestone-step-' + i);
 
-        const activeContent = document.getElementById('step-content-' + step);
-        const activeNav = document.getElementById('step-nav-' + step);
-        if (activeContent) activeContent.classList.remove('d-none');
-        if (activeNav) activeNav.classList.add('active');
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        if (step === 8) {
-            const title = document.getElementById('inputCourseTitle')?.value;
-            const cat = document.getElementById('inputCourseCategory')?.value;
-            const sub = document.getElementById('inputCourseSubCategory')?.value;
-            const city = document.getElementById('inputCourseCity')?.value;
-            const state = document.getElementById('inputCourseState')?.value;
-            const desc = document.getElementById('inputCourseDesc')?.value;
-            const access = document.getElementById('inputAccessType')?.value || 'Lifetime Access';
-            const cert = document.getElementById('pricingCertIncluded')?.checked;
-            const isFree = document.getElementById('inputIsFree')?.value === '1';
-            const price = parseFloat(document.getElementById('inputCoursePrice')?.value) || 0;
-            const discount = parseFloat(document.getElementById('inputCourseDiscount')?.value) || 0;
-
-            if (title) {
-                document.getElementById('previewCourseTitle').textContent = title;
-                document.getElementById('previewCourseAboutHeading').textContent = 'About ' + title;
-                document.getElementById('previewCourseLogoChar').textContent = title.charAt(0).toUpperCase();
-                document.getElementById('previewCourseLogoSub').textContent = title.split(' ')[0].substring(0, 4).toUpperCase();
-            }
-            if (cat && sub) document.getElementById('previewCourseCategory').textContent = sub + ' • ' + cat;
-            if (city && state) document.getElementById('previewCourseLocation').textContent = city + ', ' + state;
-            if (desc) document.getElementById('previewCourseAbout').textContent = desc;
-
-            const accessEl = document.getElementById('previewCourseAccess');
-            if (accessEl) accessEl.textContent = access;
-
-            const certEl = document.getElementById('previewCourseCert');
-            if (certEl) certEl.textContent = cert ? 'Included' : 'None';
-
-            const priceBadge = document.getElementById('previewCoursePriceBadge');
-            if (priceBadge) {
-                if (isFree) {
-                    priceBadge.textContent = 'FREE';
-                    priceBadge.className = 'badge bg-success rounded-pill small px-2.5 py-1 font-mono-code fw-bold';
-                } else {
-                    const finalPrice = discount > 0 ? discount : price;
-                    priceBadge.textContent = '₹' + finalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-                    priceBadge.className = 'badge bg-primary rounded-pill small px-2.5 py-1 font-mono-code fw-bold';
-                }
-            }
-        }
-    }
-
-    // ==========================================
-    // STEP 6: COURSE PRICING CONTROLS
-    // ==========================================
-    function setCoursePricingModel(model) {
-        const cardPaid = document.getElementById('cardModelPaid');
-        const cardFree = document.getElementById('cardModelFree');
-        const radioPaid = document.getElementById('radioModelPaid');
-        const radioFree = document.getElementById('radioModelFree');
-        const paidSection = document.getElementById('paidPricingFieldsSection');
-        const isFreeInput = document.getElementById('inputIsFree');
-
-        if (model === 'free') {
-            if (cardPaid) cardPaid.classList.remove('selected');
-            if (cardFree) cardFree.classList.add('selected');
-            if (radioPaid) radioPaid.checked = false;
-            if (radioFree) radioFree.checked = true;
-            if (paidSection) paidSection.style.display = 'none';
-            if (isFreeInput) isFreeInput.value = '1';
-
-            const pillHeadline = document.getElementById('livePillHeadline');
-            const pillSubline = document.getElementById('livePillSubline');
-            const pillBadge = document.getElementById('livePillBadge');
-
-            if (pillHeadline) {
-                pillHeadline.textContent = 'FREE';
-                pillHeadline.className = 'fs-4 fw-bolder text-success font-mono-code';
-            }
-            if (pillSubline) pillSubline.style.display = 'none';
-            if (pillBadge) {
-                pillBadge.textContent = '100% Free';
-                pillBadge.className = 'badge bg-success rounded-pill px-2 py-0.5 fw-bold small';
-                pillBadge.style.display = 'inline-block';
-            }
-        } else {
-            if (cardFree) cardFree.classList.remove('selected');
-            if (cardPaid) cardPaid.classList.add('selected');
-            if (radioFree) radioFree.checked = false;
-            if (radioPaid) radioPaid.checked = true;
-            if (paidSection) paidSection.style.display = 'block';
-            if (isFreeInput) isFreeInput.value = '0';
-
-            const pillSubline = document.getElementById('livePillSubline');
-            const pillHeadline = document.getElementById('livePillHeadline');
-            if (pillSubline) pillSubline.style.display = 'inline';
-            if (pillHeadline) pillHeadline.className = 'fs-4 fw-bolder text-dark font-mono-code';
-            calculateLiveDiscount();
-        }
-        updateLivePricingPill();
-    }
-
-    function calculateLiveDiscount() {
-        const mrp = parseFloat(document.getElementById('inputCoursePrice')?.value) || 0;
-        const discount = parseFloat(document.getElementById('inputCourseDiscount')?.value) || 0;
-        const discountBadge = document.getElementById('liveDiscountBadge');
-        const savingsText = document.getElementById('liveSavingsText');
-        const pillHeadline = document.getElementById('livePillHeadline');
-        const pillSubline = document.getElementById('livePillSubline');
-        const pillBadge = document.getElementById('livePillBadge');
-
-        if (pillHeadline) pillHeadline.textContent = '₹' + discount.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-        if (pillSubline) pillSubline.textContent = '₹' + mrp.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-
-        if (mrp > 0 && discount > 0 && mrp > discount) {
-            const savings = mrp - discount;
-            const pct = Math.round((savings / mrp) * 100);
-            if (discountBadge) {
-                discountBadge.textContent = pct + '% OFF';
-                discountBadge.style.display = 'inline-block';
-            }
-            if (pillBadge) {
-                pillBadge.textContent = pct + '% OFF';
-                pillBadge.style.display = 'inline-block';
-                pillBadge.className = 'badge bg-danger rounded-pill px-2 py-0.5 fw-bold small';
-            }
-            if (savingsText) {
-                savingsText.innerHTML = 'Students save <strong>₹' + savings.toLocaleString('en-IN', { minimumFractionDigits: 2 }) + '</strong> on this course!';
-            }
-        } else if (mrp > 0 && mrp === discount) {
-            if (discountBadge) discountBadge.style.display = 'none';
-            if (pillBadge) pillBadge.style.display = 'none';
-            if (savingsText) savingsText.textContent = 'Course offered at regular list price.';
-        } else {
-            if (discountBadge) discountBadge.style.display = 'none';
-            if (pillBadge) pillBadge.style.display = 'none';
-            if (savingsText) savingsText.textContent = 'Enter regular & offer prices above.';
-        }
-    }
-
-    function updateLivePricingPill() {
-        const access = document.getElementById('inputAccessType')?.value || 'Lifetime Access';
-        const cert = document.getElementById('pricingCertIncluded')?.checked;
-        const qa = document.getElementById('pricingQaEnabled')?.checked;
-        const res = document.getElementById('pricingResourcesIncluded')?.checked;
-
-        let parts = ['Includes ' + access];
-        if (cert) parts.push('Certificate');
-        if (qa) parts.push('Q&A Support');
-        if (res) parts.push('Resources');
-
-        const detailsEl = document.getElementById('livePillDetails');
-        if (detailsEl) detailsEl.textContent = parts.join(' • ');
-    }
-
-    function selectCourseType(type, element) {
-        document.querySelectorAll('.type-select-card').forEach(c => {
-            c.classList.remove('selected');
-            const radio = c.querySelector('input[type="radio"]');
-            if (radio) radio.checked = false;
-        });
-        element.classList.add('selected');
-        const r = element.querySelector('input[type="radio"]');
-        if (r) r.checked = true;
-        document.getElementById('inputCourseType').value = type;
-    }
-
-    function addCourseHighlightRow() {
-        const container = document.getElementById('courseHighlightsContainer');
-        const div = document.createElement('div');
-        div.className = 'input-group input-group-sm';
-        div.innerHTML = `
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-plus"></i></span>
-            <input type="text" name="features[]" class="form-control" placeholder="Enter course highlight...">
-            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-        `;
-        container.appendChild(div);
-    }
-
-    function selectCoursePricingPlan(name, price, mrp, element) {
-        document.querySelectorAll('.pricing-plan-card').forEach(p => {
-            p.classList.remove('selected');
-            const r = p.querySelector('input[type="radio"]');
-            if (r) r.checked = false;
-            const btn = p.querySelector('.btn-plan-action');
+            if (pane) pane.classList.add('d-none');
             if (btn) {
-                btn.textContent = 'Select Plan';
-                btn.removeAttribute('style');
-            }
-        });
-
-        element.classList.add('selected');
-        const r = element.querySelector('input[type="radio"]');
-        if (r) r.checked = true;
-        const btn = element.querySelector('.btn-plan-action');
-        if (btn) {
-            btn.textContent = 'Selected ✓';
-            btn.removeAttribute('style');
-        }
-
-        document.getElementById('inputCoursePlanName').value = name;
-        const listingPriceInput = document.getElementById('inputListingPlanPrice');
-        if (listingPriceInput) listingPriceInput.value = price.toFixed(2);
-        updateCourseSummary();
-    }
-
-    function updateCourseSummary() {
-        const planName = document.getElementById('inputCoursePlanName').value;
-        const planPrice = parseFloat(document.getElementById('inputListingPlanPrice')?.value || 1499);
-        const addon1 = document.getElementById('courseAddon1').checked;
-        const addon2 = document.getElementById('courseAddon2').checked;
-
-        document.getElementById('summaryCoursePlanText').textContent = planName + ' (1 Year)';
-        document.getElementById('summaryCoursePlanPrice').textContent = '₹' + planPrice.toLocaleString();
-
-        let total = planPrice;
-        if (addon1) total += 499;
-        if (addon2) total += 299;
-
-        const badgeRow = document.getElementById('summaryCourseBadgeRow');
-        if (badgeRow) badgeRow.style.display = addon1 ? 'flex' : 'none';
-
-        document.getElementById('summaryCourseTotalPrice').textContent = '₹' + total.toLocaleString();
-    }
-
-    // ==========================================
-    // MEDIA & GALLERY FILE UPLOAD HANDLERS
-    // ==========================================
-    const uploadApiUrl = "{{ route('seller.media.upload') }}";
-    const csrfToken = "{{ csrf_token() }}";
-
-    function uploadFileAjax(file, type, onSuccess, onError, onProgress) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('type', type);
-        formData.append('_token', csrfToken);
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', uploadApiUrl, true);
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-        if (onProgress && xhr.upload) {
-            xhr.upload.onprogress = function(e) {
-                if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    onProgress(percent);
+                btn.classList.remove('active');
+                if (i < step) {
+                    btn.classList.add('completed');
+                } else {
+                    btn.classList.remove('completed');
                 }
-            };
+            }
+            if (milestone) {
+                milestone.classList.remove('active');
+                if (i < step) {
+                    milestone.classList.add('completed');
+                } else {
+                    milestone.classList.remove('completed');
+                }
+            }
         }
 
-        xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    const res = JSON.parse(xhr.responseText);
-                    if (res.success) {
-                        if (onSuccess) onSuccess(res);
-                        return;
-                    }
-                } catch(e) {}
-            }
-            if (onError) onError(xhr.statusText || 'Upload failed');
-        };
+        const activePane = document.getElementById('step-pane-' + step);
+        const activeBtn = document.getElementById('step-nav-' + step);
+        const activeMilestone = document.getElementById('milestone-step-' + step);
 
-        xhr.onerror = function() {
-            if (onError) onError('Network error occurred during upload');
-        };
+        if (activePane) activePane.classList.remove('d-none');
+        if (activeBtn) activeBtn.classList.add('active');
+        if (activeMilestone) activeMilestone.classList.add('active');
 
-        xhr.send(formData);
+        updateLivePreview();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
     }
 
-    // 1. Thumbnail / Badge
-    function handleThumbnailSelect(input) {
-        if (!input.files || !input.files[0]) return;
-        const file = input.files[0];
-
-        // Instant local preview
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const previewImg = document.getElementById('badgePreviewImg');
-            const defaultPlaceholder = document.getElementById('badgeDefaultPlaceholder');
-            if (previewImg) {
-                previewImg.src = e.target.result;
-                previewImg.classList.remove('d-none');
-            }
-            if (defaultPlaceholder) defaultPlaceholder.classList.add('d-none');
-        };
-        reader.readAsDataURL(file);
-
-        // UI text update
-        const uploadText = document.getElementById('badgeUploadText');
-        const uploadSub = document.getElementById('badgeUploadSubtext');
-        const uploadIcon = document.getElementById('badgeUploadIcon');
-        if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading ' + file.name + '...</span>';
-
-        uploadFileAjax(file, 'thumbnail', function(res) {
-            if (uploadText) uploadText.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Badge Ready: ' + file.name + '</span>';
-            if (uploadSub) uploadSub.textContent = (file.size / 1024).toFixed(1) + ' KB • Click to change';
-            if (uploadIcon) uploadIcon.className = 'fa-solid fa-circle-check text-success fs-4 mb-1';
-            document.getElementById('inputThumbnailUrl').value = res.url;
-        }, function(err) {
-            if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-circle-check me-1"></i> Badge Selected: ' + file.name + '</span>';
-            if (uploadSub) uploadSub.textContent = (file.size / 1024).toFixed(1) + ' KB • Ready for save';
-        });
-    }
-
-    // 2. Cover Banner
-    function handleCoverSelect(input) {
-        if (!input.files || !input.files[0]) return;
-        const file = input.files[0];
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const bannerBox = document.getElementById('bannerPreviewBox');
-            if (bannerBox) {
-                bannerBox.style.background = "linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.65)), url('" + e.target.result + "') center/cover";
-            }
-        };
-        reader.readAsDataURL(file);
-
-        const sub = document.getElementById('bannerSubtext');
-        if (sub) sub.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading ' + file.name + '...';
-
-        uploadFileAjax(file, 'cover', function(res) {
-            if (sub) sub.innerHTML = '<i class="fa-solid fa-circle-check text-success me-1"></i> Custom Banner Ready: ' + file.name;
-            document.getElementById('inputCoverUrl').value = res.url;
-        }, function(err) {
-            if (sub) sub.innerHTML = '<i class="fa-solid fa-check text-success me-1"></i> Banner Selected: ' + file.name;
-        });
-    }
-
-    function clearBannerImage() {
-        const input = document.getElementById('inputCoverFile');
-        if (input) input.value = '';
-        document.getElementById('inputCoverUrl').value = '';
-        const bannerBox = document.getElementById('bannerPreviewBox');
-        if (bannerBox) {
-            bannerBox.style.background = "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800') center/cover";
+    function togglePaidInputs(isPaid) {
+        const row = document.getElementById('paidPriceInputsRow');
+        const priceInput = document.getElementById('inputPrice');
+        if (isPaid) {
+            row.style.display = 'flex';
+        } else {
+            row.style.display = 'none';
+            if (priceInput) priceInput.value = '0';
         }
-        const sub = document.getElementById('bannerSubtext');
-        if (sub) sub.textContent = 'Course Banner Preview • Click anywhere to upload';
+        updateLivePreview();
     }
 
-    // 3. Gallery Multi-files
-    let galleryList = [];
-    function handleGallerySelect(input) {
-        if (!input.files || input.files.length === 0) return;
-        const container = document.getElementById('galleryContainer');
-        const addBtn = container.querySelector('.border-dashed');
-
-        Array.from(input.files).forEach(file => {
+    function previewUploadedThumb(input) {
+        if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'rounded-2 border overflow-hidden position-relative';
-                itemDiv.style.width = '70px';
-                itemDiv.style.height = '50px';
-                itemDiv.innerHTML = `
-                    <img src="${e.target.result}" class="w-100 h-100 object-fit-cover">
-                    <span class="position-absolute top-0 end-0 bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" 
-                          style="width: 16px; height: 16px; font-size: 0.55rem; cursor: pointer; margin: 2px;"
-                          onclick="this.parentElement.remove(); updateGalleryJson();" title="Remove">&times;</span>
-                `;
-                container.insertBefore(itemDiv, addBtn);
+                document.getElementById('previewImg').src = e.target.result;
             };
-            reader.readAsDataURL(file);
-
-            uploadFileAjax(file, 'gallery', function(res) {
-                galleryList.push(res.url);
-                updateGalleryJson();
-            });
-        });
-    }
-
-    function updateGalleryJson() {
-        document.getElementById('inputGalleryJson').value = JSON.stringify(galleryList);
-    }
-
-    // 4. Video Upload
-    function handleVideoSelect(input) {
-        if (!input.files || !input.files[0]) return;
-        const file = input.files[0];
-
-        const player = document.getElementById('videoPreviewPlayer');
-        const placeholder = document.getElementById('videoPreviewPlaceholder');
-        if (player) {
-            player.src = URL.createObjectURL(file);
-            player.classList.remove('d-none');
+            reader.readAsDataURL(input.files[0]);
         }
-        if (placeholder) placeholder.classList.add('d-none');
+    }
 
-        const uploadText = document.getElementById('videoUploadText');
-        const uploadSub = document.getElementById('videoUploadSubtext');
-        const uploadIcon = document.getElementById('videoUploadIcon');
-        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+    function updateLivePreview() {
+        const title = document.getElementById('inputTitle')?.value || 'Complete Digital Marketing Course';
+        const desc = document.getElementById('inputShortDesc')?.value || 'Learn digital marketing from basics to advanced with practical examples.';
+        const cat = document.getElementById('inputCategory')?.value || 'Digital Marketing';
+        const lang = document.getElementById('inputLanguage')?.value || 'Hindi';
+        const level = document.getElementById('inputLevel')?.value || 'Beginner';
+        const access = document.getElementById('inputAccessType')?.value || 'Lifetime Access';
+        const thumbUrl = document.getElementById('inputThumbnailUrl')?.value;
+        const isFree = document.getElementById('priceRadioFree')?.checked;
+        const price = parseFloat(document.getElementById('inputPrice')?.value) || 0;
+        const discountPrice = parseFloat(document.getElementById('inputDiscountPrice')?.value) || 0;
+        const cert = document.getElementById('checkCertificate')?.checked;
+        const qa = document.getElementById('checkQa')?.checked;
 
-        if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading ' + file.name + ' (' + sizeMb + ' MB)...</span>';
+        // Card update
+        if (document.getElementById('previewTitle')) document.getElementById('previewTitle').textContent = title;
+        if (document.getElementById('previewDesc')) document.getElementById('previewDesc').textContent = desc;
+        if (thumbUrl && document.getElementById('previewImg') && !document.getElementById('inputThumbnailFile')?.files?.length) {
+            document.getElementById('previewImg').src = thumbUrl;
+        }
 
-        uploadFileAjax(file, 'video', function(res) {
-            if (uploadText) uploadText.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check me-1"></i> Video Ready: ' + file.name + '</span>';
-            if (uploadSub) uploadSub.textContent = sizeMb + ' MB • Uploaded successfully';
-            if (uploadIcon) uploadIcon.className = 'fa-solid fa-circle-check text-success fs-4 mb-1';
-            document.getElementById('inputVideoUrl').value = res.url;
-            const urlField = document.getElementById('inputVideoUrlField');
-            if (urlField) urlField.value = res.url;
-        }, function(err) {
-            if (uploadText) uploadText.innerHTML = '<span class="text-primary"><i class="fa-solid fa-circle-check me-1"></i> Video Selected: ' + file.name + '</span>';
-            if (uploadSub) uploadSub.textContent = sizeMb + ' MB • Ready for save';
-        }, function(progress) {
-            if (uploadSub) uploadSub.textContent = 'Uploading: ' + progress + '% (' + sizeMb + ' MB)';
-        });
+        const priceEl = document.getElementById('previewPrice');
+        const origPriceEl = document.getElementById('previewOrigPrice');
+        const offBadge = document.getElementById('previewOffBadge');
+
+        if (isFree) {
+            priceEl.textContent = 'FREE';
+            origPriceEl.style.display = 'none';
+            offBadge.style.display = 'none';
+        } else {
+            origPriceEl.style.display = 'inline';
+            if (discountPrice > 0 && discountPrice < price) {
+                priceEl.textContent = '₹' + discountPrice.toLocaleString('en-IN');
+                origPriceEl.textContent = '₹' + price.toLocaleString('en-IN');
+                const offPercent = Math.round(((price - discountPrice) / price) * 100);
+                offBadge.textContent = offPercent + '% OFF';
+                offBadge.style.display = 'inline';
+            } else {
+                priceEl.textContent = '₹' + price.toLocaleString('en-IN');
+                origPriceEl.style.display = 'none';
+                offBadge.style.display = 'none';
+            }
+        }
+
+        // Summary Checklist update
+        if (document.getElementById('summaryCategory')) document.getElementById('summaryCategory').textContent = cat;
+        if (document.getElementById('summaryLanguage')) document.getElementById('summaryLanguage').textContent = lang;
+        if (document.getElementById('summaryLevel')) document.getElementById('summaryLevel').textContent = level;
+        if (document.getElementById('summaryAccess')) document.getElementById('summaryAccess').textContent = access;
+        if (document.getElementById('summaryCert')) document.getElementById('summaryCert').textContent = cert ? 'Included' : 'None';
+        if (document.getElementById('summaryQa')) document.getElementById('summaryQa').textContent = qa ? 'Enabled' : 'Disabled';
+    }
+
+    let sectionCount = 3;
+    function addNewSection() {
+        sectionCount++;
+        const container = document.getElementById('sectionsContainer');
+        const sectionId = 'section-' + sectionCount;
+        const lecturesId = 'lectures-section-' + sectionCount;
+
+        const html = `
+            <div class="section-block" id="${sectionId}">
+                <div class="section-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-folder text-primary"></i>
+                        <span class="section-title-text" contenteditable="true">${sectionCount}. New Section</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="removeSection('${sectionId}')" title="Delete section">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+                <div class="lectures-list" id="${lecturesId}">
+                    <div class="lecture-item">
+                        <div class="lecture-left">
+                            <i class="fa-regular fa-circle-play text-primary"></i>
+                            <span contenteditable="true">Lesson 1: Introduction</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="lecture-duration" contenteditable="true">10:00</span>
+                            <button type="button" class="btn btn-link text-muted p-0" onclick="this.closest('.lecture-item').remove()">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-2 bg-light bg-opacity-50 border-top">
+                    <button type="button" class="btn btn-sm btn-link text-primary fw-bold text-decoration-none p-0" onclick="addLectureToSection('${lecturesId}')">
+                        <i class="fa-solid fa-plus me-1"></i> Add Lecture
+                    </button>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeSection(sectionId) {
+        const el = document.getElementById(sectionId);
+        if (el) el.remove();
+    }
+
+    function addLectureToSection(lecturesId) {
+        const list = document.getElementById(lecturesId);
+        if (!list) return;
+
+        const count = list.children.length + 1;
+        const html = `
+            <div class="lecture-item">
+                <div class="lecture-left">
+                    <i class="fa-regular fa-circle-play text-primary"></i>
+                    <span contenteditable="true">Lesson ${count}: New Lecture Title</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="lecture-duration" contenteditable="true">10:00</span>
+                    <button type="button" class="btn btn-link text-muted p-0" onclick="this.closest('.lecture-item').remove()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        list.insertAdjacentHTML('beforeend', html);
     }
 </script>
 @endsection
