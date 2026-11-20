@@ -20,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $middleware->validateCsrfTokens(except: [
+            'seller/login',
+            'seller/login/*',
+            'admin/login',
+            'admin/login/*',
+            'customer/login',
+            'customer/login/*',
             'cart/*',
             'cart*',
             'cart/checkout',
@@ -51,8 +57,36 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 419);
             }
 
+            if ($request->is('seller*')) {
+                return redirect()->route('seller.login')->with('warning', 'Your session expired. Please sign in again.');
+            }
+            if ($request->is('admin*') || $request->is('super/admin*')) {
+                return redirect()->route('admin.login')->with('warning', 'Your session expired. Please sign in again.');
+            }
+
             return redirect()->back()
                 ->withInput($request->except(['_token', 'password', 'password_confirmation']))
                 ->with('warning', 'Your session expired due to inactivity. Please submit again.');
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, \Illuminate\Http\Request $request) {
+            if ($e->getStatusCode() === 419) {
+                if ($request->expectsJson() || $request->is('api/*')) {
+                    return response()->json([
+                        'message' => 'Session expired. Please refresh the page and try again.',
+                    ], 419);
+                }
+
+                if ($request->is('seller*')) {
+                    return redirect()->route('seller.login')->with('warning', 'Your session expired. Please sign in again.');
+                }
+                if ($request->is('admin*') || $request->is('super/admin*')) {
+                    return redirect()->route('admin.login')->with('warning', 'Your session expired. Please sign in again.');
+                }
+
+                return redirect()->back()
+                    ->withInput($request->except(['_token', 'password', 'password_confirmation']))
+                    ->with('warning', 'Your session expired due to inactivity. Please submit again.');
+            }
         });
     })->create();
