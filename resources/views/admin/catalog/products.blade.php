@@ -487,7 +487,7 @@
                                     <td class="text-muted">{{ $idx + 1 }}</td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
-                                            <img src="{{ $thumbnail }}" alt="{{ $name }}" class="rounded border p-1" style="width: 44px; height: 38px; object-fit: contain; background: #fff;">
+                                            <img src="{{ $thumbnail }}" alt="{{ $name }}" class="rounded border p-1" style="width: 44px; height: 38px; object-fit: contain; background: #fff;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=100&auto=format&fit=crop&q=80';">
                                             <div>
                                                 <div class="fw-semibold text-dark text-truncate" style="max-width: 160px;">{{ $name }}</div>
                                                 <div class="text-muted font-monospace" style="font-size: 0.68rem;">SKU: {{ $sku }}</div>
@@ -612,14 +612,14 @@
                     <button class="btn btn-sm btn-light border-0 position-absolute top-0 end-0 m-2 text-muted" onclick="document.getElementById('productInspector').classList.toggle('d-none')">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
-                    <img id="inspMainImg" src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80" alt="Product" class="img-fluid" style="max-height: 160px; object-fit: contain;">
+                    <img id="inspMainImg" src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80" alt="Product" class="img-fluid" style="max-height: 160px; object-fit: contain;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80';">
                 </div>
 
                 <!-- Small Thumbnails Strip below main preview -->
                 <div class="d-flex gap-2 mb-3">
-                    <img id="inspThumb1" src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=100&auto=format&fit=crop&q=80" class="rounded border p-1" style="width: 48px; height: 38px; object-fit: contain; cursor: pointer;">
-                    <img id="inspThumb2" src="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=100&auto=format&fit=crop&q=80" class="rounded border p-1" style="width: 48px; height: 38px; object-fit: contain; cursor: pointer;">
-                    <img id="inspThumb3" src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=100&auto=format&fit=crop&q=80" class="rounded border p-1" style="width: 48px; height: 38px; object-fit: contain; cursor: pointer;">
+                    <img id="inspThumb1" src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=100&auto=format&fit=crop&q=80" class="rounded border p-1" style="width: 48px; height: 38px; object-fit: contain; cursor: pointer;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=100&auto=format&fit=crop&q=80';">
+                    <img id="inspThumb2" src="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=100&auto=format&fit=crop&q=80" class="rounded border p-1" style="width: 48px; height: 38px; object-fit: contain; cursor: pointer;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=100&auto=format&fit=crop&q=80';">
+                    <img id="inspThumb3" src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=100&auto=format&fit=crop&q=80" class="rounded border p-1" style="width: 48px; height: 38px; object-fit: contain; cursor: pointer;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=100&auto=format&fit=crop&q=80';">
                     <div class="rounded border d-flex align-items-center justify-content-center text-muted fw-bold small bg-light" style="width: 48px; height: 38px; font-size: 0.72rem;">
                         +3
                     </div>

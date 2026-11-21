@@ -238,58 +238,64 @@
 
     .product-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 0.85rem;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        border-radius: 18px;
+        padding: 0.95rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         position: relative;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
     }
     .product-card:hover {
-        border-color: #93c5fd;
-        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
-        transform: translateY(-5px);
+        border-color: rgba(16, 185, 129, 0.45);
+        box-shadow: 0 22px 42px -8px rgba(16, 185, 129, 0.18), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+        transform: translateY(-6px);
     }
 
     .product-card-badge {
         position: absolute;
         top: 10px;
         left: 10px;
-        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        background: rgba(239, 68, 68, 0.92);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.35);
         color: #ffffff;
-        font-size: 0.65rem;
+        font-size: 0.68rem;
         font-weight: 700;
-        padding: 0.2rem 0.55rem;
-        border-radius: 6px;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
         z-index: 2;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
     }
     .product-card-heart {
         position: absolute;
         top: 10px;
         right: 10px;
         color: #ef4444;
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(4px);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
         border-radius: 50%;
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         cursor: pointer;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         z-index: 2;
         border: none;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .product-card-heart:hover {
         background: #ffffff;
         transform: scale(1.15);
+        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
     }
 
     .product-card-thumb-wrap {

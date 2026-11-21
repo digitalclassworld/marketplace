@@ -458,79 +458,101 @@
     }
     .trending-course-card {
         background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        border-radius: 18px;
         overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
         display: flex;
         flex-direction: column;
         height: 100%;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+        position: relative;
     }
     .trending-course-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.1);
-        border-color: #00b074;
+        transform: translateY(-7px);
+        box-shadow: 0 22px 42px -10px rgba(0, 102, 255, 0.18), 0 8px 18px -4px rgba(15, 23, 42, 0.06);
+        border-color: rgba(0, 102, 255, 0.4);
     }
     .trending-course-thumb-box {
         position: relative;
         width: 100%;
-        height: 165px;
+        height: 175px;
         overflow: hidden;
-        background-color: #f1f5f9;
+        background: #f1f5f9;
+    }
+    .trending-course-thumb-box::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.05) 0%, transparent 40%, rgba(15, 23, 42, 0.3) 100%);
+        pointer-events: none;
+        transition: opacity 0.3s;
     }
     .trending-course-thumb-box img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s ease;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .trending-course-card:hover .trending-course-thumb-box img {
-        transform: scale(1.04);
+        transform: scale(1.08);
     }
     .trending-crown-badge {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 26px;
-        height: 26px;
-        background: rgba(17, 24, 39, 0.85);
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #f59e0b;
-        font-size: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        font-size: 13px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        z-index: 2;
+        transition: transform 0.3s ease;
+    }
+    .trending-course-card:hover .trending-crown-badge {
+        transform: scale(1.1) rotate(5deg);
     }
     .level-pill-badge {
-        background: #fff4eb;
-        color: #ff7a18;
-        border-radius: 6px;
-        padding: 3px 8px;
+        background: #eff6ff;
+        color: #0066ff;
+        border: 1px solid #dbeafe;
+        border-radius: 999px;
+        padding: 3px 10px;
         font-size: 0.72rem;
-        font-weight: 600;
+        font-weight: 700;
         display: inline-block;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
+        letter-spacing: 0.02em;
     }
     .course-card-title {
         font-size: 0.95rem;
         font-weight: 700;
-        color: #111827;
+        color: #0f172a;
         line-height: 1.4;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
         height: 2.7em;
+        transition: color 0.2s ease;
+    }
+    .trending-course-card:hover .course-card-title a {
+        color: #0066ff !important;
     }
     .course-tutor-link {
         font-size: 0.78rem;
         color: #64748b;
         text-decoration: none;
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -542,34 +564,37 @@
     .price-row-wrap {
         display: flex;
         align-items: baseline;
-        gap: 6px;
-        margin-bottom: 10px;
+        gap: 8px;
+        margin-bottom: 12px;
     }
     .price-current {
-        font-size: 1.15rem;
+        font-size: 1.22rem;
         font-weight: 800;
-        color: #111827;
+        color: #0f172a;
+        letter-spacing: -0.02em;
     }
     .price-original {
-        font-size: 0.82rem;
-        color: #9ca3af;
+        font-size: 0.84rem;
+        color: #94a3b8;
         text-decoration: line-through;
     }
     .badge-discount-orange {
-        background: #ff7a18;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: #ffffff;
         font-size: 0.68rem;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-weight: 800;
         text-transform: uppercase;
+        letter-spacing: 0.03em;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
     .btn-add-to-cart-green {
-        background-color: #00b074;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: #ffffff;
         border: none;
-        border-radius: 8px;
-        padding: 9px 14px;
+        border-radius: 10px;
+        padding: 10px 16px;
         font-weight: 700;
         font-size: 0.88rem;
         text-align: center;
@@ -578,6 +603,17 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    }
+    .btn-add-to-cart-green:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.45);
+    }
         transition: all 0.2s ease;
         text-decoration: none;
         cursor: pointer;
@@ -652,163 +688,217 @@
         justify-content: space-between;
     }
 
-    /* Service Card */
+    /* Luxury Service Card */
     .service-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        border-radius: 18px;
         overflow: hidden;
-        transition: all 0.2s ease;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+        position: relative;
     }
     .service-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+        transform: translateY(-7px);
+        box-shadow: 0 22px 42px -10px rgba(6, 182, 212, 0.2), 0 8px 18px -4px rgba(15, 23, 42, 0.06);
+        border-color: rgba(6, 182, 212, 0.45);
     }
     .service-thumb {
-        height: 130px;
+        position: relative;
+        height: 165px;
         background: #f1f5f9;
         overflow: hidden;
+    }
+    .service-thumb::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.04) 0%, transparent 40%, rgba(15, 23, 42, 0.28) 100%);
+        pointer-events: none;
     }
     .service-thumb img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .service-card:hover .service-thumb img {
+        transform: scale(1.08);
     }
     .service-body {
-        padding: 0.9rem;
+        padding: 1.1rem;
         display: flex;
         flex-direction: column;
         flex: 1;
     }
     .service-title {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #0f172a;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.45rem;
+        line-height: 1.4;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        min-height: 2.5em;
+        min-height: 2.7em;
+        transition: color 0.2s ease;
+    }
+    .service-card:hover .service-title {
+        color: #0284c7;
     }
     .service-price-tag {
-        font-size: 0.82rem;
+        font-size: 0.88rem;
         color: #0284c7;
-        font-weight: 700;
+        font-weight: 800;
         margin-top: auto;
+        padding-top: 0.6rem;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
-    /* Product Card */
+    /* Luxury Product Card */
     .product-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        border-radius: 18px;
         overflow: hidden;
-        transition: all 0.2s ease;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+        position: relative;
     }
     .product-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+        transform: translateY(-7px);
+        box-shadow: 0 22px 42px -10px rgba(16, 185, 129, 0.2), 0 8px 18px -4px rgba(15, 23, 42, 0.06);
+        border-color: rgba(16, 185, 129, 0.45);
     }
     .product-thumb {
-        height: 130px;
+        position: relative;
+        height: 165px;
         background: #f8fafc;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        position: relative;
+        padding: 12px;
+    }
+    .product-thumb::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, transparent 50%, rgba(15, 23, 42, 0.1) 100%);
+        pointer-events: none;
     }
     .product-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .product-card:hover .product-thumb img {
+        transform: scale(1.08);
     }
     .product-body {
-        padding: 0.9rem;
+        padding: 1.1rem;
         display: flex;
         flex-direction: column;
         flex: 1;
     }
     .product-title {
-        font-size: 0.88rem;
+        font-size: 0.95rem;
         font-weight: 700;
         color: #0f172a;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.45rem;
+        line-height: 1.4;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        min-height: 2.5em;
+        min-height: 2.7em;
+        transition: color 0.2s ease;
+    }
+    .product-card:hover .product-title {
+        color: #059669;
     }
     .product-price-row {
         display: flex;
         align-items: baseline;
-        gap: 0.4rem;
+        gap: 0.5rem;
         margin-top: auto;
+        padding-top: 0.6rem;
+        border-top: 1px solid #f1f5f9;
     }
 
-    /* Business Card */
+    /* Luxury Business Card */
     .business-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        border-radius: 18px;
         overflow: hidden;
-        transition: all 0.2s ease;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+        position: relative;
     }
     .business-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+        transform: translateY(-7px);
+        box-shadow: 0 22px 42px -10px rgba(245, 158, 11, 0.2), 0 8px 18px -4px rgba(15, 23, 42, 0.06);
+        border-color: rgba(245, 158, 11, 0.5);
     }
     .business-thumb {
-        height: 130px;
-        background: #ffffff;
-        overflow: hidden;
         position: relative;
+        height: 165px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 12px;
+        padding: 14px;
         border-bottom: 1px solid #f1f5f9;
     }
     .business-thumb img {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
-        transition: transform 0.25s ease;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .business-card:hover .business-thumb img {
-        transform: scale(1.06);
+        transform: scale(1.08);
     }
     .business-body {
-        padding: 0.9rem;
+        padding: 1.1rem;
         display: flex;
         flex-direction: column;
         flex: 1;
     }
     .business-name {
-        font-size: 0.9rem;
+        font-size: 0.98rem;
         font-weight: 800;
         color: #0f172a;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.3rem;
         display: -webkit-box;
         -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        transition: color 0.2s ease;
+    }
+    .business-card:hover .business-name {
+        color: #d97706;
     }
     .business-loc {
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         color: #64748b;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.5rem;
     }
 
     /* ==========================================================================

@@ -637,41 +637,49 @@
     /* Wide Horizontal Service Row Card */
     .service-row-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 1.25rem;
-        margin-bottom: 1.15rem;
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        border-radius: 18px;
+        padding: 1.35rem;
+        margin-bottom: 1.25rem;
         display: grid;
         grid-template-columns: 210px 1fr 200px;
-        gap: 1.25rem;
+        gap: 1.35rem;
         align-items: center;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         position: relative;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
     }
 
     .service-row-card:hover {
-        border-color: #93c5fd;
-        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
-        transform: translateY(-4px);
+        border-color: rgba(6, 182, 212, 0.45);
+        box-shadow: 0 22px 42px -8px rgba(6, 182, 212, 0.18), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+        transform: translateY(-6px);
     }
 
     .service-card-thumb-col {
         position: relative;
-        height: 145px;
-        border-radius: 12px;
+        height: 155px;
+        border-radius: 14px;
         overflow: hidden;
-        background: #e2e8f0;
+        background: #0f172a;
+    }
+    .service-card-thumb-col::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.02) 40%, rgba(15, 23, 42, 0.55) 100%);
+        pointer-events: none;
+        z-index: 1;
     }
 
     .service-card-thumb-col img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .service-row-card:hover .service-card-thumb-col img {
-        transform: scale(1.06);
+        transform: scale(1.08);
     }
 
     .video-projects-badge {

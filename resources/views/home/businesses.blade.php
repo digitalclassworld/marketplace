@@ -334,60 +334,69 @@
         justify-content: space-between;
     }
 
-    /* Business Card Grid & Cards */
+    /* Luxury Business Card Grid & Cards */
     .business-grid-card {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        border-radius: 18px;
         overflow: hidden;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
         display: flex;
         flex-direction: column;
         height: 100%;
         position: relative;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
     }
     .business-grid-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
-        border-color: #93c5fd;
+        transform: translateY(-7px);
+        box-shadow: 0 22px 42px -10px rgba(245, 158, 11, 0.2), 0 8px 18px -4px rgba(15, 23, 42, 0.06);
+        border-color: rgba(245, 158, 11, 0.45);
     }
 
     .card-thumb-wrapper {
         position: relative;
         width: 100%;
-        height: 145px;
-        background: #f1f5f9;
+        height: 160px;
+        background: #f8fafc;
         overflow: hidden;
+    }
+    .card-thumb-wrapper::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.04) 0%, transparent 40%, rgba(15, 23, 42, 0.35) 100%);
+        pointer-events: none;
     }
     .card-thumb-wrapper img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .business-grid-card:hover .card-thumb-wrapper img {
-        transform: scale(1.06);
+        transform: scale(1.08);
     }
 
     .card-badge-pill {
         position: absolute;
         top: 10px;
         left: 10px;
-        font-size: 0.65rem;
+        font-size: 0.68rem;
         font-weight: 700;
-        padding: 0.2rem 0.55rem;
-        border-radius: 6px;
-        letter-spacing: 0.03em;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        letter-spacing: 0.02em;
         z-index: 2;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
     }
     .card-badge-featured {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.98) 100%);
         color: #ffffff;
     }
     .card-badge-verified {
-        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.95) 0%, rgba(30, 64, 175, 0.98) 100%);
         color: #ffffff;
     }
 
@@ -395,103 +404,113 @@
         position: absolute;
         top: 10px;
         right: 10px;
-        width: 28px;
-        height: 28px;
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(4px);
-        border: none;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #ef4444;
-        font-size: 0.85rem;
+        font-size: 0.88rem;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         z-index: 2;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
     }
     .card-heart-btn:hover {
         background: #ffffff;
         transform: scale(1.15);
         color: #dc2626;
+        box-shadow: 0 6px 14px rgba(239, 68, 68, 0.25);
     }
     .card-heart-btn.active i {
         font-weight: 900;
     }
 
     .card-content-body {
-        padding: 0.85rem 1rem;
+        padding: 1.1rem 1.1rem 0.85rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
 
     .business-card-title {
-        font-size: 0.925rem;
+        font-size: 0.98rem;
         font-weight: 700;
         color: #0f172a;
-        margin-bottom: 0.35rem;
-        line-height: 1.3;
+        margin-bottom: 0.4rem;
+        line-height: 1.35;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        height: 2.6em;
+        height: 2.7em;
+        transition: color 0.2s ease;
+    }
+    .business-grid-card:hover .business-card-title a {
+        color: #d97706 !important;
     }
 
     .card-rating-row {
         display: flex;
         align-items: center;
-        gap: 0.35rem;
-        font-size: 0.75rem;
-        margin-bottom: 0.35rem;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+        margin-bottom: 0.45rem;
     }
 
     .card-location-row {
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         color: #64748b;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.6rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .card-tag-pill {
-        background: #f1f5f9;
+        background: #f8fafc;
         color: #475569;
         font-size: 0.68rem;
         font-weight: 600;
-        padding: 0.15rem 0.5rem;
-        border-radius: 6px;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
         display: inline-block;
-        margin-right: 0.25rem;
-        margin-bottom: 0.25rem;
+        margin-right: 0.3rem;
+        margin-bottom: 0.3rem;
         border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+    .card-tag-pill:hover {
+        border-color: #cbd5e1;
+        color: #0f172a;
     }
 
     /* Action Buttons Row */
     .card-actions-row {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        gap: 0.4rem;
-        padding: 0.75rem 1rem 0.85rem;
+        gap: 0.5rem;
+        padding: 0.85rem 1.1rem 1.1rem;
         background: #ffffff;
         border-top: 1px solid #f1f5f9;
     }
 
     .btn-card-action {
-        font-size: 0.72rem;
+        font-size: 0.75rem;
         font-weight: 700;
-        padding: 0.45rem 0.35rem;
-        border-radius: 8px;
+        padding: 0.5rem 0.35rem;
+        border-radius: 10px;
         text-align: center;
         text-decoration: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.3rem;
-        transition: all 0.2s ease;
+        gap: 0.35rem;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn-card-call {
@@ -503,31 +522,37 @@
         background: #0066ff;
         border-color: #0066ff;
         color: #ffffff;
-        box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.28);
+        transform: translateY(-1px);
     }
 
     .btn-card-wa {
-        background: #25D366;
-        border: 1px solid #25D366;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        border: 1px solid #16a34a;
         color: #ffffff;
-        box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.28);
     }
     .btn-card-wa:hover {
-        background: #1eb857;
-        border-color: #1eb857;
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        border-color: #15803d;
         color: #ffffff;
-        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+        box-shadow: 0 6px 14px rgba(34, 197, 94, 0.4);
+        transform: translateY(-1px);
     }
 
     .btn-card-view {
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
-        color: #0066ff;
+        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+        border: 1px solid #0052cc;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 102, 255, 0.28);
     }
     .btn-card-view:hover {
-        background: #0066ff;
-        border-color: #0066ff;
+        background: linear-gradient(135deg, #0052cc 0%, #004099 100%);
+        border-color: #004099;
         color: #ffffff;
+        box-shadow: 0 6px 14px rgba(0, 102, 255, 0.4);
+        transform: translateY(-1px);
+    }
         box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
     }
 

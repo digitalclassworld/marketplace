@@ -554,6 +554,156 @@
                 margin-bottom: 0;
             }
         }
+
+        /* ==========================================================================
+           UNIVERSAL LUXURY CARDS SYSTEM (FOR ALL CURRENT & FUTURE CARDS)
+           ========================================================================== */
+        .luxury-card,
+        .business-grid-card,
+        .trending-course-card,
+        .course-card-unified,
+        .service-card,
+        .service-card-unified,
+        .product-card,
+        .product-card-unified,
+        .business-card {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+            will-change: transform, box-shadow;
+        }
+
+        .luxury-card:hover,
+        .business-grid-card:hover,
+        .trending-course-card:hover,
+        .course-card-unified:hover,
+        .service-card:hover,
+        .service-card-unified:hover,
+        .product-card:hover,
+        .product-card-unified:hover,
+        .business-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 38px -10px rgba(15, 23, 42, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.05);
+            border-color: rgba(0, 102, 255, 0.35);
+        }
+
+        .luxury-card-thumb,
+        .trending-course-thumb-box,
+        .card-thumb-wrapper,
+        .service-thumb,
+        .product-thumb,
+        .business-thumb,
+        .course-thumb-box {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .luxury-card-thumb img,
+        .trending-course-thumb-box img,
+        .card-thumb-wrapper img,
+        .service-thumb img,
+        .product-thumb img,
+        .business-thumb img,
+        .course-thumb-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .luxury-card:hover .luxury-card-thumb img,
+        .trending-course-card:hover .trending-course-thumb-box img,
+        .business-grid-card:hover .card-thumb-wrapper img,
+        .service-card:hover .service-thumb img,
+        .product-card:hover .product-thumb img,
+        .business-card:hover .business-thumb img,
+        .course-card-unified:hover .course-thumb-box img {
+            transform: scale(1.08);
+        }
+
+        /* Luxury Glass Badge */
+        .luxury-glass-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 3;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            letter-spacing: 0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .luxury-glass-badge.gold {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.98) 100%);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+        }
+
+        .luxury-glass-badge.blue {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.95) 0%, rgba(30, 64, 175, 0.98) 100%);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 4px 14px rgba(0, 102, 255, 0.35);
+        }
+
+        .luxury-glass-badge.emerald {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.98) 100%);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        }
+
+        /* Luxury Rating Pill */
+        .luxury-rating-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            border-radius: 999px;
+            padding: 0.15rem 0.55rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .luxury-rating-pill .fa-star {
+            color: #f59e0b;
+        }
+
+        /* Luxury Price Typography */
+        .luxury-price-current {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        .luxury-discount-pill {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
     </style>
     @yield('styles')
 </head>
