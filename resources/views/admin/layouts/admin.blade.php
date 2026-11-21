@@ -664,22 +664,36 @@
                 </div>
 
                 @php
-                    $navPendingCount = \App\Models\BusinessListing::where('status', 'pending')->count()
-                        + \App\Models\Course::where('status', 'pending')->count()
-                        + \App\Models\Service::where('status', 'pending')->count()
-                        + \App\Models\Product::where('status', 'pending')->count()
-                        + \App\Models\Seller::whereIn('seller_status', [\App\Models\Seller::STATUS_PENDING_APPROVAL, 'Pending', 'pending'])->count();
+                    $navPendingCount = \Illuminate\Support\Facades\Cache::remember('admin_nav_pending_count', 30, function() {
+                        return \App\Models\BusinessListing::where('status', 'pending')->count()
+                            + \App\Models\Course::where('status', 'pending')->count()
+                            + \App\Models\Service::where('status', 'pending')->count()
+                            + \App\Models\Product::where('status', 'pending')->count()
+                            + \App\Models\Seller::whereIn('seller_status', [\App\Models\Seller::STATUS_PENDING_APPROVAL, 'Pending', 'pending'])->count();
+                    });
                 @endphp
-                <!-- Quick Pending Requests Shortcut Link -->
-                <a href="{{ route('admin.dashboard') }}#pendingRequestsModal" class="btn btn-sm btn-outline-warning text-dark fw-bold d-flex align-items-center gap-1.5 px-2.5 py-1.5 rounded-pill shadow-xs" title="View Pending Approvals on Dashboard" style="font-size: 0.76rem; border-color: #f59e0b; background: #fffbeb;">
-                    <i class="fa-solid fa-clock-rotate-left text-warning"></i>
-                    <span class="d-none d-lg-inline">Pending Requests</span>
-                    @if($navPendingCount > 0)
-                        <span class="badge bg-danger text-white rounded-pill ms-1" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
-                            {{ $navPendingCount }}
-                        </span>
-                    @endif
-                </a>
+                <!-- Quick Pending Requests Shortcut (Direct Modal on Dashboard, Direct Link elsewhere) -->
+                @if(request()->routeIs('admin.dashboard'))
+                    <button type="button" class="btn btn-sm btn-outline-warning text-dark fw-bold d-flex align-items-center gap-1.5 px-2.5 py-1.5 rounded-pill shadow-xs" data-bs-toggle="modal" data-bs-target="#pendingRequestsModal" title="Open Pending Approvals Central" style="font-size: 0.76rem; border-color: #f59e0b; background: #fffbeb;">
+                        <i class="fa-solid fa-clock-rotate-left text-warning"></i>
+                        <span class="d-none d-lg-inline">Pending Requests</span>
+                        @if($navPendingCount > 0)
+                            <span class="badge bg-danger text-white rounded-pill ms-1" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                                {{ $navPendingCount }}
+                            </span>
+                        @endif
+                    </button>
+                @else
+                    <a href="{{ route('admin.dashboard') }}#pendingRequestsModal" class="btn btn-sm btn-outline-warning text-dark fw-bold d-flex align-items-center gap-1.5 px-2.5 py-1.5 rounded-pill shadow-xs" title="View Pending Approvals on Dashboard" style="font-size: 0.76rem; border-color: #f59e0b; background: #fffbeb;">
+                        <i class="fa-solid fa-clock-rotate-left text-warning"></i>
+                        <span class="d-none d-lg-inline">Pending Requests</span>
+                        @if($navPendingCount > 0)
+                            <span class="badge bg-danger text-white rounded-pill ms-1" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                                {{ $navPendingCount }}
+                            </span>
+                        @endif
+                    </a>
+                @endif
 
                 <!-- Notification Bell with Red Badge 3 -->
                 <div class="position-relative">

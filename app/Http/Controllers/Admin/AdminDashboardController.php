@@ -394,32 +394,43 @@ class AdminDashboardController extends Controller
         ];
 
         // 5. Pending Approvals across all sections (Sellers, Courses, Services, Business Listings, Products)
+        // Optimized with select and limit for instant load times over remote DB
+        $pendingSellersCount = Seller::whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending', 'pending', 'Under Review'])->count();
+        $pendingCoursesCount = Course::where('status', 'pending')->count();
+        $pendingServicesCount = Service::where('status', 'pending')->count();
+        $pendingListingsCount = BusinessListing::where('status', 'pending')->count();
+        $pendingProductsCount = Product::where('status', 'pending')->count();
+        $totalPendingCount = $pendingSellersCount + $pendingCoursesCount + $pendingServicesCount + $pendingListingsCount + $pendingProductsCount;
+
         $pendingSellers = Seller::whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending', 'pending', 'Under Review'])
             ->with(['user', 'businessDetail'])
             ->latest('id')
+            ->take(15)
             ->get();
 
         $pendingCourses = Course::where('status', 'pending')
             ->with(['seller.user', 'seller.businessDetail'])
             ->latest('id')
+            ->take(15)
             ->get();
 
         $pendingServices = Service::where('status', 'pending')
             ->with(['seller.user', 'seller.businessDetail'])
             ->latest('id')
+            ->take(15)
             ->get();
 
         $pendingListings = BusinessListing::where('status', 'pending')
             ->with(['seller.user', 'seller.businessDetail'])
             ->latest('id')
+            ->take(15)
             ->get();
 
         $pendingProducts = Product::where('status', 'pending')
             ->with(['seller.user', 'seller.businessDetail'])
             ->latest('id')
+            ->take(15)
             ->get();
-
-        $totalPendingCount = $pendingSellers->count() + $pendingCourses->count() + $pendingServices->count() + $pendingListings->count() + $pendingProducts->count();
 
         // 8. All Platform Users (Active, Inactive, Sellers, Students, Institutes) from Real Backend Database (Latest 15 for instant load)
         $allPlatformUsers = User::with(['seller.businessDetail'])
@@ -501,6 +512,11 @@ class AdminDashboardController extends Controller
             'pendingServices'      => $pendingServices,
             'pendingListings'      => $pendingListings,
             'pendingProducts'      => $pendingProducts,
+            'pendingSellersCount'  => $pendingSellersCount,
+            'pendingCoursesCount'  => $pendingCoursesCount,
+            'pendingServicesCount' => $pendingServicesCount,
+            'pendingListingsCount' => $pendingListingsCount,
+            'pendingProductsCount' => $pendingProductsCount,
             'totalPendingCount'    => $totalPendingCount,
         ]);
     }

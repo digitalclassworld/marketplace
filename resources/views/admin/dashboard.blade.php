@@ -921,27 +921,27 @@
                     <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3" id="pendingTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active rounded-pill px-3 py-1.5 fw-bold" id="sellers-tab" data-bs-toggle="pill" data-bs-target="#tab-sellers" type="button" role="tab">
-                                <i class="fa-solid fa-store me-1"></i> Sellers ({{ $pendingSellers->count() }})
+                                <i class="fa-solid fa-store me-1"></i> Sellers ({{ $pendingSellersCount ?? $pendingSellers->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="courses-tab" data-bs-toggle="pill" data-bs-target="#tab-courses" type="button" role="tab">
-                                <i class="fa-solid fa-graduation-cap me-1"></i> Courses ({{ $pendingCourses->count() }})
+                                <i class="fa-solid fa-graduation-cap me-1"></i> Courses ({{ $pendingCoursesCount ?? $pendingCourses->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="services-tab" data-bs-toggle="pill" data-bs-target="#tab-services" type="button" role="tab">
-                                <i class="fa-solid fa-briefcase me-1"></i> Services ({{ $pendingServices->count() }})
+                                <i class="fa-solid fa-briefcase me-1"></i> Services ({{ $pendingServicesCount ?? $pendingServices->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="listings-tab" data-bs-toggle="pill" data-bs-target="#tab-listings" type="button" role="tab">
-                                <i class="fa-solid fa-building me-1"></i> Businesses ({{ $pendingListings->count() }})
+                                <i class="fa-solid fa-building me-1"></i> Businesses ({{ $pendingListingsCount ?? $pendingListings->count() }})
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link rounded-pill px-3 py-1.5 fw-bold" id="products-tab" data-bs-toggle="pill" data-bs-target="#tab-products" type="button" role="tab">
-                                <i class="fa-solid fa-box-open me-1"></i> Products ({{ $pendingProducts->count() }})
+                                <i class="fa-solid fa-box-open me-1"></i> Products ({{ $pendingProductsCount ?? $pendingProducts->count() }})
                             </button>
                         </li>
                     </ul>
@@ -995,6 +995,13 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                @if(($pendingSellersCount ?? 0) > $pendingSellers->count())
+                                    <div class="text-center py-2 border-top mt-2">
+                                        <a href="{{ route('admin.sellers.index', ['status' => 'pending']) }}" class="btn btn-sm btn-outline-primary fw-semibold">
+                                            View All {{ $pendingSellersCount }} Pending Sellers in Management &rarr;
+                                        </a>
+                                    </div>
+                                @endif
                             @endif
                         </div>
 
@@ -1044,6 +1051,13 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                @if(($pendingCoursesCount ?? 0) > $pendingCourses->count())
+                                    <div class="text-center py-2 border-top mt-2">
+                                        <a href="{{ route('admin.catalog.courses', ['tab' => 'pending']) }}" class="btn btn-sm btn-outline-primary fw-semibold">
+                                            View All {{ $pendingCoursesCount }} Pending Courses in Catalog &rarr;
+                                        </a>
+                                    </div>
+                                @endif
                             @endif
                         </div>
 
@@ -1142,6 +1156,13 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                @if(($pendingListingsCount ?? 0) > $pendingListings->count())
+                                    <div class="text-center py-2 border-top mt-2">
+                                        <a href="{{ route('admin.catalog.listings', ['status' => 'pending']) }}" class="btn btn-sm btn-outline-primary fw-semibold">
+                                            View All {{ $pendingListingsCount }} Pending Business Listings in Catalog &rarr;
+                                        </a>
+                                    </div>
+                                @endif
                             @endif
                         </div>
 
@@ -1191,6 +1212,13 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                @if(($pendingProductsCount ?? 0) > $pendingProducts->count())
+                                    <div class="text-center py-2 border-top mt-2">
+                                        <a href="{{ route('admin.catalog.products', ['status' => 'pending']) }}" class="btn btn-sm btn-outline-primary fw-semibold">
+                                            View All {{ $pendingProductsCount }} Pending Products in Catalog &rarr;
+                                        </a>
+                                    </div>
+                                @endif
                             @endif
                         </div>
                     </div>
