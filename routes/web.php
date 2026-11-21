@@ -82,6 +82,9 @@ Route::get('/business-listing/training-institutes', function () {
     return redirect()->route('businesses', ['category' => 'Training Institute'], 301);
 });
 
+// Business Directory Institute Course (Legacy format matching /business-listing/course/{id}/{slug})
+Route::get('/business-listing/course/{id}/{slug?}', [HomeController::class, 'instituteCourseShow'])->name('business.course.show');
+
 // Business Directory Listing Public Profile matching target SEO format:
 // e.g. /business-listing/coaching/prarthna-paramedical-institute
 Route::get('/business-listing/{category}/{slug}', [HomeController::class, 'businessProfile'])->name('business.show');

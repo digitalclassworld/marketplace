@@ -106,11 +106,40 @@ class InstituteCourse extends Model
     }
 
     /**
-     * Clean course slug
+     * Clean course slug matching legacy URL structure
      */
     public function getSlugAttribute(): string
     {
-        return \Illuminate\Support\Str::slug($this->course_name) . '-' . $this->id;
+        if (!empty($this->course_by)) {
+            return \Illuminate\Support\Str::slug($this->course_by);
+        }
+
+        if ($this->affiliate_id) {
+            try {
+                $affSlug = \Illuminate\Support\Facades\DB::table('dc_affiliate')
+                    ->where('id', $this->affiliate_id)
+                    ->value('url_slug');
+                if (!empty($affSlug)) {
+                    return \Illuminate\Support\Str::slug($affSlug);
+                }
+                $schoolName = \Illuminate\Support\Facades\DB::table('dc_affiliate')
+                    ->where('id', $this->affiliate_id)
+                    ->value('school_name');
+                if (!empty($schoolName)) {
+                    return \Illuminate\Support\Str::slug($schoolName);
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        return \Illuminate\Support\Str::slug($this->course_name ?: 'institute-course');
+    }
+
+    /**
+     * Direct target URL: /business-listing/course/{id}/{slug}
+     */
+    public function getUrlAttribute(): string
+    {
+        return url('/business-listing/course/' . $this->id . '/' . $this->slug);
     }
 }
 

@@ -526,17 +526,29 @@
                                         <div class="col">
                                             <div class="course-card-authentic">
                                                 <div class="course-thumb-box">
+                                                    @if(!empty($course['url']))
+                                                        <a href="{{ $course['url'] }}" class="d-block w-100 h-100 text-decoration-none">
+                                                    @endif
                                                     @if(!empty($course['thumbnail']))
                                                         <img src="{{ $course['thumbnail'] }}" alt="{{ $course['title'] }}" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
                                                     @else
-                                                        <div class="text-center text-primary">
+                                                        <div class="text-center text-primary py-3">
                                                             <i class="fa-solid fa-graduation-cap fa-3x mb-1"></i>
                                                             <div class="fw-bold small">{{ $course['title'] }}</div>
                                                         </div>
                                                     @endif
+                                                    @if(!empty($course['url']))
+                                                        </a>
+                                                    @endif
                                                 </div>
                                                 <div class="course-body-authentic">
-                                                    <h3 class="course-title-authentic">{{ $course['title'] }}</h3>
+                                                    <h3 class="course-title-authentic">
+                                                        @if(!empty($course['url']))
+                                                            <a href="{{ $course['url'] }}" class="text-dark text-decoration-none hover-primary">{{ $course['title'] }}</a>
+                                                        @else
+                                                            {{ $course['title'] }}
+                                                        @endif
+                                                    </h3>
                                                     <div class="d-flex align-items-center gap-2 small text-muted mb-2">
                                                         <span><i class="fa-regular fa-clock text-primary me-1"></i> {{ $course['duration'] ?? '3 Months' }}</span>
                                                         <span>&bull;</span>
@@ -555,9 +567,15 @@
                                                                 <span class="badge bg-success-subtle text-success">Free / Inquire</span>
                                                             @endif
                                                         </div>
-                                                        <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#inquiryModal" onclick="document.getElementById('inquiryCourseField').value='{{ addslashes($course['title']) }}'">
-                                                            Inquire Now
-                                                        </button>
+                                                        @if(!empty($course['url']))
+                                                            <a href="{{ $course['url'] }}" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-semibold">
+                                                                View Details
+                                                            </a>
+                                                        @else
+                                                            <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#inquiryModal" onclick="document.getElementById('inquiryCourseField').value='{{ addslashes($course['title']) }}'">
+                                                                Inquire Now
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>

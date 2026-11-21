@@ -524,6 +524,7 @@ class HomeController extends Controller
                 'id' => $sc->id,
                 'title' => $sc->title,
                 'slug' => $sc->slug,
+                'url' => route('course.show', $sc->slug),
                 'duration' => $sc->duration ?? '3 Months',
                 'mode' => $sc->level ?? 'Online/Offline',
                 'rating' => 4.9,
@@ -550,6 +551,7 @@ class HomeController extends Controller
                 'id' => $rc->id,
                 'title' => $rc->course_name,
                 'slug' => $rc->slug,
+                'url' => $rc->url,
                 'duration' => $rc->duration ?: '3 Months',
                 'mode' => 'Offline/Online',
                 'rating' => round(4.7 + (($rc->id % 4) * 0.1), 1),
@@ -2654,7 +2656,10 @@ class HomeController extends Controller
         if (!$course) {
             // Check in InstituteCourse (authentic institute courses)
             $instCourse = null;
-            if (preg_match('/-(\d+)$/', $slug, $matches)) {
+            if (is_numeric($slug)) {
+                $instCourse = \App\Models\InstituteCourse::find((int)$slug);
+            }
+            if (!$instCourse && preg_match('/-(\d+)$/', $slug, $matches)) {
                 $instCourse = \App\Models\InstituteCourse::find($matches[1]);
             }
             if (!$instCourse) {
@@ -2663,18 +2668,41 @@ class HomeController extends Controller
             }
 
             if ($instCourse) {
-                $business = \App\Models\BusinessListing::where('slug', 'like', "%-{$instCourse->affiliate_id}")->first();
-                $bName = $business->business_name ?? 'Institute Faculty';
-                $bCity = $business->city ?? 'Ahmedabad';
+                $business = null;
+                if ($instCourse->affiliate_id) {
+                    $business = \App\Models\BusinessListing::where('slug', 'like', "%-{$instCourse->affiliate_id}")->first();
+                }
+                if (!$business && !empty($instCourse->course_by)) {
+                    $cleanBy = \Illuminate\Support\Str::slug($instCourse->course_by);
+                    $business = \App\Models\BusinessListing::where('slug', 'like', "{$cleanBy}%")->first();
+                }
+
+                $affiliateRecord = null;
+                if ($instCourse->affiliate_id) {
+                    try {
+                        $affiliateRecord = \Illuminate\Support\Facades\DB::table('dc_affiliate')->where('id', $instCourse->affiliate_id)->first();
+                    } catch (\Throwable $e) {}
+                }
+
+                $bName = $instCourse->course_by ?: ($business->business_name ?? ($affiliateRecord->school_name ?? 'Institute Faculty'));
+                $bCity = $business->city ?? ($affiliateRecord->city ?? 'India');
+                $bState = $business->state ?? ($affiliateRecord->state ?? 'Gujarat');
+                $bPhone = $business->phone ?? ($affiliateRecord->contact ?? '');
+                $bAddress = $business->address ?? ($affiliateRecord->address ?? '');
+                $bAvatar = ($business && !empty($business->logo)) ? $business->logo : (!empty($affiliateRecord->logo) ? $affiliateRecord->logo : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80');
+
+                $instUrl = $business ? $business->url : ($affiliateRecord ? url('/business-listing/coaching/' . ($affiliateRecord->url_slug ?: \Illuminate\Support\Str::slug($affiliateRecord->school_name))) : null);
 
                 $price = $instCourse->price;
                 $origPrice = $instCourse->original_price;
+                $discStr = $instCourse->discount_percentage;
 
                 $course = (object) [
                     'id' => $instCourse->id,
                     'title' => $instCourse->course_name,
                     'slug' => $instCourse->slug,
-                    'category' => $business->category ?? 'Coaching Institute',
+                    'url' => $instCourse->url,
+                    'category' => $business->category ?? ($affiliateRecord->coaching_category ?? 'Coaching Institute'),
                     'language' => $instCourse->course_language ?: 'English / Hindi',
                     'level' => 'All Levels',
                     'duration' => $instCourse->duration ?: '3 Months',
@@ -2682,9 +2710,13 @@ class HomeController extends Controller
                     'description' => $instCourse->course_desc ?: ($instCourse->course_name . ' comprehensive course with live training, practical sessions and completion certificate.'),
                     'thumbnail' => $instCourse->thumbnail_url,
                     'cover_image' => $instCourse->thumbnail_url,
-                    'price' => $origPrice,
-                    'discount_price' => $price,
-                    'access_type' => 'Full Lifetime Access',
+                    'price' => $origPrice ?: $price,
+                    'discount_price' => ($origPrice > $price) ? $price : 0,
+                    'selling_price' => $price,
+                    'original_price' => $origPrice,
+                    'discount_percentage' => $discStr,
+                    'discount_text' => $discStr,
+                    'access_type' => $instCourse->sessions ?: 'Full Lifetime Access',
                     'certificate_included' => true,
                     'qa_enabled' => true,
                     'status' => 'published',
@@ -2696,7 +2728,7 @@ class HomeController extends Controller
                     'reviews_count' => 145,
                     'students_count' => 1250,
                     'instructor_name' => $instCourse->name_of_instructor ?: $bName,
-                    'instructor_avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                    'instructor_avatar' => $bAvatar,
                     'instructor_category' => 'Senior Academic',
                     'meta_description' => $instCourse->course_name . ' coaching and certification course at ' . $bName,
                     'meta_keywords' => $instCourse->course_name . ', coaching institute, digital class',
@@ -2706,18 +2738,18 @@ class HomeController extends Controller
                         ],
                         'businessDetail' => (object) [
                             'company_name' => $bName,
-                            'phone' => $business->phone ?? '',
-                            'address' => $business->address ?? '',
+                            'phone' => $bPhone,
+                            'address' => $bAddress,
                             'city' => $bCity,
-                            'state' => $business->state ?? 'Gujarat',
+                            'state' => $bState,
                         ],
                     ],
                     'contents' => collect(),
                     'is_institute_course' => true,
-                    'institute_url' => $business ? $business->url : null,
-                    'instructor_url' => $business ? $business->url : null,
+                    'institute_url' => $instUrl,
+                    'instructor_url' => $instUrl,
                     'instructor_bio' => $bName . ' offers high-quality training and career-oriented educational programs in ' . $bCity . '.',
-                    'instructor_subtitle' => ($business->category ?? 'Coaching Institute') . ' • ' . $bCity . ', ' . ($business->state ?? 'Gujarat'),
+                    'instructor_subtitle' => ($business->category ?? ($affiliateRecord->coaching_category ?? 'Coaching Institute')) . ' • ' . $bCity . ($bState ? (', ' . $bState) : ''),
                 ];
             }
         }
@@ -3977,5 +4009,36 @@ class HomeController extends Controller
         }
 
         return $this->courseShow($request, (string)$elearnCourse->id);
+    }
+
+    /**
+     * Display dedicated Institute Course Show page matching target legacy format:
+     * e.g. /business-listing/course/{id}/{slug} (e.g. /business-listing/course/1320/mastermind-gurukul)
+     */
+    public function instituteCourseShow(Request $request, $id, $slug = null): View|\Illuminate\Http\RedirectResponse
+    {
+        $courseId = is_numeric($id) ? (int)$id : (is_numeric($slug) ? (int)$slug : null);
+        $instCourse = null;
+
+        if ($courseId) {
+            $instCourse = \App\Models\InstituteCourse::find($courseId);
+        }
+
+        if (!$instCourse) {
+            $clean = str_replace('-', ' ', $id);
+            $instCourse = \App\Models\InstituteCourse::where('course_name', 'like', "%{$clean}%")->first();
+        }
+
+        if (!$instCourse) {
+            abort(404, 'Institute Course not found.');
+        }
+
+        // Canonical 301 redirect to guarantee exact slug match: /business-listing/course/{id}/{slug}
+        $expectedPath = 'business-listing/course/' . $instCourse->id . '/' . $instCourse->slug;
+        if (trim($request->path(), '/') !== $expectedPath) {
+            return redirect()->to(url($expectedPath), 301);
+        }
+
+        return $this->courseShow($request, (string)$instCourse->id);
     }
 }

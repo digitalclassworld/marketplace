@@ -347,8 +347,20 @@
          ======================================================================== -->
     <nav class="course-page-breadcrumb">
         <a href="{{ route('home') }}">Home</a> &gt; 
-        <a href="{{ route('courses') }}">Courses</a> &gt; 
-        <a href="{{ route('courses', ['category' => $course->category]) }}">{{ $course->category }}</a> &gt; 
+        @if(!empty($course->is_institute_course))
+            <a href="{{ route('businesses') }}">Coaching Institutes</a> &gt; 
+            @if(!empty($course->instructor_url))
+                <a href="{{ $course->instructor_url }}">{{ $course->instructor_name }}</a> &gt; 
+            @endif
+        @elseif(!empty($course->is_elearn_course))
+            <a href="{{ route('courses') }}">E-Learning</a> &gt; 
+            @if(!empty($course->tutor_url))
+                <a href="{{ $course->tutor_url }}">{{ $course->instructor_name }}</a> &gt; 
+            @endif
+        @else
+            <a href="{{ route('courses') }}">Courses</a> &gt; 
+            <a href="{{ route('courses', ['category' => $course->category]) }}">{{ $course->category }}</a> &gt; 
+        @endif
         <span class="text-dark fw-semibold">{{ $course->title }}</span>
     </nav>
 
