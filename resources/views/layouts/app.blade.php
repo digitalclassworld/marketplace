@@ -821,7 +821,8 @@
 
                 <!-- Right Side Elements -->
                 <div class="d-flex align-items-center gap-2 gap-xl-2.5 ms-xl-auto mt-2 mt-xl-0 flex-wrap flex-xl-nowrap">
-                    <!-- Location Selector -->
+                    <!-- Location Selector (Hidden on Home Page) -->
+                    @if(!request()->routeIs('home'))
                     <div class="dropdown d-none d-md-block" id="navLocationDropdown">
                         <button class="btn btn-sm btn-light border-0 dropdown-toggle small text-muted d-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown" id="navLocationBtn">
                             <i class="fa-solid fa-location-dot text-primary"></i>
@@ -853,6 +854,7 @@
                             <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Indore' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Indore']) }}">Indore</a></li>
                         </ul>
                     </div>
+                    @endif
 
                     <!-- Cart Icon with Live Dynamic Badge -->
                     <button type="button" class="btn btn-light rounded-circle position-relative p-2 border-0 shadow-sm dc-cart-nav-btn" onclick="openCartDrawer()" title="View Shopping Cart" style="width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; background: #f8fafc; transition: all 0.2s;">
