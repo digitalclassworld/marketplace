@@ -873,11 +873,28 @@
                                     </div>
 
                                     <!-- Price -->
+                                    @php
+                                        $sellPrice = (float)($c->selling_price ?? 0);
+                                        $mrpPrice = (float)($c->original_price ?? $c->mrp ?? 0);
+                                        if ($sellPrice == 0) {
+                                            if (isset($c->discount_price) && $c->discount_price > 0 && $c->price > $c->discount_price) {
+                                                $sellPrice = (float)$c->discount_price;
+                                                $mrpPrice = (float)$c->price;
+                                            } else {
+                                                $sellPrice = (float)($c->price ?? 0);
+                                            }
+                                        }
+                                        if ($mrpPrice == 0 && isset($c->price) && $c->price > $sellPrice) {
+                                            $mrpPrice = (float)$c->price;
+                                        }
+                                    @endphp
                                     <div class="course-price-row">
-                                        <span class="price-current">₹{{ number_format($c->discount_price > 0 ? $c->discount_price : $c->price) }}</span>
-                                        @if($c->discount_price > 0 && $c->price > $c->discount_price)
-                                            <span class="price-mrp">₹{{ number_format($c->price) }}</span>
-                                            <span class="badge-discount-green">{{ $c->discount_percentage }}</span>
+                                        <span class="price-current">₹{{ number_format($sellPrice) }}</span>
+                                        @if($mrpPrice > $sellPrice && $sellPrice > 0)
+                                            <span class="price-mrp">₹{{ number_format($mrpPrice) }}</span>
+                                            <span class="badge-discount-green">{{ $c->discount_percentage ?? $c->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% off' }}</span>
+                                        @elseif($sellPrice == 0)
+                                            <span class="badge-discount-green">FREE</span>
                                         @endif
                                     </div>
 
@@ -890,7 +907,7 @@
                                                 <div class="instructor-cat-label">{{ $c->instructor_category }}</div>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle p-1" title="Add to Cart" onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)($c->discount_price > 0 ? $c->discount_price : $c->price) }}, thumbnail: '{{ $c->thumbnail }}', seller_id: {{ $c->seller_id ?? 1 }} })" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle p-1" title="Add to Cart" onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $c->thumbnail }}', seller_id: {{ $c->seller_id ?? 1 }} })" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                             <i class="fa-solid fa-cart-plus" style="font-size: 0.75rem;"></i>
                                         </button>
                                     </div>

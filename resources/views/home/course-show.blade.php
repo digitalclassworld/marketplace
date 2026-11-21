@@ -690,11 +690,33 @@
             <!-- Sticky Purchase Card -->
             <div class="sticky-purchase-card mb-3">
                 
+                @php
+                    $sellPrice = (float)($course->selling_price ?? 0);
+                    $mrpPrice = (float)($course->original_price ?? 0);
+                    if ($sellPrice == 0) {
+                        if (isset($course->discount_price) && $course->discount_price > 0 && $course->price > $course->discount_price) {
+                            $sellPrice = (float)$course->discount_price;
+                            $mrpPrice = (float)$course->price;
+                        } else {
+                            $sellPrice = (float)($course->price ?? 0);
+                        }
+                    }
+                    if ($mrpPrice == 0 && isset($course->price) && $course->price > $sellPrice) {
+                        $mrpPrice = (float)$course->price;
+                    }
+                @endphp
                 <div class="d-flex align-items-baseline gap-2 mb-1">
-                    <span class="huge-price-display">₹{{ number_format($course->discount_price > 0 ? $course->discount_price : $course->price) }}</span>
-                    @if($course->discount_price > 0 && $course->price > $course->discount_price)
-                        <span class="text-muted text-decoration-line-through small">₹{{ number_format($course->price) }}</span>
-                        <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage }}</span>
+                    @if($sellPrice == 0)
+                        <span class="huge-price-display text-success">FREE</span>
+                        @if($mrpPrice > 0)
+                            <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
+                        @endif
+                    @else
+                        <span class="huge-price-display">₹{{ number_format($sellPrice) }}</span>
+                        @if($mrpPrice > $sellPrice)
+                            <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
+                            <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
+                        @endif
                     @endif
                 </div>
 
@@ -710,7 +732,7 @@
                     </button>
                 </form>
 
-                <button type="button" class="btn btn-outline-primary w-100 fw-semibold py-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)($course->discount_price > 0 ? $course->discount_price : $course->price) }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
+                <button type="button" class="btn btn-outline-primary w-100 fw-semibold py-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
                     <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
                 </button>
 
@@ -823,11 +845,26 @@
                                 <i class="fa-solid fa-star"></i> {{ number_format($rc->rating, 1) }}
                                 <span class="text-muted ms-1">({{ $rc->reviews_count }})</span>
                             </div>
+                            @php
+                                $rSellPrice = (float)($rc->selling_price ?? 0);
+                                $rMrpPrice = (float)($rc->original_price ?? 0);
+                                if ($rSellPrice == 0) {
+                                    if (isset($rc->discount_price) && $rc->discount_price > 0 && $rc->price > $rc->discount_price) {
+                                        $rSellPrice = (float)$rc->discount_price;
+                                        $rMrpPrice = (float)$rc->price;
+                                    } else {
+                                        $rSellPrice = (float)($rc->price ?? 0);
+                                    }
+                                }
+                                if ($rMrpPrice == 0 && isset($rc->price) && $rc->price > $rSellPrice) {
+                                    $rMrpPrice = (float)$rc->price;
+                                }
+                            @endphp
                             <div class="mt-auto d-flex align-items-baseline gap-2">
-                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">₹{{ number_format($rc->discount_price > 0 ? $rc->discount_price : $rc->price) }}</span>
-                                @if($rc->discount_price > 0 && $rc->price > $rc->discount_price)
-                                    <span class="text-muted text-decoration-line-through small" style="font-size: 0.7rem;">₹{{ number_format($rc->price) }}</span>
-                                    <span class="badge bg-success-subtle text-success py-0 px-1" style="font-size: 0.6rem;">{{ $rc->discount_percentage }}</span>
+                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">₹{{ number_format($rSellPrice) }}</span>
+                                @if($rMrpPrice > $rSellPrice && $rSellPrice > 0)
+                                    <span class="text-muted text-decoration-line-through small" style="font-size: 0.7rem;">₹{{ number_format($rMrpPrice) }}</span>
+                                    <span class="badge bg-success-subtle text-success py-0 px-1" style="font-size: 0.6rem;">{{ $rc->discount_percentage ?? $rc->discount_text ?? round((($rMrpPrice - $rSellPrice)/$rMrpPrice)*100) . '% off' }}</span>
                                 @endif
                             </div>
                         </div>

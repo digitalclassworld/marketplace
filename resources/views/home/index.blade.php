@@ -1241,14 +1241,30 @@
                             </div>
 
                             <div class="mt-auto">
+                                @php
+                                    $sellPrice = (float)($course->selling_price ?? 0);
+                                    $mrpPrice = (float)($course->original_price ?? 0);
+                                    if ($sellPrice == 0) {
+                                        if (isset($course->discount_price) && $course->discount_price > 0 && $course->price > $course->discount_price) {
+                                            $sellPrice = (float)$course->discount_price;
+                                            $mrpPrice = (float)$course->price;
+                                        } else {
+                                            $sellPrice = (float)($course->price ?? 0);
+                                        }
+                                    }
+                                    if ($mrpPrice == 0 && isset($course->price) && $course->price > $sellPrice) {
+                                        $mrpPrice = (float)$course->price;
+                                    }
+                                @endphp
                                 <div class="price-row-wrap">
-                                    <span class="price-current">₹{{ number_format($course->price, 0) }}</span>
-                                    @if($course->original_price > 0 && $course->original_price > $course->price)
-                                        <span class="price-original">₹{{ number_format($course->original_price, 0) }}</span>
-                                    @elseif($course->price == 0)
+                                    <span class="price-current">₹{{ number_format($sellPrice, 0) }}</span>
+                                    @if($mrpPrice > $sellPrice && $sellPrice > 0)
+                                        <span class="price-original">₹{{ number_format($mrpPrice, 0) }}</span>
+                                        <span class="badge-discount-orange">{{ $course->discount_text ?? $course->discount_percentage ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% off' }}</span>
+                                    @elseif($sellPrice == 0)
                                         <span class="price-original">₹0</span>
+                                        <span class="badge-discount-orange">0% off</span>
                                     @endif
-                                    <span class="badge-discount-orange">{{ $course->discount_text ?? '0% off' }}</span>
                                 </div>
 
                                 <form action="{{ route('cart.add') }}" method="POST">
@@ -1256,7 +1272,7 @@
                                     <input type="hidden" name="type" value="course">
                                     <input type="hidden" name="id" value="{{ $course->id }}">
                                     <input type="hidden" name="name" value="{{ $course->title }}">
-                                    <input type="hidden" name="price" value="{{ $course->price }}">
+                                    <input type="hidden" name="price" value="{{ $sellPrice }}">
                                     <input type="hidden" name="image" value="{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}">
                                     <button type="submit" class="btn-add-to-cart-green">
                                         Add To Cart

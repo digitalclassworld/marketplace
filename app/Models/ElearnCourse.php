@@ -80,6 +80,35 @@ class ElearnCourse extends Model
     }
 
     /**
+     * Selling price accessor
+     */
+    public function getSellingPriceAttribute(): float
+    {
+        return $this->price;
+    }
+
+    /**
+     * Discounted selling price (if discounted, or 0)
+     */
+    public function getDiscountPriceAttribute(): float
+    {
+        $orig = $this->original_price;
+        $sell = $this->price;
+        if ($orig > $sell && $sell > 0) {
+            return $sell;
+        }
+        return 0.0;
+    }
+
+    /**
+     * Discount percentage accessor
+     */
+    public function getDiscountPercentageAttribute(): string
+    {
+        return $this->discount_text;
+    }
+
+    /**
      * Discount badge string (e.g. "92% off" or "50% off" or "0% off")
      */
     public function getDiscountTextAttribute(): string

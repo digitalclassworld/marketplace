@@ -372,14 +372,30 @@
                                 </a>
 
                                 <div class="mt-auto">
+                                    @php
+                                        $tSellPrice = (float)($course->selling_price ?? 0);
+                                        $tMrpPrice = (float)($course->original_price ?? 0);
+                                        if ($tSellPrice == 0) {
+                                            if (isset($course->discount_price) && $course->discount_price > 0 && $course->price > $course->discount_price) {
+                                                $tSellPrice = (float)$course->discount_price;
+                                                $tMrpPrice = (float)$course->price;
+                                            } else {
+                                                $tSellPrice = (float)($course->price ?? 0);
+                                            }
+                                        }
+                                        if ($tMrpPrice == 0 && isset($course->price) && $course->price > $tSellPrice) {
+                                            $tMrpPrice = (float)$course->price;
+                                        }
+                                    @endphp
                                     <div class="price-row-wrap">
-                                        <span class="price-current">₹{{ number_format($course->price, 0) }}</span>
-                                        @if($course->original_price > 0 && $course->original_price > $course->price)
-                                            <span class="price-original">₹{{ number_format($course->original_price, 0) }}</span>
-                                        @elseif($course->price == 0)
+                                        <span class="price-current">₹{{ number_format($tSellPrice, 0) }}</span>
+                                        @if($tMrpPrice > $tSellPrice && $tSellPrice > 0)
+                                            <span class="price-original">₹{{ number_format($tMrpPrice, 0) }}</span>
+                                            <span class="badge-discount-orange">{{ $course->discount_text ?? $course->discount_percentage ?? round((($tMrpPrice - $tSellPrice)/$tMrpPrice)*100) . '% off' }}</span>
+                                        @elseif($tSellPrice == 0)
                                             <span class="price-original">₹0</span>
+                                            <span class="badge-discount-orange">0% off</span>
                                         @endif
-                                        <span class="badge-discount-orange">{{ $course->discount_text }}</span>
                                     </div>
 
                                     <form action="{{ route('cart.add') }}" method="POST">
@@ -387,7 +403,7 @@
                                         <input type="hidden" name="type" value="course">
                                         <input type="hidden" name="id" value="{{ $course->id }}">
                                         <input type="hidden" name="name" value="{{ $course->course_name }}">
-                                        <input type="hidden" name="price" value="{{ $course->price }}">
+                                        <input type="hidden" name="price" value="{{ $tSellPrice }}">
                                         <input type="hidden" name="image" value="{{ $course->thumbnail_url }}">
                                         <button type="submit" class="btn-add-to-cart-green">
                                             <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
