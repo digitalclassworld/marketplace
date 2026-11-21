@@ -65,6 +65,23 @@ Route::post('/course/{slug}/enroll', [HomeController::class, 'courseEnroll'])->n
 Route::post('/course/{slug}/review', [HomeController::class, 'courseReview'])->name('course.review');
 Route::get('/course/{slug}/certificate', [CertificateController::class, 'forCourse'])->name('course.certificate');
 Route::get('/certificate/{code?}', [CertificateController::class, 'show'])->name('certificate.show');
+// Legacy directory routes: redirect to /businesses with corresponding filters
+Route::get('/business-listing/category/{category}', function ($category) {
+    return redirect()->route('businesses', ['category' => str_replace('-', ' ', $category)], 301);
+});
+Route::get('/business-listing/state/{state}', function ($state) {
+    return redirect()->route('businesses', ['state' => str_replace('-', ' ', $state)], 301);
+});
+Route::get('/business-listing/city/{city}', function ($city) {
+    return redirect()->route('businesses', ['city' => str_replace('-', ' ', $city)], 301);
+});
+Route::get('/business-listing/coaching-institutes', function () {
+    return redirect()->route('businesses', ['category' => 'Coaching Institute'], 301);
+});
+Route::get('/business-listing/training-institutes', function () {
+    return redirect()->route('businesses', ['category' => 'Training Institute'], 301);
+});
+
 // Business Directory Listing Public Profile matching target SEO format:
 // e.g. /business-listing/coaching/prarthna-paramedical-institute
 Route::get('/business-listing/{category}/{slug}', [HomeController::class, 'businessProfile'])->name('business.show');

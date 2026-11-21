@@ -1400,14 +1400,11 @@
 
                 <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-md-3">
                     @forelse($popularBusinesses as $b)
-                        @php
-                            $catSlug = \Illuminate\Support\Str::slug($b->category ?: 'business');
-                        @endphp
                         <div class="col">
-                            <a href="{{ route('business.show', ['category' => $catSlug, 'slug' => $b->slug]) }}" class="text-decoration-none">
+                            <a href="{{ $b->url }}" class="text-decoration-none">
                                 <div class="business-card">
                                     <div class="business-thumb">
-                                        <img src="{{ $b->cover_image ?: ($b->logo ?: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&auto=format&fit=crop&q=80') }}"
+                                        <img src="{{ $b->logo ?: ($b->cover_image ?: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&auto=format&fit=crop&q=80') }}"
                                              alt="{{ $b->business_name }}"
                                              loading="lazy"
                                              onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&auto=format&fit=crop&q=80';">

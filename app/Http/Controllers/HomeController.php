@@ -93,7 +93,10 @@ class HomeController extends Controller
             if (Schema::hasTable('business_listings')) {
                 $totalBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])->count();
                 $popularBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
-                    ->orderByDesc('rating')
+                    ->where('id', '>', 20)
+                    ->whereNotNull('logo')
+                    ->where('logo', '!=', '')
+                    ->orderBy('id', 'asc')
                     ->take(6)
                     ->get();
             }
@@ -375,6 +378,21 @@ class HomeController extends Controller
             $targetSlug = $categoryOrSlug;
         }
 
+        // Handle directory / category slugs that should redirect to the businesses directory
+        $checkSlug = strtolower(trim($targetSlug ?: ''));
+        $categoryRedirects = [
+            'coaching-institutes' => 'Coaching Institute',
+            'training-institutes' => 'Training Institute',
+            'educational-institutes' => 'Educational Institute',
+            'coaching' => 'Coaching Institute',
+            'institutes' => 'Coaching Institute',
+            'schools' => 'School',
+            'colleges' => 'College',
+        ];
+        if (isset($categoryRedirects[$checkSlug])) {
+            return redirect()->route('businesses', ['category' => $categoryRedirects[$checkSlug]], 301);
+        }
+
         $seller = null;
         if (Auth::check() && Auth::user()->isSeller()) {
             $seller = Auth::user()->seller;
@@ -408,15 +426,20 @@ class HomeController extends Controller
                     $business = BusinessListing::where('business_name', 'like', "%{$cleanName}%")->first();
                 }
 
-                // 5. Match with category constraint or keyword search
+                // 5. Match distinctive words (exclude common stop words so generic queries never match mock row ID 1)
                 if (!$business) {
-                    $nameWords = array_filter(explode('-', preg_replace('/-\d+$/', '', $targetSlug)), fn($w) => strlen($w) > 2);
-                    if (!empty($nameWords)) {
-                        $business = BusinessListing::where(function($q) use ($nameWords) {
-                            foreach ($nameWords as $word) {
-                                $q->orWhere('business_name', 'like', "%{$word}%");
-                            }
-                        })->first();
+                    $stopWords = ['institute', 'institutes', 'coaching', 'training', 'classes', 'center', 'centre', 'academy', 'education', 'educational', 'school', 'schools', 'college', 'colleges', 'computer', 'learning', 'services', 'solutions', 'for', 'and', 'the', 'group', 'pvt', 'ltd'];
+                    $rawWords = explode('-', preg_replace('/-\d+$/', '', $targetSlug));
+                    $distinctiveWords = array_values(array_filter($rawWords, function($w) use ($stopWords) {
+                        return strlen($w) >= 3 && !in_array(strtolower($w), $stopWords);
+                    }));
+
+                    if (!empty($distinctiveWords)) {
+                        $q = BusinessListing::query();
+                        foreach ($distinctiveWords as $dw) {
+                            $q->where('business_name', 'like', "%{$dw}%");
+                        }
+                        $business = $q->first();
                     }
                 }
             }
@@ -2653,6 +2676,19 @@ class HomeController extends Controller
                         ->where('title', 'like', "%{$slug}%")
                         ->first();
                 }
+
+                if ($course) {
+                    $bListing = null;
+                    if ($course->seller_id) {
+                        $bListing = \App\Models\BusinessListing::where('seller_id', $course->seller_id)->first();
+                    }
+                    $course->instructor_url = $bListing ? $bListing->url : ($course->seller?->slug ? route('sellers.show', $course->seller->slug) : '#');
+                    $course->instructor_name = $course->seller?->businessDetail?->business_name ?? ($course->seller?->user?->name ?? 'Digital Class Instructor');
+                    $course->instructor_avatar = $course->seller?->businessDetail?->logo ?: 'https://ui-avatars.com/api/?name=' . urlencode($course->instructor_name);
+                    $course->instructor_category = $course->category ?? 'Instructor';
+                    $course->instructor_bio = $course->seller?->businessDetail?->description ?: ($course->short_description ?: ($course->instructor_name . ' is an authorized educational seller on Digital Class.'));
+                    $course->instructor_subtitle = ($course->seller?->businessDetail?->city ?? 'India') . ($course->seller?->businessDetail?->state ? (', ' . $course->seller->businessDetail->state) : '');
+                }
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Database connection failed on courseShow: ' . $e->getMessage());
@@ -2722,6 +2758,9 @@ class HomeController extends Controller
                     'contents' => collect(),
                     'is_institute_course' => true,
                     'institute_url' => $business ? $business->url : null,
+                    'instructor_url' => $business ? $business->url : null,
+                    'instructor_bio' => $bName . ' offers high-quality training and career-oriented educational programs in ' . $bCity . '.',
+                    'instructor_subtitle' => ($business->category ?? 'Coaching Institute') . ' • ' . $bCity . ', ' . ($business->state ?? 'Gujarat'),
                 ];
             }
         }
@@ -2771,6 +2810,8 @@ class HomeController extends Controller
                     'instructor_name' => $tName,
                     'instructor_avatar' => $tutor ? $tutor->profile_url : 'https://ui-avatars.com/api/?name=' . urlencode($tName),
                     'instructor_category' => $tutor ? ($tutor->expert_category ?: 'Expert Tutor') : 'Instructor',
+                    'instructor_bio' => !empty($tutor->profile_desc) ? strip_tags($tutor->profile_desc) : ($tName . ' is an experienced educator specializing in ' . ($tutor->expert_category ?: 'Academic Courses') . '.'),
+                    'instructor_subtitle' => ($tutor->expert_category ?: 'Expert Tutor') . ($tutor->city ? (' • ' . $tutor->city . ', ' . ($tutor->state ?: 'India')) : ''),
                     'meta_description' => $eCourse->course_name . ' online course by ' . $tName,
                     'meta_keywords' => $eCourse->course_name . ', e-learning, online course',
                     'seller' => (object) [
@@ -2788,6 +2829,7 @@ class HomeController extends Controller
                     'contents' => collect(),
                     'is_elearn_course' => true,
                     'tutor_url' => $tutor ? $tutor->url : null,
+                    'instructor_url' => $tutor ? $tutor->url : null,
                 ];
             }
         }

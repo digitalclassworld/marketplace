@@ -395,12 +395,12 @@
 
                 <!-- Instructor Byline -->
                 <div class="d-flex align-items-center gap-2 mb-3">
-                    <a href="{{ route('sellers.show', 'vcec') }}" class="text-decoration-none">
+                    <a href="{{ $course->instructor_url ?: '#' }}" class="text-decoration-none">
                         <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;">
                     </a>
                     <div style="font-size: 0.78rem;">
-                        <a href="{{ route('sellers.show', 'vcec') }}" class="text-decoration-none text-dark fw-bold">By {{ $course->instructor_name }}</a>
-                        <span class="text-muted ms-1">&bull; {{ $course->instructor_category }} Expert | 12+ Years Experience</span>
+                        <a href="{{ $course->instructor_url ?: '#' }}" class="text-decoration-none text-dark fw-bold">By {{ $course->instructor_name }}</a>
+                        <span class="text-muted ms-1">&bull; {{ $course->instructor_category }} Expert | {{ $course->instructor_subtitle ?? 'Verified Educator' }}</span>
                     </div>
                 </div>
 
@@ -564,13 +564,13 @@
                     
                     <div>
                         <div class="d-flex align-items-center gap-2">
-                            <a href="{{ route('sellers.show', 'vcec') }}" class="text-decoration-none">
+                            <a href="{{ $course->instructor_url ?: '#' }}" class="text-decoration-none">
                                 <h4 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">{{ $course->instructor_name }}</h4>
                             </a>
                             <span class="badge bg-primary text-white py-1 px-2" style="font-size: 0.65rem;">Top Instructor</span>
                         </div>
-                        <div class="text-primary small fw-semibold" style="font-size: 0.78rem;">Founder & CEO, Digital Class</div>
-                        <div class="text-muted small" style="font-size: 0.72rem;">12+ Years Experience in Digital Marketing, EdTech & Business Growth</div>
+                        <div class="text-primary small fw-semibold" style="font-size: 0.78rem;">{{ $course->instructor_subtitle ?? ($course->instructor_category . ' Expert') }}</div>
+                        <div class="text-muted small" style="font-size: 0.72rem;">Authentic educator &amp; course creator on Digital Class</div>
 
                         <!-- 4 Instructor Stats -->
                         <div class="d-flex flex-wrap gap-3 mt-2 font-monospace" style="font-size: 0.72rem;">
@@ -581,15 +581,15 @@
                         </div>
 
                         <div class="mt-2">
-                            <a href="{{ route('sellers.show', 'vcec') }}" class="btn btn-sm btn-outline-primary fw-bold" style="font-size: 0.75rem;">
-                                <i class="fa-solid fa-store me-1"></i> View Instructor Storefront &rarr;
+                            <a href="{{ $course->instructor_url ?: '#' }}" class="btn btn-sm btn-outline-primary fw-bold" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-store me-1"></i> View Instructor / Institute Profile &rarr;
                             </a>
                         </div>
                     </div>
                 </div>
 
                 <p class="text-secondary small mb-0" style="font-size: 0.8rem; line-height: 1.55;">
-                    {{ $course->instructor_name }} is a Digital Marketing Expert and the Founder of Digital Class. With 12+ years of experience, he has trained thousands of students and professionals. His practical and easy-to-follow teaching method helps learners get real skills and real results.
+                    {{ $course->instructor_bio ?? ($course->short_description ?: ($course->instructor_name . ' provides high quality education and career guidance on Digital Class.')) }}
                 </p>
             </div>
 
