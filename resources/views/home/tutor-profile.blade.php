@@ -157,7 +157,7 @@
         font-weight: 700;
     }
     .btn-add-to-cart-green {
-        background-color: #00b074;
+        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
         color: #ffffff;
         border: none;
         border-radius: 8px;
@@ -170,15 +170,16 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         text-decoration: none;
         cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.32);
     }
     .btn-add-to-cart-green:hover {
-        background-color: #009663;
+        background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
         color: #ffffff;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 176, 116, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 102, 255, 0.45);
     }
 
     /* Mobile Responsive Polish */

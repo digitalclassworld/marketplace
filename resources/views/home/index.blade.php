@@ -590,7 +590,7 @@
         box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
     .btn-add-to-cart-green {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
         color: #ffffff;
         border: none;
         border-radius: 10px;
@@ -606,23 +606,13 @@
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         text-decoration: none;
         cursor: pointer;
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.32);
     }
     .btn-add-to-cart-green:hover {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
         color: #ffffff;
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.45);
-    }
-        transition: all 0.2s ease;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    .btn-add-to-cart-green:hover {
-        background-color: #009663;
-        color: #ffffff;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 10px rgba(0, 176, 116, 0.35);
+        box-shadow: 0 8px 22px rgba(0, 102, 255, 0.45);
     }
     .course-body {
         padding: 1rem;

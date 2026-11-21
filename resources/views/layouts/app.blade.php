@@ -704,6 +704,23 @@
             letter-spacing: 0.02em;
             box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
+
+        /* Cart Button Brand Style (Replacing legacy green with Royal Blue) */
+        .btn-add-to-cart-green,
+        .btn-add-to-cart {
+            background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(0, 102, 255, 0.35) !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .btn-add-to-cart-green:hover,
+        .btn-add-to-cart:hover {
+            background: linear-gradient(135deg, #0052cc 0%, #003d99 100%) !important;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0, 102, 255, 0.45) !important;
+        }
     </style>
     @yield('styles')
 </head>
