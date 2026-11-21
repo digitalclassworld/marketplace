@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\BusinessListing;
+use App\Models\DiscountCoupon;
 use App\Models\Seller;
 use App\Traits\HandlesSellerMediaUploads;
 use Illuminate\Http\RedirectResponse;
@@ -67,11 +68,46 @@ class SellerBusinessListingController extends Controller
             'video_url'        => ['nullable', 'string', 'max:255'],
             'plan_name'        => ['nullable', 'string', 'max:50'],
             'plan_price'       => ['nullable', 'numeric'],
+            'coupon_code'      => ['nullable', 'string', 'max:50'],
+            'discount_amount'  => ['nullable', 'numeric'],
             'add_ons'          => ['nullable'],
         ]);
 
         $features = is_array($request->features) ? $request->features : (is_string($request->features) ? json_decode($request->features, true) : null);
-        $addOns = is_array($request->add_ons) ? $request->add_ons : (is_string($request->add_ons) ? json_decode($request->add_ons, true) : null);
+        $addOns = is_array($request->add_ons) ? $request->add_ons : (is_string($request->add_ons) ? json_decode($request->add_ons, true) : []);
+        $addOns = is_array($addOns) ? $addOns : [];
+
+        $rawPrice = floatval($validated['plan_price'] ?? 1499.00);
+        $couponCode = strtoupper(trim($request->input('coupon_code') ?: ($request->input('applied_coupon_code') ?: '')));
+        $discountAmount = 0.00;
+
+        if ($couponCode) {
+            $coupon = DiscountCoupon::where('coupon_code', $couponCode)->first();
+            if ($coupon && strtolower($coupon->status) === 'active') {
+                $minOrder = floatval($coupon->min_order_amount ?? 0);
+                if ($rawPrice >= $minOrder) {
+                    if (strtolower($coupon->discount_type) === 'percentage') {
+                        $discountAmount = round(($rawPrice * floatval($coupon->discount_value)) / 100, 2);
+                    } else {
+                        $discountAmount = min($rawPrice, floatval($coupon->discount_value));
+                    }
+                    $coupon->increment('used_count');
+                }
+            } else {
+                $discountAmount = floatval($request->input('discount_amount', 0));
+            }
+        }
+
+        $finalPrice = max(0, round($rawPrice - $discountAmount, 2));
+
+        if ($couponCode && $discountAmount > 0) {
+            $addOns['coupon_details'] = [
+                'code'            => $couponCode,
+                'discount_amount' => $discountAmount,
+                'original_price'  => $rawPrice,
+                'final_price'     => $finalPrice,
+            ];
+        }
 
         $media = $this->processMediaUploads($request, 'listing');
 
@@ -104,7 +140,7 @@ class SellerBusinessListingController extends Controller
             'video_url'        => $media['video_url'] ?: ($validated['video_url'] ?? null),
             'gallery'          => $media['gallery'],
             'plan_name'        => $validated['plan_name'] ?? 'Premium Listing',
-            'plan_price'       => $validated['plan_price'] ?? 1499.00,
+            'plan_price'       => $finalPrice,
             'add_ons'          => $addOns,
             'status'           => 'approved',
         ]);

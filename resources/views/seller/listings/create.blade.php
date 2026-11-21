@@ -727,6 +727,9 @@
 
                 <input type="hidden" name="plan_name" id="inputPlanName" value="Premium Listing">
                 <input type="hidden" name="plan_price" id="inputPlanPrice" value="1499.00">
+                <input type="hidden" name="coupon_code" id="inputCouponCode" value="">
+                <input type="hidden" name="discount_amount" id="inputDiscountAmount" value="0.00">
+                <input type="hidden" name="raw_subtotal" id="inputRawSubtotal" value="1998.00">
 
                 <div class="row g-3 mb-4">
                     <!-- Plan 1: Free Listing -->
@@ -876,19 +879,68 @@
                     </div>
 
                     <div class="col-md-5">
-                        <div class="p-3 rounded-3 bg-light border">
-                            <h6 class="fw-bold text-dark mb-2" style="font-size: 0.85rem;">Order Summary</h6>
+                        <div class="p-3 rounded-3 bg-light border shadow-sm">
+                            <h6 class="fw-bold text-dark mb-2.5 d-flex align-items-center justify-content-between" style="font-size: 0.88rem;">
+                                <span><i class="fa-solid fa-receipt text-primary me-1.5"></i>Order Summary</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill small px-2 py-0.5" style="font-size: 0.68rem;">1 Year Validity</span>
+                            </h6>
                             <div class="d-flex justify-content-between py-1 small">
-                                <span class="text-muted" id="summaryPlanText">Premium Listing (1 Year)</span>
-                                <span class="fw-semibold font-mono-code" id="summaryPlanPrice">₹1,499</span>
+                                <span class="text-secondary" id="summaryPlanText">Premium Listing (1 Year)</span>
+                                <span class="fw-semibold font-mono-code text-dark" id="summaryPlanPrice">₹1,499</span>
                             </div>
                             <div class="d-flex justify-content-between py-1 small" id="summaryBadgeRow">
-                                <span class="text-muted">Verified Business Badge</span>
-                                <span class="fw-semibold font-mono-code">₹499</span>
+                                <span class="text-secondary">Verified Business Badge</span>
+                                <span class="fw-semibold font-mono-code text-dark">₹499</span>
                             </div>
-                            <div class="d-flex justify-content-between pt-2 border-top mt-2 fw-bold text-dark">
-                                <span>Total:</span>
-                                <span class="font-mono-code text-primary fs-6" id="summaryTotalPrice">₹1,998</span>
+                            <div class="d-flex justify-content-between py-1 small" id="summaryImagesRow" style="display: none;">
+                                <span class="text-secondary">Additional Gallery Images</span>
+                                <span class="fw-semibold font-mono-code text-dark">₹299</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 small border-top text-muted mt-1 pt-1" id="summarySubtotalRow">
+                                <span>Subtotal</span>
+                                <span class="font-mono-code fw-semibold text-dark" id="summarySubtotalPrice">₹1,998</span>
+                            </div>
+                            <div class="d-flex justify-content-between py-1 small text-success fw-bold" id="summaryDiscountRow" style="display: none;">
+                                <span class="d-flex align-items-center gap-1">
+                                    <i class="fa-solid fa-tag"></i>
+                                    <span>Coupon (<span id="summaryCouponName"></span>)</span>
+                                    <button type="button" class="btn btn-link text-danger p-0 ms-1 text-decoration-none small" style="font-size: 0.72rem;" onclick="removeCoupon()" title="Remove coupon">&times; Remove</button>
+                                </span>
+                                <span class="font-mono-code" id="summaryDiscountPrice">-₹0</span>
+                            </div>
+                            <div class="d-flex justify-content-between pt-2 border-top mt-2 fw-bold text-dark align-items-baseline">
+                                <span class="fs-6">Total Due:</span>
+                                <span class="font-mono-code text-primary fs-5" id="summaryTotalPrice">₹1,998</span>
+                            </div>
+
+                            <!-- Coupon Code Input Box -->
+                            <div class="mt-3 pt-2.5 border-top">
+                                <label class="form-label small fw-bold text-dark mb-1 d-flex align-items-center justify-content-between">
+                                    <span><i class="fa-solid fa-ticket text-primary me-1"></i> Have a Discount Coupon?</span>
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="couponCodeInput" class="form-control text-uppercase font-mono-code fw-semibold" placeholder="e.g. WELCOME10" style="letter-spacing: 0.05em;">
+                                    <button class="btn btn-primary fw-semibold px-3" type="button" id="btnApplyCoupon" onclick="applyCoupon()">
+                                        Apply
+                                    </button>
+                                </div>
+                                <div id="couponFeedback" class="small mt-1" style="display: none;"></div>
+
+                                <!-- Quick Apply Coupon Pills -->
+                                <div class="mt-2">
+                                    <div class="text-muted small fw-medium mb-1" style="font-size: 0.72rem;">Available Offers:</div>
+                                    <div class="d-flex flex-wrap gap-1" id="availableCouponsContainer">
+                                        <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('WELCOME10')">
+                                            🏷️ WELCOME10 <span class="fw-normal text-muted">(10% OFF)</span>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('FESTIVE500')">
+                                            🏷️ FESTIVE500 <span class="fw-normal text-muted">(₹500 OFF)</span>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('DIGITAL20')">
+                                            🏷️ DIGITAL20 <span class="fw-normal text-muted">(20% OFF)</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -982,6 +1034,31 @@
                             <p class="text-muted small mb-0" id="previewAbout">
                                 VCEC is a trusted computer education center providing industry-relevant courses for students, professionals and business owners. Our mission is to make everyone digitally skilled and job-ready with practical training.
                             </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan & Payment Review Card -->
+                <div class="card border border-primary-subtle rounded-3 p-3 bg-light mb-4 shadow-xs">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;">
+                                <i class="fa-solid fa-crown fs-5"></i>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-0.5 small fw-bold">Selected Listing Plan</span>
+                                <h6 class="fw-bold text-dark mt-1 mb-0" id="previewPlanName">Premium Listing (1 Year)</h6>
+                                <div class="text-muted small mt-0.5" id="previewPlanAddons">Includes Verified Business Badge</div>
+                            </div>
+                        </div>
+                        <div class="text-md-end">
+                            <div class="text-muted small">Total Due Payable</div>
+                            <div class="d-flex align-items-baseline gap-2 justify-content-md-end">
+                                <span class="fs-4 fw-bolder text-primary font-mono-code" id="previewPlanTotal">₹1,998</span>
+                            </div>
+                            <div class="text-success small fw-semibold" id="previewDiscountRow" style="display: none;">
+                                <i class="fa-solid fa-tag me-1"></i> Coupon Discount: <span id="previewDiscountAmount">-₹0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1111,23 +1188,183 @@
         updateSummary();
     }
 
+    let currentCoupon = null;
+
     function updateSummary() {
         const planName = document.getElementById('inputPlanName').value;
         const planPrice = parseFloat(document.getElementById('inputPlanPrice').value) || 0;
-        const addon1 = document.getElementById('addon1').checked;
-        const addon2 = document.getElementById('addon2').checked;
+        const addon1 = document.getElementById('addon1')?.checked || false;
+        const addon2 = document.getElementById('addon2')?.checked || false;
 
         document.getElementById('summaryPlanText').textContent = planName + ' (1 Year)';
-        document.getElementById('summaryPlanPrice').textContent = '₹' + planPrice.toLocaleString();
+        document.getElementById('summaryPlanPrice').textContent = '₹' + planPrice.toLocaleString('en-IN');
 
-        let total = planPrice;
-        if (addon1) total += 499;
-        if (addon2) total += 299;
+        let subtotal = planPrice;
+        if (addon1) subtotal += 499;
+        if (addon2) subtotal += 299;
 
         const badgeRow = document.getElementById('summaryBadgeRow');
         if (badgeRow) badgeRow.style.display = addon1 ? 'flex' : 'none';
 
-        document.getElementById('summaryTotalPrice').textContent = '₹' + total.toLocaleString();
+        const imagesRow = document.getElementById('summaryImagesRow');
+        if (imagesRow) imagesRow.style.display = addon2 ? 'flex' : 'none';
+
+        const subtotalEl = document.getElementById('summarySubtotalPrice');
+        if (subtotalEl) subtotalEl.textContent = '₹' + subtotal.toLocaleString('en-IN');
+
+        const rawSubtotalInput = document.getElementById('inputRawSubtotal');
+        if (rawSubtotalInput) rawSubtotalInput.value = subtotal.toFixed(2);
+
+        // Re-evaluate discount if a coupon was applied
+        let discountAmount = 0;
+        if (currentCoupon) {
+            if (subtotal < (currentCoupon.min_order_amount || 0)) {
+                showCouponFeedback('Subtotal dropped below required ₹' + currentCoupon.min_order_amount + '. Coupon removed.', 'danger');
+                removeCoupon(false);
+            } else {
+                if (currentCoupon.discount_type === 'percentage') {
+                    discountAmount = Math.round((subtotal * currentCoupon.discount_value) / 100);
+                } else {
+                    discountAmount = Math.min(subtotal, currentCoupon.discount_value);
+                }
+            }
+        }
+
+        const discountRow = document.getElementById('summaryDiscountRow');
+        const discountEl = document.getElementById('summaryDiscountPrice');
+        const discountInput = document.getElementById('inputDiscountAmount');
+        const couponInput = document.getElementById('inputCouponCode');
+
+        if (discountAmount > 0 && currentCoupon) {
+            if (discountRow) discountRow.style.display = 'flex';
+            if (discountEl) discountEl.textContent = '-₹' + discountAmount.toLocaleString('en-IN');
+            const summaryName = document.getElementById('summaryCouponName');
+            if (summaryName) summaryName.textContent = currentCoupon.code;
+            if (discountInput) discountInput.value = discountAmount.toFixed(2);
+            if (couponInput) couponInput.value = currentCoupon.code;
+        } else {
+            if (discountRow) discountRow.style.display = 'none';
+            if (discountInput) discountInput.value = '0.00';
+            if (couponInput && !currentCoupon) couponInput.value = '';
+        }
+
+        const finalTotal = Math.max(0, subtotal - discountAmount);
+        document.getElementById('summaryTotalPrice').textContent = '₹' + finalTotal.toLocaleString('en-IN');
+
+        // Also update Step 7 preview summary
+        const previewPlanName = document.getElementById('previewPlanName');
+        if (previewPlanName) previewPlanName.textContent = planName + ' (1 Year)';
+        const previewTotal = document.getElementById('previewPlanTotal');
+        if (previewTotal) previewTotal.textContent = '₹' + finalTotal.toLocaleString('en-IN');
+        
+        let addonsDesc = [];
+        if (addon1) addonsDesc.push('Verified Business Badge (+₹499)');
+        if (addon2) addonsDesc.push('Additional Gallery Images (+₹299)');
+        const previewAddons = document.getElementById('previewPlanAddons');
+        if (previewAddons) {
+            previewAddons.textContent = addonsDesc.length ? 'Add-ons: ' + addonsDesc.join(', ') : 'No optional add-ons selected';
+        }
+
+        const previewDiscountRow = document.getElementById('previewDiscountRow');
+        if (previewDiscountRow) {
+            if (discountAmount > 0 && currentCoupon) {
+                previewDiscountRow.style.display = 'block';
+                const previewDiscAmount = document.getElementById('previewDiscountAmount');
+                if (previewDiscAmount) previewDiscAmount.textContent = '-₹' + discountAmount.toLocaleString('en-IN') + ' (' + currentCoupon.code + ')';
+            } else {
+                previewDiscountRow.style.display = 'none';
+            }
+        }
+    }
+
+    function quickApplyCoupon(code) {
+        const input = document.getElementById('couponCodeInput');
+        if (input) {
+            input.value = code;
+            applyCoupon();
+        }
+    }
+
+    async function applyCoupon() {
+        const input = document.getElementById('couponCodeInput');
+        const btn = document.getElementById('btnApplyCoupon');
+        const code = input ? input.value.trim().toUpperCase() : '';
+
+        if (!code) {
+            showCouponFeedback('Please enter a coupon code.', 'danger');
+            return;
+        }
+
+        const planPrice = parseFloat(document.getElementById('inputPlanPrice')?.value) || 0;
+        const addon1 = document.getElementById('addon1')?.checked || false;
+        const addon2 = document.getElementById('addon2')?.checked || false;
+        let subtotal = planPrice + (addon1 ? 499 : 0) + (addon2 ? 299 : 0);
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+        }
+
+        try {
+            const response = await fetch("{{ route('coupons.validate') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    code: code,
+                    total: subtotal,
+                    context: 'business_listing'
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                currentCoupon = {
+                    code: data.code,
+                    discount_type: data.discount_type,
+                    discount_value: data.discount_value,
+                    min_order_amount: data.min_order_amount,
+                    discount_amount: data.discount_amount
+                };
+                showCouponFeedback('✓ ' + data.message, 'success');
+                updateSummary();
+            } else {
+                showCouponFeedback('✕ ' + (data.message || 'Invalid coupon code.'), 'danger');
+            }
+        } catch (err) {
+            showCouponFeedback('✕ Failed to validate coupon. Please try again.', 'danger');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Apply';
+            }
+        }
+    }
+
+    function removeCoupon(clearFeedback = true) {
+        currentCoupon = null;
+        const input = document.getElementById('couponCodeInput');
+        if (input) input.value = '';
+        if (clearFeedback) {
+            showCouponFeedback('Coupon removed.', 'info');
+            setTimeout(() => {
+                const feedback = document.getElementById('couponFeedback');
+                if (feedback) feedback.style.display = 'none';
+            }, 2000);
+        }
+        updateSummary();
+    }
+
+    function showCouponFeedback(msg, type) {
+        const feedback = document.getElementById('couponFeedback');
+        if (!feedback) return;
+        feedback.className = 'small mt-1 text-' + (type === 'danger' ? 'danger' : (type === 'success' ? 'success fw-semibold' : 'muted'));
+        feedback.innerHTML = msg;
+        feedback.style.display = 'block';
     }
 
     // ==========================================
