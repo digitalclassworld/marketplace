@@ -560,7 +560,6 @@ class HomeController extends Controller
                 'thumbnail' => $sc->thumbnail_url ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80',
                 'description' => $sc->short_description ?? '',
                 'is_legacy' => false,
-                'is_institute_course' => true,
             ];
         }
 
@@ -588,7 +587,6 @@ class HomeController extends Controller
                 'thumbnail' => $rc->thumbnail_url,
                 'description' => $rc->course_desc ?? '',
                 'is_legacy' => true,
-                'is_institute_course' => true,
             ];
         }
 
@@ -978,8 +976,6 @@ class HomeController extends Controller
                             'businessDetail' => (object) ['business_name' => $tName],
                         ],
                         'tutor' => $tutor,
-                        'is_institute_course' => false,
-                        'can_buy' => true,
                     ];
                 });
             } elseif (Schema::hasTable('courses')) {
@@ -1760,22 +1756,10 @@ class HomeController extends Controller
                     if ($course->seller_id) {
                         $bListing = \App\Models\BusinessListing::where('seller_id', $course->seller_id)->first();
                     }
-                    $isInst = false;
-                    if ($bListing || ($course->seller && $course->seller->businessListings()->exists())) {
-                        $isInst = true;
-                    }
-                    if (!$isInst && !empty($course->access_type) && (str_contains(strtolower($course->access_type), 'institute') || str_contains(strtolower($course->access_type), 'classroom') || str_contains(strtolower($course->access_type), 'inquiry') || str_contains(strtolower($course->access_type), 'offline'))) {
-                        $isInst = true;
-                    }
-
-                    $course->is_institute_course = $isInst;
-                    $course->business_listing = $bListing;
-                    $course->instructor_phone = $bListing?->phone ?? ($course->seller?->businessDetail?->business_phone ?? '');
-                    $course->instructor_whatsapp = $bListing?->whatsapp_number ?? ($bListing?->phone ?? ($course->seller?->businessDetail?->business_phone ?? ''));
                     $course->instructor_url = $bListing ? $bListing->url : ($course->seller?->slug ? route('sellers.show', $course->seller->slug) : '#');
                     $course->instructor_name = $course->seller?->businessDetail?->business_name ?? ($course->seller?->user?->name ?? 'Digital Class Instructor');
                     $course->instructor_avatar = $course->seller?->businessDetail?->logo ?: 'https://ui-avatars.com/api/?name=' . urlencode($course->instructor_name);
-                    $course->instructor_category = $course->category ?? ($isInst ? 'Educational Institute' : 'Instructor');
+                    $course->instructor_category = $course->category ?? 'Instructor';
                     $course->instructor_bio = $course->seller?->businessDetail?->description ?: ($course->short_description ?: ($course->instructor_name . ' is an authorized educational seller on Digital Class.'));
                     $course->instructor_subtitle = ($course->seller?->businessDetail?->city ?? 'India') . ($course->seller?->businessDetail?->state ? (', ' . $course->seller->businessDetail->state) : '');
                 }
@@ -1879,9 +1863,6 @@ class HomeController extends Controller
                     'is_institute_course' => true,
                     'institute_url' => $instUrl,
                     'instructor_url' => $instUrl,
-                    'instructor_phone' => $bPhone,
-                    'instructor_whatsapp' => $business?->whatsapp_number ?? $bPhone,
-                    'business_listing' => $business,
                     'instructor_bio' => $bName . ' offers high-quality training and career-oriented educational programs in ' . $bCity . '.',
                     'instructor_subtitle' => ($business->category ?? ($affiliateRecord->coaching_category ?? 'Coaching Institute')) . ' • ' . $bCity . ($bState ? (', ' . $bState) : ''),
                 ];
@@ -1953,8 +1934,6 @@ class HomeController extends Controller
                         ],
                     ],
                     'contents' => collect(),
-                    'is_institute_course' => false,
-                    'can_buy' => true,
                     'is_elearn_course' => true,
                     'tutor_url' => $tutor ? $tutor->url : null,
                     'instructor_url' => $tutor ? $tutor->url : null,

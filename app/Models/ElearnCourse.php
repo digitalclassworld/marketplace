@@ -150,15 +150,5 @@ class ElearnCourse extends Model
         }
         return 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png';
     }
-
-    public function getIsInstituteCourseAttribute(): bool
-    {
-        return false;
-    }
-
-    public function getCanBuyAttribute(): bool
-    {
-        return true;
-    }
 }
 

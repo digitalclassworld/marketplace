@@ -786,19 +786,14 @@
                     <!-- ========================================== -->
                     <div class="step-pane d-none" id="step-pane-3">
                         <h2 class="pane-header-title">Pricing & Access</h2>
-                        <p class="pane-header-sub">Set course pricing and delivery model</p>
-
-                        <div class="alert alert-light border small py-2 px-3 rounded-3 mb-3 text-muted" style="font-size: 0.78rem;">
-                            <i class="fa-solid fa-circle-info text-primary me-1"></i>
-                            <strong>Course Model Guide:</strong> Courses listed under an Educational Institute / Business are presented for <strong>Information & Student Inquiries</strong> (classroom batches, demo sessions & admission counseling). Digital video courses with price can be <strong>bought online directly</strong> by students.
-                        </div>
+                        <p class="pane-header-sub">Price set kare aur publish kare</p>
 
                         <!-- Free / Paid Radio -->
                         <div class="d-flex align-items-center gap-4 mb-4">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="is_free" id="priceRadioFree" value="1" onchange="togglePaidInputs(false)">
                                 <label class="form-check-label fw-bold text-dark" for="priceRadioFree">
-                                    Free Course / Inquiry
+                                    Free Course
                                 </label>
                             </div>
                             <div class="form-check">
@@ -812,7 +807,7 @@
                         <!-- Price Inputs -->
                         <div class="row g-3 mb-3" id="paidPriceInputsRow">
                             <div class="col-md-6">
-                                <label class="field-label">Price / Tuition Fee (₹) <span class="req">*</span></label>
+                                <label class="field-label">Price (₹) <span class="req">*</span></label>
                                 <input type="number"
                                        name="price"
                                        id="inputPrice"
@@ -839,13 +834,12 @@
 
                         <!-- Course Access Dropdown -->
                         <div class="mb-3">
-                            <label class="field-label">Course Access / Delivery Mode <span class="req">*</span></label>
+                            <label class="field-label">Course Access <span class="req">*</span></label>
                             <select name="access_type" id="inputAccessType" class="custom-select" required onchange="updateLivePreview()">
-                                <option value="Lifetime Access" {{ old('access_type') == 'Lifetime Access' ? 'selected' : '' }}>Lifetime Access (Online Video Course - Purchasable)</option>
-                                <option value="Classroom / Institute Program" {{ old('access_type') == 'Classroom / Institute Program' ? 'selected' : '' }}>Classroom / Institute Program (Campus Coaching - For Information)</option>
-                                <option value="1 Year Access" {{ old('access_type') == '1 Year Access' ? 'selected' : '' }}>1 Year Access (Online)</option>
-                                <option value="6 Months Access" {{ old('access_type') == '6 Months Access' ? 'selected' : '' }}>6 Months Access (Online)</option>
-                                <option value="3 Months Access" {{ old('access_type') == '3 Months Access' ? 'selected' : '' }}>3 Months Access (Online)</option>
+                                <option value="Lifetime Access" {{ old('access_type') == 'Lifetime Access' ? 'selected' : '' }}>Lifetime Access</option>
+                                <option value="1 Year Access" {{ old('access_type') == '1 Year Access' ? 'selected' : '' }}>1 Year Access</option>
+                                <option value="6 Months Access" {{ old('access_type') == '6 Months Access' ? 'selected' : '' }}>6 Months Access</option>
+                                <option value="3 Months Access" {{ old('access_type') == '3 Months Access' ? 'selected' : '' }}>3 Months Access</option>
                             </select>
                         </div>
 

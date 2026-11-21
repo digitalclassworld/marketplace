@@ -962,15 +962,9 @@
                                                 <div class="instructor-cat-label">{{ $c->instructor_category }}</div>
                                             </div>
                                         </div>
-                                        @if(!empty($c->is_institute_course))
-                                            <a href="{{ !empty($c->url) ? $c->url : route('course.show', $c->slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-2 py-0.5 fw-semibold" title="Institute Course (For Information & Inquiry)" style="font-size: 0.68rem; line-height: 1.2;">
-                                                Inquire
-                                            </a>
-                                        @else
-                                            <button type="button" class="btn btn-outline-primary btn-sm rounded-circle p-1" title="Add to Cart" onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $c->thumbnail }}', seller_id: {{ $c->seller_id ?? 1 }} })" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                                <i class="fa-solid fa-cart-plus" style="font-size: 0.75rem;"></i>
-                                            </button>
-                                        @endif
+                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle p-1" title="Add to Cart" onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $c->thumbnail }}', seller_id: {{ $c->seller_id ?? 1 }} })" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                            <i class="fa-solid fa-cart-plus" style="font-size: 0.75rem;"></i>
+                                        </button>
                                     </div>
 
                                 </div>

@@ -156,21 +156,5 @@ class Course extends Model
     {
         return ($this->id % 3 === 0) ? 'Offline' : 'Online';
     }
-
-    public function getIsInstituteCourseAttribute(): bool
-    {
-        if ($this->seller && $this->seller->businessListings()->exists()) {
-            return true;
-        }
-        if (!empty($this->access_type) && (str_contains(strtolower($this->access_type), 'institute') || str_contains(strtolower($this->access_type), 'classroom') || str_contains(strtolower($this->access_type), 'inquiry') || str_contains(strtolower($this->access_type), 'offline'))) {
-            return true;
-        }
-        return false;
-    }
-
-    public function getCanBuyAttribute(): bool
-    {
-        return !$this->is_institute_course;
-    }
 }
 

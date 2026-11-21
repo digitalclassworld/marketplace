@@ -427,14 +427,7 @@
             <!-- Course Title & Key Metadata -->
             <div class="col-lg-8 col-md-7">
                 <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                    @if(!empty($course->is_institute_course))
-                        <span class="badge bg-primary text-white fw-bold px-2.5 py-1" style="font-size: 0.72rem;">
-                            <i class="fa-solid fa-building-columns me-1"></i> Institute / Coaching Course
-                        </span>
-                        <span class="badge bg-info-subtle text-info-emphasis fw-bold px-2.5 py-1" style="font-size: 0.72rem;">
-                            <i class="fa-solid fa-circle-info me-1"></i> For Information & Inquiries
-                        </span>
-                    @elseif($course->badge === 'Bestseller' || $course->id == 1 || str_contains(strtolower($course->title), 'digital marketing'))
+                    @if($course->badge === 'Bestseller' || $course->id == 1 || str_contains(strtolower($course->title), 'digital marketing'))
                         <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.7rem;">Bestseller</span>
                     @endif
 
@@ -746,7 +739,7 @@
         <!-- Right Column: Sticky Purchase Card & Requirements Sidebars -->
         <div class="col-lg-4">
             
-            <!-- Sticky Purchase / Inquiry Card -->
+            <!-- Sticky Purchase Card -->
             <div class="sticky-purchase-card mb-3">
                 
                 @php
@@ -763,161 +756,64 @@
                     if ($mrpPrice == 0 && isset($course->price) && $course->price > $sellPrice) {
                         $mrpPrice = (float)$course->price;
                     }
-                    $isInst = !empty($course->is_institute_course);
-                    $contactPhone = $course->instructor_phone ?? ($course->business_listing?->phone ?? ($course->seller?->businessDetail?->business_phone ?? ''));
-                    $contactWhatsapp = $course->instructor_whatsapp ?? ($course->business_listing?->whatsapp_number ?? ($course->business_listing?->phone ?? $contactPhone));
                 @endphp
-
-                @if($isInst)
-                    <!-- ========================================================
-                         INSTITUTE COURSE: FOR INFORMATION & ADMISSION INQUIRIES
-                         ======================================================== -->
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">
-                            <i class="fa-solid fa-building-columns me-1"></i> Institute Program
-                        </span>
-                        <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
-                            For Information
-                        </span>
-                    </div>
-
-                    <!-- Fee Display -->
-                    <div class="mb-2">
-                        <div class="text-muted small fw-semibold" style="font-size: 0.74rem;">Tuition / Course Fee:</div>
-                        @if($sellPrice > 0)
-                            <div class="d-flex align-items-baseline gap-2">
-                                <span class="huge-price-display">₹{{ number_format($sellPrice) }}</span>
-                                @if($mrpPrice > $sellPrice)
-                                    <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
-                                    <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
-                                @endif
-                            </div>
-                        @else
-                            <div class="huge-price-display text-primary" style="font-size: 1.4rem;">Inquire for Fees</div>
+                <div class="d-flex align-items-baseline gap-2 mb-1">
+                    @if($sellPrice == 0)
+                        <span class="huge-price-display text-success">FREE</span>
+                        @if($mrpPrice > 0)
+                            <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
                         @endif
-                    </div>
-
-                    <div class="alert alert-light border small text-muted py-2 px-2.5 rounded-3 mb-3" style="font-size: 0.74rem; background: #f8fafc; line-height: 1.45;">
-                        <i class="fa-solid fa-circle-info text-primary me-1"></i> Offered by <strong>{{ $course->instructor_name }}</strong>. Classroom & coaching sessions are conducted at the institute campus. Inquire directly for batch schedule, demo & counseling.
-                    </div>
-
-                    <!-- Inquire CTA Button -->
-                    <button type="button" class="btn btn-primary w-100 fw-bold py-2.5 mb-2 shadow-sm" style="background-color: #0066ff; border: none; font-size: 0.88rem; border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#courseInquiryModal">
-                        <i class="fa-solid fa-paper-plane me-1.5"></i> Inquire Now / Get Admission Info
-                    </button>
-
-                    <!-- Quick Direct Contact (Call & WhatsApp) -->
-                    <div class="row g-2 mb-3">
-                        @if(!empty($contactPhone))
-                            <div class="col-6">
-                                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactPhone) }}" class="btn btn-outline-secondary w-100 fw-semibold py-1.5 text-truncate" style="font-size: 0.76rem; border-radius: 8px;">
-                                    <i class="fa-solid fa-phone text-success me-1"></i> Call Institute
-                                </a>
-                            </div>
+                    @else
+                        <span class="huge-price-display">₹{{ number_format($sellPrice) }}</span>
+                        @if($mrpPrice > $sellPrice)
+                            <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
+                            <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
                         @endif
-                        @if(!empty($contactWhatsapp))
-                            <div class="{{ !empty($contactPhone) ? 'col-6' : 'col-12' }}">
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $contactWhatsapp) }}?text={{ urlencode('Hi, I saw your course ' . $course->title . ' on Digital Class. Please share course fee and upcoming batch details.') }}" target="_blank" class="btn btn-outline-success w-100 fw-semibold py-1.5 text-truncate" style="font-size: 0.76rem; border-radius: 8px;">
-                                    <i class="fa-brands fa-whatsapp text-success me-1"></i> WhatsApp
-                                </a>
-                            </div>
-                        @endif
-                    </div>
-
-                    @if(!empty($course->instructor_url) && $course->instructor_url !== '#')
-                        <a href="{{ $course->instructor_url }}" class="btn btn-outline-primary w-100 fw-semibold py-1.5 mb-3" style="font-size: 0.75rem; border-radius: 8px;">
-                            <i class="fa-solid fa-building me-1"></i> View Institute Profile & Courses &rarr;
-                        </a>
                     @endif
+                </div>
 
-                    <!-- Institute Checkpoints List -->
-                    <div class="pt-2 border-top">
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-primary"></i> <span>Offline & Classroom Training</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-primary"></i> <span>Free Demo Class & Counseling</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-primary"></i> <span>Direct Institute Admission Support</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between mb-2 text-dark" style="font-size: 0.75rem;">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-circle-check text-primary"></i> <span>Institute Completion Certificate</span>
-                            </div>
-                            <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" target="_blank" class="text-primary text-decoration-none fw-semibold" style="font-size: 0.7rem;">
-                                View Sample &rarr;
-                            </a>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-primary"></i> <span>Experienced Institute Faculty</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-location-dot text-primary"></i> <span>{{ $course->instructor_subtitle ?? 'Verified Campus' }}</span>
-                        </div>
-                    </div>
-                @else
-                    <!-- ========================================================
-                         DIGITAL / ONLINE COURSE WITH PRICE: CAN BUY ONLINE
-                         ======================================================== -->
-                    <div class="d-flex align-items-baseline gap-2 mb-1">
-                        @if($sellPrice == 0)
-                            <span class="huge-price-display text-success">FREE</span>
-                            @if($mrpPrice > 0)
-                                <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
-                            @endif
-                        @else
-                            <span class="huge-price-display">₹{{ number_format($sellPrice) }}</span>
-                            @if($mrpPrice > $sellPrice)
-                                <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
-                                <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
-                            @endif
-                        @endif
-                    </div>
+                <div class="text-danger small fw-semibold mb-3" style="font-size: 0.72rem;">
+                    <i class="fa-regular fa-clock me-1"></i> Offer ends in 2 days
+                </div>
 
-                    <div class="text-danger small fw-semibold mb-3" style="font-size: 0.72rem;">
-                        <i class="fa-regular fa-clock me-1"></i> Offer ends in 2 days
-                    </div>
-
-                    <!-- CTA Action Buttons -->
-                    <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="mb-2">
-                        @csrf
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm" style="background-color: #0066ff; border: none; font-size: 0.875rem; border-radius: 8px;">
-                            Buy Now
-                        </button>
-                    </form>
-
-                    <button type="button" class="btn btn-outline-primary w-100 fw-semibold py-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
-                        <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
+                <!-- CTA Action Buttons -->
+                <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="mb-2">
+                    @csrf
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm" style="background-color: #0066ff; border: none; font-size: 0.875rem; border-radius: 8px;">
+                        Buy Now
                     </button>
+                </form>
 
-                    <!-- Guarantee Checkpoints List -->
-                    <div class="pt-2 border-top">
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-success"></i> <span>Lifetime Online Access</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-success"></i> <span>Learn at Your Own Pace</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-success"></i> <span>Mobile, Tablet & Desktop Access</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between mb-2 text-dark" style="font-size: 0.75rem;">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-circle-check text-success"></i> <span>Certificate of Completion</span>
-                            </div>
-                            <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" target="_blank" class="text-primary text-decoration-none fw-semibold" style="font-size: 0.7rem;">
-                                View PDF &rarr;
-                            </a>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-success"></i> <span>Live Projects & Resources</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-circle-check text-success"></i> <span>30 Days Money Back Guarantee</span>
-                        </div>
+                <button type="button" class="btn btn-outline-primary w-100 fw-semibold py-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
+                    <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
+                </button>
+
+                <!-- Guarantee Checkpoints List -->
+                <div class="pt-2 border-top">
+                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i> <span>Lifetime Access</span>
                     </div>
-                @endif
+                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i> <span>Learn at Your Own Pace</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i> <span>Mobile, Tablet & Desktop Access</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mb-2 text-dark" style="font-size: 0.75rem;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-success"></i> <span>Certificate of Completion</span>
+                        </div>
+                        <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" target="_blank" class="text-primary text-decoration-none fw-semibold" style="font-size: 0.7rem;">
+                            View PDF &rarr;
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i> <span>Live Projects & Resources</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-circle-check text-success"></i> <span>30 Days Money Back Guarantee</span>
+                    </div>
+                </div>
 
             </div>
 
@@ -1124,7 +1020,7 @@
     }
 </script>
 
-<!-- Mobile Sticky Purchase / Inquiry Bar (Bottom Fixed on Phones) -->
+<!-- Mobile Sticky Purchase Bar (Bottom Fixed on Phones) -->
 <div class="mobile-sticky-purchase-bar d-lg-none">
     <div class="d-flex align-items-center justify-content-between gap-3">
         <div>
@@ -1138,80 +1034,21 @@
                     @endif
                 @endif
             </div>
-            @if($isInst)
-                <span class="badge bg-primary-subtle text-primary fw-bold" style="font-size: 0.65rem;">
-                    Institute Course
-                </span>
-            @elseif($mrpPrice > $sellPrice)
+            @if($mrpPrice > $sellPrice)
                 <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.65rem;">
                     {{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}
                 </span>
             @endif
         </div>
         <div class="d-flex align-items-center gap-2">
-            @if($isInst)
-                @if(!empty($contactPhone))
-                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactPhone) }}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill fw-semibold" title="Call Institute">
-                        <i class="fa-solid fa-phone text-success"></i>
-                    </a>
-                @endif
-                <button type="button" class="btn btn-primary btn-sm px-3 rounded-pill fw-bold" style="background-color: #0066ff;" data-bs-toggle="modal" data-bs-target="#courseInquiryModal">
-                    <i class="fa-solid fa-envelope me-1"></i> Inquire Now
-                </button>
-            @else
-                <button type="button" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })" title="Add to Cart">
-                    <i class="fa-solid fa-cart-shopping"></i>
-                </button>
-                <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="m-0">
-                    @csrf
-                    <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" style="background-color: #0066ff;">
-                        Buy Now
-                    </button>
-                </form>
-            @endif
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Course Inquiry / Admission Query -->
-<div class="modal fade" id="courseInquiryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
-            <div class="modal-header bg-light py-3 px-4 border-bottom">
-                <div>
-                    <h5 class="modal-title fw-bold text-dark mb-0">
-                        <i class="fa-solid fa-graduation-cap text-primary me-2"></i> Course Inquiry & Admission Details
-                    </h5>
-                    <div class="small text-muted" style="font-size: 0.78rem;">{{ $course->title }} &bull; {{ $course->instructor_name }}</div>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('business.enquiry') }}" method="POST">
+            <button type="button" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })" title="Add to Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+            <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="m-0">
                 @csrf
-                <input type="hidden" name="course" value="{{ $course->title }}">
-                <div class="modal-body p-4">
-                    <div class="alert alert-primary border-0 small py-2 px-3 rounded-3 mb-3" style="font-size: 0.78rem;">
-                        <i class="fa-solid fa-circle-check text-primary me-1"></i> Submit your inquiry directly to <strong>{{ $course->instructor_name }}</strong> for fee schedule, batch timings, and demo classes.
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Your Full Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter your full name" required value="{{ Auth::user()?->name ?? '' }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Mobile Phone Number <span class="text-danger">*</span></label>
-                        <input type="tel" name="phone" class="form-control" placeholder="Enter 10-digit mobile number" required value="{{ Auth::user()?->phone ?? '' }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Your Query / Requirements</label>
-                        <textarea name="message" class="form-control" rows="3" placeholder="Tell us what you'd like to know (e.g. course fees, upcoming batch start date, classroom counseling, demo session)..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light py-2 px-4 border-top">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">
-                        <i class="fa-solid fa-paper-plane me-1"></i> Send Inquiry Now
-                    </button>
-                </div>
+                <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" style="background-color: #0066ff;">
+                    Buy Now
+                </button>
             </form>
         </div>
     </div>
