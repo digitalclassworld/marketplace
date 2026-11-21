@@ -419,7 +419,7 @@
                 <div class="flex-shrink-0 text-center">
                     <div class="institute-logo-box">
                         @if(!empty($business->logo))
-                            <img src="{{ $business->logo }}" alt="{{ $business->business_name }}" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                            <img src="{{ $business->logo }}" alt="{{ $business->business_name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=300&auto=format&fit=crop&q=80';">
                         @else
                             <div class="text-center text-muted">
                                 <i class="fa-solid fa-building-columns fa-3x mb-2 text-primary"></i>
@@ -877,7 +877,7 @@
                             <div class="related-institute-item">
                                 <div class="related-logo-box">
                                     @if(!empty($rel->logo))
-                                        <img src="{{ $rel->logo }}" alt="{{ $rel->business_name }}" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                        <img src="{{ $rel->logo }}" alt="{{ $rel->business_name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=200&auto=format&fit=crop&q=80';">
                                     @else
                                         <i class="fa-solid fa-graduation-cap fa-2x text-primary"></i>
                                     @endif

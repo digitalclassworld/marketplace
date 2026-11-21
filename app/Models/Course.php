@@ -113,6 +113,25 @@ class Course extends Model
             ?? 'Digital Class Academy';
     }
 
+    public static array $educationInstructorAvatars = [
+        'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80', // Professional female lecturer
+        'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=160&auto=format&fit=crop&q=80', // Academic professor with glasses
+        'https://images.unsplash.com/photo-1580894732474-954992765324?w=160&auto=format&fit=crop&q=80', // University educator
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&auto=format&fit=crop&q=80', // Senior academic faculty
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=160&auto=format&fit=crop&q=80', // Mentor & instructor
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80', // Technical coach / mentor
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=160&auto=format&fit=crop&q=80', // Online course instructor
+    ];
+
+    public static array $educationCourseThumbnails = [
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80', // Online digital study
+        'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&auto=format&fit=crop&q=80', // Study desk with notes
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&auto=format&fit=crop&q=80', // Web Development & Coding
+        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=80', // Student studying with laptop
+        'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&auto=format&fit=crop&q=80', // Classroom seminar & workshop
+        'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80', // Group academic study
+    ];
+
     public function getInstructorCategoryAttribute(): string
     {
         return $this->seller?->businessDetail?->business_category ?? $this->category;
@@ -120,15 +139,20 @@ class Course extends Model
 
     public function getInstructorAvatarAttribute(): string
     {
-        return $this->seller?->user?->avatar 
-            ?? $this->seller?->businessDetail?->logo 
-            ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80';
+        $avatar = $this->seller?->user?->avatar ?: ($this->seller?->businessDetail?->logo ?? null);
+        if (!empty($avatar)) {
+            return (str_starts_with($avatar, 'http://') || str_starts_with($avatar, 'https://')) ? $avatar : asset($avatar);
+        }
+
+        $seed = abs(crc32($this->title ?: ($this->id ?: 'edu_instructor')));
+        return self::$educationInstructorAvatars[$seed % count(self::$educationInstructorAvatars)];
     }
 
     public function getThumbnailAttribute(?string $value): string
     {
         if (empty($value)) {
-            return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';
+            $seed = abs(crc32($this->title ?: ($this->id ?: 'edu_thumb')));
+            return self::$educationCourseThumbnails[$seed % count(self::$educationCourseThumbnails)];
         }
         if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
             return $value;

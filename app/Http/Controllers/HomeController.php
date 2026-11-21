@@ -97,12 +97,10 @@ class HomeController extends Controller
                     ->get();
             }
 
-            // 4. BUSINESS LISTINGS: Show most recently added verified listings with logos first
+            // 4. BUSINESS LISTINGS: Show most recently added verified listings
             if (Schema::hasTable('business_listings')) {
                 $totalBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])->count();
                 $popularBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
-                    ->whereNotNull('logo')
-                    ->where('logo', '!=', '')
                     ->latest('id')
                     ->take(8)
                     ->get();

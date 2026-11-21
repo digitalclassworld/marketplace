@@ -900,7 +900,7 @@
                                 <!-- Thumbnail Box -->
                                 <div class="course-thumb-box">
                                     <a href="{{ !empty($c->url) ? $c->url : route('course.show', $c->slug) }}">
-                                        <img src="{{ $c->thumbnail_url ?: ($c->thumbnail ?: 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png') }}" alt="{{ $c->title }}" loading="lazy" onerror="this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png'">
+                                        <img src="{{ $c->thumbnail_url ?: ($c->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80') }}" alt="{{ $c->title }}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
                                     </a>
                                     
                                     @if($c->badge === 'Bestseller')
@@ -970,7 +970,7 @@
                                     <!-- Instructor Footer -->
                                     <div class="course-instructor-footer d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-2" style="min-width: 0;">
-                                            <img src="{{ $c->instructor_avatar }}" alt="{{ $c->instructor_name }}" class="instructor-avatar-xs">
+                                            <img src="{{ $c->instructor_avatar }}" alt="{{ $c->instructor_name }}" class="instructor-avatar-xs" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80';">
                                             <div style="min-width: 0;">
                                                 <div class="instructor-name-label" title="{{ $c->instructor_name }}">{{ $c->instructor_name }}</div>
                                                 <div class="instructor-cat-label">{{ $c->instructor_category }}</div>

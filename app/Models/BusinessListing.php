@@ -174,6 +174,28 @@ class BusinessListing extends Model
         return count($parts) > 0 ? implode(', ', $parts) : ($this->address ?: 'Ahmedabad, Gujarat');
     }
 
+    public static array $educationProfileImages = [
+        'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80', // Academic Students Collaborative Study
+        'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&auto=format&fit=crop&q=80', // Chalkboard & Learning Academy
+        'https://images.unsplash.com/photo-1562774053-701939374585?w=600&auto=format&fit=crop&q=80', // University College Campus
+        'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&auto=format&fit=crop&q=80', // Classroom & Modern Education
+        'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&auto=format&fit=crop&q=80', // Academy Classroom
+        'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&auto=format&fit=crop&q=80', // Teaching & Coaching Seminar
+        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=80', // Books & Learning Academy
+        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&auto=format&fit=crop&q=80', // Library & Institute
+    ];
+
+    public static array $educationLogos = [
+        'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1562774053-701939374585?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=200&auto=format&fit=crop&q=80',
+    ];
+
     public function getDisplayImageAttribute(): string
     {
         if (!empty($this->cover_image)) {
@@ -181,8 +203,8 @@ class BusinessListing extends Model
             return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
         }
 
-        if (!empty($this->logo)) {
-            $img = $this->logo;
+        if (!empty($this->attributes['logo'])) {
+            $img = $this->attributes['logo'];
             return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
         }
 
@@ -200,7 +222,9 @@ class BusinessListing extends Model
             return $legacyLogos[$clean];
         }
 
-        return asset('images/camera_placeholder.png');
+        // Education-related default profile image if none uploaded
+        $seed = abs(crc32($this->business_name ?: ($this->id ?: 'edu_business')));
+        return self::$educationProfileImages[$seed % count(self::$educationProfileImages)];
     }
 
     public static array $cityCoordinates = [
@@ -285,15 +309,32 @@ class BusinessListing extends Model
         return round($earthRadius * $c, 1);
     }
 
-    public function getLogoAttribute(?string $value): ?string
+    public function getLogoAttribute(?string $value): string
     {
-        if (empty($value)) {
-            return null;
+        if (!empty($value)) {
+            if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                return $value;
+            }
+            return asset($value);
         }
-        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
-            return $value;
+
+        // Known legacy logos
+        $clean = $this->clean_slug;
+        $legacyLogos = [
+            'kalashraya'                     => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/6068/institute-logo1738392221.png',
+            'legend-dance-academy'           => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/5544/institute-logo1736487363.jpg',
+            'g-k-dance-academy'              => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/5540/institute-logo1736485988.jpg',
+            'shree-aurbindo-miera-academy'   => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/institute/institute_icon/5551/institute-logo1736486898.jfif',
+            'medhaavee-mandir-public-school' => 'https://digitalclassworld.com/business-listing/storage/app/app_resources/seller/school/school_icon/14134/school-logo1731148257.jpg',
+        ];
+
+        if (isset($legacyLogos[$clean])) {
+            return $legacyLogos[$clean];
         }
-        return asset($value);
+
+        // Education-related default institute logo if none uploaded
+        $seed = abs(crc32($this->business_name ?: ($this->id ?: 'edu_logo')));
+        return self::$educationLogos[$seed % count(self::$educationLogos)];
     }
 }
 

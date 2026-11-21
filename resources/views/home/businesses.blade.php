@@ -1140,7 +1140,7 @@
                                 
                                 <!-- Card Thumbnail & Badges -->
                                 <div class="card-thumb-wrapper">
-                                    <img src="{{ $b->display_image }}" alt="{{ $b->business_name }}" loading="lazy">
+                                    <img src="{{ $b->display_image }}" alt="{{ $b->business_name }}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80';">
                                     
                                     @if($b->badge === 'Featured')
                                         <span class="card-badge-pill card-badge-featured">Featured</span>
@@ -1156,9 +1156,7 @@
                                 <!-- Card Body -->
                                 <div class="card-content-body">
                                     <div class="d-flex align-items-start gap-2 mb-1">
-                                        @if($b->logo)
-                                            <img src="{{ $b->logo }}" alt="Logo" class="rounded-circle border" style="width: 22px; height: 22px; object-fit: cover; flex-shrink: 0; margin-top: 1px;">
-                                        @endif
+                                        <img src="{{ $b->logo }}" alt="Logo" class="rounded-circle border" style="width: 24px; height: 24px; object-fit: cover; flex-shrink: 0; margin-top: 1px;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=200&auto=format&fit=crop&q=80';">
                                         <h4 class="business-card-title mb-0" title="{{ $b->business_name }}">
                                             <a href="{{ $b->url }}" class="text-dark text-decoration-none">
                                                 {{ $b->business_name }}
