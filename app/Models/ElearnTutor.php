@@ -40,9 +40,9 @@ class ElearnTutor extends Model
     {
         $img = trim($this->profile ?? '');
         if (!empty($img) && !str_contains($img, 'ic_profile.PNG')) {
-            return $img;
+            return preg_replace('/^http:\/\//i', 'https://', $img);
         }
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?: 'Tutor') . '&background=008060&color=fff&size=128';
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?: 'Tutor') . '&background=008060&color=fff&size=250';
     }
 
     /**
@@ -52,7 +52,7 @@ class ElearnTutor extends Model
     {
         $img = trim($this->cover_image ?? '');
         if (!empty($img)) {
-            return $img;
+            return preg_replace('/^http:\/\//i', 'https://', $img);
         }
         return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80';
     }

@@ -113,11 +113,11 @@ class ElearnCourse extends Model
     {
         $thumb = trim($this->course_thumbnail ?? '');
         if (!empty($thumb)) {
-            return $thumb;
+            return preg_replace('/^http:\/\//i', 'https://', $thumb);
         }
         $self = trim($this->course_self_thumbnail ?? $this->self_thumbnail ?? '');
         if (!empty($self)) {
-            return $self;
+            return preg_replace('/^http:\/\//i', 'https://', $self);
         }
         return 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png';
     }
