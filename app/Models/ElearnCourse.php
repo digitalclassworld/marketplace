@@ -122,3 +122,4 @@ class ElearnCourse extends Model
         return 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png';
     }
 }
+

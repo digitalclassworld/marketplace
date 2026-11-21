@@ -422,8 +422,21 @@ class HomeController extends Controller
             }
 
             if (!$business) {
-                $business = BusinessListing::where('business_name', 'like', '%VCEC%')->first()
-                         ?? BusinessListing::whereIn('status', ['approved', 'active', 'published'])->first();
+                // If this slug was accidentally a course request, redirect cleanly to the authentic course URL
+                if (Schema::hasTable('dc_elearn_course') && !empty($targetSlug)) {
+                    $possibleCourse = null;
+                    if (is_numeric($targetSlug)) {
+                        $possibleCourse = \App\Models\ElearnCourse::find((int)$targetSlug);
+                    } else {
+                        $clean = str_replace('-', ' ', $targetSlug);
+                        $possibleCourse = \App\Models\ElearnCourse::where('course_name', 'like', "%{$clean}%")->first();
+                    }
+                    if ($possibleCourse) {
+                        return redirect()->to($possibleCourse->url, 301);
+                    }
+                }
+
+                abort(404, 'Business listing not found.');
             }
 
             if ($business && !in_array(strtolower($business->status), ['approved', 'active', 'published'])) {
@@ -876,7 +889,89 @@ class HomeController extends Controller
         $courses = collect();
 
         try {
-            if (Schema::hasTable('courses')) {
+            if (Schema::hasTable('dc_elearn_course')) {
+                $eQuery = \App\Models\ElearnCourse::query()->with('tutor')
+                    ->where(function($q) {
+                        $q->where('status', 'active')
+                          ->orWhere('status', 'approved')
+                          ->orWhere('status', '1');
+                    });
+
+                if (!empty($searchQuery)) {
+                    $eQuery->where(function ($q) use ($searchQuery) {
+                        $q->where('course_name', 'like', "%{$searchQuery}%")
+                          ->orWhere('course_desc', 'like', "%{$searchQuery}%");
+                    });
+                }
+
+                if (!empty($selectedCategory) && $selectedCategory !== 'All Categories') {
+                    $eQuery->where(function ($q) use ($selectedCategory) {
+                        $q->where('course_name', 'like', "%{$selectedCategory}%")
+                          ->orWhere('course_desc', 'like', "%{$selectedCategory}%");
+                    });
+                }
+
+                if (!empty($selectedLanguage)) {
+                    $eQuery->whereIn('course_language', $selectedLanguage);
+                }
+
+                if ($sortBy === 'price_low') {
+                    $eQuery->orderByRaw('CAST(course_final_amount AS DECIMAL(10,2)) ASC');
+                } elseif ($sortBy === 'price_high') {
+                    $eQuery->orderByRaw('CAST(course_final_amount AS DECIMAL(10,2)) DESC');
+                } elseif ($sortBy === 'newest') {
+                    $eQuery->orderByDesc('created_at');
+                } else {
+                    $eQuery->orderByRaw("CASE 
+                        WHEN id = 1777 THEN 1 
+                        WHEN id = 1345 THEN 2 
+                        WHEN id = 1736 THEN 3 
+                        WHEN id = 1148 THEN 4 
+                        WHEN id = 876 THEN 5 
+                        ELSE 6 
+                    END ASC, id DESC");
+                }
+
+                $elearnList = $eQuery->take(40)->get();
+
+                $courses = $elearnList->map(function($ec) {
+                    $tutor = $ec->tutor;
+                    $tName = $tutor ? (!empty($tutor->name) ? $tutor->name : $tutor->company_name) : 'Digital Class Instructor';
+                    $tAvatar = $tutor ? $tutor->profile_url : 'https://ui-avatars.com/api/?name=' . urlencode($tName);
+                    $tCategory = $tutor ? ($tutor->expert_category ?: 'Expert Tutor') : 'Instructor';
+                    return (object) [
+                        'id' => $ec->id,
+                        'title' => $ec->course_name,
+                        'slug' => $ec->slug,
+                        'url' => $ec->url,
+                        'category' => $tCategory,
+                        'price' => $ec->price,
+                        'discount_price' => $ec->original_price,
+                        'mrp' => $ec->original_price,
+                        'discount' => $ec->discount_text,
+                        'short_description' => $ec->short_desc ?: \Illuminate\Support\Str::limit(strip_tags($ec->course_desc), 120),
+                        'description' => $ec->course_desc,
+                        'thumbnail' => $ec->thumbnail_url,
+                        'thumbnail_url' => $ec->thumbnail_url,
+                        'level' => $ec->level,
+                        'language' => $ec->course_language ?: 'Hindi',
+                        'duration' => $ec->course_hours ? ($ec->course_hours . ' Hours') : ($ec->course_month ? ($ec->course_month . ' Months') : '2 Months'),
+                        'access_type' => $ec->course_mode ?: 'Online',
+                        'rating' => 4.8,
+                        'reviews_count' => 125,
+                        'students_count' => 850,
+                        'badge' => $ec->is_trending ? 'Bestseller' : 'Featured',
+                        'instructor_name' => $tName,
+                        'instructor_avatar' => $tAvatar,
+                        'instructor_category' => $tCategory,
+                        'seller' => (object) [
+                            'user' => (object) ['name' => $tName],
+                            'businessDetail' => (object) ['business_name' => $tName],
+                        ],
+                        'tutor' => $tutor,
+                    ];
+                });
+            } elseif (Schema::hasTable('courses')) {
                 $query = \App\Models\Course::query()->whereIn('status', ['approved', 'active', 'published']);
 
                 if (!empty($searchQuery)) {
@@ -914,7 +1009,7 @@ class HomeController extends Controller
                             $hasCondition = true;
                         }
                         if (!$hasCondition) {
-                            $q->whereIn('access_type', $selectedMode);
+                            $query->whereIn('access_type', $selectedMode);
                         }
                     });
                 }
@@ -2652,6 +2747,8 @@ class HomeController extends Controller
                     'id' => $eCourse->id,
                     'title' => $eCourse->course_name,
                     'slug' => $eCourse->slug,
+                    'url' => $eCourse->url,
+                    'category' => $tutor ? ($tutor->expert_category ?: 'Academic Courses') : 'Academic Courses',
                     'price' => $price,
                     'discount_price' => $origPrice,
                     'discount_percentage' => $eCourse->discount_text,
@@ -3849,7 +3946,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Elearn Course Show / Preview matching /e-learning/course/{id}/{slug?}
+     * Elearn Course Show / Detail page matching /e-learning/course/{id}/{slug?}
      */
     public function elearnCourseShow(Request $request, $idOrSlug, $slug = null): View|\Illuminate\Http\RedirectResponse
     {
@@ -3867,10 +3964,16 @@ class HomeController extends Controller
                 ->first();
         }
 
-        if ($elearnCourse && $elearnCourse->tutor) {
-            return redirect()->to($elearnCourse->tutor->url . '#course-' . $elearnCourse->id);
+        if (!$elearnCourse) {
+            abort(404, 'Course not found.');
         }
 
-        return redirect()->route('courses');
+        // Canonical 301 redirect to guarantee exact slug match: /e-learning/course/{id}/{slug}
+        $expectedPath = 'e-learning/course/' . $elearnCourse->id . '/' . $elearnCourse->slug;
+        if (trim($request->path(), '/') !== $expectedPath) {
+            return redirect()->to(url($expectedPath), 301);
+        }
+
+        return $this->courseShow($request, (string)$elearnCourse->id);
     }
 }

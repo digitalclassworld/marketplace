@@ -79,3 +79,4 @@ class ElearnTutor extends Model
         return $this->hasMany(ElearnCourse::class, 'tutor_id')->orderBy('id', 'desc');
     }
 }
+

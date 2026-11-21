@@ -830,8 +830,8 @@
                                 
                                 <!-- Thumbnail Box -->
                                 <div class="course-thumb-box">
-                                    <a href="{{ route('course.show', $c->slug) }}">
-                                        <img src="{{ $c->thumbnail }}" alt="{{ $c->title }}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80'">
+                                    <a href="{{ !empty($c->url) ? $c->url : route('course.show', $c->slug) }}">
+                                        <img src="{{ $c->thumbnail_url ?: ($c->thumbnail ?: 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png') }}" alt="{{ $c->title }}" loading="lazy" onerror="this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png'">
                                     </a>
                                     
                                     @if($c->badge === 'Bestseller')
@@ -850,7 +850,7 @@
                                 <!-- Card Body -->
                                 <div class="course-card-content">
                                     <h4 class="course-card-heading" title="{{ $c->title }}">
-                                        <a href="{{ route('course.show', $c->slug) }}">
+                                        <a href="{{ !empty($c->url) ? $c->url : route('course.show', $c->slug) }}">
                                             {{ $c->title }}
                                         </a>
                                     </h4>

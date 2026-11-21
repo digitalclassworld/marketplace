@@ -1210,7 +1210,7 @@
                 <div class="col">
                     <div class="trending-course-card">
                         <div class="trending-course-thumb-box">
-                            <a href="{{ !empty($course->tutor) ? $course->tutor->url : route('course.show', $course->slug) }}" class="d-block w-100 h-100">
+                            <a href="{{ !empty($course->url) ? $course->url : route('course.show', $course->slug) }}" class="d-block w-100 h-100">
                                 <img src="{{ $course->thumbnail_url ?: ($course->thumbnail ?: 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png') }}"
                                      alt="{{ $course->title }}"
                                      loading="lazy"
@@ -1224,7 +1224,7 @@
                             <div>
                                 <span class="level-pill-badge">{{ $course->level }}</span>
                                 <h5 class="course-card-title" title="{{ $course->title }}">
-                                    <a href="{{ !empty($course->tutor) ? $course->tutor->url : route('course.show', $course->slug) }}" class="text-dark text-decoration-none">
+                                    <a href="{{ !empty($course->url) ? $course->url : route('course.show', $course->slug) }}" class="text-dark text-decoration-none">
                                         {{ $course->short_title ?? $course->title }}
                                     </a>
                                 </h5>
