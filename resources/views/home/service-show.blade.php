@@ -841,7 +841,7 @@
                             </div>
                         </div>
 
-                        @foreach($reviews as $rv)
+                        @forelse($reviews as $rv)
                             <div class="single-review-item">
                                 <div class="d-flex align-items-center gap-2 mb-2">
                                     <img src="{{ $rv['avatar'] }}" alt="{{ $rv['name'] }}" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
@@ -857,7 +857,7 @@
                                 </div>
                                 <p class="small text-secondary mb-0">{{ $rv['comment'] }}</p>
                             </div>
-                        @endforeach
+                        @empty<p class="text-muted small py-3 mb-0 text-center">No client reviews submitted yet for this service.</p>@endforelse
                     </div>
 
                 </div>
@@ -967,18 +967,18 @@
                         </div>
 
                         @foreach($related_services as $rs)
-                            <a href="{{ route('service.show', $rs['slug']) }}" class="text-decoration-none text-dark d-flex gap-3 mb-3 pb-3 border-bottom">
-                                <img src="{{ $rs['thumbnail'] }}" alt="{{ $rs['title'] }}" class="rounded-3" style="width: 72px; height: 55px; object-fit: cover;">
+                            @php
+                                $rsSlug = is_array($rs) ? $rs['slug'] : $rs->slug;
+                                $rsTitle = is_array($rs) ? $rs['title'] : $rs->title;
+                                $rsThumb = is_array($rs) ? ($rs['thumbnail'] ?? '') : ($rs->thumbnail ?? '');
+                                $rsPrice = is_array($rs) ? $rs['price'] : $rs->price;
+                            @endphp
+                            <a href="{{ route('service.show', $rsSlug) }}" class="text-decoration-none text-dark d-flex gap-3 mb-3 pb-3 border-bottom">
+                                <img src="{{ $rsThumb ?: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&auto=format&fit=crop&q=80' }}" alt="{{ $rsTitle }}" class="rounded-3" style="width: 72px; height: 55px; object-fit: cover;">
                                 <div>
-                                    <div class="fw-bold fs-7 mb-1 text-truncate" style="max-width: 180px;">{{ $rs['title'] }}</div>
-                                    <div class="small text-warning mb-1">
-                                        <i class="fa-solid fa-star"></i> {{ number_format($rs['rating'], 1) }}
-                                        <span class="text-muted">({{ $rs['reviews_count'] }})</span>
-                                    </div>
+                                    <div class="fw-bold fs-7 mb-1 text-truncate" style="max-width: 180px;">{{ $rsTitle }}</div>
                                     <div class="d-flex align-items-baseline gap-1">
-                                        <span class="fw-bold text-dark">₹{{ number_format($rs['price']) }}</span>
-                                        <span class="text-muted text-decoration-line-through fs-8">₹{{ number_format($rs['mrp']) }}</span>
-                                        <span class="badge bg-success-subtle text-success fs-8">{{ $rs['discount'] }}% OFF</span>
+                                        <span class="fw-bold text-dark">₹{{ number_format((float)$rsPrice) }}</span>
                                     </div>
                                 </div>
                             </a>

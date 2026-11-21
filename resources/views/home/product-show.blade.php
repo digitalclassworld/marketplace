@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', ($product->title ?? 'HP 15s Laptop') . ' - Digital Class')
+@section('title', ($product->title ?? 'Product Details') . ' - Digital Class')
 
 @section('styles')
 <!-- SEO Meta Tags -->
-<meta name="description" content="{{ Str::limit(strip_tags($product->description ?? 'HP 15s Laptop with Intel Core i5 13th Gen, 16GB RAM, 512GB SSD for students and professionals.'), 160) }}">
+<meta name="description" content="{{ Str::limit(strip_tags($product->description ?? ($product->title . ' available on Digital Class Marketplace with verified seller assurance.')), 160) }}">
 <meta name="keywords" content="{{ $product->category ?? 'Laptops' }}, {{ $product->title }}, online shopping, digital class, laptop for students, best price">
 <link rel="canonical" href="{{ url()->current() }}">
 
@@ -1144,9 +1144,7 @@
                     <i class="fa-solid fa-star-half-stroke"></i>
                     <span class="ms-1 text-dark">4.6</span>
                 </div>
-                <span class="text-muted">(1,240 reviews)</span>
-                <span class="text-muted">|</span>
-                <span class="sold-count-badge"><i class="fa-solid fa-bag-shopping text-primary me-1"></i> 2,500+ sold</span>
+                <span class="text-muted">(Verified Merchant)</span><span class="text-muted">|</span><span class="sold-count-badge"><i class="fa-solid fa-shield-check text-primary me-1"></i> Quality Assured</span>
             </div>
 
             <!-- Trust Highlights (4 Pills) -->
@@ -1159,7 +1157,7 @@
 
             <!-- Description Summary -->
             <p class="product-summary-p">
-                {{ $product->description ?: 'Powerful and stylish laptop for students, professionals and business users. Perfect for online classes, office work, content creation and everyday use.' }}
+                {{ $product->description ?: 'High quality genuine product from certified seller with fast delivery and warranty.' }}
             </p>
 
             <!-- 6 Key Spec Cards -->
@@ -1177,6 +1175,7 @@
                 @endforeach
             </div>
 
+            @if(!empty($colorOptions))
             <!-- Color Selector -->
             <div class="color-selection-wrap">
                 <div class="color-label">Color: <span id="selectedColorName" class="fw-bold text-dark">Silver</span></div>
@@ -1186,14 +1185,17 @@
                     <div class="color-swatch" style="background: #fef08a;" onclick="selectProductColor('Warm Gold', this)" title="Warm Gold"></div>
                 </div>
             </div>
+            @endif
+            </div>
 
             <!-- Meta details bar -->
             <div class="meta-details-bar">
-                <div>Brand: <strong>HP</strong></div>
-                <div>Series: <strong>15s</strong></div>
-                <div>Product Code: <strong>HP15S-i5-512-SL</strong></div>
-                <div>Availability: <strong class="text-success"><i class="fa-solid fa-circle-check"></i> In Stock</strong></div>
+                <div>Brand: <strong>{{ $brand }}</strong></div>
+                <div>Category: <strong>{{ $product->category ?: 'General' }}</strong></div>
+                <div>Product Code: <strong>{{ $productCode }}</strong></div>
+                <div>Availability: <strong class="{{ ($product->stock_quantity ?? 0) > 0 ? 'text-success' : 'text-danger' }}"><i class="fa-solid fa-circle-check"></i> {{ ($product->stock_quantity ?? 0) > 0 ? 'In Stock (' . $product->stock_quantity . ' available)' : 'Out of Stock' }}</strong></div>
             </div>
+        </div>
         </div>
 
         <!-- 3. RIGHT STICKY PURCHASE CARD -->
@@ -1208,17 +1210,17 @@
                 <!-- Price Numbers -->
                 <div class="d-flex align-items-baseline mb-1">
                     <span class="huge-price-text">₹{{ number_format((float)$product->price) }}</span>
-                    @if($product->mrp > $product->price)
+                    @if($product->mrp && $product->mrp > $product->price)
                         <span class="mrp-strike-text">₹{{ number_format((float)$product->mrp) }}</span>
-                    @else
-                        <span class="mrp-strike-text">₹63,999</span>
                     @endif
                 </div>
 
                 <!-- Savings -->
-                <div class="savings-text">
-                    You save ₹{{ number_format((float)(($product->mrp ?: 63999) - $product->price)) }} ({{ $product->discount_percentage ?? 33 }}%)
-                </div>
+                @if($product->mrp && $product->mrp > $product->price)
+                    <div class="savings-text">
+                        You save ₹{{ number_format((float)($product->mrp - $product->price)) }} ({{ $product->discount_percentage ?? round((($product->mrp - $product->price)/$product->mrp)*100) }}%)
+                    </div>
+                @endif
 
                 <!-- Quantity Stepper & Stock -->
                 <div class="stepper-stock-row">

@@ -57,7 +57,7 @@ class SellerProductController extends Controller
 
         $seller->products()->create([
             'title'            => $validated['title'],
-            'slug'             => Str::slug($validated['title']) . '-' . Str::random(5),
+            'slug'             => Product::generateUniqueSlug($validated['title']),
             'category'         => $validated['category'],
             'product_type'     => $validated['product_type'],
             'description'      => $validated['description'] ?? null,

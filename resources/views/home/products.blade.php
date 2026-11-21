@@ -841,7 +841,7 @@
 
                 <!-- Products Grid (6 Columns Layout) -->
                 <div class="product-grid-container mb-4">
-                    @foreach($products as $p)
+                    @forelse($products as $p)
                         @php
                             $title = is_array($p) ? $p['title'] : $p->title;
                             $specs = is_array($p) ? ($p['specs'] ?? '') : ($p->shipping_details ?? '');
@@ -911,7 +911,22 @@
                                 <i class="fa-solid fa-cart-shopping"></i>
                             </button>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col-12 w-100 text-center py-5 bg-white rounded-4 border border-light-subtle shadow-sm my-3" style="grid-column: 1 / -1;">
+                            <div class="mb-3 text-muted">
+                                <i class="fa-solid fa-box-open fs-1 text-primary-subtle" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark">No Products Listed Yet</h5>
+                            <p class="text-muted small mb-3">Our merchant catalog is currently being updated with verified products.</p>
+                            @if(request()->anyFilled(['search', 'category', 'brand', 'min_price', 'max_price']))
+                                <a href="{{ route('products') }}" class="btn btn-primary btn-sm px-4 rounded-pill">Reset All Filters</a>
+                            @else
+                                <a href="{{ route('seller.register') }}" class="btn btn-primary btn-sm px-4 rounded-pill">
+                                    <i class="fa-solid fa-store me-1"></i> Start Selling Products
+                                </a>
+                            @endif
+                        </div>
+                    @endforelse
                 </div>
             </div>
 

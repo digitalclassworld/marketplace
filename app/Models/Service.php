@@ -66,5 +66,20 @@ class Service extends Model
     {
         return $this->status === 'rejected';
     }
+
+    public static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $slug = \Illuminate\Support\Str::slug($title);
+        if (empty($slug)) {
+            $slug = 'service';
+        }
+        $originalSlug = $slug;
+        $count = 1;
+        while (static::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = "{$originalSlug}-{$count}";
+            $count++;
+        }
+        return $slug;
+    }
 }
 

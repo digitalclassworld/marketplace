@@ -57,7 +57,7 @@ class SellerServiceController extends Controller
 
         $seller->services()->create([
             'title'              => $validated['title'],
-            'slug'               => Str::slug($validated['title']) . '-' . Str::random(5),
+            'slug'               => Service::generateUniqueSlug($validated['title']),
             'category'           => $validated['category'],
             'short_description'  => $validated['short_description'] ?? null,
             'description'        => $validated['description'] ?? null,

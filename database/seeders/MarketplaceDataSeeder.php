@@ -246,78 +246,11 @@ class MarketplaceDataSeeder extends Seeder
             }
         }
 
-        // 4. Populate Services matching the screenshot design
-        if ($primarySeller) {
-            $services = [
-                ['title' => 'Website Development for School, Institute & Business', 'category' => 'Development', 'price' => 4999, 'thumb' => 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Social Media Marketing', 'category' => 'Digital Marketing', 'price' => 2999, 'thumb' => 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'GST Registration Service', 'category' => 'Legal & Finance', 'price' => 1499, 'thumb' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Graphic Design Service', 'category' => 'Design', 'price' => 999, 'thumb' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'App Development', 'category' => 'Development', 'price' => 9999, 'thumb' => 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Content Writing', 'category' => 'Content', 'price' => 799, 'thumb' => 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'AI Chatbot Integration', 'category' => 'AI & Automation', 'price' => 3999, 'thumb' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Tally Support & Training', 'category' => 'Accounting', 'price' => 1999, 'thumb' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Video Editing Service', 'category' => 'Multimedia', 'price' => 1499, 'thumb' => 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Resume Making Service', 'category' => 'Career Support', 'price' => 599, 'thumb' => 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&auto=format&fit=crop&q=80'],
-            ];
+        // 4. Populate Services - Seeded dummy services disabled to prevent polluting marketplace.
+        // Real services are created dynamically by verified sellers.
 
-            foreach ($services as $s) {
-                Service::firstOrCreate(
-                    ['title' => $s['title']],
-                    [
-                        'seller_id' => $primarySeller->id,
-                        'slug' => Str::slug($s['title']),
-                        'category' => $s['category'],
-                        'short_description' => 'Professional service delivered on time with revision guarantees and dedicated support.',
-                        'delivery_days' => 5,
-                        'package_name' => 'Standard Professional Plan',
-                        'price' => $s['price'],
-                        'thumbnail' => $s['thumb'],
-                        'status' => 'approved',
-                        'approved_at' => now(),
-                    ]
-                );
-            }
-        }
-
-        // 5. Populate Products matching the screenshot design
-        if ($primarySeller) {
-            $productsList = [
-                ['title' => 'HP 15s Laptop', 'category' => 'Laptops & Computers', 'price' => 42999, 'mrp' => 52999, 'specs' => '(Intel Core i5, 16GB, 512GB SSD)', 'thumb' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Logitech Wireless Mouse', 'category' => 'Accessories', 'price' => 499, 'mrp' => 799, 'specs' => 'M331', 'thumb' => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Canon G3010 All-in-One Ink Tank Printer', 'category' => 'Printers & Scanners', 'price' => 12499, 'mrp' => 14999, 'specs' => 'Ink Tank Multi-function', 'thumb' => 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Webcam Full HD 1080p with Mic', 'category' => 'Accessories', 'price' => 2499, 'mrp' => 3499, 'specs' => 'Full HD 1080p', 'thumb' => 'https://images.unsplash.com/photo-1588508065123-287b28e013da?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Tally Prime with GST', 'category' => 'Software & Licenses', 'price' => 20999, 'mrp' => 25999, 'specs' => '(Original License)', 'thumb' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Classroom LED Display', 'category' => 'Projectors & Displays', 'price' => 124999, 'mrp' => 149999, 'specs' => '65 Inch 4K', 'thumb' => 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Lenovo Tab M10', 'category' => 'Mobiles & Tablets', 'price' => 14999, 'mrp' => 18999, 'specs' => '(4GB, 64GB, WiFi)', 'thumb' => 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Study Material Combo', 'category' => 'Books & Study Material', 'price' => 1299, 'mrp' => 1799, 'specs' => '(10th & 12th)', 'thumb' => 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Classroom Projector', 'category' => 'Projectors & Displays', 'price' => 39999, 'mrp' => 49999, 'specs' => '(Epson EB-E01)', 'thumb' => 'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'Office Chair Ergonomic', 'category' => 'Furniture', 'price' => 6499, 'mrp' => 8999, 'specs' => 'Adjustable Mesh Lumbar', 'thumb' => 'https://images.unsplash.com/photo-1580481077195-c22f03f7495b?w=400&auto=format&fit=crop&q=80'],
-                ['title' => 'WiFi Router TP-Link Dual Band', 'category' => 'Networking', 'price' => 2199, 'mrp' => 3499, 'specs' => 'Gigabit Dual Band', 'thumb' => 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&auto=format&fit=crop&q=80'],
-                ['title' => '32GB Pen Drive', 'category' => 'Storage Devices', 'price' => 599, 'mrp' => 999, 'specs' => 'SanDisk USB 3.0', 'thumb' => 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400&auto=format&fit=crop&q=80'],
-            ];
-
-            foreach ($productsList as $p) {
-                Product::firstOrCreate(
-                    ['title' => $p['title']],
-                    [
-                        'seller_id' => $primarySeller->id,
-                        'slug' => Str::slug($p['title']),
-                        'category' => $p['category'],
-                        'product_type' => 'Physical',
-                        'description' => 'Genuine high quality product with full warranty and fast shipping.',
-                        'sku' => 'SKU-' . rand(10000, 99999),
-                        'mrp' => $p['mrp'],
-                        'price' => $p['price'],
-                        'stock_quantity' => 50,
-                        'shipping_details' => $p['specs'],
-                        'thumbnail' => $p['thumb'],
-                        'status' => 'approved',
-                        'approved_at' => now(),
-                    ]
-                );
-            }
-        }
+        // 5. Populate Products - Seeded dummy products disabled to prevent polluting marketplace.
+        // Real products are created dynamically by verified sellers.
 
         // 6. Business Listings - Only real seller businesses are retained.
         // Seeded dummy businesses disabled to prevent polluting marketplace.
