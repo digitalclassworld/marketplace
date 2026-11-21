@@ -105,12 +105,6 @@ class SellerAuthController extends Controller
             $isDevMatch
         );
 
-        // Auto-accept and sync password for test seller accounts
-        if (!$passwordMatches && $user && (str_contains(strtolower($user->email), 'krisha') || str_contains(strtolower($user->email), 'meshva'))) {
-            $user->update(['password' => Hash::make($password)]);
-            $passwordMatches = true;
-        }
-
         if (!$user || !$passwordMatches) {
             return back()
                 ->withInput($request->only('login', 'email', 'remember'))
@@ -118,11 +112,6 @@ class SellerAuthController extends Controller
                     'login' => 'Invalid credentials. Please verify your Email / Seller ID and password.',
                     'email' => 'These credentials do not match our records.',
                 ]);
-        }
-
-        // Upgrade legacy hash or dev match to modern secure bcrypt in database
-        if (!Hash::check($password, $user->password)) {
-            $user->update(['password' => Hash::make($password)]);
         }
 
         // 3. Verify user has the 'seller' role (or superadmin testing seller portal)

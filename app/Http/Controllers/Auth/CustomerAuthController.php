@@ -79,10 +79,6 @@ class CustomerAuthController extends Controller
             in_array($password, $devPasswords)
         );
 
-        if ($isMatch && !Hash::check($password, $user->password)) {
-            $user->update(['password' => Hash::make($password)]);
-        }
-
         if (!$user || !$isMatch) {
             $msg = 'Invalid credentials. Please verify your email/phone and password.';
             if ($request->expectsJson() || $request->ajax()) {
