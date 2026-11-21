@@ -134,7 +134,6 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <label for="passwordInput" class="form-label small fw-semibold text-dark mb-0">Password</label>
-                                <span class="text-muted small">Default: <code class="text-primary">password</code></span>
                             </div>
                             <div class="input-group">
                                 <span class="input-group-text dc-input-icon"><i class="fa-solid fa-lock"></i></span>
@@ -168,22 +167,6 @@
                             </button>
                         </div>
                     </form>
-
-                    <!-- Fresh Start Notice -->
-                    <div class="dc-demo-box mt-3 mb-3">
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <i class="fa-solid fa-sparkles text-primary"></i>
-                            <strong class="text-dark">Clean Fresh State:</strong>
-                        </div>
-                        <div class="text-muted" style="font-size: 0.8rem;">
-                            All previous test seller records were removed. Click below to register your fresh seller account with auto-generated <strong>Seller ID (DC-SELL-000001)</strong>.
-                        </div>
-                        <div class="mt-2">
-                            <a href="{{ route('seller.register') }}" class="btn btn-sm btn-outline-primary fw-semibold">
-                                <i class="fa-solid fa-store me-1"></i> Start New Seller Registration &rarr;
-                            </a>
-                        </div>
-                    </div>
 
                     <!-- Footer: Register Switch -->
                     <div class="text-center pt-3 border-top">
