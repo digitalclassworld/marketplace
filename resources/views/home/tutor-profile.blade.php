@@ -180,6 +180,24 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 176, 116, 0.35);
     }
+
+    /* Mobile Responsive Polish */
+    @media (max-width: 767px) {
+        .tutor-profile-header-card {
+            padding: 1.25rem 1rem;
+            border-radius: 14px;
+        }
+        .tutor-avatar-box {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .tutor-avatar-img {
+            max-width: 180px;
+        }
+        .tutor-course-thumb-box {
+            height: 140px;
+        }
+    }
 </style>
 @endsection
 

@@ -419,6 +419,141 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* ========================================================================
+           MODERN UI DESIGN TOKENS & RESPONSIVE POLISH
+           ======================================================================== */
+        :root {
+            --dc-surface-card: #ffffff;
+            --dc-surface-subtle: #f8fafc;
+            --dc-radius-sm: 8px;
+            --dc-radius-md: 14px;
+            --dc-radius-lg: 20px;
+            --dc-radius-pill: 9999px;
+            --dc-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --dc-shadow-sm: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+            --dc-shadow-md: 0 12px 28px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+            --dc-shadow-lg: 0 20px 40px -6px rgba(15, 23, 42, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
+            --dc-shadow-glow: 0 8px 24px -2px rgba(0, 102, 255, 0.28);
+        }
+
+        /* Enhanced Card Polish with subtle border gradient & smooth transition */
+        .card, .dc-card-modern {
+            border-radius: var(--dc-radius-md);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: var(--dc-shadow-sm);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+        }
+        .card:hover, .dc-card-modern:hover {
+            border-color: #cbd5e1;
+        }
+
+        /* Modern Pill Navigation & Interactive Badges */
+        .badge-modern-verified {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: var(--dc-radius-pill);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Mobile Bottom Navigation Dock */
+        .dc-mobile-bottom-dock {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(226, 232, 240, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 6px 8px;
+            z-index: 1040;
+            box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+        }
+        .dc-mob-dock-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 6px;
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            gap: 3px;
+            flex: 1;
+            max-width: 72px;
+        }
+        .dc-mob-dock-item i {
+            font-size: 1.15rem;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .dc-mob-dock-item:hover, .dc-mob-dock-item:active {
+            color: var(--dc-primary);
+        }
+        .dc-mob-dock-item.active {
+            color: var(--dc-primary);
+            font-weight: 700;
+        }
+        .dc-mob-dock-item.active i {
+            transform: translateY(-2px);
+        }
+
+        /* Hide scrollbars for slick horizontal swipe bars on mobile */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Smooth Tap Target Sizing & Responsive Rules */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 74px !important; /* Prevent bottom nav from covering page content */
+            }
+            .container, .container-fluid {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+            .dc-top-alert {
+                font-size: 0.72rem;
+                padding: 0.4rem 0;
+            }
+            .dc-navbar {
+                padding: 0.5rem 0;
+            }
+            .navbar-collapse {
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(20px);
+                border-radius: 16px;
+                padding: 1rem;
+                margin-top: 0.5rem;
+                box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+                border: 1px solid #e2e8f0;
+            }
+            .navbar-nav .nav-link {
+                padding: 0.65rem 1rem !important;
+                margin-bottom: 2px;
+            }
+            .dc-footer {
+                padding: 3rem 0 1.5rem;
+                margin-bottom: 0;
+            }
+        }
     </style>
     @yield('styles')
 </head>
@@ -2014,6 +2149,16 @@
                     badge.style.display = 'none';
                 }
             }
+            const mobBadge = document.getElementById('mobileCartNavBadge');
+            if (mobBadge) {
+                if (totalQty > 0) {
+                    mobBadge.textContent = totalQty;
+                    mobBadge.style.display = 'inline-block';
+                } else {
+                    mobBadge.textContent = '0';
+                    mobBadge.style.display = 'none';
+                }
+            }
 
             if (drawerCount) {
                 drawerCount.textContent = totalQty + (totalQty === 1 ? ' item in cart' : ' items in cart');
@@ -2138,6 +2283,35 @@
             }, { timeout: 10000, enableHighAccuracy: true });
         }
     </script>
+    <!-- ========================================================================
+         MOBILE BOTTOM FLOATING DOCK / NAVIGATION BAR (App-like UX on Phone)
+         ======================================================================== -->
+    <nav class="dc-mobile-bottom-dock d-md-none" aria-label="Mobile Navigation">
+        <a href="{{ route('home') }}" class="dc-mob-dock-item {{ request()->routeIs('home') ? 'active' : '' }}">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ route('courses') }}" class="dc-mob-dock-item {{ request()->routeIs('courses*') || request()->routeIs('course.*') || request()->routeIs('elearn.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Courses</span>
+        </a>
+        <a href="{{ route('businesses') }}" class="dc-mob-dock-item {{ request()->routeIs('businesses') || request()->routeIs('business.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>Institutes</span>
+        </a>
+        <a href="{{ route('services') }}" class="dc-mob-dock-item {{ request()->routeIs('services*') || request()->routeIs('service.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-briefcase"></i>
+            <span>Services</span>
+        </a>
+        <button type="button" class="dc-mob-dock-item position-relative border-0 bg-transparent p-0" onclick="openCartDrawer()" title="View Cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span class="position-absolute top-0 start-50 translate-middle-x badge rounded-pill bg-danger" id="mobileCartNavBadge" style="display: none; font-size: 0.6rem; transform: translate(8px, -4px) !important;">
+                0
+            </span>
+            <span>Cart</span>
+        </button>
+    </nav>
+
     @yield('scripts')
 </body>
 </html>

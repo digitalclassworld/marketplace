@@ -610,6 +610,27 @@
         transform: translateY(-3px);
         box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
     }
+
+    /* Mobile Responsive Polish */
+    @media (max-width: 767px) {
+        .hero-marketplace {
+            padding: 2rem 0 1.75rem;
+        }
+        .hero-title {
+            font-size: 1.85rem;
+        }
+        .hero-subtitle {
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+        }
+        .hero-search-box {
+            border-radius: 14px;
+            padding: 0.25rem;
+        }
+        .card-thumb-wrapper {
+            height: 135px;
+        }
+    }
 </style>
 @endsection
 

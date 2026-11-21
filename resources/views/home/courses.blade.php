@@ -461,6 +461,42 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    /* Enhanced Mobile Responsiveness & Polish */
+    @media (max-width: 767px) {
+        .hero-courses {
+            padding: 1.25rem 0 1.5rem;
+        }
+        .courses-hero-title {
+            font-size: 1.65rem;
+        }
+        .courses-hero-subtitle {
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .courses-search-card {
+            border-radius: 14px;
+            padding: 0.25rem;
+        }
+        .hero-trust-column {
+            margin-top: 1rem;
+            padding: 1rem;
+        }
+        .course-thumb-box {
+            height: 135px;
+        }
+        .course-card-heading {
+            font-size: 0.82rem;
+            height: auto;
+            max-height: 2.6em;
+        }
+        .course-price-row {
+            margin-bottom: 0.4rem;
+        }
+        .price-current {
+            font-size: 0.95rem;
+        }
+    }
 </style>
 @endsection
 
@@ -587,7 +623,7 @@
      ============================================================================ -->
 <div class="course-category-bar">
     <div class="container-fluid px-lg-4">
-        <div class="course-cat-scroll-container">
+        <div class="course-cat-scroll-container no-scrollbar">
             @foreach($horizontalCategories as $hc)
                 @php
                     $isHcActive = ($selectedCategory === $hc['name'] || ($selectedCategory === 'All Categories' && $hc['name'] === 'All Categories') || ($selectedCategory === $hc['slug']));
@@ -616,7 +652,7 @@
             <!-- ==========================================
                  LEFT SIDEBAR: FILTERS
                  ========================================== -->
-            <div class="col-xl-2 col-lg-3 col-md-4">
+            <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block">
                 <form id="coursesFilterForm" action="{{ route('courses') }}" method="GET" class="courses-filter-card">
                     @if($searchQuery)
                         <input type="hidden" name="search" value="{{ $searchQuery }}">
@@ -783,8 +819,27 @@
             <!-- ==========================================
                  RIGHT COLUMN: COURSES GRID (5 COLS ON XL)
                  ========================================== -->
-            <div class="col-xl-10 col-lg-9 col-md-8">
+            <div class="col-xl-10 col-lg-9 col-md-8 col-12">
                 
+                <!-- Mobile Filter & Sort Pill Bar -->
+                <div class="d-md-none mb-3 d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-primary btn-sm flex-fill fw-bold rounded-pill py-2 shadow-xs d-flex align-items-center justify-content-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileFiltersDrawer" aria-controls="mobileFiltersDrawer">
+                        <i class="fa-solid fa-sliders text-primary"></i>
+                        <span>Filters</span>
+                        @if($selectedCategory && $selectedCategory !== 'All Categories')
+                            <span class="badge rounded-pill bg-primary text-white" style="font-size: 0.65rem;">1</span>
+                        @endif
+                    </button>
+                    <div class="flex-fill">
+                        <select class="form-select form-select-sm rounded-pill py-2 border-secondary-subtle fw-semibold shadow-xs" onchange="submitCoursesSort(this.value)">
+                            <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
+                            <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
+                            <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                            <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Results Bar -->
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <div>
@@ -825,7 +880,7 @@
                 <!-- Responsive Cards Grid -->
                 <div class="row g-3">
                     @forelse($courses as $c)
-                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
                             <div class="course-card-unified">
                                 
                                 <!-- Thumbnail Box -->
@@ -972,6 +1027,85 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Mobile Filters Offcanvas Drawer -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileFiltersDrawer" aria-labelledby="mobileFiltersDrawerLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold text-dark d-flex align-items-center gap-2" id="mobileFiltersDrawerLabel" style="font-size: 1.05rem;">
+            <i class="fa-solid fa-sliders text-primary"></i> Filter Courses
+        </h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-3">
+        <form action="{{ route('courses') }}" method="GET" id="mobileCoursesFilterForm">
+            @if($searchQuery)
+                <input type="hidden" name="search" value="{{ $searchQuery }}">
+            @endif
+            <input type="hidden" name="sort" value="{{ $sortBy }}">
+
+            <!-- Categories -->
+            <div class="mb-4">
+                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Category</div>
+                <div class="d-flex flex-column gap-1">
+                    <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
+                        <span class="small fw-semibold text-dark">All Categories</span>
+                        <input class="form-check-input ms-2" type="radio" name="category" value="" {{ ($selectedCategory === 'All Categories' || !$selectedCategory) ? 'checked' : '' }}>
+                    </label>
+                    @foreach($sidebarCategories as $sc)
+                        <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
+                            <span class="small text-secondary">{{ $sc['name'] }}</span>
+                            <input class="form-check-input ms-2" type="radio" name="category" value="{{ $sc['name'] }}" {{ $selectedCategory === $sc['name'] ? 'checked' : '' }}>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Mode -->
+            <div class="mb-4">
+                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Learning Mode</div>
+                <div class="d-flex gap-2">
+                    <label class="btn btn-sm btn-outline-secondary flex-fill text-start py-2">
+                        <input type="checkbox" name="mode[]" value="online" class="form-check-input me-1" {{ in_array('online', (array)$selectedMode) ? 'checked' : '' }}> Online
+                    </label>
+                    <label class="btn btn-sm btn-outline-secondary flex-fill text-start py-2">
+                        <input type="checkbox" name="mode[]" value="offline" class="form-check-input me-1" {{ in_array('offline', (array)$selectedMode) ? 'checked' : '' }}> Offline
+                    </label>
+                </div>
+            </div>
+
+            <!-- Level -->
+            <div class="mb-4">
+                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Level</div>
+                <div class="d-flex flex-column gap-1">
+                    @foreach(['Beginner', 'Intermediate', 'Advanced'] as $lvl)
+                        <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
+                            <span class="small text-secondary">{{ $lvl }}</span>
+                            <input class="form-check-input ms-2" type="checkbox" name="level[]" value="{{ $lvl }}" {{ in_array($lvl, (array)$selectedLevel) ? 'checked' : '' }}>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Language -->
+            <div class="mb-4">
+                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Language</div>
+                <div class="d-flex flex-column gap-1">
+                    @foreach(['English', 'Hindi', 'Gujarati'] as $lang)
+                        <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
+                            <span class="small text-secondary">{{ $lang }}</span>
+                            <input class="form-check-input ms-2" type="checkbox" name="language[]" value="{{ $lang }}" {{ in_array($lang, (array)$selectedLanguage) ? 'checked' : '' }}>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 pt-2 border-top">
+                <a href="{{ route('courses') }}" class="btn btn-light btn-sm flex-fill fw-semibold py-2">Reset</a>
+                <button type="submit" class="btn btn-primary btn-sm flex-fill fw-bold py-2">Apply Filters</button>
+            </div>
+        </form>
     </div>
 </div>
 

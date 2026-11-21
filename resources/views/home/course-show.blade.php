@@ -335,6 +335,46 @@
         height: 110px;
         object-fit: cover;
     }
+
+    /* Mobile Responsive Polish */
+    @media (max-width: 991px) {
+        .mobile-sticky-purchase-bar {
+            position: fixed;
+            bottom: 64px; /* Sits right above the mobile bottom dock */
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(226, 232, 240, 0.9);
+            padding: 10px 16px;
+            z-index: 1030;
+            box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+        }
+        .course-hero-header-card {
+            padding: 1.15rem;
+            border-radius: 14px;
+        }
+        .video-preview-thumbnail-box {
+            height: 185px;
+        }
+        .course-subnav-tabs {
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .course-meta-four-box {
+            gap: 0.75rem;
+            padding-top: 0.65rem;
+        }
+    }
+    @media (max-width: 576px) {
+        .video-preview-thumbnail-box {
+            height: 165px;
+        }
+        .huge-price-display {
+            font-size: 1.65rem;
+        }
+    }
 </style>
 @endsection
 
@@ -979,5 +1019,39 @@
         }, 2500);
     }
 </script>
+
+<!-- Mobile Sticky Purchase Bar (Bottom Fixed on Phones) -->
+<div class="mobile-sticky-purchase-bar d-lg-none">
+    <div class="d-flex align-items-center justify-content-between gap-3">
+        <div>
+            <div class="d-flex align-items-baseline gap-1.5">
+                @if($sellPrice == 0)
+                    <span class="fw-bold fs-5 text-success">FREE</span>
+                @else
+                    <span class="fw-bold fs-5 text-dark">₹{{ number_format($sellPrice) }}</span>
+                    @if($mrpPrice > $sellPrice)
+                        <span class="text-muted text-decoration-line-through small" style="font-size: 0.72rem;">₹{{ number_format($mrpPrice) }}</span>
+                    @endif
+                @endif
+            </div>
+            @if($mrpPrice > $sellPrice)
+                <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.65rem;">
+                    {{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}
+                </span>
+            @endif
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })" title="Add to Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+            <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="m-0">
+                @csrf
+                <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" style="background-color: #0066ff;">
+                    Buy Now
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 @endsection

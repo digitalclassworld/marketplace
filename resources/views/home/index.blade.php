@@ -952,19 +952,48 @@
         }
     }
     @media (max-width: 767px) {
+        .marketplace-hero {
+            padding: 2rem 0 1.5rem;
+        }
         .hero-main-title {
-            font-size: 2rem;
+            font-size: 1.85rem;
+            line-height: 1.2;
+        }
+        .hero-main-sub {
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+        }
+        .hero-search-wrapper {
+            border-radius: 12px;
+            padding: 0.35rem;
         }
         .hero-search-form {
             flex-direction: column;
             align-items: stretch;
+            gap: 0.35rem;
+        }
+        .hero-search-input {
+            padding: 0.55rem 0.75rem;
         }
         .hero-search-select {
             border-left: none;
             border-top: 1px solid #e2e8f0;
+            padding: 0.55rem 0.75rem;
+        }
+        .hero-stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        .hero-stat-pill {
+            padding: 0.4rem 0.65rem;
         }
         .ribbon-grid {
             grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        .trending-course-thumb-box {
+            height: 140px;
         }
     }
 </style>

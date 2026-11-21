@@ -33,21 +33,37 @@
     .institute-header-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 1.75rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+    .institute-header-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0066ff 0%, #00d2ff 50%, #10b981 100%);
     }
     .institute-logo-box {
         width: 190px;
         height: 160px;
         border: 1px solid #e2e8f0;
-        border-radius: 8px;
+        border-radius: 14px;
         background: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 10px;
+        padding: 12px;
         margin-bottom: 0.85rem;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        transition: transform 0.2s ease;
+    }
+    .institute-logo-box:hover {
+        transform: scale(1.02);
     }
     .institute-logo-box img {
         max-width: 100%;
@@ -55,23 +71,26 @@
         object-fit: contain;
     }
     .btn-send-inquiry {
-        background-color: #0097a7;
+        background: linear-gradient(135deg, #0097a7 0%, #00838f 100%);
         color: #ffffff;
         border: none;
-        border-radius: 6px;
+        border-radius: 999px;
         font-weight: 700;
-        font-size: 0.9rem;
-        padding: 0.65rem 1rem;
+        font-size: 0.875rem;
+        padding: 0.65rem 1.25rem;
         width: 190px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        transition: background-color 0.15s;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(0, 151, 167, 0.25);
     }
     .btn-send-inquiry:hover {
-        background-color: #00838f;
+        background: linear-gradient(135deg, #00838f 0%, #006064 100%);
         color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 151, 167, 0.35);
     }
     .institute-title {
         font-size: 1.75rem;
@@ -335,15 +354,39 @@
     }
 
     @media (max-width: 768px) {
+        .institute-header-card {
+            padding: 1.25rem 1rem;
+            border-radius: 14px;
+        }
         .institute-header-flex {
             flex-direction: column;
             text-align: center;
+            align-items: center;
         }
-        .institute-logo-box, .btn-send-inquiry {
-            margin: 0 auto 1rem;
+        .institute-title {
+            font-size: 1.45rem;
+        }
+        .institute-logo-box {
+            width: 140px;
+            height: 130px;
+            margin: 0 auto 0.75rem;
+        }
+        .btn-send-inquiry {
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto 1.25rem;
         }
         .institute-meta-item {
             justify-content: center;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        .institute-tabs-bar {
+            padding: 4px;
+            overflow-x: auto;
+        }
+        .course-thumb-box {
+            height: 140px;
         }
     }
 </style>
@@ -475,7 +518,7 @@
 
         <!-- 3. NAVIGATION TABS BAR -->
         <div class="institute-tabs-bar mb-4">
-            <ul class="nav nav-pills border-0 gap-1 w-100" id="profileTabs" role="tablist">
+            <ul class="nav nav-pills border-0 gap-1 w-100 no-scrollbar" id="profileTabs" role="tablist" style="overflow-x: auto; flex-wrap: nowrap;">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link @if(count($courses) == 0) active @endif" id="overview-tab" data-bs-toggle="pill" data-bs-target="#tab-overview" type="button" role="tab">Overview</button>
                 </li>
