@@ -33,7 +33,14 @@ class SellerBusinessListingController extends Controller
     public function create(): View
     {
         $seller = $this->getSeller();
-        return view('seller.listings.create', compact('seller'));
+        $availableCoupons = DiscountCoupon::where('status', 'Active')
+            ->where(function ($q) {
+                $q->whereNull('valid_until')->orWhere('valid_until', '>=', now()->startOfDay());
+            })
+            ->latest('id')
+            ->get();
+
+        return view('seller.listings.create', compact('seller', 'availableCoupons'));
     }
 
     public function store(Request $request): RedirectResponse

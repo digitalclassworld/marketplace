@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BusinessListing;
 use App\Models\Course;
 use App\Models\Product;
+use App\Models\Promotion;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -124,6 +125,23 @@ class HomeController extends Controller
             ['name' => 'Health & Wellness',    'icon' => 'fa-solid fa-heart-pulse',      'url' => route('businesses', ['category' => 'Gym & Fitness'])],
         ];
 
+        // Fetch active promotional banners uploaded by Admin
+        $promotionalBanners = collect();
+        if (Schema::hasTable('promotions')) {
+            $promotionalBanners = Promotion::where('status', 'Active')
+                ->where(function ($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now()->startOfDay());
+                })
+                ->where(function ($q) {
+                    $q->where('promotion_type', 'Banner Promotion')
+                      ->orWhere('listing_type', 'Banner')
+                      ->orWhereNotNull('listing_thumbnail');
+                })
+                ->latest('id')
+                ->take(3)
+                ->get();
+        }
+
         return view('home.index', compact(
             'seller',
             'featuredCourses',
@@ -134,7 +152,8 @@ class HomeController extends Controller
             'totalServices',
             'totalProducts',
             'totalBusinesses',
-            'categoryPills'
+            'categoryPills',
+            'promotionalBanners'
         ));
     }
 

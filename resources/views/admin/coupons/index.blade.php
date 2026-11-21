@@ -799,18 +799,22 @@
                             <label class="form-label small fw-semibold">Offer Name</label>
                             <input type="text" name="offer_name" class="form-control" placeholder="e.g. Festival Season Mega Discount">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label small fw-semibold">Discount Type *</label>
                             <select name="discount_type" class="form-select" required>
                                 <option value="Percentage">Percentage (%)</option>
                                 <option value="Fixed Amount">Fixed Amount (₹)</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label small fw-semibold">Discount Value *</label>
-                            <input type="number" step="any" name="discount_value" class="form-control" placeholder="e.g. 50 or 1000" required>
+                            <input type="number" step="any" name="discount_value" class="form-control" placeholder="e.g. 10 or 500" required>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Min Order Amount (₹)</label>
+                            <input type="number" step="any" name="min_order_amount" class="form-control" placeholder="e.g. 499 or 2499" value="0">
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label small fw-semibold">Max Discount Cap (₹)</label>
                             <input type="number" name="max_discount" class="form-control" placeholder="e.g. 2000">
                         </div>

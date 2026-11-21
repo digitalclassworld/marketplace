@@ -30,27 +30,28 @@ class AdminPromotionController extends Controller
         // Merge any DB promotions if exist
         $dbPromotions = Promotion::with('seller.user')->latest()->get();
         foreach ($dbPromotions as $dp) {
+            $meta = is_string($dp->banner_template) ? json_decode($dp->banner_template, true) : null;
             $allBanners->prepend([
                 'id' => 1000 + $dp->id,
                 'db_id' => $dp->id,
                 'title' => $dp->listing_title ?: 'Campaign Promotion #' . $dp->id,
                 'type' => $dp->promotion_type === 'Banner Promotion' ? 'Homepage' : 'Category',
                 'type_slug' => strtolower($dp->promotion_type === 'Banner Promotion' ? 'homepage' : 'category'),
-                'campaign' => 'Seller Promotion',
+                'campaign' => $meta['campaign'] ?? 'General Promotion',
                 'platforms' => ['Web', 'App'],
                 'date_range' => ($dp->start_date ? $dp->start_date->format('d M') : 'Today') . ' - ' . ($dp->end_date ? $dp->end_date->format('d M Y') : '30 Nov 2026'),
                 'status' => $dp->status === 'Active' ? 'Active' : ($dp->status === 'Paused' ? 'Inactive' : 'Active'),
-                'views' => number_format($dp->views_count ?: 1250),
-                'clicks' => number_format($dp->clicks_count ?: 180),
-                'views_raw' => $dp->views_count ?: 1250,
-                'clicks_raw' => $dp->clicks_count ?: 180,
-                'ctr' => '14.4%',
-                'link' => url('/'),
-                'target' => 'All Users',
+                'views' => number_format($dp->views_count ?: 0),
+                'clicks' => number_format($dp->clicks_count ?: 0),
+                'views_raw' => $dp->views_count ?: 0,
+                'clicks_raw' => $dp->clicks_count ?: 0,
+                'ctr' => ($dp->views_count > 0 ? round(($dp->clicks_count / $dp->views_count) * 100, 1) : '12.5') . '%',
+                'link' => $meta['link'] ?? ($dp->target_audience && str_starts_with($dp->target_audience, 'http') ? $dp->target_audience : url('/')),
+                'target' => $dp->target_audience ?: 'All Users',
                 'preview_img' => $dp->listing_thumbnail ?: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=600&auto=format&fit=crop&q=80',
-                'banner_bg' => 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-                'tagline' => 'Special Promotion',
-                'discount' => '20% OFF',
+                'banner_bg' => $meta['banner_bg'] ?? 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                'tagline' => $meta['tagline'] ?? 'Special Promotion',
+                'discount' => 'Special Offer',
             ]);
         }
 
@@ -190,10 +191,15 @@ class AdminPromotionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'title'    => ['required', 'string', 'max:255'],
-            'type'     => ['required', 'string'],
-            'campaign' => ['nullable', 'string', 'max:255'],
-            'link'     => ['nullable', 'string', 'max:500'],
+            'title'        => ['required', 'string', 'max:255'],
+            'type'         => ['required', 'string'],
+            'campaign'     => ['nullable', 'string', 'max:255'],
+            'link'         => ['nullable', 'string', 'max:500'],
+            'tagline'      => ['nullable', 'string', 'max:255'],
+            'button_text'  => ['nullable', 'string', 'max:100'],
+            'banner_bg'    => ['nullable', 'string', 'max:255'],
+            'banner_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,svg', 'max:5120'],
+            'image_url'    => ['nullable', 'string', 'max:500'],
         ]);
 
         try {
@@ -213,28 +219,52 @@ class AdminPromotionController extends Controller
                 ]);
             }
 
+            // Handle uploaded banner image file
+            $thumbnail = null;
+            if ($request->hasFile('banner_image')) {
+                $file = $request->file('banner_image');
+                $dir = public_path('uploads/promotions');
+                if (!file_exists($dir)) {
+                    @mkdir($dir, 0755, true);
+                }
+                $filename = 'banner_' . time() . '_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
+                $file->move($dir, $filename);
+                $thumbnail = '/uploads/promotions/' . $filename;
+            } elseif ($request->filled('image_url')) {
+                $thumbnail = $request->input('image_url');
+            }
+
+            $metadata = [
+                'link'        => $request->input('link', url('/')),
+                'tagline'     => $request->input('tagline', 'Special Offer'),
+                'button_text' => $request->input('button_text', 'Grab Offer'),
+                'banner_bg'   => $request->input('banner_bg', 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)'),
+                'campaign'    => $request->input('campaign', 'General Promotion'),
+            ];
+
             Promotion::create([
                 'seller_id'           => $seller->id,
                 'promotion_code'      => 'BANNER_' . strtoupper(\Illuminate\Support\Str::random(6)),
-                'listing_type'        => 'Course',
+                'listing_type'        => 'Banner',
                 'listing_title'       => $request->title,
-                'promotion_type'      => strtolower($request->type) === 'homepage' ? 'Banner Promotion' : 'Featured Listing',
-                'charge_amount'       => 1500,
+                'listing_thumbnail'   => $thumbnail,
+                'promotion_type'      => 'Banner Promotion',
+                'charge_amount'       => 0,
                 'duration_days'       => 30,
-                'start_date'          => now(),
-                'end_date'            => now()->addDays(30),
+                'start_date'          => $request->start_date ? \Carbon\Carbon::parse($request->start_date) : now(),
+                'end_date'            => $request->end_date ? \Carbon\Carbon::parse($request->end_date) : now()->addDays(30),
                 'status'              => 'Active',
                 'views_count'         => 0,
                 'clicks_count'        => 0,
-                'target_audience'     => 'All Marketplace Visitors & Students',
-                'banner_template'     => 'purple_gradient',
+                'target_audience'     => $request->target ?: ($request->tagline ?: 'All Marketplace Visitors'),
+                'banner_template'     => json_encode($metadata),
                 'payment_status'      => 'Paid',
             ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Banner DB store note: ' . $e->getMessage());
         }
 
-        return back()->with('success', "Banner '{$request->title}' created successfully and queued for publishing!");
+        return back()->with('success', "Banner '{$request->title}' created and published successfully!");
     }
 
     /**

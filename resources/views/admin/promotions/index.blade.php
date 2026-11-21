@@ -877,22 +877,22 @@
 <div class="modal fade" id="createBannerModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <form method="POST" action="{{ route('admin.promotions.store') }}">
+            <form method="POST" action="{{ route('admin.promotions.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header border-bottom pb-3">
                     <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-plus text-primary me-2"></i>Create New Banner</h5>
-                    <button type="button" class="btn-close" data-bs-toggle="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label small fw-semibold">Banner Title *</label>
-                            <input type="text" name="title" class="form-control" placeholder="e.g. New Year Learning Festival 2027" required>
+                            <label class="form-label small fw-semibold">Banner Title / Heading *</label>
+                            <input type="text" name="title" class="form-control" placeholder="e.g. Extra 50% OFF on Selected Courses" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold">Banner Type *</label>
                             <select name="type" class="form-select" required>
-                                <option value="Homepage">Homepage Slider</option>
+                                <option value="Homepage">Homepage Banner</option>
                                 <option value="Category">Category Header</option>
                                 <option value="Services">Services Promotion</option>
                                 <option value="Products">Products Deal</option>
@@ -902,16 +902,39 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Campaign Name</label>
-                            <input type="text" name="campaign" class="form-control" placeholder="e.g. Diwali 2026, Career Boost">
+                            <label class="form-label small fw-semibold">Promotional Tag / Badge</label>
+                            <input type="text" name="tagline" class="form-control" placeholder="e.g. Festival Offer, Grow Your Business">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-semibold">Target Audience</label>
-                            <input type="text" name="target" class="form-control" placeholder="e.g. All Users, Students & Professionals">
+                            <label class="form-label small fw-semibold">Action Button Text</label>
+                            <input type="text" name="button_text" class="form-control" placeholder="e.g. Grab Offer, Explore Now, Start Selling">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Upload Banner Image File</label>
+                            <input type="file" name="banner_image" class="form-control" accept="image/*">
+                            <small class="text-muted" style="font-size: 0.72rem;">PNG, JPG, WEBP (Max 5MB). Banner will feature this image.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Or Image URL</label>
+                            <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Background Theme Style</label>
+                            <select name="banner_bg" class="form-select">
+                                <option value="linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)">Deep Royal Blue</option>
+                                <option value="linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)">Crimson Red Festival</option>
+                                <option value="linear-gradient(135deg, #065f46 0%, #059669 100%)">Emerald Green Growth</option>
+                                <option value="linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)">Sunset Orange</option>
+                                <option value="linear-gradient(135deg, #581c87 0%, #9333ea 100%)">Purple Violet</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Campaign Name</label>
+                            <input type="text" name="campaign" class="form-control" placeholder="e.g. Diwali 2026, Summer Learning">
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-semibold">Destination URL / Deep Link</label>
-                            <input type="url" name="link" class="form-control" placeholder="https://digitalclass.in/courses/offer">
+                            <label class="form-label small fw-semibold">Destination URL / Click Link</label>
+                            <input type="url" name="link" class="form-control" placeholder="https://digitalclass.in/courses or /businesses">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-semibold">Start Date</label>
@@ -938,11 +961,12 @@
                 </div>
                 <div class="modal-footer border-top pt-3">
                     <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-medium">Save & Publish Banner</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-medium">Upload & Publish Banner</button>
                 </div>
             </form>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Modal 2: Manage Campaigns Modal -->

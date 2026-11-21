@@ -926,19 +926,30 @@
                                 </div>
                                 <div id="couponFeedback" class="small mt-1" style="display: none;"></div>
 
-                                <!-- Quick Apply Coupon Pills -->
+                                <!-- Quick Apply Coupon Pills (Loaded dynamically from Admin coupons) -->
                                 <div class="mt-2">
-                                    <div class="text-muted small fw-medium mb-1" style="font-size: 0.72rem;">Available Offers:</div>
+                                    <div class="text-muted small fw-medium mb-1" style="font-size: 0.72rem;">Available Offers from Admin:</div>
                                     <div class="d-flex flex-wrap gap-1" id="availableCouponsContainer">
-                                        <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('WELCOME10')">
-                                            🏷️ WELCOME10 <span class="fw-normal text-muted">(10% OFF)</span>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('FESTIVE500')">
-                                            🏷️ FESTIVE500 <span class="fw-normal text-muted">(₹500 OFF)</span>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('DIGITAL20')">
-                                            🏷️ DIGITAL20 <span class="fw-normal text-muted">(20% OFF)</span>
-                                        </button>
+                                        @forelse($availableCoupons ?? [] as $ac)
+                                            @php
+                                                $isPct = strtolower($ac->discount_type) === 'percentage';
+                                                $discVal = $isPct ? intval($ac->discount_value) . '% OFF' : '₹' . number_format($ac->discount_value, 0) . ' OFF';
+                                                $minVal = $ac->min_order_amount > 0 ? '(Min ₹' . number_format($ac->min_order_amount, 0) . ')' : '';
+                                            @endphp
+                                            <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('{{ $ac->coupon_code }}')">
+                                                🏷️ {{ $ac->coupon_code }} <span class="fw-normal text-muted">{{ $discVal }} {{ $minVal }}</span>
+                                            </button>
+                                        @empty
+                                            <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('WELCOME10')">
+                                                🏷️ WELCOME10 <span class="fw-normal text-muted">10% OFF (Min ₹499)</span>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('FESTIVE500')">
+                                                🏷️ FESTIVE500 <span class="fw-normal text-muted">₹500 OFF (Min ₹2,499)</span>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary btn-sm py-0.5 px-2 rounded-pill font-mono-code" style="font-size: 0.72rem;" onclick="quickApplyCoupon('DIGITAL20')">
+                                                🏷️ DIGITAL20 <span class="fw-normal text-muted">20% OFF (Min ₹1,999)</span>
+                                            </button>
+                                        @endforelse
                                     </div>
                                 </div>
                             </div>

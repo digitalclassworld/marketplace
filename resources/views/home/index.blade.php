@@ -1212,43 +1212,74 @@
      ============================================================================ -->
 <div class="container-fluid px-3 px-md-4 px-xl-5 py-4">
 
-    <!-- 3 Promotional Banners -->
+    <!-- 3 Promotional Banners (Dynamically uploaded by Admin or curated defaults) -->
     <div class="promo-banners-row">
-        <!-- Banner 1: Festival Offer -->
-        <div class="promo-banner-card promo-card-1">
-            <div>
-                <span class="promo-tag">Festival Offer</span>
-                <div class="promo-title">Extra 50% OFF<br>on Selected Courses</div>
-                <div class="promo-desc">Learn top IT, Design & Management skills today</div>
+        @if(isset($promotionalBanners) && $promotionalBanners->count() > 0)
+            @foreach($promotionalBanners as $idx => $banner)
+                @php
+                    $meta = is_string($banner->banner_template) ? json_decode($banner->banner_template, true) : null;
+                    $bg = $meta['banner_bg'] ?? (['promo-card-1', 'promo-card-2', 'promo-card-3'][$idx % 3]);
+                    $link = $meta['link'] ?? ($banner->target_audience && str_starts_with($banner->target_audience, 'http') ? $banner->target_audience : route('courses'));
+                    $tagline = $meta['tagline'] ?? ($banner->target_audience ?: 'Special Offer');
+                    $btnText = $meta['button_text'] ?? 'Explore Offer';
+                    $hasImg = !empty($banner->listing_thumbnail);
+                    $style = '';
+                    if ($hasImg) {
+                        $style = "background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('{$banner->listing_thumbnail}'); background-size: cover; background-position: center;";
+                    } elseif (str_starts_with($bg, 'linear-gradient') || str_starts_with($bg, 'radial-gradient')) {
+                        $style = "background: {$bg};";
+                    }
+                @endphp
+                <div class="promo-banner-card {{ !$style ? $bg : '' }}" style="{{ $style }}">
+                    <div>
+                        <span class="promo-tag">{{ $tagline }}</span>
+                        <div class="promo-title">{!! nl2br(e($banner->listing_title)) !!}</div>
+                        @if(!empty($meta['campaign']))
+                            <div class="promo-desc">{{ $meta['campaign'] }}</div>
+                        @endif
+                    </div>
+                    <a href="{{ $link }}" class="promo-btn">
+                        {{ $btnText }} <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            @endforeach
+        @else
+            <!-- Banner 1: Festival Offer -->
+            <div class="promo-banner-card promo-card-1">
+                <div>
+                    <span class="promo-tag">Festival Offer</span>
+                    <div class="promo-title">Extra 50% OFF<br>on Selected Courses</div>
+                    <div class="promo-desc">Learn top IT, Design & Management skills today</div>
+                </div>
+                <a href="{{ route('courses') }}" class="promo-btn">
+                    Grab Offer <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
             </div>
-            <a href="{{ route('courses') }}" class="promo-btn">
-                Grab Offer <i class="fa-solid fa-arrow-right ms-1"></i>
-            </a>
-        </div>
 
-        <!-- Banner 2: Grow Your Business -->
-        <div class="promo-banner-card promo-card-2">
-            <div>
-                <span class="promo-tag">Grow Your Business</span>
-                <div class="promo-title">List Your Business for Free</div>
-                <div class="promo-desc">Get discovered by thousands of active students & clients</div>
+            <!-- Banner 2: Grow Your Business -->
+            <div class="promo-banner-card promo-card-2">
+                <div>
+                    <span class="promo-tag">Grow Your Business</span>
+                    <div class="promo-title">List Your Business for Free</div>
+                    <div class="promo-desc">Get discovered by thousands of active students & clients</div>
+                </div>
+                <a href="{{ route('businesses') }}" class="promo-btn">
+                    Add Your Business <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
             </div>
-            <a href="{{ route('businesses') }}" class="promo-btn">
-                Add Your Business <i class="fa-solid fa-arrow-right ms-1"></i>
-            </a>
-        </div>
 
-        <!-- Banner 3: Become a Seller -->
-        <div class="promo-banner-card promo-card-3">
-            <div>
-                <span class="promo-tag">Become a Seller</span>
-                <div class="promo-title">Sell Courses, Services & Products</div>
-                <div class="promo-desc">Join 10,000+ educators & service providers nationwide</div>
+            <!-- Banner 3: Become a Seller -->
+            <div class="promo-banner-card promo-card-3">
+                <div>
+                    <span class="promo-tag">Become a Seller</span>
+                    <div class="promo-title">Sell Courses, Services & Products</div>
+                    <div class="promo-desc">Join 10,000+ educators & service providers nationwide</div>
+                </div>
+                <a href="{{ route('seller.register') }}" class="promo-btn">
+                    Start Selling <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
             </div>
-            <a href="{{ route('seller.register') }}" class="promo-btn">
-                Start Selling <i class="fa-solid fa-arrow-right ms-1"></i>
-            </a>
-        </div>
+        @endif
     </div>
 
     <!-- ========================================================================
