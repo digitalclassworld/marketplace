@@ -83,22 +83,41 @@ class HomeController extends Controller
 
             if (Schema::hasTable('products')) {
                 $totalProducts = Product::whereIn('status', ['approved', 'active', 'published'])->count();
+                $curatedProductIds = [4, 1, 7, 2, 11, 12, 13, 9];
                 $featuredProducts = Product::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
-                    ->latest()
-                    ->take(6)
+                    ->whereIn('id', $curatedProductIds)
+                    ->orderByRaw("FIELD(id, 4, 1, 7, 2, 11, 12, 13, 9)")
                     ->get();
+
+                if ($featuredProducts->count() < 8) {
+                    $extra = Product::with(['seller.businessDetail', 'seller.user'])
+                        ->whereIn('status', ['approved', 'active', 'published'])
+                        ->whereNotIn('id', $featuredProducts->pluck('id')->toArray())
+                        ->take(8 - $featuredProducts->count())
+                        ->get();
+                    $featuredProducts = $featuredProducts->merge($extra);
+                }
             }
 
             if (Schema::hasTable('business_listings')) {
                 $totalBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])->count();
-                $popularBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
-                    ->where('id', '>', 20)
-                    ->whereNotNull('logo')
-                    ->where('logo', '!=', '')
-                    ->orderBy('id', 'asc')
-                    ->take(8)
+                $curatedBizIds = [1440, 234, 589, 866, 174, 283, 716, 43];
+                $popularBusinesses = BusinessListing::whereIn('id', $curatedBizIds)
+                    ->whereIn('status', ['approved', 'active', 'published'])
+                    ->orderByRaw("FIELD(id, 1440, 234, 589, 866, 174, 283, 716, 43)")
                     ->get();
+
+                if ($popularBusinesses->count() < 8) {
+                    $fallback = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
+                        ->where('id', '>', 20)
+                        ->whereNotNull('logo')
+                        ->where('logo', '!=', '')
+                        ->whereNotIn('id', $popularBusinesses->pluck('id')->toArray())
+                        ->take(8 - $popularBusinesses->count())
+                        ->get();
+                    $popularBusinesses = $popularBusinesses->merge($fallback);
+                }
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Catalog load failed on marketplace index: ' . $e->getMessage());

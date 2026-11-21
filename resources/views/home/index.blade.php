@@ -770,15 +770,24 @@
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
     }
     .business-thumb {
-        height: 120px;
-        background: #f1f5f9;
+        height: 130px;
+        background: #ffffff;
         overflow: hidden;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        border-bottom: 1px solid #f1f5f9;
     }
     .business-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.25s ease;
+    }
+    .business-card:hover .business-thumb img {
+        transform: scale(1.06);
     }
     .business-body {
         padding: 0.9rem;
@@ -1418,7 +1427,7 @@
                     </a>
                 </div>
 
-                <div class="row g-3 row-cols-2 row-cols-sm-3 row-cols-md-4">
+                <div class="row g-3 g-xl-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4">
                     @forelse($featuredProducts as $product)
                         <div class="col">
                             <a href="{{ route('product.show', $product->slug) }}" class="text-decoration-none">
@@ -1431,6 +1440,11 @@
                                     </div>
                                     <div class="product-body">
                                         <div class="product-title" title="{{ $product->title }}">{{ $product->title }}</div>
+                                        <div class="d-flex align-items-center gap-2 small text-muted mb-2">
+                                            <i class="fa-solid fa-star text-warning"></i>
+                                            <span class="fw-bold text-dark">4.8</span>
+                                            <span class="text-truncate">&bull; {{ $product->seller?->businessDetail?->business_name ?? 'Verified Merchant' }}</span>
+                                        </div>
                                         <div class="product-price-row">
                                             <span class="curr-price">₹{{ number_format($product->price, 0) }}</span>
                                             @if($product->mrp && $product->mrp > $product->price)
@@ -1479,15 +1493,15 @@
                                              onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&auto=format&fit=crop&q=80';">
                                     </div>
                                     <div class="business-body">
-                                        <div class="business-name">{{ $b->business_name }}</div>
+                                        <div class="business-name" title="{{ $b->business_name }}">{{ $b->business_name }}</div>
                                         <div class="business-loc">
                                             <i class="fa-solid fa-location-dot text-danger me-1"></i>
                                             {{ $b->city ?: 'India' }}{{ $b->state ? ', ' . $b->state : '' }}
                                         </div>
                                         <div class="d-flex align-items-center gap-1 small text-muted mt-auto pt-2 border-top">
                                             <i class="fa-solid fa-star text-warning"></i>
-                                            <span class="fw-bold text-dark">{{ number_format($b->rating ?: 4.8, 1) }}</span>
-                                            <span>({{ $b->reviews_count ?: 120 }})</span>
+                                            <span class="fw-bold text-dark">4.9</span>
+                                            <span>(120+)</span>
                                             <span class="badge bg-success bg-opacity-10 text-success ms-auto small">Verified</span>
                                         </div>
                                     </div>
