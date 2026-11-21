@@ -9,12 +9,22 @@
         border: 1px solid #e2e8f0;
         border-radius: 12px;
         padding: 1.1rem 1.25rem;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         position: relative;
+        text-decoration: none;
+        display: block;
+        color: inherit;
     }
     .product-kpi-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+        border-color: #cbd5e1;
+        color: inherit;
+    }
+    .product-kpi-card.is-active {
+        border-color: #0066ff;
+        background-color: #f8faff;
+        box-shadow: 0 0 0 1px #0066ff;
     }
     .kpi-icon-circle {
         width: 42px;
@@ -97,13 +107,22 @@
         font-weight: 600;
         padding: 0.2rem 0.55rem;
         border-radius: 6px;
+        display: inline-block;
+        white-space: nowrap;
     }
-    .cat-computers    { background: #eff6ff; color: #1d4ed8; }
-    .cat-accessories  { background: #ecfeff; color: #0891b2; }
-    .cat-furniture    { background: #fef2f2; color: #dc2626; }
-    .cat-designtools  { background: #f5f3ff; color: #7c3aed; }
-    .cat-software     { background: #eff6ff; color: #2563eb; }
-    .cat-camera       { background: #fff7ed; color: #ea580c; }
+    .cat-computers, .cat-laptopscomputers { background: #eff6ff; color: #1d4ed8; }
+    .cat-accessories                     { background: #ecfeff; color: #0891b2; }
+    .cat-electronics                     { background: #eef2ff; color: #4f46e5; }
+    .cat-furniture                       { background: #fef2f2; color: #dc2626; }
+    .cat-designtools                     { background: #f5f3ff; color: #7c3aed; }
+    .cat-software, .cat-softwarelicenses { background: #eff6ff; color: #2563eb; }
+    .cat-camera, .cat-printers           { background: #fff7ed; color: #ea580c; }
+    .cat-printersandscanners, .cat-printersscanners { background: #fff7ed; color: #ea580c; }
+    .cat-projectors, .cat-projectorsanddisplays, .cat-projectorsdisplays { background: #fdf2f8; color: #db2777; }
+    .cat-mobiles, .cat-mobilestablets    { background: #ecfdf5; color: #059669; }
+    .cat-books, .cat-booksandstudymaterial, .cat-booksstudymaterial { background: #fffbeb; color: #d97706; }
+    .cat-networking                      { background: #f0fdf4; color: #16a34a; }
+    .cat-storagedevices                  { background: #faf5ff; color: #9333ea; }
 
     .inspector-panel {
         background: #ffffff;
@@ -160,7 +179,9 @@
     <div class="row g-3 mb-4">
         <!-- Card 1: Total Products -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="product-kpi-card h-100">
+            <a href="{{ route('admin.catalog.products', array_merge(request()->query(), ['status' => 'all'])) }}" 
+               class="product-kpi-card h-100 {{ (!request('status') || request('status') === 'all') ? 'is-active' : '' }}"
+               title="Filter all products">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-muted small fw-medium">Total Products</span>
                     <div class="kpi-icon-circle kpi-icon-rose">
@@ -172,12 +193,14 @@
                     <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['total_growth'] ?? '0%' }}</span>
                 </div>
                 <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['total_sub'] ?? '+0 this month' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 2: Active Products -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="product-kpi-card h-100">
+            <a href="{{ route('admin.catalog.products', array_merge(request()->query(), ['status' => 'active'])) }}" 
+               class="product-kpi-card h-100 {{ in_array(request('status'), ['active', 'approved']) ? 'is-active' : '' }}"
+               title="Filter by active products">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-muted small fw-medium">Active Products</span>
                     <div class="kpi-icon-circle kpi-icon-green">
@@ -189,12 +212,14 @@
                     <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['active_growth'] ?? '0%' }}</span>
                 </div>
                 <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['active_sub'] ?? '0% of total' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 3: Pending Approval -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="product-kpi-card h-100">
+            <a href="{{ route('admin.catalog.products', array_merge(request()->query(), ['status' => 'pending'])) }}" 
+               class="product-kpi-card h-100 {{ request('status') === 'pending' ? 'is-active' : '' }}"
+               title="Filter by pending approval products">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-muted small fw-medium">Pending Approval</span>
                     <div class="kpi-icon-circle kpi-icon-amber">
@@ -205,12 +230,14 @@
                     <span class="fs-4 fw-bold text-dark">{{ $stats['pending'] ?? '0' }}</span>
                 </div>
                 <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['pending_sub'] ?? 'All reviewed' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 4: Rejected Products -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="product-kpi-card h-100">
+            <a href="{{ route('admin.catalog.products', array_merge(request()->query(), ['status' => 'rejected'])) }}" 
+               class="product-kpi-card h-100 {{ request('status') === 'rejected' ? 'is-active' : '' }}"
+               title="Filter by rejected products">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-muted small fw-medium">Rejected Products</span>
                     <div class="kpi-icon-circle kpi-icon-red">
@@ -221,12 +248,14 @@
                     <span class="fs-4 fw-bold text-dark">{{ $stats['rejected'] ?? '0' }}</span>
                 </div>
                 <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['rejected_sub'] ?? 'None rejected' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 5: Featured Products -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="product-kpi-card h-100">
+            <a href="{{ route('admin.catalog.products', array_merge(request()->query(), ['status' => 'featured'])) }}" 
+               class="product-kpi-card h-100 {{ request('status') === 'featured' ? 'is-active' : '' }}"
+               title="Filter by featured products">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-muted small fw-medium">Featured Products</span>
                     <div class="kpi-icon-circle kpi-icon-purple">
@@ -238,12 +267,14 @@
                     <span class="badge bg-success-subtle text-success small fw-semibold">↑ {{ $stats['featured_growth'] ?? '0%' }}</span>
                 </div>
                 <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['featured_sub'] ?? '0% of total' }}</div>
-            </div>
+            </a>
         </div>
 
         <!-- Card 6: Top Selling -->
         <div class="col-12 col-sm-6 col-xl-2">
-            <div class="product-kpi-card h-100">
+            <a href="{{ route('admin.catalog.products', array_merge(request()->query(), ['status' => 'top_selling'])) }}" 
+               class="product-kpi-card h-100 {{ request('status') === 'top_selling' ? 'is-active' : '' }}"
+               title="Filter by top selling products">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-muted small fw-medium">Top Selling</span>
                     <div class="kpi-icon-circle kpi-icon-yellow">
@@ -254,10 +285,7 @@
                     <span class="fs-4 fw-bold text-dark">{{ $stats['top_selling'] ?? '0' }}</span>
                 </div>
                 <div class="text-muted" style="font-size: 0.75rem;">{{ $stats['top_sub'] ?? 'Active in catalog' }}</div>
-            </div>
-        </div>
-                <div class="text-muted" style="font-size: 0.75rem;">Based on orders & revenue</div>
-            </div>
+            </a>
         </div>
     </div>
 
@@ -288,7 +316,7 @@
         </nav>
     </div>
 
-    <!-- 2-Row Filter & Search Toolbar matching Screenshot 1 -->
+    <!-- Filter & Search Toolbar -->
     <div class="bg-white p-3 rounded-3 border mb-3">
         <form method="GET" action="{{ route('admin.catalog.products') }}">
             @if(request('status'))
@@ -297,48 +325,52 @@
 
             <!-- Row 1 -->
             <div class="row g-2 align-items-center mb-2">
-                <div class="col-12 col-lg-3">
+                <div class="col-12 col-md-4 col-xl-3">
                     <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-transparent border-end-0 text-muted">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <input type="text" name="q" value="{{ request('q') }}" class="form-control border-start-0 ps-0" placeholder="Search by product name, seller, SKU...">
+                        <input type="text" name="q" value="{{ request('q') }}" class="form-control border-start-0 ps-0" placeholder="Search product, seller, SKU...">
+                        @if(request('q'))
+                            <a href="{{ route('admin.catalog.products', array_filter(request()->except('q'))) }}" class="input-group-text bg-white border-start-0 text-muted text-decoration-none" title="Clear search">
+                                <i class="fa-solid fa-xmark"></i>
+                            </a>
+                        @endif
                     </div>
                 </div>
 
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-3 col-xl-2">
                     <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="all">All Categories</option>
-                        <option value="Computers" {{ request('category') === 'Computers' ? 'selected' : '' }}>Computers</option>
-                        <option value="Accessories" {{ request('category') === 'Accessories' ? 'selected' : '' }}>Accessories</option>
-                        <option value="Furniture" {{ request('category') === 'Furniture' ? 'selected' : '' }}>Furniture</option>
-                        <option value="Design Tools" {{ request('category') === 'Design Tools' ? 'selected' : '' }}>Design Tools</option>
-                        <option value="Software" {{ request('category') === 'Software' ? 'selected' : '' }}>Software</option>
-                        <option value="Camera" {{ request('category') === 'Camera' ? 'selected' : '' }}>Camera</option>
+                        @php
+                            $availableProductCats = ['Laptops & Computers', 'Accessories', 'Electronics', 'Printers & Scanners', 'Projectors & Displays', 'Mobiles & Tablets', 'Books & Study Material', 'Software & Licenses', 'Furniture', 'Networking', 'Storage Devices', 'Computers', 'Camera', 'Design Tools'];
+                        @endphp
+                        @foreach($availableProductCats as $c)
+                            <option value="{{ $c }}" {{ request('category') === $c ? 'selected' : '' }}>{{ $c }}</option>
+                        @endforeach
                     </select>
                 </div>
 
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-2 col-xl-2">
                     <select name="type" class="form-select form-select-sm" onchange="this.form.submit()">
-                        <option value="all">Product Type</option>
+                        <option value="all">All Product Types</option>
                         <option value="Physical" {{ request('type') === 'Physical' ? 'selected' : '' }}>Physical</option>
                         <option value="Digital" {{ request('type') === 'Digital' ? 'selected' : '' }}>Digital</option>
                     </select>
                 </div>
 
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-3 col-xl-2">
                     <select name="seller" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="all">All Sellers</option>
-                        <option value="Tech World" {{ request('seller') === 'Tech World' ? 'selected' : '' }}>Tech World</option>
-                        <option value="Gadget Hub" {{ request('seller') === 'Gadget Hub' ? 'selected' : '' }}>Gadget Hub</option>
-                        <option value="HomeOffice" {{ request('seller') === 'HomeOffice' ? 'selected' : '' }}>HomeOffice</option>
-                        <option value="Design Store" {{ request('seller') === 'Design Store' ? 'selected' : '' }}>Design Store</option>
-                        <option value="VCEC Store" {{ request('seller') === 'VCEC Store' ? 'selected' : '' }}>VCEC Store</option>
-                        <option value="Creative Minds" {{ request('seller') === 'Creative Minds' ? 'selected' : '' }}>Creative Minds</option>
+                        <option value="Tech Skills Academy" {{ request('seller') === 'Tech Skills Academy' ? 'selected' : '' }}>Tech Skills Academy</option>
+                        <option value="56 stores" {{ request('seller') === '56 stores' ? 'selected' : '' }}>56 stores</option>
+                        <option value="VCEC - Vinayak" {{ request('seller') === 'VCEC - Vinayak' ? 'selected' : '' }}>VCEC - Vinayak</option>
+                        <option value="Knowledge Book" {{ request('seller') === 'Knowledge Book' ? 'selected' : '' }}>Knowledge Book</option>
+                        <option value="General store" {{ request('seller') === 'General store' ? 'selected' : '' }}>General store</option>
                     </select>
                 </div>
 
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-2 col-xl-2">
                     <select name="stock_status" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="all">Stock Status</option>
                         <option value="in_stock" {{ request('stock_status') === 'in_stock' ? 'selected' : '' }}>In Stock</option>
@@ -346,16 +378,16 @@
                     </select>
                 </div>
 
-                <div class="col-12 col-lg-1">
-                    <select class="form-select form-select-sm text-muted">
-                        <option>Price Range</option>
-                    </select>
+                <div class="col-6 col-md-2 col-xl-1 text-end">
+                    <a href="{{ route('admin.catalog.products') }}" class="btn btn-sm btn-link text-decoration-none text-muted p-0 fw-semibold" style="font-size: 0.8rem;">
+                        <i class="fa-solid fa-rotate-left me-1"></i>Reset
+                    </a>
                 </div>
             </div>
 
             <!-- Row 2 -->
             <div class="row g-2 align-items-center">
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-3 col-xl-2">
                     <select name="location" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="all">All Locations</option>
                         <option value="Surat" {{ request('location') === 'Surat' ? 'selected' : '' }}>Surat</option>
@@ -364,39 +396,38 @@
                         <option value="Bengaluru" {{ request('location') === 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
                         <option value="Jaipur" {{ request('location') === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
                         <option value="Delhi" {{ request('location') === 'Delhi' ? 'selected' : '' }}>Delhi</option>
+                        <option value="Patna" {{ request('location') === 'Patna' ? 'selected' : '' }}>Patna</option>
                     </select>
                 </div>
 
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-3 col-xl-2">
                     <select name="featured_status" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="all">Featured Status</option>
-                        <option value="featured">Featured Only</option>
-                        <option value="not_featured">Non-Featured</option>
+                        <option value="featured" {{ request('featured_status') === 'featured' ? 'selected' : '' }}>Featured Only</option>
+                        <option value="not_featured" {{ request('featured_status') === 'not_featured' ? 'selected' : '' }}>Non-Featured</option>
                     </select>
                 </div>
 
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-3 col-xl-2">
                     <select name="approval_status" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="all">Approval Status</option>
-                        <option value="active">Active</option>
-                        <option value="pending">Pending</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="active" {{ request('approval_status') === 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="pending" {{ request('approval_status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="rejected" {{ request('approval_status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
                     </select>
                 </div>
 
-                <div class="col-8 col-lg-2">
+                <div class="col-6 col-md-3 col-xl-2">
                     <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-transparent border-end-0 text-muted p-1">
+                        <span class="input-group-text bg-white border-end-0 text-muted p-1">
                             <i class="fa-regular fa-calendar" style="font-size:0.75rem;"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 ps-0 text-muted" style="font-size: 0.7rem;" value="01 Oct 2026 - 31 Oct 2026" readonly>
+                        <input type="text" class="form-control border-start-0 ps-0 text-muted bg-white" style="font-size: 0.7rem;" value="{{ date('d M Y') }}" readonly>
                     </div>
                 </div>
 
-                <div class="col-4 col-lg-4 text-end">
-                    <a href="{{ route('admin.catalog.products') }}" class="btn btn-sm btn-link text-decoration-none text-muted p-0">
-                        <i class="fa-solid fa-rotate-left me-1"></i> Reset
-                    </a>
+                <div class="col-12 col-md-12 col-xl-4 text-xl-end">
+                    <span class="text-muted small" style="font-size: 0.75rem;">Showing <strong>{{ count($products) }}</strong> verified products in catalog</span>
                 </div>
             </div>
         </form>
@@ -405,7 +436,7 @@
     <!-- Main Content Area: Table + Right Inspector Panel -->
     <div class="row g-3">
         <!-- Left: Products Table -->
-        <div class="col-12 col-xl-8">
+        <div class="col-12 col-xl-8" id="productsTableCol">
             <div class="bg-white border rounded-3 shadow-sm overflow-hidden">
                 <div class="table-responsive">
                     <table class="table align-middle table-hover mb-0" id="productsTable">
@@ -413,16 +444,16 @@
                             <tr>
                                 <th style="width: 32px;"><input type="checkbox" class="form-check-input" id="checkAll"></th>
                                 <th style="width: 36px;">#</th>
-                                <th>Product Details</th>
-                                <th>Seller</th>
-                                <th>Category</th>
-                                <th>Type</th>
-                                <th>Price</th>
-                                <th class="text-center">Stock</th>
-                                <th class="text-center">Orders</th>
-                                <th>Status</th>
-                                <th class="text-center">Featured</th>
-                                <th class="text-end">Actions</th>
+                                <th style="min-width: 190px;">Product Details</th>
+                                <th style="min-width: 130px;">Seller</th>
+                                <th style="min-width: 110px;">Category</th>
+                                <th style="min-width: 75px;">Type</th>
+                                <th style="min-width: 80px;">Price</th>
+                                <th style="min-width: 65px;" class="text-center">Stock</th>
+                                <th style="min-width: 65px;" class="text-center">Orders</th>
+                                <th style="min-width: 85px;">Status</th>
+                                <th style="min-width: 70px;" class="text-center">Featured</th>
+                                <th style="min-width: 60px;" class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="small">
@@ -556,7 +587,7 @@
 
                 <!-- Footer Pagination Bar -->
                 <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light small">
-                    <span class="text-muted">Showing 1 to {{ count($products) }} of {{ number_format($counts['all'] ?? 3980) }} products</span>
+                    <span class="text-muted">Showing 1 to {{ count($products) }} of {{ number_format($counts['all'] ?? count($products)) }} products</span>
                     <nav>
                         <ul class="pagination pagination-sm mb-0">
                             <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
