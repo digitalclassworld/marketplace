@@ -1360,17 +1360,23 @@
                                     @endif
                                 </div>
 
-                                <form action="{{ route('cart.add') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="type" value="course">
-                                    <input type="hidden" name="id" value="{{ $course->id }}">
-                                    <input type="hidden" name="name" value="{{ $course->title }}">
-                                    <input type="hidden" name="price" value="{{ $sellPrice }}">
-                                    <input type="hidden" name="image" value="{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}">
-                                    <button type="submit" class="btn-add-to-cart-green">
-                                        Add To Cart
-                                    </button>
-                                </form>
+                                @if(!empty($course->is_institute_course))
+                                    <a href="{{ !empty($course->url) ? $course->url : route('course.show', $course->slug) }}" class="btn btn-outline-primary w-100 fw-bold py-1.5" style="border-radius: 8px; font-size: 0.82rem;">
+                                        <i class="fa-solid fa-circle-info me-1"></i> View & Inquire
+                                    </a>
+                                @else
+                                    <form action="{{ route('cart.add') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="type" value="course">
+                                        <input type="hidden" name="id" value="{{ $course->id }}">
+                                        <input type="hidden" name="name" value="{{ $course->title }}">
+                                        <input type="hidden" name="price" value="{{ $sellPrice }}">
+                                        <input type="hidden" name="image" value="{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}">
+                                        <button type="submit" class="btn-add-to-cart-green">
+                                            Add To Cart
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>

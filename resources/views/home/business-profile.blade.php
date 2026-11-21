@@ -562,7 +562,16 @@
                     <!-- TAB: COURSES -->
                     <div class="tab-pane fade @if(count($courses) > 0) show active @endif" id="tab-courses" role="tabpanel">
                         <div class="tab-content-card">
-                            <h2 class="section-accent-header">Courses</h2>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h2 class="section-accent-header mb-0">Courses & Programs</h2>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-semibold">
+                                    <i class="fa-solid fa-building-columns me-1"></i> Institute Catalog
+                                </span>
+                            </div>
+                            <div class="alert alert-primary bg-primary bg-opacity-10 border-0 rounded-3 py-2 px-3 mb-3 small d-flex align-items-center gap-2" style="font-size: 0.78rem;">
+                                <i class="fa-solid fa-circle-info text-primary fs-6"></i>
+                                <span>The following courses are conducted by <strong>{{ $business->business_name }}</strong>. All details, fee schedules, demo classes, and admissions are provided for student information and inquiries.</span>
+                            </div>
                             @if(!empty($courses) && count($courses) > 0)
                                 <div class="row row-cols-1 row-cols-md-2 g-3">
                                     @foreach($courses as $course)
@@ -585,6 +594,10 @@
                                                     @endif
                                                 </div>
                                                 <div class="course-body-authentic">
+                                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                                        <span class="badge bg-light text-secondary border rounded-pill" style="font-size: 0.65rem;">Informational</span>
+                                                        <span class="small text-muted" style="font-size: 0.7rem;"><i class="fa-solid fa-chalkboard-user text-success me-1"></i> {{ $course['mode'] ?? 'Classroom' }}</span>
+                                                    </div>
                                                     <h3 class="course-title-authentic">
                                                         @if(!empty($course['url']))
                                                             <a href="{{ $course['url'] }}" class="text-dark text-decoration-none hover-primary">{{ $course['title'] }}</a>
@@ -595,30 +608,34 @@
                                                     <div class="d-flex align-items-center gap-2 small text-muted mb-2">
                                                         <span><i class="fa-regular fa-clock text-primary me-1"></i> {{ $course['duration'] ?? '3 Months' }}</span>
                                                         <span>&bull;</span>
-                                                        <span><i class="fa-solid fa-chalkboard-user text-success me-1"></i> {{ $course['mode'] ?? 'Offline/Online' }}</span>
+                                                        <span><i class="fa-solid fa-user-graduate text-primary me-1"></i> Certificate Included</span>
                                                     </div>
                                                     @if(!empty($course['description']))
                                                         <p class="small text-muted mb-3" style="line-height: 1.4;">
                                                             {{ Str::limit(strip_tags($course['description']), 100) }}
                                                         </p>
                                                     @endif
-                                                    <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
-                                                        <div class="fw-bold text-dark">
-                                                            @if(!empty($course['price']) && $course['price'] > 0)
-                                                                ₹{{ number_format($course['price']) }}
-                                                            @else
-                                                                <span class="badge bg-success-subtle text-success">Free / Inquire</span>
+                                                    <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top gap-2">
+                                                        <div>
+                                                            <div class="small text-muted" style="font-size: 0.68rem;">Course Fee:</div>
+                                                            <div class="fw-bold text-dark" style="font-size: 0.88rem;">
+                                                                @if(!empty($course['price']) && $course['price'] > 0)
+                                                                    ₹{{ number_format($course['price']) }}
+                                                                @else
+                                                                    <span class="badge bg-success-subtle text-success">Inquire for Fee</span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex align-items-center gap-1.5">
+                                                            <button type="button" class="btn btn-sm btn-primary px-3 rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#inquiryModal" onclick="document.getElementById('inquiryCourseField').value='{{ addslashes($course['title']) }}'">
+                                                                <i class="fa-solid fa-envelope me-1"></i> Inquire Now
+                                                            </button>
+                                                            @if(!empty($course['url']))
+                                                                <a href="{{ $course['url'] }}" class="btn btn-sm btn-outline-secondary px-2.5 rounded-pill fw-semibold" title="View Course Details">
+                                                                    Details
+                                                                </a>
                                                             @endif
                                                         </div>
-                                                        @if(!empty($course['url']))
-                                                            <a href="{{ $course['url'] }}" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-semibold">
-                                                                View Details
-                                                            </a>
-                                                        @else
-                                                            <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#inquiryModal" onclick="document.getElementById('inquiryCourseField').value='{{ addslashes($course['title']) }}'">
-                                                                Inquire Now
-                                                            </button>
-                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>

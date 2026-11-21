@@ -141,5 +141,15 @@ class InstituteCourse extends Model
     {
         return url('/business-listing/course/' . $this->id . '/' . $this->slug);
     }
+
+    public function getIsInstituteCourseAttribute(): bool
+    {
+        return true;
+    }
+
+    public function getCanBuyAttribute(): bool
+    {
+        return false;
+    }
 }
 
