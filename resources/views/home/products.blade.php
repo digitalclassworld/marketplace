@@ -488,7 +488,7 @@
                     </span>
                     <span class="hero-trust-pill">
                         <i class="fa-solid fa-tags"></i>
-                        <span><strong>Wide Range</strong> | 10,000+ Products</span>
+                        <span><strong>Verified Quality</strong> | Real Merchant Products</span>
                     </span>
                 </div>
 
@@ -795,21 +795,21 @@
                         </div>
                         <div class="filter-checkbox-item">
                             <label class="form-check-label d-flex align-items-center gap-2">
-                                <input type="checkbox" class="form-check-input">
+                                <input type="checkbox" class="form-check-input" checked>
                                 <span>All Sellers</span>
                             </label>
-                            <span class="text-muted" style="font-size: 0.7rem;">(10,240)</span>
+                            <span class="text-muted" style="font-size: 0.7rem;">({{ count($products) }})</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- CENTER & MAIN CONTENT: 10,000+ PRODUCTS GRID -->
+            <!-- CENTER & MAIN CONTENT: PRODUCTS GRID -->
             <div class="col-xl-8 col-lg-9 col-md-8">
                 <!-- Top Bar: Count, Sort, Grid View & Pagination -->
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                     <h2 class="fw-bold text-dark mb-0" style="font-size: 1.15rem;">
-                        10,000+ Products
+                        {{ count($products) }} {{ count($products) === 1 ? 'Product' : 'Products' }}
                     </h2>
 
                     <div class="d-flex align-items-center gap-3">
@@ -830,12 +830,14 @@
                             <button type="button" class="btn btn-outline-secondary py-1 px-2"><i class="fa-solid fa-list"></i></button>
                         </div>
 
-                        <!-- Pagination Indicator -->
-                        <div class="d-flex align-items-center gap-2 small text-muted" style="font-size: 0.75rem;">
-                            <span>1 of 240 pages</span>
-                            <button class="btn btn-sm btn-light border py-0 px-2" disabled>&lt;</button>
-                            <button class="btn btn-sm btn-light border py-0 px-2">&gt;</button>
-                        </div>
+                        @if(count($products) > 0)
+                            <!-- Pagination Indicator -->
+                            <div class="d-flex align-items-center gap-2 small text-muted" style="font-size: 0.75rem;">
+                                <span>Page 1 of 1</span>
+                                <button class="btn btn-sm btn-light border py-0 px-2" disabled>&lt;</button>
+                                <button class="btn btn-sm btn-light border py-0 px-2" disabled>&gt;</button>
+                            </div>
+                        @endif
                     </div>
                 </div>
 

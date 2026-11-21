@@ -1421,7 +1421,7 @@
                 <!-- Header with Available Count & Toggle Icons -->
                 <div class="listing-header-wrap">
                     <h2 class="available-count-heading">
-                        {{ count($services) > 0 ? number_format(count($services) * 150) . '+ Services Available' : 'Services Available' }}
+                        {{ count($services) }} {{ count($services) === 1 ? 'Service' : 'Services' }} Available
                     </h2>
                     <div class="btn-group view-toggle-btns" role="group">
                         <button type="button" class="btn btn-sm btn-outline-secondary" title="Grid View">

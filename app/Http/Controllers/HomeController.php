@@ -1113,82 +1113,82 @@ class HomeController extends Controller
         $maxPrice = $request->input('max_price', 50000);
         $sortBy = $request->input('sort', 'popular');
 
-        // 11 Horizontal Category Cards with counts & photos matching screenshot
+        // 11 Horizontal Category Cards matching screenshot
         $categories = [
             [
                 'name' => 'Website Development',
                 'slug' => 'Website Development',
-                'experts' => '240+ Experts',
+                'experts' => 'Verified Agencies',
                 'image' => 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-code',
             ],
             [
                 'name' => 'Mobile App Development',
                 'slug' => 'Mobile App Development',
-                'experts' => '180+ Experts',
+                'experts' => 'App Developers',
                 'image' => 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-mobile-screen',
             ],
             [
                 'name' => 'Digital Marketing',
                 'slug' => 'Digital Marketing',
-                'experts' => '220+ Experts',
+                'experts' => 'Marketing Agencies',
                 'image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-chart-line',
             ],
             [
                 'name' => 'Logo & Branding',
                 'slug' => 'Logo & Branding',
-                'experts' => '160+ Experts',
+                'experts' => 'Design Studios',
                 'image' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-palette',
             ],
             [
                 'name' => 'Graphic Design',
                 'slug' => 'Graphic Design',
-                'experts' => '190+ Experts',
+                'experts' => 'Creative Experts',
                 'image' => 'https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-bezier-curve',
             ],
             [
                 'name' => 'SEO Services',
                 'slug' => 'SEO Services',
-                'experts' => '150+ Experts',
+                'experts' => 'SEO Specialists',
                 'image' => 'https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-magnifying-glass-chart',
             ],
             [
                 'name' => 'Content Writing',
                 'slug' => 'Content Writing',
-                'experts' => '120+ Experts',
+                'experts' => 'Content Writers',
                 'image' => 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-pen-nib',
             ],
             [
                 'name' => 'Video & Animation',
                 'slug' => 'Video & Animation',
-                'experts' => '110+ Experts',
+                'experts' => 'Video Editors',
                 'image' => 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-video',
             ],
             [
                 'name' => 'Accounting & Finance',
                 'slug' => 'Accounting & Finance',
-                'experts' => '100+ Experts',
+                'experts' => 'CA & Accountants',
                 'image' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-calculator',
             ],
             [
                 'name' => 'Business Consulting',
                 'slug' => 'Business Consulting',
-                'experts' => '90+ Experts',
+                'experts' => 'Business Advisors',
                 'image' => 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=300&auto=format&fit=crop&q=80',
                 'icon' => 'fa-solid fa-briefcase',
             ],
             [
                 'name' => 'More Services',
                 'slug' => 'all',
-                'experts' => '500+ Experts',
+                'experts' => 'All Categories',
                 'image' => null,
                 'icon' => 'fa-solid fa-ellipsis',
             ],
@@ -1674,22 +1674,22 @@ class HomeController extends Controller
             ['name' => 'More',                  'icon' => 'fa-solid fa-ellipsis',           'slug' => 'more'],
         ];
 
-        // Sidebar categories with matching counts from screenshot
+        // Sidebar categories with real counts from database
         $sidebarCategories = [
-            ['name' => 'Laptops & Computers',    'count' => '1,240'],
-            ['name' => 'Mobiles & Tablets',      'count' => '890'],
-            ['name' => 'Accessories',            'count' => '1,560'],
-            ['name' => 'Software & Licenses',    'count' => '720'],
-            ['name' => 'Books & Study Material', 'count' => '1,980'],
+            ['name' => 'Laptops & Computers',    'count' => \App\Models\Product::where('category', 'like', '%Laptop%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Mobiles & Tablets',      'count' => \App\Models\Product::where('category', 'like', '%Mobile%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Accessories',            'count' => \App\Models\Product::where('category', 'like', '%Accessories%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Software & Licenses',    'count' => \App\Models\Product::where('category', 'like', '%Software%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Books & Study Material', 'count' => \App\Models\Product::where('category', 'like', '%Book%')->whereIn('status', ['approved', 'active', 'published'])->count()],
         ];
 
-        // Sidebar brands with matching counts from screenshot
+        // Sidebar brands with real counts from database
         $sidebarBrands = [
-            ['name' => 'HP',      'count' => '320'],
-            ['name' => 'Dell',    'count' => '280'],
-            ['name' => 'Lenovo',  'count' => '260'],
-            ['name' => 'Apple',   'count' => '180'],
-            ['name' => 'Samsung', 'count' => '310'],
+            ['name' => 'HP',      'count' => \App\Models\Product::where('title', 'like', '%HP%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Dell',    'count' => \App\Models\Product::where('title', 'like', '%Dell%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Lenovo',  'count' => \App\Models\Product::where('title', 'like', '%Lenovo%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Apple',   'count' => \App\Models\Product::where('title', 'like', '%Apple%')->whereIn('status', ['approved', 'active', 'published'])->count()],
+            ['name' => 'Samsung', 'count' => \App\Models\Product::where('title', 'like', '%Samsung%')->whereIn('status', ['approved', 'active', 'published'])->count()],
         ];
 
         // Deal of the Day
