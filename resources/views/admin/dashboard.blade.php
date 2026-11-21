@@ -1454,6 +1454,14 @@ document.addEventListener('DOMContentLoaded', function() {
             applyUserFiltering();
         });
     });
+
+    if (window.location.hash === '#pendingRequestsModal') {
+        const modalEl = document.getElementById('pendingRequestsModal');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
 });
 </script>
 @endsection

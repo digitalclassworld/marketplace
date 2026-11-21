@@ -850,16 +850,19 @@
             <!-- Quick Actions -->
             <div class="fw-bold text-dark fs-7 mb-2">Quick Actions</div>
             <div class="d-grid gap-2">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-success fw-bold" onclick="alert('Course marked as approved')">
-                        <i class="fa-solid fa-check me-1"></i> Approve
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger fw-bold" onclick="alert('Course marked as rejected')">
-                        <i class="fa-solid fa-xmark me-1"></i> Reject
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="alert('Course toggled as featured')">
-                        <i class="fa-solid fa-star me-1"></i> Feature
-                    </button>
+                <div class="btn-group w-100">
+                    <form id="inspCourseApproveForm" method="POST" action="{{ route('admin.catalog.courses.approve', $firstCourse['id'] ?? 1) }}" class="d-inline flex-fill">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-success fw-bold w-100 rounded-end-0">
+                            <i class="fa-solid fa-check me-1"></i> Approve
+                        </button>
+                    </form>
+                    <form id="inspCourseRejectForm" method="POST" action="{{ route('admin.catalog.courses.reject', $firstCourse['id'] ?? 1) }}" class="d-inline flex-fill">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-danger fw-bold w-100 rounded-start-0">
+                            <i class="fa-solid fa-xmark me-1"></i> Reject
+                        </button>
+                    </form>
                 </div>
             </div>
         @else
@@ -914,6 +917,11 @@
                 tagsBox.appendChild(badge);
             });
         }
+
+        const approveForm = document.getElementById('inspCourseApproveForm');
+        if (approveForm) approveForm.action = `/admin/catalog/courses/${c.id}/approve`;
+        const rejectForm = document.getElementById('inspCourseRejectForm');
+        if (rejectForm) rejectForm.action = `/admin/catalog/courses/${c.id}/reject`;
     }
 </script>
 @endsection
