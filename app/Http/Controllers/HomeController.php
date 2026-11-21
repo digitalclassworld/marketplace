@@ -163,9 +163,6 @@ class HomeController extends Controller
         }
 
         $businesses = collect();
-        $featuredCourses = collect();
-        $featuredServices = collect();
-        $featuredProducts = collect();
 
         // Safely check if database table exists
         try {
@@ -270,46 +267,6 @@ class HomeController extends Controller
                     })->values();
                 }
             }
-
-            if (Schema::hasTable('dc_elearn_course')) {
-                $featuredCourses = \App\Models\ElearnCourse::with('tutor')
-                    ->whereIn('id', [1345, 1736, 1148, 876])
-                    ->orWhere(function($q) {
-                        $q->where('is_trending', '1')
-                          ->whereIn('status', ['active', 'approved', 'published']);
-                    })
-                    ->orderByRaw("CASE 
-                        WHEN id = 1345 THEN 1 
-                        WHEN id = 1736 THEN 2 
-                        WHEN id = 1148 THEN 3 
-                        WHEN id = 876 THEN 4 
-                        ELSE 5 
-                    END ASC, id DESC")
-                    ->take(8)
-                    ->get();
-            } elseif (Schema::hasTable('courses')) {
-                $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published'])
-                    ->latest()
-                    ->take(8)
-                    ->get();
-            }
-
-            if (Schema::hasTable('services')) {
-                $featuredServices = Service::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published'])
-                    ->latest()
-                    ->take(8)
-                    ->get();
-            }
-
-            if (Schema::hasTable('products')) {
-                $featuredProducts = Product::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published'])
-                    ->latest()
-                    ->take(8)
-                    ->get();
-            }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Database connection failed on businesses page: ' . $e->getMessage());
             $businesses = collect();
@@ -347,9 +304,6 @@ class HomeController extends Controller
         return view('home.businesses', [
             'seller'                => $seller,
             'businesses'            => $businesses,
-            'featuredCourses'       => $featuredCourses,
-            'featuredServices'      => $featuredServices,
-            'featuredProducts'      => $featuredProducts,
             'horizontalCategories'  => $horizontalCategories,
             'sidebarCategories'     => $sidebarCategories,
             'searchQuery'           => $searchQuery,
