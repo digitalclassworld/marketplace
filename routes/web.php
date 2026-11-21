@@ -70,6 +70,13 @@ Route::get('/certificate/{code?}', [CertificateController::class, 'show'])->name
 Route::get('/business-listing/{category}/{slug}', [HomeController::class, 'businessProfile'])->name('business.show');
 Route::get('/business-listing/{slug}', [HomeController::class, 'businessProfile'])->name('business.show.single');
 
+// E-Learning Tutor Profile & Courses (Legacy format matching /e-learning/tutor/{slug}/{id})
+Route::get('/e-learning/tutor/{slug}/{id}', [HomeController::class, 'tutorProfile'])->name('tutor.profile');
+Route::get('/e-learning/tutor/{id}', [HomeController::class, 'tutorProfile']);
+Route::get('/tutor/{slug}/{id}', [HomeController::class, 'tutorProfile']);
+Route::get('/e-learning/course/{id}/{slug?}', [HomeController::class, 'elearnCourseShow'])->name('elearn.course.show');
+Route::get('/e-learning/course/{slug}', [HomeController::class, 'elearnCourseShow']);
+
 // Legacy 301 redirects from /business/{slug} and /sellers/{slug} to /business-listing/{category}/{slug}
 Route::get('/business/{slug?}', [HomeController::class, 'businessProfileLegacyRedirect']);
 Route::get('/sellers/{slug?}', [HomeController::class, 'businessProfileLegacyRedirect'])->name('sellers.show');

@@ -430,6 +430,138 @@
         border-radius: 4px;
         backdrop-filter: blur(4px);
     }
+    .trending-course-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .trending-course-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.1);
+        border-color: #00b074;
+    }
+    .trending-course-thumb-box {
+        position: relative;
+        width: 100%;
+        height: 165px;
+        overflow: hidden;
+        background-color: #f1f5f9;
+    }
+    .trending-course-thumb-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .trending-course-card:hover .trending-course-thumb-box img {
+        transform: scale(1.04);
+    }
+    .trending-crown-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 26px;
+        height: 26px;
+        background: rgba(17, 24, 39, 0.85);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f59e0b;
+        font-size: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .level-pill-badge {
+        background: #fff4eb;
+        color: #ff7a18;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 6px;
+    }
+    .course-card-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.4;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 2.7em;
+    }
+    .course-tutor-link {
+        font-size: 0.78rem;
+        color: #64748b;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.15s;
+    }
+    .course-tutor-link:hover {
+        color: #0066ff;
+    }
+    .price-row-wrap {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    .price-current {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #111827;
+    }
+    .price-original {
+        font-size: 0.82rem;
+        color: #9ca3af;
+        text-decoration: line-through;
+    }
+    .badge-discount-orange {
+        background: #ff7a18;
+        color: #ffffff;
+        font-size: 0.68rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .btn-add-to-cart-green {
+        background-color: #00b074;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 9px 14px;
+        font-weight: 700;
+        font-size: 0.88rem;
+        text-align: center;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .btn-add-to-cart-green:hover {
+        background-color: #009663;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 176, 116, 0.35);
+    }
     .course-body {
         padding: 1rem;
         display: flex;
@@ -1058,61 +1190,81 @@
     </div>
 
     <!-- ========================================================================
-         SEQUENCE 1: ONLINE COURSES (Full Width Section with View All ->)
+         SEQUENCE 1: TRENDING COURSES (Legacy authentic courses from dc_elearn_course)
          ======================================================================== -->
     <div class="mb-5">
-        <div class="section-header-row">
+        <div class="section-header-row align-items-end mb-3">
             <div>
-                <h2 class="section-title">
-                    <i class="fa-solid fa-graduation-cap text-primary"></i>
-                    <span>Online Courses</span>
+                <h2 class="section-title fw-bold text-dark mb-1" style="font-size: 2rem; letter-spacing: -0.02em;">
+                    Trending <span style="position: relative; display: inline-block;">Courses<svg style="position: absolute; bottom: -4px; left: 0; width: 100%; height: 10px;" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M5,15 Q50,0 95,15" stroke="#f59e0b" stroke-width="4" fill="none"/></svg></span>
                 </h2>
-                <p class="section-sub">Upgrade your career with certified courses taught by industry leaders</p>
+                <p class="text-secondary small mb-0">Find courses that are best for your profession</p>
             </div>
             <a href="{{ route('courses') }}" class="btn-view-all">
                 View All <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
 
-        <div class="row g-3 g-xl-4 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
+        <div class="row g-3 g-xl-4 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
             @forelse($featuredCourses as $course)
                 <div class="col">
-                    <a href="{{ route('course.show', $course->slug) }}" class="text-decoration-none">
-                        <div class="course-card">
-                            <div class="course-thumb-box">
-                                <img src="{{ $course->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80' }}"
+                    <div class="trending-course-card">
+                        <div class="trending-course-thumb-box">
+                            <a href="{{ !empty($course->tutor) ? $course->tutor->url : route('course.show', $course->slug) }}" class="d-block w-100 h-100">
+                                <img src="{{ $course->thumbnail_url ?: ($course->thumbnail ?: 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png') }}"
                                      alt="{{ $course->title }}"
                                      loading="lazy"
-                                     onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80';">
-                                <span class="course-badge-overlay">
-                                    <i class="fa-regular fa-clock me-1"></i> {{ $course->level ?: 'Beginner' }}
-                                </span>
-                            </div>
-                            <div class="course-body">
-                                <div class="course-title" title="{{ $course->title }}">{{ $course->title }}</div>
-                                <div class="course-rating-row">
-                                    <i class="fa-solid fa-star"></i>
-                                    <span class="fw-bold text-dark">4.8</span>
-                                    <span class="text-muted">(1.2K)</span>
-                                </div>
-                                <div class="course-seller-meta">
-                                    <span><i class="fa-regular fa-user me-1"></i> {{ $course->seller?->businessDetail?->business_name ?? ($course->seller?->user?->name ?? 'Digital Class Academy') }}</span>
-                                </div>
-                                <div class="course-price-row">
-                                    <span class="curr-price">₹{{ number_format($course->price, 0) }}</span>
-                                    @if($course->discount_price && $course->discount_price > $course->price)
-                                        <span class="old-price">₹{{ number_format($course->discount_price, 0) }}</span>
-                                        <span class="discount-badge">
-                                            {{ round((($course->discount_price - $course->price) / $course->discount_price) * 100) }}% OFF
-                                        </span>
-                                    @else
-                                        <span class="old-price">₹{{ number_format($course->price * 1.5, 0) }}</span>
-                                        <span class="discount-badge">33% OFF</span>
-                                    @endif
-                                </div>
+                                     onerror="this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                            </a>
+                            <div class="trending-crown-badge">
+                                <i class="fa-solid fa-crown"></i>
                             </div>
                         </div>
-                    </a>
+                        <div class="p-3 d-flex flex-column flex-grow-1">
+                            <div>
+                                <span class="level-pill-badge">{{ $course->level }}</span>
+                                <h5 class="course-card-title" title="{{ $course->title }}">
+                                    <a href="{{ !empty($course->tutor) ? $course->tutor->url : route('course.show', $course->slug) }}" class="text-dark text-decoration-none">
+                                        {{ $course->short_title ?? $course->title }}
+                                    </a>
+                                </h5>
+
+                                @if(!empty($course->tutor))
+                                    <a href="{{ $course->tutor->url }}" class="course-tutor-link" title="{{ $course->tutor->name }}">
+                                        <i class="fa-regular fa-user text-primary me-1"></i> {{ $course->tutor->name }}
+                                    </a>
+                                @elseif(!empty($course->seller))
+                                    <div class="course-tutor-link">
+                                        <i class="fa-regular fa-user text-primary me-1"></i> {{ $course->seller?->businessDetail?->business_name ?? $course->seller?->user?->name }}
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="mt-auto">
+                                <div class="price-row-wrap">
+                                    <span class="price-current">₹{{ number_format($course->price, 0) }}</span>
+                                    @if($course->original_price > 0 && $course->original_price > $course->price)
+                                        <span class="price-original">₹{{ number_format($course->original_price, 0) }}</span>
+                                    @elseif($course->price == 0)
+                                        <span class="price-original">₹0</span>
+                                    @endif
+                                    <span class="badge-discount-orange">{{ $course->discount_text ?? '0% off' }}</span>
+                                </div>
+
+                                <form action="{{ route('cart.add') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="type" value="course">
+                                    <input type="hidden" name="id" value="{{ $course->id }}">
+                                    <input type="hidden" name="name" value="{{ $course->title }}">
+                                    <input type="hidden" name="price" value="{{ $course->price }}">
+                                    <input type="hidden" name="image" value="{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}">
+                                    <button type="submit" class="btn-add-to-cart-green">
+                                        Add To Cart
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @empty
                 <div class="col-12 py-4 text-center text-muted">
