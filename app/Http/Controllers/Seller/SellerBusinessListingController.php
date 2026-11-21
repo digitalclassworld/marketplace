@@ -106,7 +106,7 @@ class SellerBusinessListingController extends Controller
             'plan_name'        => $validated['plan_name'] ?? 'Premium Listing',
             'plan_price'       => $validated['plan_price'] ?? 1499.00,
             'add_ons'          => $addOns,
-            'status'           => 'pending',
+            'status'           => 'approved',
         ]);
 
         try {

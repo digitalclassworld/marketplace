@@ -93,7 +93,7 @@ class SellerCourseController extends Controller
             'access_type'          => $validated['access_type'],
             'certificate_included' => $request->boolean('certificate_included', true),
             'qa_enabled'           => $request->boolean('qa_enabled', true),
-            'status'               => 'pending',
+            'status'               => 'approved',
         ]);
 
         // Save sections / lectures if provided

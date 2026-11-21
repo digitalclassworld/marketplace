@@ -44,80 +44,67 @@ class HomeController extends Controller
         $totalBusinesses = 0;
 
         try {
-            if (Schema::hasTable('dc_elearn_course')) {
-                $totalCourses = \App\Models\ElearnCourse::whereIn('status', ['active', 'approved', 'published', '1'])->count();
-                // Priority courses matching authentic legacy homepage: 1345 (Credit Risk), 1736 (Software Projects), 1148 (3D Epoxy), 876 (Sales Strategies)
-                $featuredCourses = \App\Models\ElearnCourse::with('tutor')
-                    ->whereIn('id', [1345, 1736, 1148, 876])
-                    ->orWhere(function($q) {
-                        $q->where('is_trending', '1')
-                          ->whereIn('status', ['active', 'approved', 'published']);
-                    })
-                    ->orderByRaw("CASE 
-                        WHEN id = 1345 THEN 1 
-                        WHEN id = 1736 THEN 2 
-                        WHEN id = 1148 THEN 3 
-                        WHEN id = 876 THEN 4 
-                        ELSE 5 
-                    END ASC, id DESC")
-                    ->take(8)
-                    ->get();
-            } elseif (Schema::hasTable('courses')) {
-                $totalCourses = Course::whereIn('status', ['approved', 'active', 'published'])->count();
-                $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published'])
-                    ->latest()
-                    ->take(8)
-                    ->get();
+            // 1. COURSES: Show most recently added courses first (combining seller courses and elearn catalog)
+            if (Schema::hasTable('courses') || Schema::hasTable('dc_elearn_course')) {
+                $totalCourses = 0;
+                $sellerCourses = collect();
+                if (Schema::hasTable('courses')) {
+                    $totalCourses += Course::whereIn('status', ['approved', 'active', 'published'])->count();
+                    $sellerCourses = Course::with(['seller.businessDetail', 'seller.user'])
+                        ->whereIn('status', ['approved', 'active', 'published'])
+                        ->latest('id')
+                        ->take(8)
+                        ->get();
+                }
+
+                $elearnCourses = collect();
+                if (Schema::hasTable('dc_elearn_course')) {
+                    $totalCourses += \App\Models\ElearnCourse::whereIn('status', ['active', 'approved', 'published', '1'])->count();
+                    $elearnCourses = \App\Models\ElearnCourse::with('tutor')
+                        ->whereIn('status', ['active', 'approved', 'published', '1'])
+                        ->where('course_name', '!=', '')
+                        ->whereNotNull('course_name')
+                        ->where('course_name', 'not like', 'hkjh%')
+                        ->where('course_name', 'not like', 'test%')
+                        ->where('course_name', '!=', 'english speaking')
+                        ->latest('id')
+                        ->take(8)
+                        ->get();
+                }
+
+                $featuredCourses = $sellerCourses->concat($elearnCourses)->take(8);
             }
 
+            // 2. SERVICES: Show most recently added services first
             if (Schema::hasTable('services')) {
                 $totalServices = Service::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])->count();
                 $featuredServices = Service::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
-                    ->orderBy('id', 'asc')
+                    ->latest('id')
                     ->take(8)
                     ->get();
             }
 
+            // 3. PRODUCTS: Show most recently added products first
             if (Schema::hasTable('products')) {
                 $totalProducts = Product::whereIn('status', ['approved', 'active', 'published'])->count();
-                $curatedProductIds = [4, 1, 7, 2, 11, 12, 13, 9];
                 $featuredProducts = Product::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
-                    ->whereIn('id', $curatedProductIds)
-                    ->orderByRaw("FIELD(id, 4, 1, 7, 2, 11, 12, 13, 9)")
+                    ->latest('id')
+                    ->take(8)
                     ->get();
-
-                if ($featuredProducts->count() < 8) {
-                    $extra = Product::with(['seller.businessDetail', 'seller.user'])
-                        ->whereIn('status', ['approved', 'active', 'published'])
-                        ->whereNotIn('id', $featuredProducts->pluck('id')->toArray())
-                        ->take(8 - $featuredProducts->count())
-                        ->get();
-                    $featuredProducts = $featuredProducts->merge($extra);
-                }
             }
 
+            // 4. BUSINESS LISTINGS: Show most recently added verified listings with logos first
             if (Schema::hasTable('business_listings')) {
                 $totalBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])->count();
-                $curatedBizIds = [1440, 234, 589, 866, 174, 283, 716, 43];
-                $popularBusinesses = BusinessListing::whereIn('id', $curatedBizIds)
-                    ->whereIn('status', ['approved', 'active', 'published'])
-                    ->orderByRaw("FIELD(id, 1440, 234, 589, 866, 174, 283, 716, 43)")
+                $popularBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
+                    ->whereNotNull('logo')
+                    ->where('logo', '!=', '')
+                    ->latest('id')
+                    ->take(8)
                     ->get();
-
-                if ($popularBusinesses->count() < 8) {
-                    $fallback = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
-                        ->where('id', '>', 20)
-                        ->whereNotNull('logo')
-                        ->where('logo', '!=', '')
-                        ->whereNotIn('id', $popularBusinesses->pluck('id')->toArray())
-                        ->take(8 - $popularBusinesses->count())
-                        ->get();
-                    $popularBusinesses = $popularBusinesses->merge($fallback);
-                }
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Catalog load failed on marketplace index: ' . $e->getMessage());
