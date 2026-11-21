@@ -168,51 +168,77 @@
         line-height: 1.1;
     }
 
-    /* Hero Right Side Graphic / Features Box */
-    .hero-features-box {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        padding: 1.75rem;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.05);
+    /* Hero Thematic Visual Showcase with Floating Glass Badges */
+    .hero-thematic-showcase {
         position: relative;
+        border-radius: 24px;
+        overflow: visible;
+        padding: 10px;
     }
-    .feature-card-item {
+    .hero-thematic-img-wrap {
+        position: relative;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 25px 60px -15px rgba(0, 102, 255, 0.22), 0 0 0 1px rgba(226, 232, 240, 0.8);
+        height: 420px;
+        background: #0f172a;
+    }
+    .hero-thematic-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-thematic-showcase:hover .hero-thematic-img-wrap img {
+        transform: scale(1.04);
+    }
+    .hero-img-gradient-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.05) 0%, rgba(15, 23, 42, 0.45) 100%);
+        pointer-events: none;
+    }
+
+    /* Floating Badges */
+    .hero-floating-badge {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        padding: 0.65rem 0.95rem;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
         display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: 0.85rem 1rem;
-        border-radius: 12px;
-        background: #f8fafc;
-        border: 1px solid #f1f5f9;
-        margin-bottom: 0.85rem;
-        text-decoration: none;
-        transition: all 0.2s ease;
+        gap: 0.65rem;
+        z-index: 5;
+        transition: transform 0.25s ease;
     }
-    .feature-card-item:hover {
-        background: #eff6ff;
-        border-color: #bfdbfe;
-        transform: translateY(-2px);
+    .hero-floating-badge:hover {
+        transform: translateY(-3px) scale(1.02);
     }
-    .feature-card-icon {
-        width: 44px;
-        height: 44px;
+    .hero-badge-top-left {
+        top: -12px;
+        left: -16px;
+    }
+    .hero-badge-bottom-left {
+        bottom: 24px;
+        left: -20px;
+    }
+    .hero-badge-bottom-right {
+        bottom: -14px;
+        right: 16px;
+    }
+    .hero-badge-icon-wrap {
+        width: 38px;
+        height: 38px;
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
+        font-size: 1rem;
         flex-shrink: 0;
-    }
-    .feature-card-title {
-        font-size: 0.92rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 0.1rem;
-    }
-    .feature-card-sub {
-        font-size: 0.75rem;
-        color: #64748b;
     }
 
     /* ==========================================================================
@@ -1009,7 +1035,7 @@
         <div class="row align-items-center g-4">
 
             <!-- Left: Hero Headline & Search Box -->
-            <div class="col-lg-7 col-xl-8">
+            <div class="col-lg-7 col-xl-7">
                 <div class="hero-badge-pill">
                     <i class="fa-solid fa-shield-check"></i>
                     <span>India's Trusted Marketplace for Learning, Services, Products & Businesses</span>
@@ -1104,53 +1130,51 @@
                 </div>
             </div>
 
-            <!-- Right: Hero Quick Features Cards -->
-            <div class="col-lg-5 col-xl-4 d-none d-lg-block">
-                <div class="hero-features-box">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="fw-bold text-dark small text-uppercase tracking-wider">Explore Digital Class</span>
-                        <span class="badge bg-primary bg-opacity-10 text-primary small">All-in-One</span>
+            <!-- Right: Hero Thematic Visual Showcase with Floating Glass Badges -->
+            <div class="col-lg-5 col-xl-5 d-none d-lg-block">
+                <div class="hero-thematic-showcase">
+                    
+                    <!-- Floating Badge: Top-Left (Rating & Learners) -->
+                    <div class="hero-floating-badge hero-badge-top-left">
+                        <div class="hero-badge-icon-wrap bg-warning bg-opacity-15 text-warning">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark small" style="font-size: 0.82rem; line-height: 1.2;">4.9 / 5.0 Rating</div>
+                            <div class="text-muted" style="font-size: 0.68rem;">150,000+ Learners</div>
+                        </div>
                     </div>
 
-                    <a href="{{ route('courses') }}" class="feature-card-item">
-                        <div class="feature-card-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        </div>
-                        <div>
-                            <div class="feature-card-title">Learn New Skills</div>
-                            <div class="feature-card-sub">Certified online courses with expert mentors</div>
-                        </div>
-                    </a>
+                    <!-- Main Hero Visual Image -->
+                    <div class="hero-thematic-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=900&auto=format&fit=crop&q=80" 
+                             alt="Digital Class Learning & Skills Marketplace" 
+                             loading="eager">
+                        <div class="hero-img-gradient-overlay"></div>
+                    </div>
 
-                    <a href="{{ route('services') }}" class="feature-card-item">
-                        <div class="feature-card-icon bg-info bg-opacity-10 text-info">
-                            <i class="fa-solid fa-user-tie"></i>
+                    <!-- Floating Badge: Bottom-Left (11,000+ Institutes) -->
+                    <div class="hero-floating-badge hero-badge-bottom-left">
+                        <div class="hero-badge-icon-wrap bg-primary bg-opacity-15 text-primary">
+                            <i class="fa-solid fa-building-columns"></i>
                         </div>
                         <div>
-                            <div class="feature-card-title">Hire Experts</div>
-                            <div class="feature-card-sub">Vetted agencies and freelance professionals</div>
+                            <div class="fw-bold text-dark small" style="font-size: 0.82rem; line-height: 1.2;">11,000+ Institutes</div>
+                            <div class="text-muted" style="font-size: 0.68rem;">Verified Coaching Directory</div>
                         </div>
-                    </a>
+                    </div>
 
-                    <a href="{{ route('products') }}" class="feature-card-item">
-                        <div class="feature-card-icon bg-success bg-opacity-10 text-success">
-                            <i class="fa-solid fa-laptop"></i>
+                    <!-- Floating Badge: Bottom-Right (Verified Freelancers & Services) -->
+                    <div class="hero-floating-badge hero-badge-bottom-right">
+                        <div class="hero-badge-icon-wrap bg-success bg-opacity-15 text-success">
+                            <i class="fa-solid fa-shield-check"></i>
                         </div>
                         <div>
-                            <div class="feature-card-title">Buy Quality Products</div>
-                            <div class="feature-card-sub">Laptops, books, notes & educational tools</div>
+                            <div class="fw-bold text-dark small" style="font-size: 0.82rem; line-height: 1.2;">Verified Experts</div>
+                            <div class="text-muted" style="font-size: 0.68rem;">100% Escrow Protection</div>
                         </div>
-                    </a>
+                    </div>
 
-                    <a href="{{ route('businesses') }}" class="feature-card-item mb-0">
-                        <div class="feature-card-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="fa-solid fa-store"></i>
-                        </div>
-                        <div>
-                            <div class="feature-card-title">Find Trusted Businesses</div>
-                            <div class="feature-card-sub">Coaching institutes, colleges & local stores</div>
-                        </div>
-                    </a>
                 </div>
             </div>
 
@@ -1344,7 +1368,7 @@
                     </a>
                 </div>
 
-                <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-md-3">
+                <div class="row g-3 g-xl-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4">
                     @forelse($featuredServices as $service)
                         <div class="col">
                             <a href="{{ route('service.show', $service->slug) }}" class="text-decoration-none">
@@ -1443,7 +1467,7 @@
                     </a>
                 </div>
 
-                <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-md-3">
+                <div class="row g-3 g-xl-4 row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4">
                     @forelse($popularBusinesses as $b)
                         <div class="col">
                             <a href="{{ $b->url }}" class="text-decoration-none">

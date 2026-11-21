@@ -76,8 +76,8 @@ class HomeController extends Controller
                     ->whereIn('status', ['approved', 'active', 'published'])->count();
                 $featuredServices = Service::with(['seller.businessDetail', 'seller.user'])
                     ->whereIn('status', ['approved', 'active', 'published'])
-                    ->latest()
-                    ->take(6)
+                    ->orderBy('id', 'asc')
+                    ->take(8)
                     ->get();
             }
 
@@ -97,7 +97,7 @@ class HomeController extends Controller
                     ->whereNotNull('logo')
                     ->where('logo', '!=', '')
                     ->orderBy('id', 'asc')
-                    ->take(6)
+                    ->take(8)
                     ->get();
             }
         } catch (\Throwable $e) {
