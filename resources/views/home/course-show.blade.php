@@ -81,65 +81,25 @@
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
     }
 
-    .video-preview-thumbnail-box {
+    .course-thumbnail-image-box {
         position: relative;
         border-radius: 14px;
         overflow: hidden;
-        background: #0b1528;
-        cursor: pointer;
+        background: #f8fafc;
         width: 100%;
-        height: 210px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        height: 220px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        border: 1px solid #e2e8f0;
     }
-    .video-preview-thumbnail-box img {
+    .course-thumbnail-image-box img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.9;
-        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        display: block;
+        transition: transform 0.3s ease;
     }
-    .video-preview-thumbnail-box:hover img {
-        transform: scale(1.05);
-        opacity: 0.98;
-    }
-
-    .video-play-center-btn {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
-        color: #ffffff;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.35rem;
-        box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.25), 0 8px 20px rgba(0, 102, 255, 0.4);
-        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .video-preview-thumbnail-box:hover .video-play-center-btn {
-        transform: translate(-50%, -50%) scale(1.12);
-        box-shadow: 0 0 0 12px rgba(255, 255, 255, 0.35), 0 12px 28px rgba(0, 102, 255, 0.5);
-    }
-
-    .video-bottom-strip {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-        background: rgba(15, 23, 42, 0.85);
-        backdrop-filter: blur(8px);
-        color: #ffffff;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.35rem 0.75rem;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .course-thumbnail-image-box:hover img {
+        transform: scale(1.03);
     }
 
     .course-meta-four-box {
@@ -412,8 +372,8 @@
             padding: 1.15rem;
             border-radius: 14px;
         }
-        .video-preview-thumbnail-box {
-            height: 185px;
+        .course-thumbnail-image-box {
+            height: 195px;
         }
         .course-subnav-tabs {
             border-radius: 12px;
@@ -425,8 +385,8 @@
         }
     }
     @media (max-width: 576px) {
-        .video-preview-thumbnail-box {
-            height: 165px;
+        .course-thumbnail-image-box {
+            height: 175px;
         }
         .huge-price-display {
             font-size: 1.65rem;
@@ -467,17 +427,10 @@
     <div class="course-hero-header-card">
         <div class="row align-items-center g-4">
             
-            <!-- Video Preview Thumbnail with Glowing Play Overlay -->
+            <!-- Course Thumbnail Image from Backend -->
             <div class="col-lg-4 col-md-5">
-                <div class="video-preview-thumbnail-box" onclick="openTrailerModal()">
+                <div class="course-thumbnail-image-box">
                     <img src="{{ $course->thumbnail ?? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80' }}" alt="{{ $course->title }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
-                    <div class="video-play-center-btn">
-                        <i class="fa-solid fa-play ms-1"></i>
-                    </div>
-                    <div class="video-bottom-strip">
-                        <span><i class="fa-solid fa-circle-play me-1"></i> Preview This Course</span>
-                        <span>02:15</span>
-                    </div>
                 </div>
             </div>
 
@@ -757,7 +710,7 @@
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         @if(!empty($item['preview']))
-                                                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.65rem; cursor: pointer;" onclick="openTrailerModal()">Preview</span>
+                                                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.65rem;">Lecture</span>
                                                         @endif
                                                         <span class="text-muted">{{ $item['duration'] }}</span>
                                                     </div>
@@ -1095,25 +1048,8 @@
 </div>
 
 <!-- ========================================================================
-     MODALS: VIDEO TRAILER & WRITE REVIEW
+     MODALS: WRITE REVIEW
      ======================================================================== -->
-<!-- Video Trailer Modal -->
-<div class="modal fade" id="trailerModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content rounded-4 border-0 shadow bg-dark text-white overflow-hidden">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-white">{{ $course->title }} &mdash; Free Preview</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-3">
-                <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
-                    <iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=0" title="Course Trailer" allowfullscreen></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Write Review Modal -->
 <div class="modal fade" id="reviewCourseModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1153,11 +1089,6 @@
 
 <!-- JavaScript Logic -->
 <script>
-    function openTrailerModal() {
-        const modal = new bootstrap.Modal(document.getElementById('trailerModal'));
-        modal.show();
-    }
-
     // Interactive Tab Switching: Whatever clicks, only it opens
     function switchCourseTab(tabKey, btn) {
         // 1. Update button active states
