@@ -118,11 +118,30 @@ class SellerBusinessListingController extends Controller
 
         $media = $this->processMediaUploads($request, 'listing');
 
+        $planName = $validated['plan_name'] ?? 'Premium Listing';
+        $listingType = $validated['listing_type'] ?? 'Business Profile';
+
+        // Map listing_type and badges based on paid plan selected
+        if (str_contains(strtolower($planName), 'featured') || $rawPrice >= 2999) {
+            $listingType = 'Featured';
+        } elseif (str_contains(strtolower($planName), 'premium') || $rawPrice >= 1499) {
+            $listingType = 'Premium';
+        }
+
+        if (!is_array($features)) {
+            $features = [];
+        }
+        if ($listingType === 'Featured') {
+            $features['badge'] = 'Featured';
+        } elseif ($listingType === 'Premium') {
+            $features['badge'] = 'Premium';
+        }
+
         $seller->businessListings()->create([
             'business_name'    => $validated['business_name'],
             'slug'             => Str::slug($validated['business_name']) . '-' . Str::random(5),
             'category'         => $validated['category'],
-            'listing_type'     => $validated['listing_type'] ?? 'Business Profile',
+            'listing_type'     => $listingType,
             'sub_category'     => $validated['sub_category'] ?? 'Computer Training Institute',
             'established_year' => $validated['established_year'] ?? '2015',
             'employees_count'  => $validated['employees_count'] ?? '5 - 10',
@@ -146,7 +165,7 @@ class SellerBusinessListingController extends Controller
             'cover_image'      => $media['cover_image'] ?: ($validated['cover_image'] ?? null),
             'video_url'        => $media['video_url'] ?: ($validated['video_url'] ?? null),
             'gallery'          => $media['gallery'],
-            'plan_name'        => $validated['plan_name'] ?? 'Premium Listing',
+            'plan_name'        => $planName,
             'plan_price'       => $finalPrice,
             'add_ons'          => $addOns,
             'status'           => 'pending',

@@ -1597,23 +1597,42 @@
                         <div class="col">
                             <a href="{{ $b->url }}" class="text-decoration-none">
                                 <div class="business-card">
-                                    <div class="business-thumb">
-                                        <img src="{{ $b->logo ?: ($b->cover_image ?: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&auto=format&fit=crop&q=80') }}"
+                                    <div class="business-thumb position-relative">
+                                        <img src="{{ $b->display_image }}"
                                              alt="{{ $b->business_name }}"
                                              loading="lazy"
                                              onerror="this.src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&auto=format&fit=crop&q=80';">
+                                        @if($b->badge === 'Featured')
+                                            <span class="position-absolute top-0 start-0 m-2 badge rounded-pill text-white shadow-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); font-size: 0.68rem; padding: 0.35rem 0.65rem;">
+                                                <i class="fa-solid fa-crown me-1"></i>Featured
+                                            </span>
+                                        @elseif($b->badge === 'Premium')
+                                            <span class="position-absolute top-0 start-0 m-2 badge rounded-pill text-white shadow-sm" style="background: linear-gradient(135deg, #7c3aed, #6d28d9); font-size: 0.68rem; padding: 0.35rem 0.65rem;">
+                                                <i class="fa-solid fa-gem me-1"></i>Premium
+                                            </span>
+                                        @elseif($b->badge === 'Verified')
+                                            <span class="position-absolute top-0 start-0 m-2 badge rounded-pill text-white shadow-sm" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); font-size: 0.68rem; padding: 0.35rem 0.65rem;">
+                                                <i class="fa-solid fa-circle-check me-1"></i>Verified
+                                            </span>
+                                        @endif
                                     </div>
                                     <div class="business-body">
                                         <div class="business-name" title="{{ $b->business_name }}">{{ $b->business_name }}</div>
                                         <div class="business-loc">
-                                            <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                                            <i class="fa-solid fa-location-dot me-1" style="color: #6d28d9;"></i>
                                             {{ $b->city ?: 'India' }}{{ $b->state ? ', ' . $b->state : '' }}
                                         </div>
                                         <div class="d-flex align-items-center gap-1 small text-muted mt-auto pt-2 border-top">
                                             <i class="fa-solid fa-star text-warning"></i>
-                                            <span class="fw-bold text-dark">4.9</span>
-                                            <span>(120+)</span>
-                                            <span class="badge bg-success bg-opacity-10 text-success ms-auto small">Verified</span>
+                                            <span class="fw-bold text-dark">{{ number_format($b->rating ?: 4.9, 1) }}</span>
+                                            <span>({{ $b->reviews_count ?: '120+' }})</span>
+                                            @if($b->badge === 'Featured')
+                                                <span class="badge rounded-pill ms-auto" style="background: #fef3c7; color: #b45309; font-size: 0.65rem;"><i class="fa-solid fa-crown me-0.5"></i>Featured</span>
+                                            @elseif($b->badge === 'Premium')
+                                                <span class="badge rounded-pill ms-auto" style="background: #f3e8ff; color: #6d28d9; font-size: 0.65rem;"><i class="fa-solid fa-gem me-0.5"></i>Premium</span>
+                                            @else
+                                                <span class="badge rounded-pill ms-auto" style="background: #e0f2fe; color: #0369a1; font-size: 0.65rem;"><i class="fa-solid fa-circle-check me-0.5"></i>Verified</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

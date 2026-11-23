@@ -931,7 +931,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item small py-2 text-primary" href="javascript:void(0)" onclick="openCustomerAuthModal('login')">
+                                        <a class="dropdown-item small py-2" style="color: #6d28d9;" href="{{ route('customer.login') }}">
                                             <i class="fa-solid fa-user-plus me-2"></i> Login as Customer
                                         </a>
                                     </li>
@@ -964,19 +964,19 @@
                         <!-- Guest Navigation: Sequence = Seller Login -> Customer Login -> Customer Sign Up -->
                         <div class="d-flex align-items-center gap-2 flex-wrap flex-xl-nowrap">
                             <!-- 1. Seller Login -->
-                            <a href="{{ route('seller.login') }}" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem;" title="Instructor & Institute Seller Login">
-                                <i class="fa-solid fa-store"></i>
+                            <a href="{{ route('seller.login') }}" class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem; color: #475569; border: 1px solid #cbd5e1; background: #ffffff;" title="Instructor & Institute Seller Login">
+                                <i class="fa-solid fa-store" style="color: #d97706;"></i>
                                 <span>Seller Login</span>
                             </a>
 
-                            <!-- 2. Customer Login -->
-                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem;" onclick="openCustomerAuthModal('login')">
+                            <!-- 2. Customer Login (Dedicated Page) -->
+                            <a href="{{ route('customer.login') }}" class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem; color: #6d28d9; border: 1px solid #ddd6fe; background-color: #faf5ff;">
                                 <i class="fa-regular fa-user"></i>
                                 <span>Login</span>
-                            </button>
+                            </a>
 
                             <!-- 3. Customer Sign Up (Dedicated Registration Page) -->
-                            <a href="{{ route('customer.register') }}" class="btn btn-sm btn-primary rounded-pill px-3.5 fw-bold text-nowrap shadow-sm d-inline-flex align-items-center" style="height: 36px; font-size: 0.8125rem; background-color: #0066ff;">
+                            <a href="{{ route('customer.register') }}" class="btn btn-sm rounded-pill px-3.5 fw-bold text-nowrap shadow-sm d-inline-flex align-items-center text-white" style="height: 36px; font-size: 0.8125rem; background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);">
                                 <span>Sign Up</span>
                             </a>
                         </div>
@@ -1795,22 +1795,13 @@
 
         window.pendingCartItem = null;
 
-        // Open Customer Auth Modal
+        // Open Customer Auth Page (Navigates directly to dedicated login/register page)
         function openCustomerAuthModal(tab) {
             if (tab === 'register') {
                 window.location.href = "{{ route('customer.register') }}";
                 return;
             }
-
-            const modalEl = document.getElementById('customerAuthModal');
-            if (!modalEl) {
-                window.location.href = "{{ route('customer.login') }}";
-                return;
-            }
-
-            switchCustomerAuthTab('login');
-            const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            bsModal.show();
+            window.location.href = "{{ route('customer.login') }}";
         }
 
         // Switch Tabs in Customer Modal

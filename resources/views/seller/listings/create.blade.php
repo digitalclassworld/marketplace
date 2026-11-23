@@ -145,9 +145,9 @@
         border-color: #cbd5e1;
     }
     .pricing-plan-card.selected {
-        border-color: #0066ff;
-        background: #f8faff;
-        box-shadow: 0 8px 24px -8px rgba(0, 102, 255, 0.2);
+        border-color: #7c3aed;
+        background: #faf5ff;
+        box-shadow: 0 10px 28px -6px rgba(124, 58, 237, 0.22);
     }
 
     .pricing-plan-card .btn-plan-action {
@@ -157,22 +157,22 @@
         padding: 0.55rem 1rem;
         border-radius: 10px;
         transition: all 0.2s ease;
-        border: 1.5px solid #0066ff !important;
+        border: 1.5px solid #7c3aed !important;
         background-color: transparent !important;
-        color: #0066ff !important;
+        color: #7c3aed !important;
     }
     .pricing-plan-card .btn-plan-action:hover {
-        background-color: #eff6ff !important;
-        color: #0052cc !important;
+        background-color: #f3e8ff !important;
+        color: #6d28d9 !important;
     }
     .pricing-plan-card.selected .btn-plan-action {
-        background-color: #0066ff !important;
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
         color: #ffffff !important;
-        border-color: #0066ff !important;
-        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+        border-color: #6d28d9 !important;
+        box-shadow: 0 4px 14px rgba(109, 40, 217, 0.3);
     }
     .pricing-plan-card.selected .btn-plan-action:hover {
-        background-color: #0052cc !important;
+        background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%) !important;
         color: #ffffff !important;
     }
 
@@ -196,8 +196,8 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: #ecfdf5;
-        color: #059669;
+        background: #f5f3ff;
+        color: #7c3aed;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -768,7 +768,7 @@
                     <!-- Plan 2: Premium Listing (Most Popular) -->
                     <div class="col-md-4">
                         <div class="pricing-plan-card selected" id="cardPlanPremium" onclick="selectPlan('Premium Listing', 1499, this)">
-                            <span class="badge bg-primary position-absolute top-0 end-0 m-3 rounded-pill px-2.5 py-1 fw-bold shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.02em;">Most Popular</span>
+                            <span class="badge position-absolute top-0 end-0 m-3 rounded-pill px-2.5 py-1 fw-bold shadow-sm text-white" style="font-size: 0.7rem; letter-spacing: 0.02em; background: linear-gradient(135deg, #7c3aed, #6d28d9);">Most Popular</span>
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <input type="radio" name="plan_radio" class="form-check-input" style="cursor: pointer;" checked>
                                 <h6 class="fw-bold text-dark mb-0 fs-6">Premium Listing</h6>

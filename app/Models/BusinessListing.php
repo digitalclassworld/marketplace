@@ -134,9 +134,69 @@ class BusinessListing extends Model
         return isset($this->features['reviews_count']) ? (int)$this->features['reviews_count'] : 0;
     }
 
+    public function isFeatured(): bool
+    {
+        $plan = strtolower($this->plan_name ?? '');
+        $type = strtolower($this->listing_type ?? '');
+        $badge = strtolower($this->features['badge'] ?? '');
+        return str_contains($plan, 'featured') 
+            || $type === 'featured' 
+            || $badge === 'featured'
+            || (float)($this->plan_price ?? 0) >= 2999;
+    }
+
+    public function isPremium(): bool
+    {
+        $plan = strtolower($this->plan_name ?? '');
+        $type = strtolower($this->listing_type ?? '');
+        $badge = strtolower($this->features['badge'] ?? '');
+        return $this->isFeatured()
+            || str_contains($plan, 'premium') 
+            || $type === 'premium' 
+            || $badge === 'premium'
+            || (float)($this->plan_price ?? 0) >= 1499;
+    }
+
+    public function hasVerifiedBadge(): bool
+    {
+        if ($this->isPremium()) {
+            return true;
+        }
+        $addOns = $this->add_ons;
+        if (is_array($addOns)) {
+            if (!empty($addOns['verified_badge']) || in_array('verified_badge', $addOns) || in_array('Verified Business Badge', $addOns)) {
+                return true;
+            }
+        }
+        return strtolower($this->listing_type ?? '') === 'verified';
+    }
+
+    public function getPriorityRankAttribute(): int
+    {
+        if ($this->isFeatured()) {
+            return 1;
+        }
+        if ($this->isPremium()) {
+            return 2;
+        }
+        return 3;
+    }
+
     public function getBadgeAttribute(): ?string
     {
-        return $this->features['badge'] ?? ($this->listing_type === 'Featured' ? 'Featured' : ($this->listing_type === 'Verified' ? 'Verified' : null));
+        if (!empty($this->features['badge'])) {
+            return $this->features['badge'];
+        }
+        if ($this->isFeatured()) {
+            return 'Featured';
+        }
+        if ($this->isPremium()) {
+            return 'Premium';
+        }
+        if ($this->hasVerifiedBadge()) {
+            return 'Verified';
+        }
+        return null;
     }
 
     public function getTagsListAttribute(): array

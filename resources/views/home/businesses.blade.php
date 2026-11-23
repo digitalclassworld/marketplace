@@ -392,12 +392,19 @@
         border: 1px solid rgba(255, 255, 255, 0.25);
     }
     .card-badge-featured {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.98) 100%);
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.98) 0%, rgba(217, 119, 6, 1) 100%);
         color: #ffffff;
+        box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+    }
+    .card-badge-premium {
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.98) 0%, rgba(109, 40, 217, 1) 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35);
     }
     .card-badge-verified {
-        background: linear-gradient(135deg, rgba(0, 102, 255, 0.95) 0%, rgba(30, 64, 175, 0.98) 100%);
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.98) 0%, rgba(2, 132, 199, 1) 100%);
         color: #ffffff;
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
     }
 
     .card-heart-btn {
@@ -1143,9 +1150,11 @@
                                     <img src="{{ $b->display_image }}" alt="{{ $b->business_name }}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80';">
                                     
                                     @if($b->badge === 'Featured')
-                                        <span class="card-badge-pill card-badge-featured">Featured</span>
+                                        <span class="card-badge-pill card-badge-featured"><i class="fa-solid fa-crown me-1 text-warning"></i>Featured</span>
+                                    @elseif($b->badge === 'Premium')
+                                        <span class="card-badge-pill card-badge-premium"><i class="fa-solid fa-gem me-1"></i>Premium</span>
                                     @elseif($b->badge === 'Verified')
-                                        <span class="card-badge-pill card-badge-verified">Verified</span>
+                                        <span class="card-badge-pill card-badge-verified"><i class="fa-solid fa-circle-check me-1"></i>Verified</span>
                                     @endif
 
                                     <button class="card-heart-btn" onclick="toggleFavorite(this, '{{ addslashes($b->business_name) }}')" title="Save to favorites">

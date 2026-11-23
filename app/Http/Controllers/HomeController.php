@@ -101,7 +101,11 @@ class HomeController extends Controller
             if (Schema::hasTable('business_listings')) {
                 $totalBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])->count();
                 $popularBusinesses = BusinessListing::whereIn('status', ['approved', 'active', 'published'])
-                    ->latest('id')
+                    ->orderByRaw("CASE 
+                        WHEN plan_name LIKE '%Featured%' OR listing_type = 'Featured' OR plan_price >= 2999 THEN 1
+                        WHEN plan_name LIKE '%Premium%' OR listing_type = 'Premium' OR plan_price >= 1499 THEN 2
+                        ELSE 3
+                    END ASC, id DESC")
                     ->take(8)
                     ->get();
             }
@@ -232,7 +236,13 @@ class HomeController extends Controller
                     });
                 }
 
-                $businesses = $query->take(30)->get();
+                $query->orderByRaw("CASE 
+                    WHEN plan_name LIKE '%Featured%' OR listing_type = 'Featured' OR plan_price >= 2999 THEN 1
+                    WHEN plan_name LIKE '%Premium%' OR listing_type = 'Premium' OR plan_price >= 1499 THEN 2
+                    ELSE 3
+                END ASC, id DESC");
+
+                $businesses = $query->take(40)->get();
 
                 // Compute distance in KM for each business when reference coordinates exist
                 if ($userLat !== null && $userLng !== null) {
@@ -284,9 +294,17 @@ class HomeController extends Controller
                 } elseif ($sortBy === 'newest') {
                     $businesses = $businesses->sortByDesc(fn($b) => $b->created_at)->values();
                 } else {
-                    $businesses = $businesses->sortByDesc(function ($b) {
-                        $weight = $b->badge === 'Featured' ? 200 : ($b->badge === 'Verified' ? 100 : 0);
-                        return $weight + ((float)$b->rating * 10);
+                    $businesses = $businesses->sortBy(function ($b) {
+                        $rank = $b->priority_rank;
+                        $rating = (float)($b->rating ?? 0);
+                        $reviews = (int)($b->reviews_count ?? 0);
+                        $id = (int)($b->id ?? 0);
+                        return sprintf('%d-%05d-%05d-%010d', 
+                            $rank, 
+                            99999 - (int)($rating * 100), 
+                            99999 - $reviews, 
+                            9999999999 - $id
+                        );
                     })->values();
                 }
             }
