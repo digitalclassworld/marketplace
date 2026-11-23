@@ -1820,6 +1820,24 @@ class HomeController extends Controller
      */
     public function courseShow(Request $request, $slug): View
     {
+        // Prioritize InstituteCourse on any business-listing route
+        if ($request->is('business-listing/*') || $request->is('*/business-listing/*')) {
+            $instCourse = null;
+            if (is_numeric($slug)) {
+                $instCourse = \App\Models\InstituteCourse::find((int)$slug);
+            }
+            if (!$instCourse && preg_match('/-(\d+)$/', $slug, $matches)) {
+                $instCourse = \App\Models\InstituteCourse::find($matches[1]);
+            }
+            if (!$instCourse) {
+                $cleanTitle = str_replace('-', ' ', preg_replace('/-\d+$/', '', $slug));
+                $instCourse = \App\Models\InstituteCourse::where('course_name', 'like', "%{$cleanTitle}%")->first();
+            }
+            if ($instCourse) {
+                return $this->renderInstituteCourse($request, $instCourse);
+            }
+        }
+
         $seller = null;
         if (Auth::check() && Auth::user()->isSeller()) {
             $seller = Auth::user()->seller;
@@ -2537,6 +2555,174 @@ class HomeController extends Controller
             return redirect()->to(url($expectedPath), 301);
         }
 
-        return $this->courseShow($request, (string)$instCourse->id);
+        return $this->renderInstituteCourse($request, $instCourse);
+    }
+
+    /**
+     * Dedicated renderer for authentic Institute Courses (dc_affiliate_institute_course)
+     */
+    public function renderInstituteCourse(Request $request, \App\Models\InstituteCourse $instCourse): View
+    {
+        $seller = null;
+        if (Auth::check() && Auth::user()->isSeller()) {
+            $seller = Auth::user()->seller;
+        }
+
+        $business = null;
+        if ($instCourse->affiliate_id) {
+            $business = \App\Models\BusinessListing::where('slug', 'like', "%-{$instCourse->affiliate_id}")->first();
+        }
+        if (!$business && !empty($instCourse->course_by)) {
+            $cleanBy = \Illuminate\Support\Str::slug($instCourse->course_by);
+            $business = \App\Models\BusinessListing::where('slug', 'like', "{$cleanBy}%")->first();
+        }
+
+        $affiliateRecord = null;
+        if ($instCourse->affiliate_id) {
+            try {
+                $affiliateRecord = \Illuminate\Support\Facades\DB::table('dc_affiliate')->where('id', $instCourse->affiliate_id)->first();
+            } catch (\Throwable $e) {}
+        }
+
+        $bName = $instCourse->course_by ?: ($business->business_name ?? ($affiliateRecord->school_name ?? 'Institute Faculty'));
+        $bCity = $business->city ?? ($affiliateRecord->city ?? 'India');
+        $bState = $business->state ?? ($affiliateRecord->state ?? 'Gujarat');
+        $bPhone = $business->phone ?? ($affiliateRecord->contact ?? '');
+        $bAddress = $business->address ?? ($affiliateRecord->address ?? '');
+        $bAvatar = ($business && !empty($business->logo)) ? $business->logo : (!empty($affiliateRecord->logo) ? $affiliateRecord->logo : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80');
+
+        $instUrl = $business ? $business->url : ($affiliateRecord ? url('/business-listing/coaching/' . ($affiliateRecord->url_slug ?: \Illuminate\Support\Str::slug($affiliateRecord->school_name))) : null);
+
+        $price = $instCourse->price;
+        $origPrice = $instCourse->original_price;
+        $discStr = $instCourse->discount_percentage;
+
+        $trainerName = !empty($instCourse->name_of_instructor) ? $instCourse->name_of_instructor : $bName;
+        $trainerBio = !empty($instCourse->about) ? $instCourse->about : ($bName . ' offers high-quality training and career-oriented educational programs.');
+        $trainerSub = !empty($instCourse->name_of_instructor) && $instCourse->name_of_instructor !== $bName 
+            ? ($bName . ' • Professional Trainer') 
+            : (($affiliateRecord->coaching_category ?? ($business->category ?? 'Training Institutes')) . ' Expert');
+
+        $course = (object) [
+            'id' => $instCourse->id,
+            'title' => $instCourse->course_name,
+            'slug' => $instCourse->slug,
+            'url' => $instCourse->url,
+            'category' => $business->category ?? ($affiliateRecord->coaching_category ?? 'Coaching Institute'),
+            'language' => $instCourse->course_language ?: 'English, Hindi',
+            'level' => 'All Levels',
+            'duration' => $instCourse->duration ?: '3 Months',
+            'short_description' => $instCourse->course_desc ? \Illuminate\Support\Str::limit(strip_tags($instCourse->course_desc), 180) : ($instCourse->course_name . ' certification program offered by ' . $bName . ' in ' . $bCity . '.'),
+            'description' => $instCourse->course_desc ?: ($instCourse->course_name . ' comprehensive course with live training, practical sessions and completion certificate.'),
+            'raw_highlights' => $instCourse->course_highlight,
+            'about' => $instCourse->about,
+            'thumbnail' => $instCourse->thumbnail_url,
+            'cover_image' => $instCourse->thumbnail_url,
+            'price' => $origPrice ?: $price,
+            'discount_price' => ($origPrice > $price) ? $price : 0,
+            'selling_price' => $price,
+            'original_price' => $origPrice,
+            'discount_percentage' => $discStr,
+            'discount_text' => $discStr,
+            'access_type' => $instCourse->sessions ? ($instCourse->sessions . ' Sessions') : 'Classroom / Online',
+            'sessions' => $instCourse->sessions,
+            'course_chapter' => 0,
+            'course_video' => 0,
+            'course_month' => $instCourse->duration,
+            'experience' => $instCourse->experience,
+            'education' => $instCourse->education,
+            'certificate_included' => true,
+            'certificate' => 'Yes',
+            'qa_enabled' => true,
+            'status' => 'published',
+            'seller_id' => $business->seller_id ?? null,
+            'created_at' => $instCourse->created_at ?: now(),
+            'updated_at' => now(),
+            'badge' => 'Verified Institute',
+            'rating' => 0,
+            'reviews_count' => 0,
+            'students_count' => 0,
+            'instructor_name' => $trainerName,
+            'instructor_avatar' => $bAvatar,
+            'instructor_category' => $affiliateRecord->coaching_category ?? ($business->category ?? 'Training Institutes'),
+            'instructor_bio' => $trainerBio,
+            'instructor_subtitle' => $trainerSub,
+            'instructor_education' => $instCourse->education,
+            'instructor_experience' => $instCourse->experience,
+            'meta_description' => $instCourse->course_name . ' coaching and certification course at ' . $bName,
+            'meta_keywords' => $instCourse->course_name . ', coaching institute, digital class',
+            'seller' => (object) [
+                'user' => (object) [
+                    'name' => $bName,
+                ],
+                'businessDetail' => (object) [
+                    'company_name' => $bName,
+                    'phone' => $bPhone,
+                    'address' => $bAddress,
+                    'city' => $bCity,
+                    'state' => $bState,
+                ],
+            ],
+            'contents' => collect(),
+            'is_institute_course' => true,
+            'is_elearn_course' => false,
+            'institute_name' => $bName,
+            'institute_url' => $instUrl,
+            'instructor_url' => $instUrl,
+            'institute_address' => $bAddress,
+            'institute_phone' => $bPhone,
+            'institute_city' => $bCity,
+            'institute_state' => $bState,
+        ];
+
+        // Related courses (other courses from same or other institutes)
+        $relatedCourses = collect();
+        try {
+            $relatedCourses = \App\Models\InstituteCourse::where('id', '!=', $instCourse->id)
+                ->where('status', 'active')
+                ->take(4)
+                ->get()
+                ->map(function($ic) {
+                    return (object) [
+                        'id' => $ic->id,
+                        'title' => $ic->course_name,
+                        'slug' => $ic->slug,
+                        'url' => $ic->url,
+                        'category' => 'Coaching',
+                        'thumbnail' => $ic->thumbnail_url,
+                        'price' => $ic->price,
+                        'original_price' => $ic->original_price,
+                        'instructor_name' => $ic->course_by ?: ($ic->name_of_instructor ?: 'Institute'),
+                        'rating' => 0,
+                        'reviews_count' => 0,
+                    ];
+                });
+        } catch (\Throwable $e) {}
+
+        // Resolve dynamic, subject-specific Overview, Topics, Curriculum, FAQs & Requirements
+        $resolved = \App\Services\CourseContentResolver::resolve($course);
+        $curriculum            = $resolved['curriculum'];
+        $curriculumDirectItems = $resolved['curriculumDirectItems'] ?? [];
+        $courseIncludes        = $resolved['courseIncludes'] ?? [];
+        $learningPoints        = $resolved['learningPoints'];
+        $topics                = $resolved['topics'] ?? $learningPoints;
+        $targetAudience        = $resolved['targetAudience'];
+        $requirements          = $resolved['requirements'];
+        $faqs                  = $resolved['faqs'];
+
+        return view('home.course-show', [
+            'seller'                => $seller,
+            'course'                => $course,
+            'relatedCourses'        => $relatedCourses,
+            'curriculum'            => $curriculum,
+            'curriculumDirectItems' => $curriculumDirectItems,
+            'courseIncludes'        => $courseIncludes,
+            'learningPoints'        => $learningPoints,
+            'topics'                => $topics,
+            'targetAudience'        => $targetAudience,
+            'requirements'          => $requirements,
+            'faqs'                  => $faqs,
+            'reviews'               => [],
+        ]);
     }
 }

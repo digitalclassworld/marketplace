@@ -84,6 +84,113 @@ class CourseContentResolver
         $subLow = strtolower($title . ' ' . $category . ' ' . $desc);
 
         // ---------------------------------------------------------------------
+        // 0. AUTHENTIC INSTITUTE COURSES (dc_affiliate_institute_course)
+        // ---------------------------------------------------------------------
+        if (!empty($course->is_institute_course)) {
+            $highlightText = $course->raw_highlights ?? ($course->course_highlight ?? '');
+            $parsedHighlights = [];
+            if (!empty($highlightText)) {
+                $highlightText = str_replace(['\r\n', '\r', '\n'], "\n", $highlightText);
+                $rawLines = explode("\n", $highlightText);
+                foreach ($rawLines as $l) {
+                    $l = trim($l);
+                    if (empty($l)) continue;
+                    if (preg_match('/^(highlights:|highlights|let me know|note:)/i', $l)) continue;
+                    if (str_contains($l, 'suHighlights') || $l === 'Flexib' || str_starts_with($l, 'it diverse schedules')) continue;
+                    // Remove leading numbering: 1. or 1) or bullets
+                    $clean = preg_replace('/^\d+[\.\)]\s*/', '', $l);
+                    $clean = trim(ltrim($clean, "-*•·> "));
+                    if (!empty($clean) && strlen($clean) > 5) {
+                        $parsedHighlights[] = $clean;
+                    }
+                }
+                $parsedHighlights = array_values(array_unique($parsedHighlights));
+            }
+
+            // Also check course description for syllabus items (e.g. 1. PROGRAMMING FUNDAMENTALS, etc.)
+            $descSyllabus = [];
+            if (!empty($course->description)) {
+                $descText = str_replace(['\r\n', '\r', '\n'], "\n", $course->description);
+                $descLines = explode("\n", $descText);
+                foreach ($descLines as $l) {
+                    $l = trim($l);
+                    if (preg_match('/^\d+[\.\)]\s*(.+)/', $l, $m)) {
+                        $item = trim($m[1]);
+                        if (!empty($item) && strlen($item) < 80 && !str_contains($item, ':') && !str_contains($item, ' - ')) {
+                            $descSyllabus[] = $item;
+                        }
+                    }
+                }
+                $descSyllabus = array_values(array_unique($descSyllabus));
+            }
+
+            $learningPoints = !empty($parsedHighlights) ? $parsedHighlights : (!empty($descSyllabus) ? $descSyllabus : [
+                'In-depth practical training from certified industry experts',
+                'Comprehensive classroom & hands-on laboratory exercises',
+                'Real-world case studies and industry projects',
+                'Career counseling, interview preparation and placement assistance',
+                'Authorized course completion certificate',
+            ]);
+
+            $topics = $learningPoints;
+            $courseIncludes = $learningPoints;
+
+            // Build curriculum from syllabus or highlights
+            $syllabusItems = !empty($descSyllabus) ? $descSyllabus : $learningPoints;
+            $curriculum = [];
+            foreach ($syllabusItems as $sIdx => $sTitle) {
+                $curriculum[] = [
+                    'section' => ($sIdx + 1) . '. ' . $sTitle,
+                    'lectures' => 'Practical Session',
+                    'duration' => 'Classroom / Lab',
+                    'items' => [
+                        [
+                            'title' => 'Core Concepts & Hands-on Training: ' . $sTitle,
+                            'duration' => 'Live Session',
+                            'preview' => false,
+                        ],
+                        [
+                            'title' => 'Lab Exercises & Practical Assignment: ' . $sTitle,
+                            'duration' => 'Lab Work',
+                            'preview' => false,
+                        ],
+                    ],
+                ];
+            }
+
+            $faqs = [
+                [
+                    'q' => 'Is this course offered online or in-person?',
+                    'a' => 'This course is offered through interactive classroom training and structured online sessions at the institute premises.'
+                ],
+                [
+                    'q' => 'What are the prerequisites for this training program?',
+                    'a' => 'Basic interest and academic eligibility in this field. All fundamental to advanced concepts are thoroughly taught during the sessions.'
+                ],
+                [
+                    'q' => 'Will I receive a course completion certificate?',
+                    'a' => 'Yes, upon successful completion of the course syllabus and practical assignments, you will receive an official course completion certificate.'
+                ],
+                [
+                    'q' => 'How can I inquire or enroll in this course?',
+                    'a' => 'You can contact the institute directly using the contact details and address provided on this page, or visit the center during operating hours.'
+                ],
+            ];
+
+            return [
+                'overview'              => $course->description,
+                'learningPoints'        => $learningPoints,
+                'topics'                => $topics,
+                'courseIncludes'        => $courseIncludes,
+                'curriculum'            => $curriculum,
+                'curriculumDirectItems' => $learningPoints,
+                'targetAudience'        => ['Students and working professionals seeking career advancement', 'Candidates preparing for competitive industry certifications'],
+                'requirements'          => ['Basic high school / undergraduate education', 'Commitment to attend scheduled lectures and complete practical exercises'],
+                'faqs'                  => $faqs,
+            ];
+        }
+
+        // ---------------------------------------------------------------------
         // 0. FETCH REAL OLD DATA FROM DATABASE (IF AVAILABLE)
         // ---------------------------------------------------------------------
         $dbIncludes = [];

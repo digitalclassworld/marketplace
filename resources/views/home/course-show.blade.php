@@ -504,10 +504,10 @@
          ======================================================================== -->
     <div class="course-subnav-tabs">
         <button type="button" class="course-subnav-link active" data-tab="overview" onclick="switchCourseTab('overview', this)">Overview</button>
-        <button type="button" class="course-subnav-link" data-tab="topics" onclick="switchCourseTab('topics', this)">Topics</button>
-        <button type="button" class="course-subnav-link" data-tab="curriculum" onclick="switchCourseTab('curriculum', this)">Curriculum</button>
+        <button type="button" class="course-subnav-link" data-tab="topics" onclick="switchCourseTab('topics', this)">{{ !empty($course->is_institute_course) ? 'Highlights' : 'Topics' }}</button>
+        <button type="button" class="course-subnav-link" data-tab="curriculum" onclick="switchCourseTab('curriculum', this)">{{ !empty($course->is_institute_course) ? 'Course Duration' : 'Curriculum' }}</button>
         <button type="button" class="course-subnav-link" data-tab="faqs" onclick="switchCourseTab('faqs', this)">FAQ's</button>
-        <button type="button" class="course-subnav-link" data-tab="instructor" onclick="switchCourseTab('instructor', this)">Instructor</button>
+        <button type="button" class="course-subnav-link" data-tab="instructor" onclick="switchCourseTab('instructor', this)">{{ !empty($course->is_institute_course) ? 'Institute & Trainer' : 'Instructor' }}</button>
         <button type="button" class="course-subnav-link" data-tab="reviews" onclick="switchCourseTab('reviews', this)">Reviews</button>
     </div>
 
@@ -533,6 +533,12 @@
                         <span id="descToggleText">See more</span> <i class="fa-solid fa-chevron-down" id="descToggleIcon" style="font-size: 0.72rem;"></i>
                     </a>
 
+                    @if(!empty($course->is_institute_course) && !empty($course->about))
+                        <div class="card p-3 my-3 bg-light border-0 rounded-3">
+                            <p class="mb-0 text-dark" style="font-size: 0.92rem; line-height: 1.6;">{!! nl2br(e($course->about)) !!}</p>
+                        </div>
+                    @endif
+
                     @php
                         // "What you'll learn" points (Priority 1: real course includes, Priority 2: real topics, Priority 3: learning points)
                         $overviewLearnPoints = !empty($courseIncludes) ? $courseIncludes : (!empty($topics) ? $topics : (!empty($learningPoints) ? $learningPoints : []));
@@ -541,7 +547,7 @@
                     @if(!empty($overviewLearnPoints) && count($overviewLearnPoints) > 0)
                         <!-- What you’ll learn Section (Matching authentic DC screenshot media_1795429241970_3e30eeae.jpg exactly) -->
                         <div class="what-youll-learn-section mt-4 pt-2">
-                            <h3 class="fw-bold mb-3 text-dark" style="font-size: 1.35rem; letter-spacing: -0.01em;">What you’ll learn</h3>
+                            <h3 class="fw-bold mb-3 text-dark" style="font-size: 1.35rem; letter-spacing: -0.01em;">{{ !empty($course->is_institute_course) ? 'Course Highlights' : 'What you’ll learn' }}</h3>
                             <div class="d-flex flex-column gap-2.5">
                                 @foreach($overviewLearnPoints as $pt)
                                     <div class="d-flex align-items-start gap-2.5">
@@ -587,7 +593,7 @@
                                 <i class="fa-solid fa-layer-group text-success fs-5"></i>
                                 <div>
                                     <div class="text-muted" style="font-size: 0.68rem;">Chapters / Modules</div>
-                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_chapter ?: count($curriculum) }} Modules</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ (!empty($course->course_chapter) ? $course->course_chapter : count($curriculum)) }} Modules</div>
                                 </div>
                             </div>
                         </div>
@@ -665,11 +671,24 @@
                         $displayLectures = !empty($course->course_video) ? $course->course_video : ($totalCurriculumLectures ?: (!empty($curriculumDirectItems) ? count($curriculumDirectItems) : 24));
                     @endphp
                     <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h2 class="section-card-title mb-0" style="font-size: 1.35rem; font-weight: 700;">Curriculum</h2>
+                        <h2 class="section-card-title mb-0" style="font-size: 1.35rem; font-weight: 700;">{{ !empty($course->is_institute_course) ? 'Course Duration & Sessions' : 'Curriculum' }}</h2>
                         <span class="text-muted small" style="font-size: 0.75rem;">
                             {{ $displayModules }} Modules &bull; {{ $displayLectures }} Lessons &bull; {{ $courseMonthTime }} Duration
                         </span>
                     </div>
+
+                    @if(!empty($course->is_institute_course))
+                        <div class="card p-3 mb-3 bg-light border-0 rounded-3">
+                            <div class="d-flex flex-column gap-2">
+                                @if(!empty($course->sessions))
+                                    <p class="mb-1 text-dark" style="font-size: 0.95rem;"><strong>Session :</strong> <span>{{ $course->sessions }}</span></p>
+                                @endif
+                                @if(!empty($course->duration))
+                                    <p class="mb-0 text-dark" style="font-size: 0.95rem;"><strong>Duration :</strong> <span>{{ $course->duration }}</span></p>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
 
                     @if(!empty($curriculumDirectItems) && count($curriculumDirectItems) > 0)
                         {{-- Direct Authentic Curriculum items matching screenshot media_1795423722571_765e14dc.png --}}
@@ -799,6 +818,17 @@
                     <p class="text-secondary small mb-0" style="font-size: 0.8rem; line-height: 1.55;">
                         {{ $course->instructor_bio ?? ($course->short_description ?: ($course->instructor_name . ' provides high quality education and career guidance on Digital Class.')) }}
                     </p>
+
+                    @if(!empty($course->instructor_education) || !empty($course->instructor_experience))
+                        <div class="d-flex flex-wrap gap-3 mt-3 pt-2 border-top">
+                            @if(!empty($course->instructor_education))
+                                <span class="small text-secondary"><strong>Education & Qualifications:</strong> {{ $course->instructor_education }}</span>
+                            @endif
+                            @if(!empty($course->instructor_experience))
+                                <span class="small text-secondary"><strong>Experience:</strong> {{ $course->instructor_experience }}</span>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -944,6 +974,19 @@
                     <h3 class="fw-bold mb-3 pb-2 border-bottom" style="font-size: 1.15rem; color: #1e293b;">
                         <i class="fa-solid fa-graduation-cap text-primary me-2"></i>Course Information
                     </h3>
+
+                    @if(!empty($course->price) && $course->price > 0)
+                        <div class="d-flex align-items-baseline gap-2 mb-3 p-2.5 rounded-2" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                            <span class="fs-4 fw-bold" style="color: #dc2626;">₹{{ number_format($course->selling_price ?: $course->price) }}</span>
+                            @if(!empty($course->original_price) && $course->original_price > ($course->selling_price ?: $course->price))
+                                <span class="text-muted text-decoration-line-through small">₹{{ number_format($course->original_price) }}</span>
+                                @if(!empty($course->discount_percentage))
+                                    <span class="badge bg-danger-subtle text-danger fw-bold" style="font-size: 0.72rem;">{{ $course->discount_percentage }}</span>
+                                @endif
+                            @endif
+                        </div>
+                    @endif
+
                     <div class="d-flex flex-column gap-2.5">
                         <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
                             <span class="text-muted" style="font-size: 0.85rem;">Offered By</span>
@@ -967,10 +1010,25 @@
                         </div>
                     </div>
 
+                    @if(!empty($course->institute_address))
+                        <div class="mt-3 pt-2 border-top border-light text-muted small" style="font-size: 0.78rem; line-height: 1.45;">
+                            <div class="fw-semibold text-dark mb-1"><i class="fa-solid fa-location-dot text-danger me-1"></i> Institute Address:</div>
+                            <span>{{ $course->institute_address }}</span>
+                        </div>
+                    @endif
+
+                    @if(!empty($course->institute_phone))
+                        <div class="mt-3">
+                            <a href="tel:{{ preg_replace('/[^\d+]/', '', $course->institute_phone) }}" class="btn btn-primary btn-sm w-100 fw-bold py-2 mb-2" style="border-radius: 8px;">
+                                <i class="fa-solid fa-phone me-1"></i> Inquire: {{ $course->institute_phone }}
+                            </a>
+                        </div>
+                    @endif
+
                     @if(!empty($course->instructor_url) && $course->instructor_url !== '#')
-                        <div class="mt-3 pt-2 border-top">
+                        <div class="{{ empty($course->institute_phone) ? 'mt-3 pt-2 border-top' : '' }}">
                             <a href="{{ $course->instructor_url }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold py-2" style="border-radius: 8px;">
-                                <i class="fa-solid fa-building me-1"></i> View Institute Profile
+                                <i class="fa-solid fa-building me-1"></i> View Institute Profile &rarr;
                             </a>
                         </div>
                     @endif
@@ -980,11 +1038,14 @@
             @php
                 // Real Dynamic "This Course Includes" values matching screenshot media_1795428088914_1289dd77.png
                 $incLectures = !empty($course->course_video) ? (int)$course->course_video : (!empty($curriculumDirectItems) ? count($curriculumDirectItems) : ($totalCurriculumLectures ?: 8));
+                if (!empty($course->is_institute_course) && !empty($course->sessions)) {
+                    $incLectures = $course->sessions . ' Sessions';
+                }
 
                 $incMonth = '1 Month';
                 if (!empty($course->course_month) && is_numeric($course->course_month) && $course->course_month > 0) {
                     $incMonth = $course->course_month . ($course->course_month == 1 ? ' Month' : ' Months');
-                } elseif (!empty($course->duration) && str_contains(strtolower($course->duration), 'month')) {
+                } elseif (!empty($course->duration)) {
                     $incMonth = $course->duration;
                 }
 
