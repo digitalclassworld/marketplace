@@ -74,7 +74,7 @@
         margin-top: 2rem;
         border-radius: 20px;
         overflow: hidden;
-        background: linear-gradient(145deg, #eff6ff 0%, #e0f2fe 100%);
+        background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
         padding: 1.5rem 1rem 0;
         text-align: center;
     }
@@ -396,7 +396,7 @@
         height: 38px;
         border-radius: 50%;
         background: #ffffff;
-        color: #0066ff;
+        color: #0f172a;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -461,7 +461,7 @@
                     </div>
 
                     <div class="feature-point-row">
-                        <div class="feature-icon-square" style="background-color: #eff6ff; color: #2563eb;">
+                        <div class="feature-icon-square" style="background-color: #fef3c7; color: #d97706;">
                             <i class="fa-solid fa-users"></i>
                         </div>
                         <div>
@@ -729,7 +729,7 @@
                     </div>
 
                     <div class="benefit-item-row">
-                        <div class="benefit-icon-box" style="background-color: #eff6ff; color: #2563eb;">
+                        <div class="benefit-icon-box" style="background-color: #fef3c7; color: #d97706;">
                             <i class="fa-solid fa-users-viewfinder"></i>
                         </div>
                         <div>

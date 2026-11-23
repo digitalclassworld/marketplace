@@ -5,40 +5,71 @@
 @section('styles')
 <style>
     .dc-auth-wrapper {
-        background: linear-gradient(180deg, #f8fafc 0%, #eef2f6 100%);
+        background: radial-gradient(circle at 50% 0%, #1e1145 0%, #0c0a1a 45%, #06050d 100%);
         min-height: calc(100vh - 120px);
-        padding: 2.5rem 0 4rem;
+        padding: 3rem 0 5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dc-auth-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -120px;
+        left: 10%;
+        width: 550px;
+        height: 550px;
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+        filter: blur(50px);
+    }
+    .dc-auth-wrapper::after {
+        content: '';
+        position: absolute;
+        bottom: 5%;
+        right: 10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+        filter: blur(50px);
     }
 
     .auth-badge-pill {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background-color: #ecfdf5;
-        color: #047857;
+        background: rgba(124, 58, 237, 0.15);
+        color: #c4b5fd;
+        border: 1px solid rgba(167, 139, 250, 0.3);
         font-size: 0.8rem;
         font-weight: 700;
-        padding: 0.35rem 0.95rem;
+        padding: 0.4rem 1rem;
         border-radius: 999px;
-        border: 1px solid #a7f3d0;
         margin-bottom: 1.25rem;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.05em;
+        backdrop-filter: blur(8px);
     }
 
     .auth-hero-title {
         font-family: var(--dc-font-heading);
-        font-size: 2.35rem;
+        font-size: 2.4rem;
         font-weight: 800;
         line-height: 1.2;
-        color: #0f172a;
+        color: #ffffff;
         letter-spacing: -0.03em;
         margin-bottom: 0.75rem;
+    }
+    .auth-hero-title span {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .auth-hero-sub {
         font-size: 1.05rem;
-        color: #475569;
+        color: #cbd5e1;
         line-height: 1.6;
         margin-bottom: 2rem;
     }
@@ -47,22 +78,23 @@
         display: flex;
         align-items: flex-start;
         gap: 1rem;
-        margin-bottom: 1.25rem;
-        padding: 0.85rem 1rem;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        transition: all 0.2s ease;
+        margin-bottom: 1.15rem;
+        padding: 1rem 1.25rem;
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        transition: all 0.25s ease;
     }
     .benefit-item:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        border-color: rgba(167, 139, 250, 0.4);
+        background: rgba(255, 255, 255, 0.1);
         transform: translateY(-2px);
     }
     .benefit-icon-box {
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -72,44 +104,48 @@
 
     .auth-form-card {
         background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+        border-radius: 26px;
+        box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
         overflow: hidden;
     }
 
     .auth-card-header {
-        background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #059669 100%);
-        padding: 2rem 2.25rem;
+        background: linear-gradient(135deg, #1c1038 0%, #2e1065 50%, #4c1d95 100%);
+        padding: 2.25rem 2.5rem;
         color: #ffffff;
         position: relative;
     }
 
     .custom-auth-input-group {
         border: 1.5px solid #e2e8f0;
-        border-radius: 10px;
+        border-radius: 12px;
         overflow: hidden;
         transition: all 0.2s ease;
         background: #f8fafc;
     }
     .custom-auth-input-group:focus-within {
-        border-color: #059669;
+        border-color: #7c3aed;
         background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+        box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
     }
     .custom-auth-input-group .input-group-text {
         background: transparent;
         border: none;
-        color: #64748b;
+        color: #94a3b8;
         font-size: 0.95rem;
-        padding-left: 0.95rem;
+        padding-left: 1rem;
+    }
+    .custom-auth-input-group:focus-within .input-group-text {
+        color: #7c3aed;
     }
     .custom-auth-input-group .form-control,
     .custom-auth-input-group .form-select {
         border: none;
         background: transparent;
-        font-size: 0.9rem;
-        padding: 0.65rem 0.85rem;
+        font-size: 0.925rem;
+        padding: 0.75rem 0.95rem;
         box-shadow: none;
+        color: #0f172a;
     }
     .custom-auth-input-group .form-control:focus,
     .custom-auth-input-group .form-select:focus {
@@ -120,8 +156,8 @@
     .interest-chip-label {
         border: 1.5px solid #e2e8f0;
         border-radius: 999px;
-        padding: 0.35rem 0.85rem;
-        font-size: 0.8rem;
+        padding: 0.45rem 1rem;
+        font-size: 0.825rem;
         font-weight: 600;
         color: #475569;
         cursor: pointer;
@@ -130,105 +166,125 @@
         user-select: none;
     }
     .interest-chip-input:checked + .interest-chip-label {
-        background-color: #ecfdf5;
-        border-color: #059669;
-        color: #047857;
+        background-color: #f5f3ff;
+        border-color: #7c3aed;
+        color: #6d28d9;
+        box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
     }
 
     .btn-submit-customer {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #9333ea 100%);
         border: none;
         color: #ffffff;
         font-weight: 700;
         letter-spacing: 0.01em;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px -4px rgba(124, 58, 237, 0.45);
     }
     .btn-submit-customer:hover {
-        background: linear-gradient(135deg, #047857 0%, #064e3b 100%);
-        box-shadow: 0 6px 20px -3px rgba(5, 150, 105, 0.35);
+        background: linear-gradient(135deg, #5b21b6 0%, #6d28d9 50%, #7c3aed 100%);
+        box-shadow: 0 16px 32px -4px rgba(124, 58, 237, 0.55);
         color: #ffffff;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+    }
+    .btn-submit-customer:active {
+        transform: translateY(0);
+    }
+
+    .luxury-accent-link {
+        color: #7c3aed;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.15s ease;
+    }
+    .luxury-accent-link:hover {
+        color: #5b21b6;
+        text-decoration: underline;
     }
 </style>
 @endsection
 
 @section('content')
 <div class="dc-auth-wrapper">
-    <div class="container">
+    <div class="container position-relative" style="z-index: 2;">
         
         <!-- Breadcrumb / Back Link -->
         <div class="mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <a href="{{ route('home') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold">
-                <i class="fa-solid fa-arrow-left me-1.5"></i> Back to Marketplace
+            <a href="{{ route('home') }}" class="text-white-50 text-decoration-none small d-inline-flex align-items-center gap-1.5 hover-white">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Marketplace</span>
             </a>
-            <div class="d-flex align-items-center gap-2">
-                <span class="small text-muted">Already registered?</span>
-                <a href="{{ route('customer.login') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
-                    <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Customer Login
+            <div class="text-white-50 small">
+                Looking for instructor/institution portal? 
+                <a href="{{ route('seller.register') }}" class="text-warning fw-bold text-decoration-none ms-1">
+                    Become a Seller &rarr;
                 </a>
             </div>
         </div>
 
-        <div class="row g-4 g-lg-5 align-items-start">
+        <div class="row g-4 g-xl-5 align-items-start">
             
-            <!-- LEFT COLUMN: VALUE PROPOSITION & BUYER PERKS -->
-            <div class="col-lg-5 d-none d-lg-block">
-                <div class="pe-xl-3 sticky-top" style="top: 100px;">
-                    <div class="auth-badge-pill">
-                        <i class="fa-solid fa-bolt text-warning"></i> Instant Marketplace Access
-                    </div>
+            <!-- LEFT COLUMN: VALUE PROPOSITION & PROFILES -->
+            <div class="col-lg-5">
+                <div class="pe-xl-3">
+                    
+                    <!-- Pill Badge -->
+                    <span class="auth-badge-pill">
+                        <i class="fa-solid fa-sparkles text-warning"></i> Instant Marketplace Access
+                    </span>
 
+                    <!-- Main Headline -->
                     <h1 class="auth-hero-title">
-                        One Account for All Learning, Services & Shopping
+                        One Account for <span>Everything</span> You Need to Learn & Build.
                     </h1>
 
                     <p class="auth-hero-sub">
-                        Join thousands of students, business owners, professionals, and educators across India. Sign up once and buy directly with zero waiting.
+                        Create your free customer account in seconds to browse courses, hire experts, and purchase verified tools across 11,000+ top institutes.
                     </p>
 
-                    <!-- Instant Access Highlights -->
+                    <!-- Key Benefits -->
                     <div class="benefit-item">
-                        <div class="benefit-icon-box bg-success bg-opacity-10 text-success">
+                        <div class="benefit-icon-box" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0.5" style="font-size: 0.95rem;">No Admin Approval Needed</h6>
-                            <p class="small text-muted mb-0">Unlike sellers, your customer account is approved instantly! You can start browsing and buying in seconds.</p>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">No Admin Approval Needed</h6>
+                            <p class="small text-white-50 mb-0">Unlike sellers, your customer account is approved instantly! You can start browsing and buying in seconds.</p>
                         </div>
                     </div>
 
                     <div class="benefit-item">
-                        <div class="benefit-icon-box" style="background-color: #ecfdf5; color: #047857;">
+                        <div class="benefit-icon-box" style="background: rgba(167, 139, 250, 0.2); color: #c4b5fd; border: 1px solid rgba(167, 139, 250, 0.3);">
                             <i class="fa-solid fa-graduation-cap"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0.5" style="font-size: 0.95rem;">For Students & Learners</h6>
-                            <p class="small text-muted mb-0">Enroll in top instructor-led courses, watch video lectures, access study material, and earn verified certificates.</p>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">For Students & Learners</h6>
+                            <p class="small text-white-50 mb-0">Enroll in top instructor-led courses, watch video lectures, access study material, and earn verified certificates.</p>
                         </div>
                     </div>
 
                     <div class="benefit-item">
-                        <div class="benefit-icon-box bg-info bg-opacity-10 text-info">
+                        <div class="benefit-icon-box" style="background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3);">
                             <i class="fa-solid fa-briefcase"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0.5" style="font-size: 0.95rem;">For Business Owners & Employees</h6>
-                            <p class="small text-muted mb-0">Hire verified agencies for web/app development, marketing, purchase software assets, and source business tools.</p>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">For Business Owners & Employees</h6>
+                            <p class="small text-white-50 mb-0">Hire verified agencies for web/app development, marketing, purchase software assets, and source business tools.</p>
                         </div>
                     </div>
 
                     <div class="benefit-item">
-                        <div class="benefit-icon-box bg-warning bg-opacity-10 text-warning">
+                        <div class="benefit-icon-box" style="background: rgba(244, 114, 182, 0.2); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3);">
                             <i class="fa-solid fa-chalkboard-user"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0.5" style="font-size: 0.95rem;">For Teachers & Educators</h6>
-                            <p class="small text-muted mb-0">Access classroom kits, educational templates, and expand your digital teaching infrastructure.</p>
+                            <h6 class="fw-bold text-white mb-0.5" style="font-size: 0.95rem;">For Teachers & Educators</h6>
+                            <p class="small text-white-50 mb-0">Access classroom kits, educational templates, and expand your digital teaching infrastructure.</p>
                         </div>
                     </div>
 
                     <!-- Trust Stats Bar -->
-                    <div class="p-3.5 rounded-4 bg-white border mt-4">
+                    <div class="p-3.5 rounded-4 border mt-4" style="background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); border-color: rgba(255, 255, 255, 0.1) !important;">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <div class="d-flex align-items-center gap-1.5 text-warning small fw-bold">
                                 <i class="fa-solid fa-star"></i>
@@ -236,19 +292,19 @@
                                 <i class="fa-solid fa-star"></i>
                                 <i class="fa-solid fa-star"></i>
                                 <i class="fa-solid fa-star"></i>
-                                <span class="text-dark ms-1">4.9/5 Rating</span>
+                                <span class="text-white ms-1">4.9/5 Rating</span>
                             </div>
-                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-2 py-0.5" style="font-size: 0.7rem;">Verified Platform</span>
+                            <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 fw-bold px-2 py-0.5" style="font-size: 0.7rem;">Verified Platform</span>
                         </div>
-                        <p class="small text-muted mb-0" style="font-size: 0.8rem;">
-                            <i class="fa-solid fa-shield-halved text-primary me-1"></i> 100% Secure Razorpay checkout & buyer satisfaction guarantee on all orders.
+                        <p class="small text-white-50 mb-0" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-shield-halved text-warning me-1"></i> 100% Secure checkout & buyer satisfaction guarantee on all orders.
                         </p>
                     </div>
 
                     <!-- Seller Switch Callout -->
-                    <div class="mt-3 text-center p-3 rounded-3 bg-light border">
-                        <span class="small text-muted d-block mb-1">Want to teach courses or offer professional services?</span>
-                        <a href="{{ route('seller.register') }}" class="fw-bold text-success text-decoration-none small">
+                    <div class="mt-3 text-center p-3 rounded-4 border" style="background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.08) !important;">
+                        <span class="small text-white-50 d-block mb-1">Want to teach courses or offer professional services?</span>
+                        <a href="{{ route('seller.register') }}" class="fw-bold text-warning text-decoration-none small">
                             <i class="fa-solid fa-store me-1"></i> Register as a Marketplace Seller &rarr;
                         </a>
                     </div>
@@ -273,7 +329,7 @@
                                     <h3 class="fw-bold mb-0 text-white fs-4 mt-0.5">Create Customer Account</h3>
                                 </div>
                             </div>
-                            <span class="badge bg-success text-white rounded-pill px-3 py-1.5 fw-bold shadow-xs" style="font-size: 0.75rem;">
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-1.5 fw-bold shadow-xs" style="font-size: 0.75rem;">
                                 <i class="fa-solid fa-bolt me-1"></i> Instant Active
                             </span>
                         </div>
@@ -471,23 +527,23 @@
                             </div>
 
                             <!-- INSTANT ACTIVATION TRUST CALLOUT -->
-                            <div class="p-3 rounded-4 bg-success bg-opacity-10 border border-success border-opacity-25 text-success small mb-4 d-flex align-items-center gap-3">
-                                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+                            <div class="p-3 rounded-4 mb-4 d-flex align-items-center gap-3" style="background: #f5f3ff; border: 1.5px solid #ddd6fe;">
+                                <div class="rounded-circle text-white d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
                                     <i class="fa-solid fa-bolt fs-6"></i>
                                 </div>
                                 <div class="text-dark">
-                                    <strong class="d-block text-success" style="font-size: 0.85rem;">Instant Account Activation (No Approval Needed)</strong>
+                                    <strong class="d-block" style="font-size: 0.85rem; color: #6d28d9;">Instant Account Activation (No Approval Needed)</strong>
                                     <span class="text-muted" style="font-size: 0.8rem; line-height: 1.4;">
-                                        Your customer account is ready immediately upon registration. You do not need to wait for any admin approvals — you can explore the marketplace and purchase courses, services, or products directly!
+                                        Your customer account is ready immediately upon registration. You do not need to wait for any admin approvals — explore and purchase directly!
                                     </span>
                                 </div>
                             </div>
 
                             <!-- TERMS CHECKBOX -->
                             <div class="form-check mb-4">
-                                <input class="form-check-input" type="checkbox" id="termsCheck" required checked>
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required checked style="accent-color: #7c3aed;">
                                 <label class="form-check-label small text-muted" for="termsCheck" style="font-size: 0.8rem;">
-                                    I agree to the <a href="#" class="text-decoration-none fw-semibold" style="color: #059669;">Terms of Service</a> and <a href="#" class="text-decoration-none fw-semibold" style="color: #059669;">Privacy Policy</a> of Digital Class Marketplace.
+                                    I agree to the <a href="#" class="luxury-accent-link">Terms of Service</a> and <a href="#" class="luxury-accent-link">Privacy Policy</a> of Digital Class Marketplace.
                                 </label>
                             </div>
 
@@ -500,7 +556,7 @@
                             <!-- LOGIN REDIRECT FOOTER -->
                             <div class="text-center small text-muted py-2">
                                 Already have an account? 
-                                <a href="{{ route('customer.login') }}" class="fw-bold text-decoration-none ms-1" style="color: #059669;">
+                                <a href="{{ route('customer.login') }}" class="luxury-accent-link ms-1">
                                     Log In Here &rarr;
                                 </a>
                             </div>
@@ -513,36 +569,32 @@
                                     <strong class="d-block text-dark small">Are you an Instructor, Agency or Business?</strong>
                                     <span class="text-muted small" style="font-size: 0.775rem;">Sell courses, list services or products on our marketplace</span>
                                 </div>
-                                <a href="{{ route('seller.register') }}" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold">
-                                    <i class="fa-solid fa-store me-1"></i> Register as Seller
+                                <a href="{{ route('seller.register') }}" class="btn btn-dark btn-sm rounded-pill px-3 fw-bold" style="background: #0f172a;">
+                                    <i class="fa-solid fa-store me-1 text-warning"></i> Register as Seller
                                 </a>
                             </div>
 
                         </form>
-
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-function togglePassVisibility(inputId, btn) {
-    const input = document.getElementById(inputId);
-    const icon = btn.querySelector('i');
-    if (!input || !icon) return;
-
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
+    function togglePassVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
     }
-}
 </script>
 @endsection
