@@ -404,7 +404,7 @@
          ======================================================================== -->
     <nav class="course-page-breadcrumb">
         <a href="{{ route('home') }}">Home</a> &gt; 
-        @if(!empty($course->is_institute_course))
+        @if(!empty($course->is_institute_course) || request()->is('business-listing/*'))
             <a href="{{ route('businesses') }}">Coaching Institutes</a> &gt; 
             @if(!empty($course->instructor_url))
                 <a href="{{ $course->instructor_url }}">{{ $course->instructor_name }}</a> &gt; 
@@ -856,83 +856,126 @@
         <!-- Right Column: Sticky Purchase Card & Requirements Sidebars -->
         <div class="col-lg-4">
             
-            <!-- Sticky Purchase Card -->
-            <div class="sticky-purchase-card mb-3">
-                
-                @php
-                    $sellPrice = (float)($course->selling_price ?? 0);
-                    $mrpPrice = (float)($course->original_price ?? 0);
-                    if ($sellPrice == 0) {
-                        if (isset($course->discount_price) && $course->discount_price > 0 && $course->price > $course->discount_price) {
-                            $sellPrice = (float)$course->discount_price;
-                            $mrpPrice = (float)$course->price;
-                        } else {
-                            $sellPrice = (float)($course->price ?? 0);
+            @php
+                $isBusinessListingCourse = request()->is('business-listing/*') || !empty($course->is_institute_course);
+            @endphp
+
+            @if(!$isBusinessListingCourse)
+                <!-- Sticky Purchase Card -->
+                <div class="sticky-purchase-card mb-3">
+                    
+                    @php
+                        $sellPrice = (float)($course->selling_price ?? 0);
+                        $mrpPrice = (float)($course->original_price ?? 0);
+                        if ($sellPrice == 0) {
+                            if (isset($course->discount_price) && $course->discount_price > 0 && $course->price > $course->discount_price) {
+                                $sellPrice = (float)$course->discount_price;
+                                $mrpPrice = (float)$course->price;
+                            } else {
+                                $sellPrice = (float)($course->price ?? 0);
+                            }
                         }
-                    }
-                    if ($mrpPrice == 0 && isset($course->price) && $course->price > $sellPrice) {
-                        $mrpPrice = (float)$course->price;
-                    }
-                @endphp
-                <div class="d-flex align-items-baseline gap-2 mb-1">
-                    @if($sellPrice == 0)
-                        <span class="huge-price-display text-success">FREE</span>
-                        @if($mrpPrice > 0)
-                            <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
+                        if ($mrpPrice == 0 && isset($course->price) && $course->price > $sellPrice) {
+                            $mrpPrice = (float)$course->price;
+                        }
+                    @endphp
+                    <div class="d-flex align-items-baseline gap-2 mb-1">
+                        @if($sellPrice == 0)
+                            <span class="huge-price-display text-success">FREE</span>
+                            @if($mrpPrice > 0)
+                                <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
+                            @endif
+                        @else
+                            <span class="huge-price-display">₹{{ number_format($sellPrice) }}</span>
+                            @if($mrpPrice > $sellPrice)
+                                <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
+                                <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
+                            @endif
                         @endif
-                    @else
-                        <span class="huge-price-display">₹{{ number_format($sellPrice) }}</span>
-                        @if($mrpPrice > $sellPrice)
-                            <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
-                            <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
-                        @endif
+                    </div>
+
+                    <div class="text-danger small fw-semibold mb-3" style="font-size: 0.72rem;">
+                        <i class="fa-regular fa-clock me-1"></i> Offer ends in 2 days
+                    </div>
+
+                    <!-- CTA Action Buttons -->
+                    <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="mb-2">
+                        @csrf
+                        <button type="submit" class="btn w-100 fw-bold py-2 shadow-sm text-white" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); border: none; font-size: 0.875rem; border-radius: 8px;">
+                            Buy Now
+                        </button>
+                    </form>
+
+                    <button type="button" class="btn w-100 fw-bold py-2 mb-3" style="border: 2px solid #7c3aed; color: #6d28d9; background: #ffffff; font-size: 0.82rem; border-radius: 8px; transition: all 0.2s;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
+                        <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
+                    </button>
+
+                    <!-- Guarantee Checkpoints List -->
+                    <div class="pt-2 border-top">
+                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-circle-check text-success"></i> <span>Lifetime Access</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-circle-check text-success"></i> <span>Learn at Your Own Pace</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-circle-check text-success"></i> <span>Mobile, Tablet & Desktop Access</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-2 text-dark" style="font-size: 0.75rem;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-circle-check text-success"></i> <span>Certificate of Completion</span>
+                            </div>
+                            <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" target="_blank" class="text-primary text-decoration-none fw-semibold" style="font-size: 0.7rem;">
+                                View PDF &rarr;
+                            </a>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-circle-check text-success"></i> <span>Live Projects & Resources</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-circle-check text-success"></i> <span>30 Days Money Back Guarantee</span>
+                        </div>
+                    </div>
+
+                </div>
+            @else
+                <!-- Institute Course Information Card (Pure Info) -->
+                <div class="section-card-white mb-3 p-3">
+                    <h3 class="fw-bold mb-3 pb-2 border-bottom" style="font-size: 1.15rem; color: #1e293b;">
+                        <i class="fa-solid fa-graduation-cap text-primary me-2"></i>Course Information
+                    </h3>
+                    <div class="d-flex flex-column gap-2.5">
+                        <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
+                            <span class="text-muted" style="font-size: 0.85rem;">Offered By</span>
+                            <span class="fw-semibold text-dark text-end" style="font-size: 0.88rem;">{{ $course->instructor_name }}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
+                            <span class="text-muted" style="font-size: 0.85rem;">Duration</span>
+                            <span class="fw-semibold text-dark" style="font-size: 0.88rem;">{{ $course->duration ?: '3 Months' }}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
+                            <span class="text-muted" style="font-size: 0.85rem;">Learning Mode</span>
+                            <span class="fw-semibold text-dark" style="font-size: 0.88rem;">{{ $course->access_type ?: 'Classroom / Online' }}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
+                            <span class="text-muted" style="font-size: 0.85rem;">Language</span>
+                            <span class="fw-semibold text-dark" style="font-size: 0.88rem;">{{ $course->language ?: 'English / Hindi' }}</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between py-1">
+                            <span class="text-muted" style="font-size: 0.85rem;">Program Type</span>
+                            <span class="badge bg-primary-subtle text-primary fw-semibold" style="font-size: 0.75rem;">Institute Program</span>
+                        </div>
+                    </div>
+
+                    @if(!empty($course->instructor_url) && $course->instructor_url !== '#')
+                        <div class="mt-3 pt-2 border-top">
+                            <a href="{{ $course->instructor_url }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold py-2" style="border-radius: 8px;">
+                                <i class="fa-solid fa-building me-1"></i> View Institute Profile
+                            </a>
+                        </div>
                     @endif
                 </div>
-
-                <div class="text-danger small fw-semibold mb-3" style="font-size: 0.72rem;">
-                    <i class="fa-regular fa-clock me-1"></i> Offer ends in 2 days
-                </div>
-
-                <!-- CTA Action Buttons -->
-                <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="mb-2">
-                    @csrf
-                    <button type="submit" class="btn w-100 fw-bold py-2 shadow-sm text-white" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); border: none; font-size: 0.875rem; border-radius: 8px;">
-                        Buy Now
-                    </button>
-                </form>
-
-                <button type="button" class="btn w-100 fw-bold py-2 mb-3" style="border: 2px solid #7c3aed; color: #6d28d9; background: #ffffff; font-size: 0.82rem; border-radius: 8px; transition: all 0.2s;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
-                    <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
-                </button>
-
-                <!-- Guarantee Checkpoints List -->
-                <div class="pt-2 border-top">
-                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                        <i class="fa-solid fa-circle-check text-success"></i> <span>Lifetime Access</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                        <i class="fa-solid fa-circle-check text-success"></i> <span>Learn at Your Own Pace</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                        <i class="fa-solid fa-circle-check text-success"></i> <span>Mobile, Tablet & Desktop Access</span>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between mb-2 text-dark" style="font-size: 0.75rem;">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="fa-solid fa-circle-check text-success"></i> <span>Certificate of Completion</span>
-                        </div>
-                        <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" target="_blank" class="text-primary text-decoration-none fw-semibold" style="font-size: 0.7rem;">
-                            View PDF &rarr;
-                        </a>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 mb-2 text-dark" style="font-size: 0.75rem;">
-                        <i class="fa-solid fa-circle-check text-success"></i> <span>Live Projects & Resources</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem;">
-                        <i class="fa-solid fa-circle-check text-success"></i> <span>30 Days Money Back Guarantee</span>
-                    </div>
-                </div>
-
-            </div>
+            @endif
 
             @php
                 // Real Dynamic "This Course Includes" values matching screenshot media_1795428088914_1289dd77.png
@@ -1203,6 +1246,7 @@
     }
 </script>
 
+@if(!$isBusinessListingCourse)
 <!-- Mobile Sticky Purchase Bar (Bottom Fixed on Phones) -->
 <div class="mobile-sticky-purchase-bar d-lg-none">
     <div class="d-flex align-items-center justify-content-between gap-3">
@@ -1236,5 +1280,6 @@
         </div>
     </div>
 </div>
+@endif
 
 @endsection
