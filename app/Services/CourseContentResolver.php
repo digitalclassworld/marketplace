@@ -141,22 +141,24 @@ class CourseContentResolver
         // ---------------------------------------------------------------------
         // 1. TOPICS ("WHAT YOU'LL LEARN")
         // ---------------------------------------------------------------------
-        if (!empty($dbIncludes)) {
-            // Priority 1: Real includes from dc_elearn_course_include (Matches course 1324 screenshot)
-            $learningPoints = $dbIncludes;
+        $realTopics = [];
+        if (!empty($dbTopics)) {
+            // Priority 1: Real covering topics from dc_elearn_covering_topics
+            $realTopics = $dbTopics;
+        } elseif (!empty($dbIncludes)) {
+            // Priority 2: Real includes from dc_elearn_course_include
+            $realTopics = $dbIncludes;
         } elseif (count($parsedSections) >= 2) {
-            // Priority 2: Parsed section headers from course description
+            // Priority 3: Parsed section headers from course description
             foreach ($parsedSections as $sec) {
                 $cleanTitle = preg_replace('/^\d+[\.\)]\s*/', '', $sec['title']);
                 $cleanTitle = trim($cleanTitle, " \t\n\r\0\x0B:-");
                 if (!empty($cleanTitle)) {
-                    $learningPoints[] = $cleanTitle;
+                    $realTopics[] = $cleanTitle;
                 }
             }
-        } elseif (!empty($dbTopics)) {
-            // Priority 3: Real covering topics from dc_elearn_covering_topics
-            $learningPoints = array_slice($dbTopics, 0, 12);
         }
+        $learningPoints = $realTopics;
 
         // ---------------------------------------------------------------------
         // 2. CURRICULUM (MODULES & LECTURES)
@@ -621,11 +623,14 @@ class CourseContentResolver
         }
 
         return [
-            'learningPoints' => $learningPoints,
-            'curriculum'     => $curriculum,
-            'faqs'           => $faqs,
-            'targetAudience' => $targetAudience,
-            'requirements'   => $requirements,
+            'learningPoints'         => $learningPoints,
+            'topics'                 => !empty($dbTopics) ? $dbTopics : $learningPoints,
+            'courseIncludes'         => $dbIncludes,
+            'curriculum'             => $curriculum,
+            'curriculumDirectItems'  => $dbCurriculum,
+            'faqs'                   => $faqs,
+            'targetAudience'         => $targetAudience,
+            'requirements'           => $requirements,
         ];
     }
 }

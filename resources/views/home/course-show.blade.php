@@ -177,36 +177,55 @@
         line-height: 1;
     }
 
-    /* Sticky Sub-Navigation Tabs */
+    /* Sticky Sub-Navigation Tabs matching screenshot */
     .course-subnav-tabs {
-        background: #ffffff;
+        background: #eef2f6;
         border: 1px solid #e2e8f0;
-        border-radius: 999px;
-        padding: 4px 8px;
+        border-radius: 12px;
+        padding: 6px 8px;
         margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
         overflow-x: auto;
         white-space: nowrap;
         box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
     }
     .course-subnav-link {
         display: inline-block;
-        padding: 0.5rem 1.15rem;
-        font-size: 0.825rem;
+        padding: 0.45rem 1.25rem;
+        font-size: 0.9rem;
         font-weight: 600;
-        color: #64748b;
+        color: #0066ff;
         text-decoration: none;
-        border-radius: 999px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
         transition: all 0.2s ease;
     }
     .course-subnav-link:hover {
-        color: #0066ff;
-        background: #eff6ff;
+        color: #004edb;
+        background: rgba(0, 102, 255, 0.08);
     }
     .course-subnav-link.active {
-        color: #0066ff;
-        background: #eff6ff;
+        color: #ffffff !important;
+        background: #0066ff !important;
         font-weight: 700;
-        box-shadow: 0 2px 6px rgba(0, 102, 255, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+    }
+
+    /* Tab switching: Only the clicked tab opens */
+    .course-tab-pane {
+        display: none;
+    }
+    .course-tab-pane.active {
+        display: block;
+        animation: fadeInTabPane 0.2s ease-in-out;
+    }
+    @keyframes fadeInTabPane {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     /* Section Cards */
@@ -520,15 +539,15 @@
     </div>
 
     <!-- ========================================================================
-         3. STICKY SUB-NAVIGATION TABS
+         3. STICKY SUB-NAVIGATION TABS (Only the clicked tab opens)
          ======================================================================== -->
     <div class="course-subnav-tabs">
-        <a href="#overview" class="course-subnav-link active">Overview</a>
-        <a href="#topics" class="course-subnav-link">Topics</a>
-        <a href="#curriculum" class="course-subnav-link">Curriculum</a>
-        <a href="#instructor" class="course-subnav-link">Instructor</a>
-        <a href="#faqs" class="course-subnav-link">FAQs</a>
-        <a href="#reviews" class="course-subnav-link">Reviews</a>
+        <button type="button" class="course-subnav-link active" data-tab="overview" onclick="switchCourseTab('overview', this)">Overview</button>
+        <button type="button" class="course-subnav-link" data-tab="topics" onclick="switchCourseTab('topics', this)">Topics</button>
+        <button type="button" class="course-subnav-link" data-tab="curriculum" onclick="switchCourseTab('curriculum', this)">Curriculum</button>
+        <button type="button" class="course-subnav-link" data-tab="faqs" onclick="switchCourseTab('faqs', this)">FAQ's</button>
+        <button type="button" class="course-subnav-link" data-tab="instructor" onclick="switchCourseTab('instructor', this)">Instructor</button>
+        <button type="button" class="course-subnav-link" data-tab="reviews" onclick="switchCourseTab('reviews', this)">Reviews</button>
     </div>
 
     <!-- ========================================================================
@@ -536,307 +555,297 @@
          ======================================================================== -->
     <div class="row g-3">
         
-        <!-- Left Column: Course In-Depth Details -->
+        <!-- Left Column: Course In-Depth Details (Tab-switched) -->
         <div class="col-lg-8">
             
-            <!-- Course Overview Section -->
-            <div id="overview" class="section-card-white mb-3">
-                <h2 class="section-card-title mb-3">Course Overview</h2>
-                
-                <div class="course-desc-wrapper" id="courseDescWrap">
-                    <div class="course-desc-content text-secondary" style="font-size: 0.86rem; line-height: 1.65;">
-                        {!! nl2br(e($course->description)) !!}
-                    </div>
-                </div>
-                <a href="javascript:void(0)" class="btn-toggle-see-more" id="descSeeMoreBtn" onclick="toggleCourseDescription()">
-                    <span id="descToggleText">See more</span> <i class="fa-solid fa-chevron-down" id="descToggleIcon" style="font-size: 0.72rem;"></i>
-                </a>
-
-                @if(!empty($course->course_activation_instruction))
-                    <div class="alert alert-info mt-3 p-3 rounded-3 border-0 bg-primary-subtle" style="font-size: 0.8rem;">
-                        <div class="fw-bold text-primary mb-1"><i class="fa-solid fa-circle-info me-1"></i> Course Access & Activation Instructions</div>
-                        <div class="text-secondary">{!! nl2br(e($course->course_activation_instruction)) !!}</div>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Topics: What you'll learn -->
-            <div id="topics" class="what-you-learn-box mb-3">
-                <h2 class="section-card-title mb-3" style="font-size: 1.2rem; font-weight: 700;">What you'll learn</h2>
-                
-                @php
-                    $halfLp = ceil(count($learningPoints) / 2);
-                @endphp
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        @foreach(array_slice($learningPoints, 0, $halfLp) as $lp)
-                            <div class="learn-point-check d-flex align-items-start gap-2 mb-2">
-                                <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
-                                <span style="font-size: 0.86rem; color: #1e293b; line-height: 1.45;">{{ $lp }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="col-md-6">
-                        @foreach(array_slice($learningPoints, $halfLp) as $lp)
-                            <div class="learn-point-check d-flex align-items-start gap-2 mb-2">
-                                <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
-                                <span style="font-size: 0.86rem; color: #1e293b; line-height: 1.45;">{{ $lp }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            <!-- Course Highlights Grid -->
-            <div class="section-card-white mb-3 p-3">
-                <div class="row g-2">
-                    <div class="col-sm-6 col-md-4">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
-                            <i class="fa-regular fa-clock text-primary fs-5"></i>
-                            <div>
-                                <div class="text-muted" style="font-size: 0.68rem;">Duration</div>
-                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->duration }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
-                            <i class="fa-solid fa-layer-group text-success fs-5"></i>
-                            <div>
-                                <div class="text-muted" style="font-size: 0.68rem;">Chapters / Modules</div>
-                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_chapter ?: count($curriculum) }} Modules</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
-                            <i class="fa-solid fa-video text-info fs-5"></i>
-                            <div>
-                                <div class="text-muted" style="font-size: 0.68rem;">Video Lessons</div>
-                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_video ?: 24 }} Lectures</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
-                            <i class="fa-solid fa-signal text-warning fs-5"></i>
-                            <div>
-                                <div class="text-muted" style="font-size: 0.68rem;">Skill Level</div>
-                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->level }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
-                            <i class="fa-solid fa-language text-purple fs-5" style="color: #9333ea;"></i>
-                            <div>
-                                <div class="text-muted" style="font-size: 0.68rem;">Language</div>
-                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->language }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-4">
-                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
-                            <i class="fa-solid fa-certificate text-danger fs-5"></i>
-                            <div>
-                                <div class="text-muted" style="font-size: 0.68rem;">Certificate</div>
-                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">Official Verified</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Two Promotional Mini Banners -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <a href="{{ route('course.certificate', $course->slug ?? 'digital-marketing-complete-course-2026') }}" class="text-decoration-none d-block h-100" title="View & Download Official Course Certificate">
-                        <div class="cert-promo-banner d-flex align-items-center justify-content-between h-100" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">
-                            <div>
-                                <div class="fw-bold text-primary mb-1 d-flex align-items-center gap-1" style="font-size: 0.85rem;">
-                                    <i class="fa-solid fa-award me-1"></i> Get Certified & Boost Your Career
-                                    <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Download PDF</span>
-                                </div>
-                                <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.35;">
-                                    Complete this course and get a verified certificate from Digital Class - Educational World.
-                                </p>
-                            </div>
-                            <div class="ms-2 flex-shrink-0">
-                                <i class="fa-solid fa-certificate text-warning" style="font-size: 2.25rem; opacity: 0.95;"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="learn-anywhere-banner d-flex align-items-center justify-content-between h-100">
-                        <div>
-                            <div class="fw-bold text-purple mb-1" style="font-size: 0.85rem; color: #7e22ce;">
-                                <i class="fa-solid fa-laptop-code me-1"></i> Learn from Anywhere
-                            </div>
-                            <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.35;">
-                                Access on Mobile, Tablet & Desktop. Learn anytime, anywhere at your own schedule.
-                            </p>
-                        </div>
-                        <div class="ms-2 flex-shrink-0">
-                            <i class="fa-solid fa-mobile-screen-button text-purple" style="font-size: 2.25rem; color: #9333ea; opacity: 0.85;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Course Curriculum Section -->
-            <div id="curriculum" class="section-card-white mb-3">
-                @php
-                    $totalCurriculumLectures = 0;
-                    foreach($curriculum as $m) {
-                        $totalCurriculumLectures += count($m['items'] ?? []);
-                    }
-                    $displayModules = !empty($course->course_chapter) ? $course->course_chapter : count($curriculum);
-                    $displayLectures = !empty($course->course_video) ? $course->course_video : ($totalCurriculumLectures ?: 24);
-                @endphp
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h2 class="section-card-title mb-0">Course Curriculum</h2>
-                    <span class="text-muted small" style="font-size: 0.75rem;">
-                        {{ $displayModules }} Modules &bull; {{ $displayLectures }} Lectures &bull; {{ $course->duration }} Total Length
-                    </span>
-                </div>
-
-                <div class="accordion accordion-curriculum" id="courseAccordion">
-                    @foreach($curriculum as $idx => $mod)
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="heading{{ $idx }}">
-                                <button class="accordion-button {{ $idx > 1 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $idx }}" aria-expanded="{{ $idx <= 1 ? 'true' : 'false' }}">
-                                    <div class="d-flex align-items-center justify-content-between w-100 me-2">
-                                        <span>{{ $mod['section'] }}</span>
-                                        <span class="text-muted fw-normal small" style="font-size: 0.7rem;">
-                                            {{ $mod['lectures'] }} &bull; {{ $mod['duration'] }}
-                                        </span>
-                                    </div>
-                                </button>
-                            </h3>
-                            <div id="collapse{{ $idx }}" class="accordion-collapse collapse {{ $idx <= 1 ? 'show' : '' }}" data-bs-parent="#courseAccordion">
-                                <div class="accordion-body p-0">
-                                    @foreach($mod['items'] as $item)
-                                        <div class="lecture-item-row">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <i class="fa-regular fa-circle-play text-primary"></i>
-                                                <span>{{ $item['title'] }}</span>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                @if(!empty($item['preview']))
-                                                    <span class="badge bg-primary-subtle text-primary" style="font-size: 0.65rem; cursor: pointer;" onclick="openTrailerModal()">Preview</span>
-                                                @endif
-                                                <span class="text-muted">{{ $item['duration'] }}</span>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- About the Instructor Section -->
-            <div id="instructor" class="section-card-white mb-3">
-                <h2 class="section-card-title mb-3">About the Instructor</h2>
-                
-                <div class="d-flex align-items-start gap-3 mb-3">
-                    <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 68px; height: 68px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80';">
+            <!-- PANE 1: Course Overview Section -->
+            <div id="tab-pane-overview" class="course-tab-pane active">
+                <div id="overview" class="section-card-white mb-3">
+                    <h2 class="section-card-title mb-3" style="font-size: 1.35rem; font-weight: 700;">Course Overview</h2>
                     
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{{ $course->instructor_url ?: '#' }}" class="text-decoration-none">
-                                <h4 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">{{ $course->instructor_name }}</h4>
-                            </a>
-                            <span class="badge bg-primary text-white py-1 px-2" style="font-size: 0.65rem;">Top Instructor</span>
-                        </div>
-                        <div class="text-primary small fw-semibold" style="font-size: 0.78rem;">{{ $course->instructor_subtitle ?? ($course->instructor_category . ' Expert') }}</div>
-                        <div class="text-muted small" style="font-size: 0.72rem;">Authentic educator &amp; course creator on Digital Class</div>
-
-                        <div class="mt-2">
-                            <a href="{{ $course->instructor_url ?: '#' }}" class="btn btn-sm btn-outline-primary fw-bold" style="font-size: 0.75rem;">
-                                <i class="fa-solid fa-store me-1"></i> View Instructor / Institute Profile &rarr;
-                            </a>
+                    <div class="course-desc-wrapper" id="courseDescWrap">
+                        <div class="course-desc-content text-secondary" style="font-size: 0.86rem; line-height: 1.65;">
+                            {!! nl2br(e($course->description)) !!}
                         </div>
                     </div>
+                    <a href="javascript:void(0)" class="btn-toggle-see-more" id="descSeeMoreBtn" onclick="toggleCourseDescription()">
+                        <span id="descToggleText">See more</span> <i class="fa-solid fa-chevron-down" id="descToggleIcon" style="font-size: 0.72rem;"></i>
+                    </a>
+
+                    @if(!empty($course->course_activation_instruction))
+                        <div class="alert alert-info mt-3 p-3 rounded-3 border-0 bg-primary-subtle" style="font-size: 0.8rem;">
+                            <div class="fw-bold text-primary mb-1"><i class="fa-solid fa-circle-info me-1"></i> Course Access & Activation Instructions</div>
+                            <div class="text-secondary">{!! nl2br(e($course->course_activation_instruction)) !!}</div>
+                        </div>
+                    @endif
                 </div>
 
-                <p class="text-secondary small mb-0" style="font-size: 0.8rem; line-height: 1.55;">
-                    {{ $course->instructor_bio ?? ($course->short_description ?: ($course->instructor_name . ' provides high quality education and career guidance on Digital Class.')) }}
-                </p>
-            </div>
-
-            <!-- Frequently Asked Questions Section -->
-            <div id="faqs" class="section-card-white mb-3">
-                <h2 class="section-card-title mb-3">Frequently Asked Questions</h2>
-                <div class="accordion accordion-curriculum" id="courseFaqAccordion">
-                    @foreach($faqs as $fIdx => $faq)
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeading{{ $fIdx }}">
-                                <button class="accordion-button {{ $fIdx > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ $fIdx }}" aria-expanded="{{ $fIdx === 0 ? 'true' : 'false' }}">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fa-regular fa-circle-question text-primary"></i>
-                                        <span class="fw-bold">{{ $faq['q'] }}</span>
-                                    </div>
-                                </button>
-                            </h3>
-                            <div id="faqCollapse{{ $fIdx }}" class="accordion-collapse collapse {{ $fIdx === 0 ? 'show' : '' }}" data-bs-parent="#courseFaqAccordion">
-                                <div class="accordion-body text-secondary" style="font-size: 0.82rem; line-height: 1.6;">
-                                    {{ $faq['a'] }}
+                <!-- Course Highlights Grid -->
+                <div class="section-card-white mb-3 p-3">
+                    <div class="row g-2">
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                                <i class="fa-regular fa-clock text-primary fs-5"></i>
+                                <div>
+                                    <div class="text-muted" style="font-size: 0.68rem;">Duration</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->duration }}</div>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                                <i class="fa-solid fa-layer-group text-success fs-5"></i>
+                                <div>
+                                    <div class="text-muted" style="font-size: 0.68rem;">Chapters / Modules</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_chapter ?: count($curriculum) }} Modules</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                                <i class="fa-solid fa-video text-info fs-5"></i>
+                                <div>
+                                    <div class="text-muted" style="font-size: 0.68rem;">Video Lessons</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_video ?: 24 }} Lectures</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                                <i class="fa-solid fa-signal text-warning fs-5"></i>
+                                <div>
+                                    <div class="text-muted" style="font-size: 0.68rem;">Skill Level</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->level }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                                <i class="fa-solid fa-language text-purple fs-5" style="color: #9333ea;"></i>
+                                <div>
+                                    <div class="text-muted" style="font-size: 0.68rem;">Language</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->language }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                                <i class="fa-solid fa-certificate text-danger fs-5"></i>
+                                <div>
+                                    <div class="text-muted" style="font-size: 0.68rem;">Certificate</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">Official Verified</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Student Reviews Section -->
-            <div id="reviews" class="section-card-white mb-3">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h2 class="section-card-title mb-0">Student Reviews</h2>
-                    <button type="button" class="btn btn-outline-primary btn-sm py-1 px-3 fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#reviewCourseModal">
-                        Write a Review
-                    </button>
-                </div>
-
-                @if(!empty($reviews) && count($reviews) > 0)
+            <!-- PANE 2: Topics Section -->
+            <div id="tab-pane-topics" class="course-tab-pane">
+                <div id="topics" class="section-card-white mb-3">
+                    <h2 class="section-card-title mb-3" style="font-size: 1.35rem; font-weight: 700;">Topics</h2>
+                    
+                    @php
+                        $displayTopics = !empty($topics) ? $topics : $learningPoints;
+                        $halfLp = ceil(count($displayTopics) / 2);
+                    @endphp
                     <div class="row g-2">
-                        @foreach($reviews as $r)
-                            <div class="col-md-4">
-                                <div class="p-3 bg-light rounded-3 h-100 d-flex flex-direction-column justify-content-between border">
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2 mb-2">
-                                            <img src="{{ $r['avatar'] }}" alt="{{ $r['author'] }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
-                                            <div>
-                                                <div class="fw-bold text-dark" style="font-size: 0.75rem;">{{ $r['author'] }}</div>
-                                                <div class="text-warning" style="font-size: 0.65rem;">
-                                                    @for($i=1; $i<=5; $i++)
-                                                        <i class="fa-solid fa-star"></i>
-                                                    @endfor
-                                                    <span class="text-muted ms-1" style="font-size: 0.6rem;">{{ $r['time_ago'] }}</span>
-                                                </div>
+                        <div class="col-md-6">
+                            @foreach(array_slice($displayTopics, 0, $halfLp) as $t)
+                                <div class="learn-point-check d-flex align-items-start gap-2 mb-2.5">
+                                    <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                    <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $t }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="col-md-6">
+                            @foreach(array_slice($displayTopics, $halfLp) as $t)
+                                <div class="learn-point-check d-flex align-items-start gap-2 mb-2.5">
+                                    <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                    <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $t }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANE 3: Course Curriculum Section -->
+            <div id="tab-pane-curriculum" class="course-tab-pane">
+                <div id="curriculum" class="section-card-white mb-3">
+                    @php
+                        $totalCurriculumLectures = 0;
+                        foreach($curriculum as $m) {
+                            $totalCurriculumLectures += count($m['items'] ?? []);
+                        }
+                        $displayModules = !empty($course->course_chapter) ? $course->course_chapter : count($curriculum);
+                        $displayLectures = !empty($course->course_video) ? $course->course_video : ($totalCurriculumLectures ?: (!empty($curriculumDirectItems) ? count($curriculumDirectItems) : 24));
+                    @endphp
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 class="section-card-title mb-0" style="font-size: 1.35rem; font-weight: 700;">Curriculum</h2>
+                        <span class="text-muted small" style="font-size: 0.75rem;">
+                            {{ $displayModules }} Modules &bull; {{ $displayLectures }} Lectures &bull; {{ $course->duration }} Total Length
+                        </span>
+                    </div>
+
+                    @if(!empty($curriculumDirectItems) && count($curriculumDirectItems) > 0)
+                        {{-- Direct Authentic Curriculum items matching screenshot media_1795423722571_765e14dc.png --}}
+                        <div class="curriculum-direct-list mb-3">
+                            @foreach($curriculumDirectItems as $cItem)
+                                <div class="d-flex align-items-start gap-2.5 mb-2.5 p-2 rounded-2" style="background: #f8fafc; border: 1px solid #f1f5f9;">
+                                    <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                    <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.55;">{{ $cItem }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if(!empty($curriculum) && count($curriculum) > 0 && (empty($curriculumDirectItems) || count($curriculumDirectItems) <= 1))
+                        {{-- Structured Accordion for Multi-module courses like Course 1324 --}}
+                        <div class="accordion accordion-curriculum mt-2" id="courseAccordion">
+                            @foreach($curriculum as $idx => $mod)
+                                <div class="accordion-item">
+                                    <h3 class="accordion-header" id="heading{{ $idx }}">
+                                        <button class="accordion-button {{ $idx > 1 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $idx }}" aria-expanded="{{ $idx <= 1 ? 'true' : 'false' }}">
+                                            <div class="d-flex align-items-center justify-content-between w-100 me-2">
+                                                <span>{{ $mod['section'] }}</span>
+                                                <span class="text-muted fw-normal small" style="font-size: 0.7rem;">
+                                                    {{ $mod['lectures'] }} &bull; {{ $mod['duration'] }}
+                                                </span>
                                             </div>
+                                        </button>
+                                    </h3>
+                                    <div id="collapse{{ $idx }}" class="accordion-collapse collapse {{ $idx <= 1 ? 'show' : '' }}" data-bs-parent="#courseAccordion">
+                                        <div class="accordion-body p-0">
+                                            @foreach($mod['items'] as $item)
+                                                <div class="lecture-item-row">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <i class="fa-regular fa-circle-play text-primary"></i>
+                                                        <span>{{ $item['title'] }}</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        @if(!empty($item['preview']))
+                                                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.65rem; cursor: pointer;" onclick="openTrailerModal()">Preview</span>
+                                                        @endif
+                                                        <span class="text-muted">{{ $item['duration'] }}</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.4;">
-                                            {{ $r['text'] }}
-                                        </p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- PANE 4: Frequently Asked Questions Section -->
+            <div id="tab-pane-faqs" class="course-tab-pane">
+                <div id="faqs" class="section-card-white mb-3">
+                    <h2 class="section-card-title mb-3" style="font-size: 1.35rem; font-weight: 700;">Frequently Asked Questions</h2>
+                    <div class="accordion accordion-curriculum" id="courseFaqAccordion">
+                        @foreach($faqs as $fIdx => $faq)
+                            <div class="accordion-item">
+                                <h3 class="accordion-header" id="faqHeading{{ $fIdx }}">
+                                    <button class="accordion-button {{ $fIdx > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ $fIdx }}" aria-expanded="{{ $fIdx === 0 ? 'true' : 'false' }}">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-regular fa-circle-question text-primary"></i>
+                                            <span class="fw-bold">{{ $faq['q'] }}</span>
+                                        </div>
+                                    </button>
+                                </h3>
+                                <div id="faqCollapse{{ $fIdx }}" class="accordion-collapse collapse {{ $fIdx === 0 ? 'show' : '' }}" data-bs-parent="#courseFaqAccordion">
+                                    <div class="accordion-body text-secondary" style="font-size: 0.85rem; line-height: 1.6;">
+                                        {!! nl2br(e($faq['a'])) !!}
                                     </div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
-                @else
-                    <div class="text-center py-4 bg-light rounded-3 border">
-                        <i class="fa-regular fa-star text-muted fs-3 mb-2"></i>
-                        <div class="fw-bold text-dark small">No Reviews Yet</div>
-                        <p class="text-muted small mb-3" style="font-size: 0.78rem;">Be the first student to review this course and share your learning feedback!</p>
-                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#reviewCourseModal" style="font-size: 0.78rem;">
-                            <i class="fa-regular fa-pen-to-square me-1"></i> Write First Review
+                </div>
+            </div>
+
+            <!-- PANE 5: About the Instructor Section -->
+            <div id="tab-pane-instructor" class="course-tab-pane">
+                <div id="instructor" class="section-card-white mb-3">
+                    <h2 class="section-card-title mb-3" style="font-size: 1.35rem; font-weight: 700;">About the Instructor</h2>
+                    
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 68px; height: 68px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80';">
+                        
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ $course->instructor_url ?: '#' }}" class="text-decoration-none">
+                                    <h4 class="fw-bold text-dark mb-0" style="font-size: 1.1rem;">{{ $course->instructor_name }}</h4>
+                                </a>
+                                <span class="badge bg-primary text-white py-1 px-2" style="font-size: 0.65rem;">Top Instructor</span>
+                            </div>
+                            <div class="text-primary small fw-semibold" style="font-size: 0.78rem;">{{ $course->instructor_subtitle ?? ($course->instructor_category . ' Expert') }}</div>
+                            <div class="text-muted small" style="font-size: 0.72rem;">Authentic educator &amp; course creator on Digital Class</div>
+
+                            <div class="mt-2">
+                                <a href="{{ $course->instructor_url ?: '#' }}" class="btn btn-sm btn-outline-primary fw-bold" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-store me-1"></i> View Instructor / Institute Profile &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-secondary small mb-0" style="font-size: 0.8rem; line-height: 1.55;">
+                        {{ $course->instructor_bio ?? ($course->short_description ?: ($course->instructor_name . ' provides high quality education and career guidance on Digital Class.')) }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- PANE 6: Student Reviews Section -->
+            <div id="tab-pane-reviews" class="course-tab-pane">
+                <div id="reviews" class="section-card-white mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 class="section-card-title mb-0" style="font-size: 1.35rem; font-weight: 700;">Student Reviews</h2>
+                        <button type="button" class="btn btn-outline-primary btn-sm py-1 px-3 fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#reviewCourseModal">
+                            Write a Review
                         </button>
                     </div>
-                @endif
+
+                    @if(!empty($reviews) && count($reviews) > 0)
+                        <div class="row g-2">
+                            @foreach($reviews as $r)
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-light rounded-3 h-100 d-flex flex-direction-column justify-content-between border">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <img src="{{ $r['avatar'] }}" alt="{{ $r['author'] }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                                                <div>
+                                                    <div class="fw-bold text-dark" style="font-size: 0.75rem;">{{ $r['author'] }}</div>
+                                                    <div class="text-warning" style="font-size: 0.65rem;">
+                                                        @for($i=1; $i<=5; $i++)
+                                                            <i class="fa-solid fa-star"></i>
+                                                        @endfor
+                                                        <span class="text-muted ms-1" style="font-size: 0.6rem;">{{ $r['time_ago'] }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.4;">
+                                                {{ $r['text'] }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-4 bg-light rounded-3 border">
+                            <i class="fa-regular fa-star text-muted fs-3 mb-2"></i>
+                            <div class="fw-bold text-dark small">No Reviews Yet</div>
+                            <p class="text-muted small mb-3" style="font-size: 0.78rem;">Be the first student to review this course and share your learning feedback!</p>
+                            <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#reviewCourseModal" style="font-size: 0.78rem;">
+                                <i class="fa-regular fa-pen-to-square me-1"></i> Write First Review
+                            </button>
+                        </div>
+                    @endif
+                </div>
             </div>
 
         </div>
@@ -1096,6 +1105,43 @@
         const modal = new bootstrap.Modal(document.getElementById('trailerModal'));
         modal.show();
     }
+
+    // Interactive Tab Switching: Whatever clicks, only it opens
+    function switchCourseTab(tabKey, btn) {
+        // 1. Update button active states
+        const btns = document.querySelectorAll('.course-subnav-link');
+        btns.forEach(b => b.classList.remove('active'));
+        if (btn) {
+            btn.classList.add('active');
+        } else {
+            const match = document.querySelector(`.course-subnav-link[data-tab="${tabKey}"]`);
+            if (match) match.classList.add('active');
+        }
+
+        // 2. Hide all panes, show only the selected tab pane
+        const panes = document.querySelectorAll('.course-tab-pane');
+        panes.forEach(p => p.classList.remove('active'));
+
+        const target = document.getElementById(`tab-pane-${tabKey}`);
+        if (target) {
+            target.classList.add('active');
+        }
+
+        // 3. Update URL hash
+        if (history.replaceState) {
+            history.replaceState(null, null, `#${tabKey}`);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const hash = window.location.hash.replace('#', '').toLowerCase();
+        if (['overview', 'topics', 'curriculum', 'faqs', 'instructor', 'reviews'].includes(hash)) {
+            const btn = document.querySelector(`.course-subnav-link[data-tab="${hash}"]`);
+            if (btn) {
+                switchCourseTab(hash, btn);
+            }
+        }
+    });
 
     function toggleCourseDescription() {
         const wrap = document.getElementById('courseDescWrap');

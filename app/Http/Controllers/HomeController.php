@@ -1985,24 +1985,30 @@ class HomeController extends Controller
 
         // Dynamically resolve real, subject-specific Overview, Topics, Curriculum, FAQs & Requirements
         $resolved = \App\Services\CourseContentResolver::resolve($course);
-        $curriculum     = $resolved['curriculum'];
-        $learningPoints = $resolved['learningPoints'];
-        $targetAudience = $resolved['targetAudience'];
-        $requirements   = $resolved['requirements'];
-        $faqs           = $resolved['faqs'];
+        $curriculum            = $resolved['curriculum'];
+        $curriculumDirectItems = $resolved['curriculumDirectItems'] ?? [];
+        $courseIncludes        = $resolved['courseIncludes'] ?? [];
+        $learningPoints        = $resolved['learningPoints'];
+        $topics                = $resolved['topics'] ?? $learningPoints;
+        $targetAudience        = $resolved['targetAudience'];
+        $requirements          = $resolved['requirements'];
+        $faqs                  = $resolved['faqs'];
 
         $reviews = [];
 
         return view('home.course-show', [
-            'seller'          => $seller,
-            'course'          => $course,
-            'relatedCourses'  => $relatedCourses,
-            'curriculum'      => $curriculum,
-            'learningPoints'  => $learningPoints,
-            'targetAudience'  => $targetAudience,
-            'requirements'    => $requirements,
-            'faqs'            => $faqs,
-            'reviews'         => $reviews,
+            'seller'                => $seller,
+            'course'                => $course,
+            'relatedCourses'        => $relatedCourses,
+            'curriculum'            => $curriculum,
+            'curriculumDirectItems' => $curriculumDirectItems,
+            'courseIncludes'        => $courseIncludes,
+            'learningPoints'        => $learningPoints,
+            'topics'                => $topics,
+            'targetAudience'        => $targetAudience,
+            'requirements'          => $requirements,
+            'faqs'                  => $faqs,
+            'reviews'               => $reviews,
         ]);
     }
 
