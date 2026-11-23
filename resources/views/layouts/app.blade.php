@@ -977,23 +977,17 @@
                             </div>
                         @endif
                     @else
-                        <!-- Guest Navigation: Sequence = Seller Login -> Customer Login -> Customer Sign Up -->
+                        <!-- Guest Navigation: User Login & User Sign Up -->
                         <div class="d-flex align-items-center gap-2 flex-wrap flex-xl-nowrap">
-                            <!-- 1. Seller Login -->
-                            <a href="{{ route('seller.login') }}" class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem; color: #475569; border: 1px solid #cbd5e1; background: #ffffff;" title="Instructor & Institute Seller Login">
-                                <i class="fa-solid fa-store" style="color: #d97706;"></i>
-                                <span>Seller Login</span>
-                            </a>
-
-                            <!-- 2. Customer Login (Dedicated Page) -->
+                            <!-- User Login (Dedicated Customer Portal) -->
                             <a href="{{ route('customer.login') }}" class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem; color: #6d28d9; border: 1px solid #ddd6fe; background-color: #faf5ff;">
                                 <i class="fa-regular fa-user"></i>
-                                <span>Login</span>
+                                <span>User Login</span>
                             </a>
 
-                            <!-- 3. Customer Sign Up (Dedicated Registration Page) -->
+                            <!-- User Sign Up (Dedicated Customer Registration) -->
                             <a href="{{ route('customer.register') }}" class="btn btn-sm rounded-pill px-3.5 fw-bold text-nowrap shadow-sm d-inline-flex align-items-center text-white" style="height: 36px; font-size: 0.8125rem; background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);">
-                                <span>Sign Up</span>
+                                <span>User Sign Up</span>
                             </a>
                         </div>
                     @endauth
