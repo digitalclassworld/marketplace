@@ -1,22 +1,18 @@
-
 @extends('layouts.app')
 
 @section('title', 'All Online Courses - Learn In-Demand Tech, Business & Creative Skills | Digital Class')
-@section('meta_description', 'Explore top-rated online courses on Digital Class. Learn Web Development, Python, Digital Marketing, Graphic Design, Spoken English, and Competitive Exam prep with verified certifications.')
-@section('meta_keywords', 'online courses India, learn coding online, digital marketing course, spoken english classes, certification courses, edtech marketplace')
+@section('meta_description', 'Explore 1,084 authentic online courses on Digital Class. Learn Web Development, Python, Digital Marketing, Shopify, Graphic Design, Spoken English, and Competitive Exam prep with verified certifications.')
+@section('meta_keywords', 'online courses India, learn coding online, digital marketing course, shopify sales machine, python programming, certification courses, edtech marketplace')
 
 @section('styles')
 <style>
     /* ==========================================================================
-       HERO SECTION WITH STUDENT LEARNING BANNER
+       HERO HEADER & SEARCH SECTION
        ========================================================================== */
     .hero-courses {
-        position: relative;
-        background: linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 45%, rgba(255, 255, 255, 0.45) 75%, rgba(255, 255, 255, 0.1) 100%),
-                    url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600&auto=format&fit=crop&q=80') center right / cover no-repeat;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         border-bottom: 1px solid #e2e8f0;
         padding: 1.5rem 0 2rem;
-        overflow: hidden;
     }
 
     .courses-breadcrumb {
@@ -27,9 +23,10 @@
     .courses-breadcrumb a {
         color: #64748b;
         text-decoration: none;
+        transition: color 0.15s;
     }
     .courses-breadcrumb a:hover {
-        color: #0066ff;
+        color: #6d28d9;
     }
 
     .courses-hero-title {
@@ -38,30 +35,35 @@
         letter-spacing: -0.025em;
         line-height: 1.15;
         color: #0f172a;
-        margin-bottom: 0.35rem;
     }
 
-    .courses-hero-subtitle {
-        font-size: 0.85rem;
+    .courses-count-pill {
+        font-size: 0.88rem;
+        font-weight: 600;
         color: #475569;
-        max-width: 620px;
-        line-height: 1.45;
-        margin-bottom: 1.25rem;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 0.4rem 0.95rem;
+        border-radius: 999px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
     }
 
     /* Dual Floating Search Box */
     .courses-search-card {
         background: #ffffff;
-        border: 1px solid rgba(203, 213, 225, 0.8);
+        border: 1px solid #cbd5e1;
         border-radius: 999px;
-        box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.8);
-        padding: 0.35rem 0.45rem;
-        max-width: 660px;
+        box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+        padding: 0.3rem 0.45rem;
+        max-width: 680px;
         transition: all 0.2s ease;
     }
     .courses-search-card:focus-within {
-        border-color: #0066ff;
-        box-shadow: 0 20px 40px -4px rgba(0, 102, 255, 0.16), 0 0 0 3px rgba(0, 102, 255, 0.15);
+        border-color: #7c3aed;
+        box-shadow: 0 12px 30px -4px rgba(124, 58, 237, 0.18), 0 0 0 3px rgba(124, 58, 237, 0.12);
     }
 
     .courses-search-input {
@@ -89,87 +91,49 @@
     }
 
     .btn-courses-search {
-        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
         color: #ffffff;
         font-weight: 700;
         font-size: 0.875rem;
         padding: 0.65rem 1.6rem;
         border-radius: 999px;
         border: none;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         gap: 0.45rem;
-        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.35);
+        box-shadow: 0 4px 14px rgba(109, 40, 217, 0.3);
     }
     .btn-courses-search:hover {
-        background: linear-gradient(135deg, #0052cc 0%, #004099 100%);
+        background: linear-gradient(135deg, #5b21b6 0%, #6d28d9 100%);
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.45);
+        box-shadow: 0 6px 20px rgba(109, 40, 217, 0.4);
     }
 
+    /* Popular Searches Pills */
     .popular-course-pills {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 0.35rem;
         margin-top: 0.85rem;
-        font-size: 0.72rem;
+        font-size: 0.75rem;
     }
-
     .popular-course-pill {
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 999px;
-        padding: 0.2rem 0.65rem;
+        padding: 0.25rem 0.75rem;
         color: #475569;
         text-decoration: none;
         font-weight: 500;
         transition: all 0.15s;
     }
     .popular-course-pill:hover {
-        border-color: #0066ff;
-        color: #0066ff;
-        background: #eff6ff;
-    }
-
-    /* Hero Right Trust Elements */
-    .hero-trust-column {
-        display: flex;
-        flex-direction: column;
-        gap: 0.65rem;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(226, 232, 240, 0.9);
-        border-radius: 16px;
-        padding: 1.15rem 1.25rem;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    }
-
-    .slogan-chalk-text {
-        font-family: 'Outfit', cursive, sans-serif;
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: #1e3a8a;
-        line-height: 1.2;
-    }
-
-    .trust-bullet-row {
-        display: flex;
-        align-items: center;
-        gap: 0.65rem;
-    }
-
-    .trust-bullet-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        flex-shrink: 0;
+        border-color: #7c3aed;
+        color: #6d28d9;
+        background: #f5f3ff;
     }
 
     /* ==========================================================================
@@ -179,9 +143,7 @@
         background: #ffffff;
         border-bottom: 1px solid #e2e8f0;
         padding: 0.75rem 0;
-        position: relative;
     }
-
     .course-cat-scroll-container {
         display: flex;
         gap: 0.45rem;
@@ -190,14 +152,6 @@
         scrollbar-width: thin;
         padding-bottom: 4px;
     }
-    .course-cat-scroll-container::-webkit-scrollbar {
-        height: 4px;
-    }
-    .course-cat-scroll-container::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-    }
-
     .course-cat-pill {
         display: inline-flex;
         align-items: center;
@@ -207,92 +161,115 @@
         border: 1px solid #e2e8f0;
         color: #475569;
         text-decoration: none;
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         font-weight: 600;
         background: #ffffff;
         transition: all 0.15s ease;
         flex-shrink: 0;
     }
-    .course-cat-pill i {
-        font-size: 0.85rem;
-        color: #64748b;
-    }
     .course-cat-pill:hover {
         background: #f8fafc;
-        border-color: #0066ff;
-        color: #0066ff;
-    }
-    .course-cat-pill:hover i {
-        color: #0066ff;
+        border-color: #7c3aed;
+        color: #6d28d9;
     }
     .course-cat-pill.active {
-        background: #0066ff;
-        border-color: #0066ff;
+        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+        border-color: #6d28d9;
         color: #ffffff;
+        box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
     }
     .course-cat-pill.active i {
         color: #ffffff;
     }
 
     /* ==========================================================================
-       2-COLUMN MAIN CONTENT & CARDS GRID
+       MAIN MARKETPLACE SECTION & SIDEBAR FILTERS
        ========================================================================== */
     .courses-main-section {
         background: #f8fafc;
-        padding: 1.5rem 0 3.5rem;
+        padding: 1.75rem 0 4rem;
     }
 
     .courses-filter-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 1rem;
-        font-size: 0.8125rem;
+        border-radius: 14px;
+        padding: 1.15rem 1.15rem;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     }
 
-    .filter-sec-header {
-        font-size: 0.8rem;
+    .filter-sec-box {
+        margin-bottom: 1.35rem;
+        padding-bottom: 1.15rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .filter-sec-box:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .filter-sec-title {
+        font-size: 0.85rem;
         font-weight: 700;
         color: #0f172a;
-        margin-bottom: 0.55rem;
-    }
-
-    .course-check-item {
+        margin-bottom: 0.65rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 0.35rem;
+    }
+
+    .course-filter-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.4rem;
         cursor: pointer;
         user-select: none;
     }
-    .course-check-item label {
+    .course-filter-option label {
         cursor: pointer;
         margin-bottom: 0;
         color: #475569;
-        font-size: 0.78rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
     }
-    .course-check-count {
+    .course-filter-option input[type="radio"],
+    .course-filter-option input[type="checkbox"] {
+        accent-color: #6d28d9;
+        cursor: pointer;
+    }
+    .course-filter-option:hover label {
+        color: #0f172a;
+    }
+    .course-filter-count {
         color: #94a3b8;
-        font-size: 0.72rem;
+        font-size: 0.75rem;
+        font-weight: 600;
     }
 
-    /* 5-Column Course Card */
+    /* ==========================================================================
+       COURSE CARD (MATCHING SCREENSHOT WITH LUXURY THEME)
+       ========================================================================== */
     .course-card-unified {
         background: #ffffff;
-        border: 1px solid rgba(226, 232, 240, 0.95);
-        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
         overflow: hidden;
-        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;
         flex-direction: column;
         height: 100%;
         position: relative;
-        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
     }
     .course-card-unified:hover {
-        transform: translateY(-7px);
-        box-shadow: 0 22px 42px -8px rgba(0, 102, 255, 0.18), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
-        border-color: rgba(0, 102, 255, 0.45);
+        transform: translateY(-5px);
+        box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(109, 40, 217, 0.25);
+        border-color: rgba(109, 40, 217, 0.3);
     }
 
     .course-thumb-box {
@@ -302,40 +279,30 @@
         background: #0f172a;
         overflow: hidden;
     }
-    .course-thumb-box::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.02) 40%, rgba(15, 23, 42, 0.6) 100%);
-        pointer-events: none;
-        z-index: 1;
-    }
     .course-thumb-box img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: transform 0.4s ease;
     }
     .course-card-unified:hover .course-thumb-box img {
-        transform: scale(1.08);
+        transform: scale(1.06);
     }
 
-    .badge-course-bestseller {
+    .badge-course-featured {
         position: absolute;
         top: 10px;
         left: 10px;
-        background: rgba(245, 158, 11, 0.92);
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.35);
-        color: #ffffff;
+        color: #0284c7;
         font-size: 0.68rem;
         font-weight: 700;
-        letter-spacing: 0.3px;
-        padding: 0.25rem 0.65rem;
-        border-radius: 999px;
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        border: 1px solid rgba(224, 242, 254, 0.8);
         z-index: 2;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
 
     .btn-course-heart {
@@ -346,7 +313,6 @@
         height: 32px;
         background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
         border: 1px solid rgba(255, 255, 255, 0.6);
         border-radius: 50%;
         display: flex;
@@ -355,161 +321,133 @@
         color: #ef4444;
         font-size: 0.9rem;
         cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.2s ease;
         z-index: 2;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .btn-course-heart:hover {
         background: #ffffff;
         transform: scale(1.15);
-        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
-        color: #dc2626;
-    }
-    .btn-course-heart.active i {
-        font-weight: 900;
-    }
-
-    .duration-pill-badge {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        background: rgba(15, 23, 42, 0.85);
-        backdrop-filter: blur(4px);
-        color: #ffffff;
-        font-size: 0.65rem;
-        font-weight: 700;
-        padding: 0.2rem 0.5rem;
-        border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .course-card-content {
-        padding: 0.75rem 0.85rem;
+        padding: 0.95rem 1rem 1.05rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
 
     .course-card-heading {
-        font-size: 0.85rem;
+        font-size: 0.88rem;
         font-weight: 700;
         color: #0f172a;
-        margin-bottom: 0.35rem;
-        line-height: 1.3;
+        margin-bottom: 0.45rem;
+        line-height: 1.35;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        height: 2.6em;
+        height: 2.7em;
     }
     .course-card-heading a {
         color: #0f172a;
         text-decoration: none;
+        transition: color 0.15s;
     }
     .course-card-heading a:hover {
-        color: #0066ff;
+        color: #6d28d9;
     }
 
-    .course-rating-metric {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        font-size: 0.72rem;
-        margin-bottom: 0.45rem;
+    .course-instructor-row {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0.55rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .course-instructor-row i {
+        color: #8b5cf6;
     }
 
     .course-price-row {
         display: flex;
         align-items: baseline;
-        gap: 0.4rem;
-        margin-bottom: 0.65rem;
+        gap: 0.45rem;
+        margin-bottom: 0.75rem;
     }
     .price-current {
-        font-size: 1rem;
+        font-size: 1.05rem;
         font-weight: 800;
         color: #0f172a;
     }
     .price-mrp {
-        font-size: 0.72rem;
+        font-size: 0.78rem;
         color: #94a3b8;
         text-decoration: line-through;
     }
-    .badge-discount-green {
-        font-size: 0.62rem;
+    .badge-discount-orange {
+        font-size: 0.68rem;
         font-weight: 700;
-        color: #059669;
-        background: #ecfdf5;
-        padding: 0.12rem 0.4rem;
+        color: #ea580c;
+        background: #fff7ed;
+        border: 1px solid #ffedd5;
+        padding: 0.12rem 0.45rem;
         border-radius: 4px;
     }
 
-    .course-instructor-footer {
-        padding-top: 0.55rem;
-        border-top: 1px solid #f1f5f9;
-        margin-top: auto;
+    /* Luxury Add to Cart Button (Spans full width, no green, no plain blue) */
+    .btn-cart-luxury {
+        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        border: none;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 0.45rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+        cursor: pointer;
+        width: 100%;
+        text-decoration: none;
     }
-    .instructor-avatar-xs {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid #e2e8f0;
-        flex-shrink: 0;
+    .btn-cart-luxury:hover {
+        background: linear-gradient(135deg, #5b21b6 0%, #6d28d9 100%);
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(109, 40, 217, 0.4);
     }
-    .instructor-name-label {
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: #1e293b;
-        line-height: 1.15;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .instructor-cat-label {
-        font-size: 0.65rem;
-        color: #64748b;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .btn-cart-luxury:active {
+        transform: translateY(0);
     }
 
-    /* Enhanced Mobile Responsiveness & Polish */
-    @media (max-width: 767px) {
-        .hero-courses {
-            padding: 1.25rem 0 1.5rem;
-        }
-        .courses-hero-title {
-            font-size: 1.65rem;
-        }
-        .courses-hero-subtitle {
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-        }
-        .courses-search-card {
-            border-radius: 14px;
-            padding: 0.25rem;
-        }
-        .hero-trust-column {
-            margin-top: 1rem;
-            padding: 1rem;
-        }
-        .course-thumb-box {
-            height: 135px;
-        }
-        .course-card-heading {
-            font-size: 0.82rem;
-            height: auto;
-            max-height: 2.6em;
-        }
-        .course-price-row {
-            margin-bottom: 0.4rem;
-        }
-        .price-current {
-            font-size: 0.95rem;
-        }
+    /* Pagination Styles */
+    .pagination {
+        gap: 0.35rem;
+    }
+    .page-item .page-link {
+        border-radius: 8px !important;
+        border: 1px solid #e2e8f0;
+        color: #334155;
+        font-weight: 600;
+        padding: 0.5rem 0.85rem;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .page-item .page-link:hover {
+        background: #f5f3ff;
+        border-color: #c4b5fd;
+        color: #6d28d9;
+    }
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+        border-color: #6d28d9;
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(109, 40, 217, 0.3);
     }
 </style>
 @endsection
@@ -517,7 +455,7 @@
 @section('content')
 
 <!-- ============================================================================
-     1. HERO SECTION WITH HEADPHONES STUDENT & SEARCH
+     1. HERO SECTION WITH SEARCH & HEADER
      ============================================================================ -->
 <div class="hero-courses">
     <div class="container-fluid px-lg-4">
@@ -529,33 +467,25 @@
         </nav>
 
         <div class="row align-items-center">
-            
-            <!-- Left Hero Content -->
-            <div class="col-lg-7 col-xl-8 mb-4 mb-lg-0">
-                <h1 class="courses-hero-title">All Courses</h1>
-                
-                <p class="courses-hero-subtitle">
-                    Learn new skills from expert educators. Explore 10,000+ online and offline courses to grow your career, business and knowledge.
+            <div class="col-lg-7 col-xl-8 mb-3 mb-lg-0">
+                <h1 class="courses-hero-title mb-2">Courses for you</h1>
+                <p class="text-muted small mb-3" style="max-width: 620px;">
+                    Explore 1,084 authentic courses taught by expert educators with verified certificates and hands-on projects.
                 </p>
 
                 <!-- Dual Search Box -->
                 <form action="{{ route('courses') }}" method="GET" class="courses-search-card d-flex align-items-center">
                     <div class="d-flex align-items-center flex-grow-1 px-2">
                         <i class="fa-solid fa-magnifying-glass text-muted me-2"></i>
-                        <input type="text" name="search" value="{{ $searchQuery }}" class="courses-search-input flex-grow-1" placeholder="What do you want to learn?">
+                        <input type="text" name="search" value="{{ $searchQuery }}" class="courses-search-input flex-grow-1" placeholder="Search by course name, topic, or keyword...">
                     </div>
 
                     <div class="d-flex align-items-center">
                         <select name="category" class="courses-cat-select" onchange="this.form.submit()">
-                            <option value="All Categories" {{ $selectedCategory === 'All Categories' ? 'selected' : '' }}>All Categories</option>
-                            <option value="Computer & IT" {{ $selectedCategory === 'Computer & IT' ? 'selected' : '' }}>Computer & IT</option>
-                            <option value="Digital Marketing" {{ $selectedCategory === 'Digital Marketing' ? 'selected' : '' }}>Digital Marketing</option>
-                            <option value="Programming" {{ $selectedCategory === 'Programming' ? 'selected' : '' }}>Programming</option>
-                            <option value="Design & Creative" {{ $selectedCategory === 'Design & Creative' ? 'selected' : '' }}>Design & Creative</option>
-                            <option value="Business & Finance" {{ $selectedCategory === 'Business & Finance' ? 'selected' : '' }}>Business & Finance</option>
-                            <option value="Office Productivity" {{ $selectedCategory === 'Office Productivity' ? 'selected' : '' }}>Office Productivity</option>
-                            <option value="Spoken English" {{ $selectedCategory === 'Spoken English' ? 'selected' : '' }}>Spoken English</option>
-                            <option value="AI & Tools" {{ $selectedCategory === 'AI & Tools' ? 'selected' : '' }}>AI & Tools</option>
+                            <option value="All Courses" {{ ($selectedCategory === 'All Courses' || !$selectedCategory) ? 'selected' : '' }}>All Categories</option>
+                            @foreach($sidebarCategories as $sc)
+                                <option value="{{ $sc['name'] }}" {{ $selectedCategory === $sc['name'] ? 'selected' : '' }}>{{ $sc['name'] }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -566,67 +496,23 @@
 
                 <!-- Popular Searches Pills -->
                 <div class="popular-course-pills">
-                    <span class="text-muted fw-bold me-1">Popular Searches:</span>
-                    <a href="{{ route('courses', ['category' => 'Digital Marketing']) }}" class="popular-course-pill">Digital Marketing</a>
-                    <a href="{{ route('courses', ['search' => 'Tally']) }}" class="popular-course-pill">Tally</a>
+                    <span class="text-muted fw-bold me-1">Popular:</span>
+                    <a href="{{ route('courses', ['search' => 'Shopify']) }}" class="popular-course-pill">Shopify</a>
                     <a href="{{ route('courses', ['search' => 'Python']) }}" class="popular-course-pill">Python</a>
-                    <a href="{{ route('courses', ['category' => 'Programming']) }}" class="popular-course-pill">Web Development</a>
-                    <a href="{{ route('courses', ['category' => 'Design & Creative']) }}" class="popular-course-pill">Graphic Design</a>
-                    <a href="{{ route('courses', ['category' => 'Spoken English']) }}" class="popular-course-pill">Spoken English</a>
-                    <a href="{{ route('courses', ['search' => 'MS Office']) }}" class="popular-course-pill">MS Office</a>
-                    <a href="{{ route('courses', ['search' => 'Data Science']) }}" class="popular-course-pill">Data Science</a>
+                    <a href="{{ route('courses', ['search' => 'Java']) }}" class="popular-course-pill">Java</a>
+                    <a href="{{ route('courses', ['category' => 'Accounts & Finance']) }}" class="popular-course-pill">Accounts & Finance</a>
+                    <a href="{{ route('courses', ['category' => 'Digital Marketing']) }}" class="popular-course-pill">Digital Marketing</a>
+                    <a href="{{ route('courses', ['category' => 'IT & Software Development']) }}" class="popular-course-pill">IT & Software</a>
+                    <a href="{{ route('courses', ['price_type' => 'free']) }}" class="popular-course-pill">Free Courses</a>
                 </div>
             </div>
 
-            <!-- Right Hero Trust Column -->
-            <div class="col-lg-5 col-xl-4">
-                <div class="hero-trust-column">
-                    <div class="slogan-chalk-text">
-                        Learn &bull; Upgrade &bull; <span style="color: #0066ff;">Grow</span>
-                    </div>
-
-                    <div class="trust-bullet-row">
-                        <div class="trust-bullet-icon bg-primary-subtle text-primary">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.78rem;">Learn from Experts</div>
-                            <div class="text-muted" style="font-size: 0.68rem;">Certified Industry Professionals</div>
-                        </div>
-                    </div>
-
-                    <div class="trust-bullet-row">
-                        <div class="trust-bullet-icon bg-warning-subtle text-warning">
-                            <i class="fa-solid fa-certificate"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.78rem;">Get Certified</div>
-                            <div class="text-muted" style="font-size: 0.68rem;">Boost Your Resume & Career</div>
-                        </div>
-                    </div>
-
-                    <div class="trust-bullet-row">
-                        <div class="trust-bullet-icon bg-success-subtle text-success">
-                            <i class="fa-solid fa-laptop-code"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.78rem;">Online & Offline</div>
-                            <div class="text-muted" style="font-size: 0.68rem;">Flexible Hybrid Learning Options</div>
-                        </div>
-                    </div>
-
-                    <div class="trust-bullet-row">
-                        <div class="trust-bullet-icon bg-info-subtle text-info">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.78rem;">Learn at Your Pace</div>
-                            <div class="text-muted" style="font-size: 0.68rem;">Lifetime Access & Practical Projects</div>
-                        </div>
-                    </div>
+            <div class="col-lg-5 col-xl-4 text-lg-end">
+                <div class="courses-count-pill">
+                    <i class="fa-solid fa-graduation-cap text-primary"></i>
+                    <span>Showing <strong>{{ $courses instanceof \Illuminate\Pagination\LengthAwarePaginator ? number_format($courses->total()) : count($courses) }}</strong> result</span>
                 </div>
             </div>
-
         </div>
 
     </div>
@@ -640,14 +526,13 @@
         <div class="course-cat-scroll-container no-scrollbar">
             @foreach($horizontalCategories as $hc)
                 @php
-                    $isHcActive = ($selectedCategory === $hc['name'] || ($selectedCategory === 'All Categories' && $hc['name'] === 'All Categories') || ($selectedCategory === $hc['slug']));
-                    $hcParam = ($hc['name'] === 'All Categories' || $hc['slug'] === 'all') ? '' : $hc['slug'];
+                    $isHcActive = ($selectedCategory === $hc['name'] || ($selectedCategory === 'All Courses' && $hc['name'] === 'All Courses') || ($selectedCategory === $hc['slug']));
+                    $hcParam = ($hc['name'] === 'All Courses' || $hc['slug'] === 'all') ? '' : $hc['slug'];
                     $hcQuery = array_merge(request()->query(), ['category' => $hcParam]);
                     if (empty($hcParam)) unset($hcQuery['category']);
                     $hcUrl = route('courses', $hcQuery);
                 @endphp
-                <a href="{{ $hcUrl }}"
-                   class="course-cat-pill {{ $isHcActive ? 'active' : '' }}">
+                <a href="{{ $hcUrl }}" class="course-cat-pill {{ $isHcActive ? 'active' : '' }}">
                     <i class="{{ $hc['icon'] }}"></i>
                     <span>{{ $hc['name'] }}</span>
                 </a>
@@ -661,169 +546,156 @@
      ============================================================================ -->
 <div class="courses-main-section">
     <div class="container-fluid px-lg-4">
-        <div class="row g-3">
+        <div class="row g-4">
             
             <!-- ==========================================
-                 LEFT SIDEBAR: FILTERS
+                 LEFT SIDEBAR: WORKABLE FILTERS
                  ========================================== -->
-            <div class="col-xl-2 col-lg-3 col-md-4 d-none d-md-block">
+            <div class="col-xl-3 col-lg-3 col-md-4 d-none d-md-block">
                 <form id="coursesFilterForm" action="{{ route('courses') }}" method="GET" class="courses-filter-card">
                     @if($searchQuery)
                         <input type="hidden" name="search" value="{{ $searchQuery }}">
                     @endif
                     <input type="hidden" name="sort" id="coursesSortInput" value="{{ $sortBy }}">
                     
-                    <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
-                        <div class="fw-bold text-dark" style="font-size: 0.85rem;">
-                            <i class="fa-solid fa-sliders me-1 text-primary"></i> Filters
+                    <div class="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
+                        <div class="fw-bold text-dark" style="font-size: 0.9rem;">
+                            <i class="fa-solid fa-sliders me-1" style="color: #6d28d9;"></i> Filters
                         </div>
-                        <a href="{{ route('courses') }}" class="text-decoration-none small text-primary fw-semibold">Clear All</a>
+                        <a href="{{ route('courses') }}" class="text-decoration-none small fw-semibold" style="color: #6d28d9;">Reset All</a>
                     </div>
 
-                    <!-- Filter Search -->
-                    <div class="mb-3">
-                        <input type="text" class="form-control form-control-sm" placeholder="Search in filters..." onkeyup="filterCheckboxes(this.value)">
-                    </div>
-
-                    <!-- Category Checkboxes -->
-                    <div class="mb-3">
-                        <div class="filter-sec-header">Category</div>
+                    <!-- 1. CATEGORY FILTER -->
+                    <div class="filter-sec-box">
+                        <div class="filter-sec-title">
+                            <span>Category</span>
+                        </div>
                         <div id="courseCatContainer">
-                            <div class="course-check-item">
-                                <div class="form-check mb-0">
-                                    <input class="form-check-input" type="radio" name="category" value="" id="ccat_all"
-                                           {{ ($selectedCategory === 'All Categories' || !$selectedCategory) ? 'checked' : '' }}
+                            <div class="course-filter-option">
+                                <label for="cat_all">
+                                    <input type="radio" name="category" value="" id="cat_all"
+                                           {{ ($selectedCategory === 'All Courses' || !$selectedCategory) ? 'checked' : '' }}
                                            onchange="document.getElementById('coursesFilterForm').submit()">
-                                    <label class="form-check-label" for="ccat_all">
-                                        All Categories
-                                    </label>
-                                </div>
+                                    <span>All Categories</span>
+                                </label>
+                                <span class="course-filter-count">({{ $courses instanceof \Illuminate\Pagination\LengthAwarePaginator ? $courses->total() : 1084 }})</span>
                             </div>
-                            @foreach($sidebarCategories as $sc)
-                                <div class="course-check-item">
-                                    <div class="form-check mb-0">
-                                        <input class="form-check-input" type="radio" name="category" value="{{ $sc['name'] }}" id="cat_{{ Str::slug($sc['name']) }}"
+
+                            @foreach($sidebarCategories as $index => $sc)
+                                <div class="course-filter-option {{ $index >= 6 ? 'more-cat-item d-none' : '' }}">
+                                    <label for="cat_{{ Str::slug($sc['name']) }}">
+                                        <input type="radio" name="category" value="{{ $sc['name'] }}" id="cat_{{ Str::slug($sc['name']) }}"
                                                {{ $selectedCategory === $sc['name'] ? 'checked' : '' }}
                                                onchange="document.getElementById('coursesFilterForm').submit()">
-                                        <label class="form-check-label" for="cat_{{ Str::slug($sc['name']) }}">
-                                            {{ $sc['name'] }}
-                                        </label>
-                                    </div>
-                                    @if(!empty($sc['count']) && (int)$sc['count'] > 0)
-                                        <span class="course-check-count">({{ $sc['count'] }})</span>
-                                    @endif
+                                        <span>{{ Str::limit($sc['name'], 20) }}</span>
+                                    </label>
+                                    <span class="course-filter-count">({{ $sc['count'] }})</span>
                                 </div>
                             @endforeach
-                            <div class="course-check-item more-course-cat d-none">
-                                <div class="form-check mb-0">
-                                    <input class="form-check-input" type="radio" name="category" value="Spoken English" id="cat_spoken"
-                                           {{ $selectedCategory === 'Spoken English' ? 'checked' : '' }}
-                                           onchange="document.getElementById('coursesFilterForm').submit()">
-                                    <label class="form-check-label" for="cat_spoken">Spoken English</label>
-                                </div>
-                            </div>
-                            <div class="course-check-item more-course-cat d-none">
-                                <div class="form-check mb-0">
-                                    <input class="form-check-input" type="radio" name="category" value="AI & Tools" id="cat_ai"
-                                           {{ $selectedCategory === 'AI & Tools' ? 'checked' : '' }}
-                                           onchange="document.getElementById('coursesFilterForm').submit()">
-                                    <label class="form-check-label" for="cat_ai">AI & Tools</label>
-                                </div>
-                            </div>
                         </div>
-                        <a href="javascript:void(0)" onclick="toggleMoreCourseCats(this)" class="d-inline-block small text-primary text-decoration-none mt-1">Show More ▾</a>
+                        @if(count($sidebarCategories) > 6)
+                            <a href="javascript:void(0)" onclick="toggleMoreCategories(this)" class="d-inline-block small fw-bold text-decoration-none mt-2" style="color: #6d28d9;">
+                                See more ▾
+                            </a>
+                        @endif
                     </div>
 
-                    <!-- Learning Mode -->
-                    <div class="mb-3">
-                        <div class="filter-sec-header">Learning Mode</div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="mode[]" value="online" id="mode_online"
-                                       {{ in_array('online', (array)$selectedMode) ? 'checked' : '' }}
+                    <!-- 2. PRICING FILTER (FREE / PAID) -->
+                    <div class="filter-sec-box">
+                        <div class="filter-sec-title">
+                            <span>Pricing</span>
+                        </div>
+                        <div class="course-filter-option">
+                            <label for="price_all">
+                                <input type="radio" name="price_type" value="all" id="price_all"
+                                       {{ ($selectedPriceType === 'all' || !$selectedPriceType) ? 'checked' : '' }}
                                        onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="mode_online">Online</label>
-                            </div>
+                                <span>All Courses</span>
+                            </label>
+                            <span class="course-filter-count">({{ ($paidCount ?? 1066) + ($freeCount ?? 18) }})</span>
                         </div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="mode[]" value="offline" id="mode_offline"
-                                       {{ in_array('offline', (array)$selectedMode) ? 'checked' : '' }}
+                        <div class="course-filter-option">
+                            <label for="price_paid">
+                                <input type="radio" name="price_type" value="paid" id="price_paid"
+                                       {{ $selectedPriceType === 'paid' ? 'checked' : '' }}
                                        onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="mode_offline">Offline</label>
-                            </div>
+                                <span>Paid</span>
+                            </label>
+                            <span class="course-filter-count">({{ $paidCount ?? 1066 }})</span>
                         </div>
-                    </div>
-
-                    <!-- Price Range Slider -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center justify-content-between filter-sec-header">
-                            <span>Price Range</span>
-                            <span class="small text-muted" id="priceDisplay">₹0 - ₹{{ number_format($maxPrice ?? 50000) }}</span>
-                        </div>
-                        <input type="range" class="form-range" min="0" max="50000" step="500" value="{{ $maxPrice ?? 50000 }}" id="priceRangeInput" oninput="updatePrice(this.value)" onchange="document.getElementById('coursesFilterForm').submit()">
-                        <div class="d-flex align-items-center gap-1 mt-1">
-                            <input type="number" class="form-control form-control-sm text-center" value="0" readonly style="font-size: 0.72rem;">
-                            <span class="text-muted small">to</span>
-                            <input type="number" name="max_price" class="form-control form-control-sm text-center" id="priceInputMax" value="{{ $maxPrice ?? 50000 }}" style="font-size: 0.72rem;" onchange="document.getElementById('coursesFilterForm').submit()">
+                        <div class="course-filter-option">
+                            <label for="price_free">
+                                <input type="radio" name="price_type" value="free" id="price_free"
+                                       {{ $selectedPriceType === 'free' ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
+                                <span>Free</span>
+                            </label>
+                            <span class="course-filter-count">({{ $freeCount ?? 18 }})</span>
                         </div>
                     </div>
 
-                    <!-- Course Level -->
-                    <div class="mb-3">
-                        <div class="filter-sec-header">Course Level</div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="level[]" value="Beginner" id="lvl_beg"
-                                       {{ in_array('Beginner', (array)$selectedLevel) ? 'checked' : '' }}
-                                       onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="lvl_beg">Beginner</label>
-                            </div>
+                    <!-- 3. CERTIFICATION FILTER -->
+                    <div class="filter-sec-box">
+                        <div class="filter-sec-title">
+                            <span>Certification</span>
                         </div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="level[]" value="Intermediate" id="lvl_int"
-                                       {{ in_array('Intermediate', (array)$selectedLevel) ? 'checked' : '' }}
+                        <div class="course-filter-option">
+                            <label for="cert_all">
+                                <input type="radio" name="certification" value="" id="cert_all"
+                                       {{ (!$selectedCertification) ? 'checked' : '' }}
                                        onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="lvl_int">Intermediate</label>
-                            </div>
+                                <span>All</span>
+                            </label>
+                            <span class="course-filter-count">({{ ($certYesCount ?? 306) + ($certNoCount ?? 765) }})</span>
                         </div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="level[]" value="Advanced" id="lvl_adv"
-                                       {{ in_array('Advanced', (array)$selectedLevel) ? 'checked' : '' }}
+                        <div class="course-filter-option">
+                            <label for="cert_yes">
+                                <input type="radio" name="certification" value="yes" id="cert_yes"
+                                       {{ $selectedCertification === 'yes' ? 'checked' : '' }}
                                        onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="lvl_adv">Advanced</label>
-                            </div>
+                                <span>Yes</span>
+                            </label>
+                            <span class="course-filter-count">({{ $certYesCount ?? 306 }})</span>
+                        </div>
+                        <div class="course-filter-option">
+                            <label for="cert_no">
+                                <input type="radio" name="certification" value="no" id="cert_no"
+                                       {{ $selectedCertification === 'no' ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
+                                <span>No</span>
+                            </label>
+                            <span class="course-filter-count">({{ $certNoCount ?? 765 }})</span>
                         </div>
                     </div>
 
-                    <!-- Language -->
-                    <div>
-                        <div class="filter-sec-header">Language</div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="language[]" value="English" id="lang_en"
-                                       {{ in_array('English', (array)$selectedLanguage) ? 'checked' : '' }}
-                                       onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="lang_en">English</label>
-                            </div>
+                    <!-- 4. DISCOUNT FILTER -->
+                    <div class="filter-sec-box">
+                        <div class="filter-sec-title">
+                            <span>Discount</span>
                         </div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="language[]" value="Hindi" id="lang_hi"
-                                       {{ in_array('Hindi', (array)$selectedLanguage) ? 'checked' : '' }}
+                        <div class="course-filter-option">
+                            <label for="disc_all">
+                                <input type="radio" name="discount" value="" id="disc_all"
+                                       {{ (!$selectedDiscount) ? 'checked' : '' }}
                                        onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="lang_hi">Hindi</label>
-                            </div>
+                                <span>All</span>
+                            </label>
                         </div>
-                        <div class="course-check-item">
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="checkbox" name="language[]" value="Gujarati" id="lang_gu"
-                                       {{ in_array('Gujarati', (array)$selectedLanguage) ? 'checked' : '' }}
+                        <div class="course-filter-option">
+                            <label for="disc_30">
+                                <input type="radio" name="discount" value="30" id="disc_30"
+                                       {{ $selectedDiscount === '30' ? 'checked' : '' }}
                                        onchange="document.getElementById('coursesFilterForm').submit()">
-                                <label class="form-check-label" for="lang_gu">Gujarati</label>
-                            </div>
+                                <span>30% or More</span>
+                            </label>
+                        </div>
+                        <div class="course-filter-option">
+                            <label for="disc_50">
+                                <input type="radio" name="discount" value="50" id="disc_50"
+                                       {{ $selectedDiscount === '50' ? 'checked' : '' }}
+                                       onchange="document.getElementById('coursesFilterForm').submit()">
+                                <span>50% or More</span>
+                            </label>
                         </div>
                     </div>
 
@@ -831,156 +703,97 @@
             </div>
 
             <!-- ==========================================
-                 RIGHT COLUMN: COURSES GRID (5 COLS ON XL)
+                 RIGHT COLUMN: COURSES GRID (MATCHING DESIGN)
                  ========================================== -->
-            <div class="col-xl-10 col-lg-9 col-md-8 col-12">
+            <div class="col-xl-9 col-lg-9 col-md-8 col-12">
                 
-                <!-- Mobile Filter & Sort Pill Bar -->
-                <div class="d-md-none mb-3 d-flex align-items-center gap-2">
-                    <button class="btn btn-outline-primary btn-sm flex-fill fw-bold rounded-pill py-2 shadow-xs d-flex align-items-center justify-content-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileFiltersDrawer" aria-controls="mobileFiltersDrawer">
-                        <i class="fa-solid fa-sliders text-primary"></i>
-                        <span>Filters</span>
-                        @if($selectedCategory && $selectedCategory !== 'All Categories')
-                            <span class="badge rounded-pill bg-primary text-white" style="font-size: 0.65rem;">1</span>
-                        @endif
-                    </button>
-                    <div class="flex-fill">
-                        <select class="form-select form-select-sm rounded-pill py-2 border-secondary-subtle fw-semibold shadow-xs" onchange="submitCoursesSort(this.value)">
-                            <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
-                            <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
-                            <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
-                            <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Results Bar -->
+                <!-- Top Results & Sort Header -->
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <div>
                         <h2 class="fw-bold text-dark mb-0" style="font-size: 1.15rem;">
-                            {{ count($courses) }} {{ count($courses) === 1 ? 'Course' : 'Courses' }}
+                            Courses for you
                         </h2>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
-                        <!-- Sort by -->
                         <div class="d-flex align-items-center gap-1 small text-muted">
                             <span>Sort by:</span>
-                            <select class="form-select form-select-sm" style="font-size: 0.75rem; width: auto;" onchange="submitCoursesSort(this.value)">
-                                <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
+                            <select class="form-select form-select-sm" style="font-size: 0.78rem; width: auto;" onchange="submitCoursesSort(this.value)">
+                                <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Featured</option>
                                 <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
                                 <option value="price_low" {{ $sortBy === 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
                                 <option value="price_high" {{ $sortBy === 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
                             </select>
                         </div>
-
-                        <!-- Grid / List Switcher -->
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-primary btn-sm px-2" title="Grid View">
-                                <i class="fa-solid fa-table-cells"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm px-2" title="List View">
-                                <i class="fa-solid fa-list"></i>
-                            </button>
-                        </div>
-
-                        <!-- Count Indicator -->
-                        @if(count($courses) > 0)
-                            <span class="small text-muted" style="font-size: 0.75rem;">Showing {{ count($courses) }} {{ count($courses) === 1 ? 'course' : 'courses' }}</span>
-                        @endif
                     </div>
                 </div>
 
-                <!-- Responsive Cards Grid -->
+                <!-- Responsive Cards Grid (3 cards per row on desktop, matching screenshot) -->
                 <div class="row g-3">
                     @forelse($courses as $c)
-                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12">
+                        @php
+                            $sellPrice = (float)($c->price ?? 0);
+                            $mrpPrice = (float)($c->original_price ?? 0);
+                            if ($mrpPrice == 0 && isset($c->course_price) && (float)$c->course_price > $sellPrice) {
+                                $mrpPrice = (float)$c->course_price;
+                            }
+                            $discText = $c->discount_text ?? $c->discount_percentage ?? '';
+                            if (empty($discText) && $mrpPrice > $sellPrice && $sellPrice > 0) {
+                                $discText = round((($mrpPrice - $sellPrice) / $mrpPrice) * 100) . '% off';
+                            }
+                            $courseUrl = !empty($c->url) ? $c->url : route('course.show', $c->slug);
+                        @endphp
+                        <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12">
                             <div class="course-card-unified">
                                 
                                 <!-- Thumbnail Box -->
                                 <div class="course-thumb-box">
-                                    <a href="{{ !empty($c->url) ? $c->url : route('course.show', $c->slug) }}">
-                                        <img src="{{ $c->thumbnail_url ?: ($c->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80') }}" alt="{{ $c->title }}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
+                                    <a href="{{ $courseUrl }}">
+                                        <img src="{{ $c->thumbnail_url ?: ($c->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80') }}"
+                                             alt="{{ $c->title }}"
+                                             loading="lazy"
+                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
                                     </a>
                                     
-                                    @if($c->badge === 'Bestseller')
-                                        <span class="badge-course-bestseller">Bestseller</span>
-                                    @endif
+                                    <span class="badge-course-featured">Featured</span>
 
                                     <button type="button" class="btn-course-heart" onclick="toggleCourseHeart(this, '{{ addslashes($c->title) }}')" title="Save course">
                                         <i class="fa-regular fa-heart"></i>
                                     </button>
-
-                                    <div class="duration-pill-badge">
-                                        <i class="fa-regular fa-clock me-1"></i> {{ $c->duration }}
-                                    </div>
                                 </div>
 
                                 <!-- Card Body -->
                                 <div class="course-card-content">
                                     <h4 class="course-card-heading" title="{{ $c->title }}">
-                                        <a href="{{ !empty($c->url) ? $c->url : route('course.show', $c->slug) }}">
+                                        <a href="{{ $courseUrl }}">
                                             {{ $c->title }}
                                         </a>
                                     </h4>
 
-                                    <!-- Rating & Students -->
-                                    <div class="course-rating-row">
-                                        @if($c->rating > 0 && (int)$c->reviews_count > 0)
-                                            <span class="text-warning fw-bold small">
-                                                <i class="fa-solid fa-star"></i> {{ number_format($c->rating, 1) }}
-                                            </span>
-                                            <span class="text-muted" style="font-size: 0.68rem;">({{ $c->reviews_count }})</span>
+                                    <!-- Instructor / Tutor Name -->
+                                    <div class="course-instructor-row" title="{{ $c->instructor_name }}">
+                                        <i class="fa-regular fa-user me-1"></i> {{ $c->instructor_name }}
+                                    </div>
+
+                                    <!-- Price Row -->
+                                    <div class="course-price-row mt-auto">
+                                        @if($sellPrice > 0)
+                                            <span class="price-current">₹ {{ number_format($sellPrice) }}</span>
+                                            @if($mrpPrice > $sellPrice)
+                                                <span class="price-mrp">₹ {{ number_format($mrpPrice) }}</span>
+                                                <span class="badge-discount-orange">{{ $discText ?: '50% off' }}</span>
+                                            @endif
                                         @else
-                                            <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">
-                                                New Course
-                                            </span>
-                                        @endif
-                                        @if(!empty($c->students_count))
-                                            <span class="text-muted" style="font-size: 0.65rem;">&bull; {{ $c->students_count }}</span>
+                                            <span class="price-current text-success">Free</span>
+                                            <span class="badge-discount-orange">Free</span>
                                         @endif
                                     </div>
 
-                                    <!-- Price -->
-                                    @php
-                                        $sellPrice = (float)($c->selling_price ?? 0);
-                                        $mrpPrice = (float)($c->original_price ?? $c->mrp ?? 0);
-                                        if ($sellPrice == 0) {
-                                            if (isset($c->discount_price) && $c->discount_price > 0 && $c->price > $c->discount_price) {
-                                                $sellPrice = (float)$c->discount_price;
-                                                $mrpPrice = (float)$c->price;
-                                            } else {
-                                                $sellPrice = (float)($c->price ?? 0);
-                                            }
-                                        }
-                                        if ($mrpPrice == 0 && isset($c->price) && $c->price > $sellPrice) {
-                                            $mrpPrice = (float)$c->price;
-                                        }
-                                    @endphp
-                                    <div class="course-price-row">
-                                        <span class="price-current">₹{{ number_format($sellPrice) }}</span>
-                                        @if($mrpPrice > $sellPrice && $sellPrice > 0)
-                                            <span class="price-mrp">₹{{ number_format($mrpPrice) }}</span>
-                                            <span class="badge-discount-green">{{ $c->discount_percentage ?? $c->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% off' }}</span>
-                                        @elseif($sellPrice == 0)
-                                            <span class="badge-discount-green">FREE</span>
-                                        @endif
-                                    </div>
-
-                                    <!-- Instructor Footer -->
-                                    <div class="course-instructor-footer d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center gap-2" style="min-width: 0;">
-                                            <img src="{{ $c->instructor_avatar }}" alt="{{ $c->instructor_name }}" class="instructor-avatar-xs" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80';">
-                                            <div style="min-width: 0;">
-                                                <div class="instructor-name-label" title="{{ $c->instructor_name }}">{{ $c->instructor_name }}</div>
-                                                <div class="instructor-cat-label">{{ $c->instructor_category }}</div>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle p-1" title="Add to Cart" onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $c->thumbnail }}', seller_id: {{ $c->seller_id ?? 1 }} })" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                            <i class="fa-solid fa-cart-plus" style="font-size: 0.75rem;"></i>
-                                        </button>
-                                    </div>
-
+                                    <!-- Luxury Add To Cart Button -->
+                                    <button type="button" class="btn-cart-luxury"
+                                            onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $c->thumbnail_url ?: ($c->thumbnail ?: '') }}', seller_id: {{ $c->seller_id ?? 1 }} })">
+                                        <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
+                                    </button>
                                 </div>
 
                             </div>
@@ -988,138 +801,25 @@
                     @empty
                         <div class="col-12 text-center py-5">
                             <i class="fa-solid fa-graduation-cap fs-1 text-muted mb-3"></i>
-                            <h5 class="fw-bold text-dark">No courses found</h5>
-                            <p class="text-muted small">Try broadening your search term or clearing the filters.</p>
-                            <a href="{{ route('courses') }}" class="btn btn-primary btn-sm px-4">Reset All Filters</a>
+                            <h5 class="fw-bold text-dark">No courses found matching your criteria</h5>
+                            <p class="text-muted small">Try selecting another category or resetting the filters.</p>
+                            <a href="{{ route('courses') }}" class="btn btn-sm text-white px-4 py-2 rounded-pill fw-bold" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);">
+                                Reset All Filters
+                            </a>
                         </div>
                     @endforelse
                 </div>
 
+                <!-- Real Pagination for 1,084 Courses -->
+                @if($courses instanceof \Illuminate\Pagination\LengthAwarePaginator && $courses->hasPages())
+                    <div class="d-flex justify-content-center mt-5 mb-4">
+                        {{ $courses->links('pagination::bootstrap-5') }}
+                    </div>
+                @endif
+
             </div>
 
         </div>
-    </div>
-</div>
-
-<!-- ============================================================================
-     COURSE ENROLLMENT / PREVIEW MODAL
-     ============================================================================ -->
-<div class="modal fade" id="coursePreviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <span id="modalCourseCat" class="badge bg-primary-subtle text-primary fw-bold"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <h4 class="fw-bold text-dark mb-2" id="modalCourseTitle"></h4>
-                <p class="text-muted small mb-3" id="modalCourseDesc"></p>
-
-                <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 mb-3 small">
-                    <div>
-                        <span class="text-muted d-block" style="font-size: 0.65rem;">Duration</span>
-                        <strong id="modalCourseDuration"></strong>
-                    </div>
-                    <div>
-                        <span class="text-muted d-block" style="font-size: 0.65rem;">Level</span>
-                        <strong id="modalCourseLevel"></strong>
-                    </div>
-                    <div>
-                        <span class="text-muted d-block" style="font-size: 0.65rem;">Language</span>
-                        <strong id="modalCourseLanguage"></strong>
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center justify-content-between pt-2">
-                    <div>
-                        <small class="text-muted d-block">Special Offer Price</small>
-                        <h3 class="fw-bold text-dark mb-0" id="modalCoursePrice"></h3>
-                    </div>
-                    <button type="button" class="btn btn-primary px-4 fw-bold" onclick="alert('Proceeding to checkout...');">
-                        <i class="fa-solid fa-cart-shopping me-1"></i> Enroll Now
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Mobile Filters Offcanvas Drawer -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileFiltersDrawer" aria-labelledby="mobileFiltersDrawerLabel">
-    <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title fw-bold text-dark d-flex align-items-center gap-2" id="mobileFiltersDrawerLabel" style="font-size: 1.05rem;">
-            <i class="fa-solid fa-sliders text-primary"></i> Filter Courses
-        </h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body p-3">
-        <form action="{{ route('courses') }}" method="GET" id="mobileCoursesFilterForm">
-            @if($searchQuery)
-                <input type="hidden" name="search" value="{{ $searchQuery }}">
-            @endif
-            <input type="hidden" name="sort" value="{{ $sortBy }}">
-
-            <!-- Categories -->
-            <div class="mb-4">
-                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Category</div>
-                <div class="d-flex flex-column gap-1">
-                    <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
-                        <span class="small fw-semibold text-dark">All Categories</span>
-                        <input class="form-check-input ms-2" type="radio" name="category" value="" {{ ($selectedCategory === 'All Categories' || !$selectedCategory) ? 'checked' : '' }}>
-                    </label>
-                    @foreach($sidebarCategories as $sc)
-                        <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
-                            <span class="small text-secondary">{{ $sc['name'] }}</span>
-                            <input class="form-check-input ms-2" type="radio" name="category" value="{{ $sc['name'] }}" {{ $selectedCategory === $sc['name'] ? 'checked' : '' }}>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Mode -->
-            <div class="mb-4">
-                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Learning Mode</div>
-                <div class="d-flex gap-2">
-                    <label class="btn btn-sm btn-outline-secondary flex-fill text-start py-2">
-                        <input type="checkbox" name="mode[]" value="online" class="form-check-input me-1" {{ in_array('online', (array)$selectedMode) ? 'checked' : '' }}> Online
-                    </label>
-                    <label class="btn btn-sm btn-outline-secondary flex-fill text-start py-2">
-                        <input type="checkbox" name="mode[]" value="offline" class="form-check-input me-1" {{ in_array('offline', (array)$selectedMode) ? 'checked' : '' }}> Offline
-                    </label>
-                </div>
-            </div>
-
-            <!-- Level -->
-            <div class="mb-4">
-                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Level</div>
-                <div class="d-flex flex-column gap-1">
-                    @foreach(['Beginner', 'Intermediate', 'Advanced'] as $lvl)
-                        <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
-                            <span class="small text-secondary">{{ $lvl }}</span>
-                            <input class="form-check-input ms-2" type="checkbox" name="level[]" value="{{ $lvl }}" {{ in_array($lvl, (array)$selectedLevel) ? 'checked' : '' }}>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Language -->
-            <div class="mb-4">
-                <div class="fw-bold text-dark small mb-2 text-uppercase" style="letter-spacing: 0.04em;">Language</div>
-                <div class="d-flex flex-column gap-1">
-                    @foreach(['English', 'Hindi', 'Gujarati'] as $lang)
-                        <label class="d-flex align-items-center justify-content-between p-2 rounded-2 bg-light-subtle border">
-                            <span class="small text-secondary">{{ $lang }}</span>
-                            <input class="form-check-input ms-2" type="checkbox" name="language[]" value="{{ $lang }}" {{ in_array($lang, (array)$selectedLanguage) ? 'checked' : '' }}>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="d-flex gap-2 pt-2 border-top">
-                <a href="{{ route('courses') }}" class="btn btn-light btn-sm flex-fill fw-semibold py-2">Reset</a>
-                <button type="submit" class="btn btn-primary btn-sm flex-fill fw-bold py-2">Apply Filters</button>
-            </div>
-        </form>
     </div>
 </div>
 
@@ -1132,8 +832,8 @@
         if (form) form.submit();
     }
 
-    function toggleMoreCourseCats(btn) {
-        const moreItems = document.querySelectorAll('.more-course-cat');
+    function toggleMoreCategories(btn) {
+        const moreItems = document.querySelectorAll('.more-cat-item');
         let isOpening = false;
         moreItems.forEach(item => {
             if (item.classList.contains('d-none')) {
@@ -1143,12 +843,7 @@
                 item.classList.add('d-none');
             }
         });
-        btn.innerText = isOpening ? 'Show Less ▴' : 'Show More ▾';
-    }
-
-    function updatePrice(val) {
-        document.getElementById('priceDisplay').innerText = '₹0 - ₹' + Number(val).toLocaleString();
-        document.getElementById('priceInputMax').value = val;
+        btn.innerText = isOpening ? 'See less ▴' : 'See more ▾';
     }
 
     function toggleCourseHeart(btn, title) {
@@ -1163,32 +858,6 @@
             icon.classList.add('fa-regular');
             showToast('Removed', title + ' removed from wishlist.');
         }
-    }
-
-    function openCoursePreviewModal(data) {
-        document.getElementById('modalCourseCat').innerText = data.category;
-        document.getElementById('modalCourseTitle').innerText = data.title;
-        document.getElementById('modalCourseDesc').innerText = data.desc;
-        document.getElementById('modalCourseDuration').innerText = data.duration;
-        document.getElementById('modalCourseLevel').innerText = data.level;
-        document.getElementById('modalCourseLanguage').innerText = data.language;
-        document.getElementById('modalCoursePrice').innerText = '₹' + Number(data.discount_price || data.price).toLocaleString();
-        
-        const modal = new bootstrap.Modal(document.getElementById('coursePreviewModal'));
-        modal.show();
-    }
-
-    function filterCheckboxes(keyword) {
-        const query = keyword.toLowerCase();
-        const items = document.querySelectorAll('#courseCatContainer .course-check-item');
-        items.forEach(item => {
-            const label = item.querySelector('label').innerText.toLowerCase();
-            if (label.includes(query)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
-        });
     }
 
     function showToast(title, message) {
@@ -1220,4 +889,3 @@
 </script>
 
 @endsection
-

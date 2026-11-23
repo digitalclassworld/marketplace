@@ -17,11 +17,76 @@ class ElearnCourse extends Model
     protected $guarded = [];
 
     /**
+     * Category ID to human-readable category name mapping
+     */
+    public static array $categoryMap = [
+        2  => 'IT & Software Development',
+        15 => 'Accounts & Finance',
+        37 => 'Designing & Creative',
+        49 => 'Digital Marketing',
+        3  => 'School & Academics',
+        16 => 'Business Management',
+        42 => 'Accounting & Commerce',
+        17 => 'Career & Leadership',
+        44 => 'Competitive Exams & Law',
+        47 => 'Business Administration',
+        45 => 'Test Preparation & Languages',
+        48 => 'Cyber & Information Security',
+        12 => 'Music & Arts',
+        4  => 'Spoken English',
+        39 => 'Database & Cloud Administration',
+    ];
+
+    /**
      * Relationship to Tutor
      */
     public function tutor()
     {
         return $this->belongsTo(ElearnTutor::class, 'tutor_id');
+    }
+
+    /**
+     * Category name accessor
+     */
+    public function getCategoryAttribute(): string
+    {
+        if (!empty($this->category_id) && isset(self::$categoryMap[$this->category_id])) {
+            return self::$categoryMap[$this->category_id];
+        }
+        if (!empty($this->course_selling_for)) {
+            return $this->course_selling_for;
+        }
+        return 'General Education';
+    }
+
+    /**
+     * Instructor / Tutor Name
+     */
+    public function getInstructorNameAttribute(): string
+    {
+        if ($this->tutor) {
+            return !empty($this->tutor->name) ? $this->tutor->name : ($this->tutor->company_name ?? 'Digital Class Instructor');
+        }
+        return 'Digital Class Instructor';
+    }
+
+    /**
+     * Instructor / Tutor Avatar
+     */
+    public function getInstructorAvatarAttribute(): string
+    {
+        if ($this->tutor && !empty($this->tutor->profile_url)) {
+            return $this->tutor->profile_url;
+        }
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->instructor_name);
+    }
+
+    /**
+     * Badge (Featured / Bestseller)
+     */
+    public function getBadgeAttribute(): string
+    {
+        return $this->is_trending ? 'Bestseller' : 'Featured';
     }
 
     /**

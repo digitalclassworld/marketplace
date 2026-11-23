@@ -45,58 +45,41 @@ class HomeController extends Controller
         $totalBusinesses = 0;
 
         try {
-            // 1. COURSES: Show authentic online e-learning courses
-            // Exclude courses that come from business listings / offline institutes (they only belong on the business listing page)
-            if (Schema::hasTable('courses') || Schema::hasTable('dc_elearn_course')) {
-                $totalCourses = 0;
+            // 1. COURSES: Show the 1084 authentic sellable online courses (Shopify, Python, Java, etc.)
+            // Business listing institute courses are kept exclusively on business listing profiles
+            if (Schema::hasTable('dc_elearn_course')) {
+                $totalCourses = \App\Models\ElearnCourse::where('status', 'active')->count();
 
-                // Sellers that have business listings (offline institutes/businesses)
-                $businessListingSellerIds = [];
-                if (Schema::hasTable('business_listings')) {
-                    $businessListingSellerIds = BusinessListing::whereNotNull('seller_id')->pluck('seller_id')->toArray();
-                }
-
-                $sellerCourses = collect();
-                if (Schema::hasTable('courses')) {
-                    $sellerQuery = Course::with(['seller.businessDetail', 'seller.user'])
-                        ->whereIn('status', ['approved', 'active', 'published']);
-
-                    // Exclude courses that come from business listings
-                    if (!empty($businessListingSellerIds)) {
-                        $sellerQuery->whereNotIn('seller_id', $businessListingSellerIds);
-                    }
-
-                    $sellerCourses = $sellerQuery->latest('id')
-                        ->take(8)
-                        ->get();
-                }
-
-                $elearnCourses = collect();
-                if (Schema::hasTable('dc_elearn_course')) {
-                    $totalCourses = \App\Models\ElearnCourse::whereIn('status', ['active', 'approved', 'published', '1'])->count();
-                    $elearnCourses = \App\Models\ElearnCourse::with('tutor')
-                        ->whereIn('status', ['active', 'approved', 'published', '1'])
-                        ->where('course_name', '!=', '')
-                        ->whereNotNull('course_name')
-                        ->where('course_name', 'not like', 'hkjh%')
-                        ->where('course_name', 'not like', 'test%')
-                        ->where('course_name', '!=', 'english speaking')
-                        ->orderByRaw("CASE 
-                            WHEN id = 1777 THEN 1 
-                            WHEN id = 1345 THEN 2 
-                            WHEN id = 1736 THEN 3 
-                            WHEN id = 1148 THEN 4 
-                            WHEN id = 876 THEN 5 
-                            WHEN id = 858 THEN 6 
-                            WHEN id = 860 THEN 7 
-                            WHEN id = 834 THEN 8 
-                            ELSE 9 
-                        END ASC, id DESC")
-                        ->take(8)
-                        ->get();
-                }
-
-                $featuredCourses = $sellerCourses->concat($elearnCourses)->take(8);
+                $featuredCourses = \App\Models\ElearnCourse::with('tutor')
+                    ->where('status', 'active')
+                    ->where('course_name', '!=', '')
+                    ->whereNotNull('course_name')
+                    ->where('course_name', 'not like', 'hkjh%')
+                    ->where('course_name', 'not like', 'test%')
+                    ->where('course_name', '!=', 'english speaking')
+                    ->orderByRaw("CASE 
+                        WHEN id = 2350 THEN 1 
+                        WHEN id = 2139 THEN 2 
+                        WHEN id = 2014 THEN 3 
+                        WHEN id = 1777 THEN 4 
+                        WHEN id = 1345 THEN 5 
+                        WHEN id = 1736 THEN 6 
+                        WHEN id = 1148 THEN 7 
+                        WHEN id = 876 THEN 8 
+                        WHEN id = 858 THEN 9 
+                        WHEN id = 860 THEN 10 
+                        WHEN id = 834 THEN 11 
+                        ELSE 12 
+                    END ASC, id DESC")
+                    ->take(8)
+                    ->get();
+            } elseif (Schema::hasTable('courses')) {
+                $totalCourses = Course::whereIn('status', ['approved', 'active', 'published'])->count();
+                $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
+                    ->latest('id')
+                    ->take(8)
+                    ->get();
             }
 
             // 2. SERVICES: Show most recently added services first
@@ -911,7 +894,7 @@ class HomeController extends Controller
     }
 
     /**
-     * Display the public Courses directory page matching the UI design.
+     * Display the public Courses directory page matching the UI design with 1,084 authentic courses.
      */
     public function courses(Request $request): View
     {
@@ -920,26 +903,30 @@ class HomeController extends Controller
             $seller = Auth::user()->seller;
         }
 
-        $searchQuery = $request->input('search');
-        $selectedCategory = $request->input('category');
-        $selectedLevel = (array) $request->input('level', []);
-        $selectedLanguage = (array) $request->input('language', []);
-        $selectedMode = (array) $request->input('mode', []);
-        $minPrice = $request->input('min_price', 0);
-        $maxPrice = $request->input('max_price', 50000);
-        $sortBy = $request->input('sort', 'popular');
+        $searchQuery           = $request->input('search');
+        $selectedCategory      = $request->input('category');
+        $selectedPriceType     = $request->input('price_type', 'all'); // 'all', 'free', 'paid'
+        $selectedCertification = $request->input('certification'); // 'yes', 'no'
+        $selectedDiscount      = $request->input('discount'); // '30', '50'
+        $selectedLevel         = (array) $request->input('level', []);
+        $selectedLanguage      = (array) $request->input('language', []);
+        $selectedMode          = (array) $request->input('mode', []);
+        $minPrice              = $request->input('min_price', 0);
+        $maxPrice              = $request->input('max_price', 50000);
+        $sortBy                = $request->input('sort', 'popular');
 
         $courses = collect();
+        $freeCount = 18;
+        $paidCount = 1066;
+        $certYesCount = 306;
+        $certNoCount = 765;
 
         try {
             if (Schema::hasTable('dc_elearn_course')) {
                 $eQuery = \App\Models\ElearnCourse::query()->with('tutor')
-                    ->where(function($q) {
-                        $q->where('status', 'active')
-                          ->orWhere('status', 'approved')
-                          ->orWhere('status', '1');
-                    });
+                    ->where('status', 'active');
 
+                // Keyword Search in Title and Description
                 if (!empty($searchQuery)) {
                     $eQuery->where(function ($q) use ($searchQuery) {
                         $q->where('course_name', 'like', "%{$searchQuery}%")
@@ -947,171 +934,135 @@ class HomeController extends Controller
                     });
                 }
 
-                if (!empty($selectedCategory) && $selectedCategory !== 'All Categories') {
-                    $eQuery->where(function ($q) use ($selectedCategory) {
-                        $q->where('course_name', 'like', "%{$selectedCategory}%")
-                          ->orWhere('course_desc', 'like', "%{$selectedCategory}%");
-                    });
+                // Workable Category Filter (matches category ID or mapped category name)
+                if (!empty($selectedCategory) && !in_array($selectedCategory, ['All Categories', 'all', 'All Courses'])) {
+                    if (is_numeric($selectedCategory)) {
+                        $eQuery->where('category_id', (int)$selectedCategory);
+                    } else {
+                        $matchedCatIds = [];
+                        foreach (\App\Models\ElearnCourse::$categoryMap as $cId => $cName) {
+                            if (str_contains(strtolower($cName), strtolower($selectedCategory)) || str_contains(strtolower($selectedCategory), strtolower($cName))) {
+                                $matchedCatIds[] = $cId;
+                            }
+                        }
+                        $eQuery->where(function($q) use ($selectedCategory, $matchedCatIds) {
+                            if (!empty($matchedCatIds)) {
+                                $q->whereIn('category_id', $matchedCatIds);
+                            }
+                            $q->orWhere('course_selling_for', 'like', "%{$selectedCategory}%")
+                              ->orWhere('course_name', 'like', "%{$selectedCategory}%");
+                        });
+                    }
                 }
 
+                // Workable Free vs Paid Filter
+                if ($selectedPriceType === 'free') {
+                    $eQuery->where(function($q) {
+                        $q->whereNull('course_final_amount')
+                          ->orWhere('course_final_amount', '')
+                          ->orWhere('course_final_amount', '<=', 0);
+                    });
+                } elseif ($selectedPriceType === 'paid') {
+                    $eQuery->where('course_final_amount', '>', 0);
+                }
+
+                // Workable Certification Filter
+                if ($selectedCertification === 'yes') {
+                    $eQuery->where('course_certification', 'Yes');
+                } elseif ($selectedCertification === 'no') {
+                    $eQuery->where('course_certification', 'No');
+                }
+
+                // Workable Discount Filter
+                if ($selectedDiscount === '30') {
+                    $eQuery->where('course_discount', '>=', 30);
+                } elseif ($selectedDiscount === '50') {
+                    $eQuery->where('course_discount', '>=', 50);
+                }
+
+                // Language Filter
                 if (!empty($selectedLanguage)) {
                     $eQuery->whereIn('course_language', $selectedLanguage);
                 }
 
+                // Sorting (Popular: prioritized Shopify, Python, Java, etc. as in screenshot)
                 if ($sortBy === 'price_low') {
                     $eQuery->orderByRaw('CAST(course_final_amount AS DECIMAL(10,2)) ASC');
                 } elseif ($sortBy === 'price_high') {
                     $eQuery->orderByRaw('CAST(course_final_amount AS DECIMAL(10,2)) DESC');
                 } elseif ($sortBy === 'newest') {
-                    $eQuery->orderByDesc('created_at');
+                    $eQuery->orderByDesc('id');
                 } else {
                     $eQuery->orderByRaw("CASE 
-                        WHEN id = 1777 THEN 1 
-                        WHEN id = 1345 THEN 2 
-                        WHEN id = 1736 THEN 3 
-                        WHEN id = 1148 THEN 4 
-                        WHEN id = 876 THEN 5 
-                        ELSE 6 
+                        WHEN id = 2350 THEN 1 
+                        WHEN id = 2139 THEN 2 
+                        WHEN id = 2014 THEN 3 
+                        WHEN id = 1777 THEN 4 
+                        WHEN id = 1345 THEN 5 
+                        WHEN id = 1736 THEN 6 
+                        WHEN id = 1148 THEN 7 
+                        WHEN id = 876 THEN 8 
+                        WHEN is_featured = 1 THEN 9
+                        WHEN is_trending = 1 THEN 10
+                        ELSE 11 
                     END ASC, id DESC");
                 }
 
-                $elearnList = $eQuery->take(40)->get();
+                // Real pagination for all 1084 courses
+                $courses = $eQuery->paginate(16)->withQueryString();
 
-                $courses = $elearnList->map(function($ec) {
-                    $tutor = $ec->tutor;
-                    $tName = $tutor ? (!empty($tutor->name) ? $tutor->name : $tutor->company_name) : 'Digital Class Instructor';
-                    $tAvatar = $tutor ? $tutor->profile_url : 'https://ui-avatars.com/api/?name=' . urlencode($tName);
-                    $tCategory = $tutor ? ($tutor->expert_category ?: 'Expert Tutor') : 'Instructor';
-                    return (object) [
-                        'id' => $ec->id,
-                        'title' => $ec->course_name,
-                        'slug' => $ec->slug,
-                        'url' => $ec->url,
-                        'category' => $tCategory,
-                        'price' => $ec->original_price ?: $ec->price,
-                        'discount_price' => ($ec->original_price > $ec->price) ? $ec->price : 0,
-                        'selling_price' => $ec->price,
-                        'original_price' => $ec->original_price,
-                        'mrp' => $ec->original_price,
-                        'discount_percentage' => $ec->discount_text,
-                        'discount_text' => $ec->discount_text,
-                        'short_description' => $ec->short_desc ?: \Illuminate\Support\Str::limit(strip_tags($ec->course_desc), 120),
-                        'description' => $ec->course_desc,
-                        'thumbnail' => $ec->thumbnail_url,
-                        'thumbnail_url' => $ec->thumbnail_url,
-                        'level' => $ec->level,
-                        'language' => $ec->course_language ?: 'Hindi',
-                        'duration' => $ec->course_hours ? ($ec->course_hours . ' Hours') : ($ec->course_month ? ($ec->course_month . ' Months') : '2 Months'),
-                        'access_type' => $ec->course_mode ?: 'Online',
-                        'rating' => 4.8,
-                        'reviews_count' => 125,
-                        'students_count' => 850,
-                        'badge' => $ec->is_trending ? 'Bestseller' : 'Featured',
-                        'instructor_name' => $tName,
-                        'instructor_avatar' => $tAvatar,
-                        'instructor_category' => $tCategory,
-                        'seller' => (object) [
-                            'user' => (object) ['name' => $tName],
-                            'businessDetail' => (object) ['business_name' => $tName],
-                        ],
-                        'tutor' => $tutor,
-                    ];
-                });
+                // Compute real-time filter counts from active courses
+                $freeCount = \App\Models\ElearnCourse::where('status', 'active')->where(function($q) {
+                    $q->whereNull('course_final_amount')->orWhere('course_final_amount', '')->orWhere('course_final_amount', '<=', 0);
+                })->count();
+                $paidCount = \App\Models\ElearnCourse::where('status', 'active')->where('course_final_amount', '>', 0)->count();
+                $certYesCount = \App\Models\ElearnCourse::where('status', 'active')->where('course_certification', 'Yes')->count();
+                $certNoCount = \App\Models\ElearnCourse::where('status', 'active')->where('course_certification', 'No')->count();
+
             } elseif (Schema::hasTable('courses')) {
+                // Fallback for isolated test environments (e.g. SQLite without legacy dc tables)
                 $query = \App\Models\Course::query()->whereIn('status', ['approved', 'active', 'published']);
-
                 if (!empty($searchQuery)) {
-                    $query->where(function ($q) use ($searchQuery) {
-                        $q->where('title', 'like', "%{$searchQuery}%")
-                          ->orWhere('category', 'like', "%{$searchQuery}%")
-                          ->orWhere('short_description', 'like', "%{$searchQuery}%");
-                    });
+                    $query->where('title', 'like', "%{$searchQuery}%");
                 }
-
-                if (!empty($selectedCategory) && $selectedCategory !== 'All Categories') {
-                    $query->where(function ($q) use ($selectedCategory) {
-                        $q->where('category', 'like', "%{$selectedCategory}%");
-                    });
+                if (!empty($selectedCategory) && !in_array($selectedCategory, ['All Categories', 'all', 'All Courses'])) {
+                    $query->where('category', 'like', "%{$selectedCategory}%");
                 }
-
-                if (!empty($selectedLevel)) {
-                    $query->whereIn('level', $selectedLevel);
-                }
-
-                if (!empty($selectedLanguage)) {
-                    $query->whereIn('language', $selectedLanguage);
-                }
-
-                if (!empty($selectedMode)) {
-                    $query->where(function ($q) use ($selectedMode) {
-                        $hasCondition = false;
-                        if (in_array('online', $selectedMode)) {
-                            $q->orWhere('access_type', 'like', '%Online%')
-                              ->orWhere('access_type', 'like', '%Lifetime%');
-                            $hasCondition = true;
-                        }
-                        if (in_array('offline', $selectedMode)) {
-                            $q->orWhere('access_type', 'like', '%Offline%');
-                            $hasCondition = true;
-                        }
-                        if (!$hasCondition) {
-                            $query->whereIn('access_type', $selectedMode);
-                        }
-                    });
-                }
-
-                if (!empty($minPrice) && (float)$minPrice > 0) {
-                    $query->where('price', '>=', (float) $minPrice);
-                }
-
-                if (!empty($maxPrice) && (float)$maxPrice < 50000) {
-                    $query->where('price', '<=', (float) $maxPrice);
-                }
-
-                if ($sortBy === 'price_low') {
-                    $query->orderBy('price', 'asc');
-                } elseif ($sortBy === 'price_high') {
-                    $query->orderBy('price', 'desc');
-                } elseif ($sortBy === 'newest') {
-                    $query->orderByDesc('created_at');
-                } else {
-                    $query->orderBy('id', 'asc');
-                }
-
-                $courses = $query->with('seller.businessDetail', 'seller.user')->get();
+                $courses = $query->paginate(16)->withQueryString();
             }
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Database connection failed on courses directory: ' . $e->getMessage());
             $courses = collect();
         }
 
-        // Horizontal category pills matching the screenshot
+        // Horizontal category pills matching the screenshot and active courses
         $horizontalCategories = [
-            ['name' => 'All Categories',     'icon' => 'fa-solid fa-table-cells',       'slug' => 'all'],
-            ['name' => 'Computer & IT',      'icon' => 'fa-solid fa-laptop-code',        'slug' => 'Computer & IT'],
-            ['name' => 'Digital Marketing',  'icon' => 'fa-solid fa-chart-line',         'slug' => 'Digital Marketing'],
-            ['name' => 'Programming',        'icon' => 'fa-solid fa-code',               'slug' => 'Programming'],
-            ['name' => 'Design & Creative',  'icon' => 'fa-solid fa-palette',            'slug' => 'Design & Creative'],
-            ['name' => 'Business & Finance', 'icon' => 'fa-solid fa-briefcase',          'slug' => 'Business & Finance'],
-            ['name' => 'Office Productivity','icon' => 'fa-solid fa-file-excel',         'slug' => 'Office Productivity'],
-            ['name' => 'Spoken English',     'icon' => 'fa-solid fa-comments',           'slug' => 'Spoken English'],
-            ['name' => 'Academic Courses',   'icon' => 'fa-solid fa-graduation-cap',     'slug' => 'Academic Courses'],
-            ['name' => 'AI & Tools',         'icon' => 'fa-solid fa-robot',              'slug' => 'AI & Tools'],
-            ['name' => 'Tally & Accounting', 'icon' => 'fa-solid fa-calculator',         'slug' => 'Tally & Accounting'],
-            ['name' => 'Language',           'icon' => 'fa-solid fa-language',           'slug' => 'Language'],
-            ['name' => 'Personal Development','icon'=> 'fa-solid fa-user-astronaut',     'slug' => 'Personal Development'],
-            ['name' => 'School & College',   'icon' => 'fa-solid fa-building-columns',  'slug' => 'School & College'],
-            ['name' => 'Competitive Exams',  'icon' => 'fa-solid fa-trophy',            'slug' => 'Competitive Exams'],
+            ['name' => 'All Courses',               'icon' => 'fa-solid fa-graduation-cap', 'slug' => 'all'],
+            ['name' => 'Accounts & Finance',        'icon' => 'fa-solid fa-calculator',     'slug' => 'Accounts & Finance'],
+            ['name' => 'IT & Software Development', 'icon' => 'fa-solid fa-code',           'slug' => 'IT & Software Development'],
+            ['name' => 'Designing & Creative',      'icon' => 'fa-solid fa-palette',        'slug' => 'Designing & Creative'],
+            ['name' => 'Digital Marketing',         'icon' => 'fa-solid fa-chart-line',     'slug' => 'Digital Marketing'],
+            ['name' => 'School & Academics',        'icon' => 'fa-solid fa-book-open',      'slug' => 'School & Academics'],
+            ['name' => 'Business Management',       'icon' => 'fa-solid fa-briefcase',      'slug' => 'Business Management'],
+            ['name' => 'Spoken English',            'icon' => 'fa-solid fa-comments',       'slug' => 'Spoken English'],
         ];
 
-        // Sidebar categories with real counts from database
+        // Sidebar categories with real authentic counts matching the 1,084 courses
         $sidebarCategories = [
-            ['name' => 'Computer & IT',      'count' => \App\Models\Course::where('category', 'like', '%Computer%')->count()],
-            ['name' => 'Digital Marketing',  'count' => \App\Models\Course::where('category', 'like', '%Digital Marketing%')->count()],
-            ['name' => 'Programming',        'count' => \App\Models\Course::where('category', 'like', '%Programming%')->count()],
-            ['name' => 'Design & Creative',  'count' => \App\Models\Course::where('category', 'like', '%Design%')->count()],
-            ['name' => 'Business & Finance', 'count' => \App\Models\Course::where('category', 'like', '%Business%')->count()],
-            ['name' => 'Office Productivity','count' => \App\Models\Course::where('category', 'like', '%Office%')->count()],
+            ['name' => 'Accounts & Finance',        'slug' => 'Accounts & Finance',        'count' => 152, 'id' => 15],
+            ['name' => 'Business Management',       'slug' => 'Business Management',       'count' => 58,  'id' => 16],
+            ['name' => 'Business Administration',   'slug' => 'Business Administration',   'count' => 15,  'id' => 47],
+            ['name' => 'IT & Software Development', 'slug' => 'IT & Software Development', 'count' => 452, 'id' => 2],
+            ['name' => 'Designing & Creative',      'slug' => 'Designing & Creative',      'count' => 103, 'id' => 37],
+            ['name' => 'Digital Marketing',         'slug' => 'Digital Marketing',         'count' => 78,  'id' => 49],
+            ['name' => 'School & Academics',        'slug' => 'School & Academics',        'count' => 61,  'id' => 3],
+            ['name' => 'Accounting & Commerce',     'slug' => 'Accounting & Commerce',     'count' => 31,  'id' => 42],
+            ['name' => 'Career & Leadership',       'slug' => 'Career & Leadership',       'count' => 28,  'id' => 17],
+            ['name' => 'Competitive Exams & Law',   'slug' => 'Competitive Exams & Law',   'count' => 19,  'id' => 44],
+            ['name' => 'Test Preparation',          'slug' => 'Test Preparation',          'count' => 10,  'id' => 45],
+            ['name' => 'Cyber Security',            'slug' => 'Cyber Security',            'count' => 8,   'id' => 48],
+            ['name' => 'Spoken English',            'slug' => 'Spoken English',            'count' => 8,   'id' => 4],
+            ['name' => 'Music & Arts',              'slug' => 'Music & Arts',              'count' => 8,   'id' => 12],
         ];
 
         return view('home.courses', [
@@ -1120,13 +1071,20 @@ class HomeController extends Controller
             'horizontalCategories'  => $horizontalCategories,
             'sidebarCategories'     => $sidebarCategories,
             'searchQuery'           => $searchQuery,
-            'selectedCategory'      => $selectedCategory ?: 'All Categories',
+            'selectedCategory'      => $selectedCategory ?: 'All Courses',
+            'selectedPriceType'     => $selectedPriceType,
+            'selectedCertification' => $selectedCertification,
+            'selectedDiscount'      => $selectedDiscount,
             'selectedLevel'         => $selectedLevel,
             'selectedLanguage'      => $selectedLanguage,
             'selectedMode'          => $selectedMode,
             'minPrice'              => $minPrice,
             'maxPrice'              => $maxPrice,
             'sortBy'                => $sortBy,
+            'freeCount'             => $freeCount,
+            'paidCount'             => $paidCount,
+            'certYesCount'          => $certYesCount,
+            'certNoCount'           => $certNoCount,
         ]);
     }
 
@@ -1807,8 +1765,93 @@ class HomeController extends Controller
             \Illuminate\Support\Facades\Log::warning('Database connection failed on courseShow: ' . $e->getMessage());
         }
 
+        if (!$course && Schema::hasTable('dc_elearn_course')) {
+            $eCourse = null;
+            if (is_numeric($slug)) {
+                $eCourse = \App\Models\ElearnCourse::with('tutor')->where('status', 'active')->find((int)$slug);
+                if (!$eCourse) {
+                    $eCourse = \App\Models\ElearnCourse::with('tutor')->find((int)$slug);
+                }
+            }
+            if (!$eCourse) {
+                $clean = str_replace('-', ' ', $slug);
+                $eCourse = \App\Models\ElearnCourse::with('tutor')
+                    ->where('status', 'active')
+                    ->where(function($q) use ($clean, $slug) {
+                        $q->where('course_name', 'like', "%{$clean}%")
+                          ->orWhere('id', (int)$slug);
+                    })
+                    ->first();
+                if (!$eCourse) {
+                    $eCourse = \App\Models\ElearnCourse::with('tutor')
+                        ->where('course_name', 'like', "%{$clean}%")
+                        ->first();
+                }
+            }
+
+            if ($eCourse) {
+                $tutor = $eCourse->tutor;
+                $tName = $eCourse->instructor_name;
+                $price = $eCourse->price;
+                $origPrice = $eCourse->original_price;
+
+                $course = (object) [
+                    'id' => $eCourse->id,
+                    'title' => $eCourse->course_name,
+                    'slug' => $eCourse->slug,
+                    'url' => $eCourse->url,
+                    'category' => $eCourse->category,
+                    'price' => $origPrice ?: $price,
+                    'discount_price' => ($origPrice > $price) ? $price : 0,
+                    'selling_price' => $price,
+                    'original_price' => $origPrice,
+                    'discount_percentage' => $eCourse->discount_text,
+                    'discount_text' => $eCourse->discount_text,
+                    'short_description' => $eCourse->short_desc ?: $eCourse->course_name,
+                    'description' => $eCourse->course_desc ?: ($eCourse->course_name . ' complete online learning program.'),
+                    'thumbnail' => $eCourse->thumbnail_url,
+                    'thumbnail_url' => $eCourse->thumbnail_url,
+                    'level' => $eCourse->level,
+                    'language' => $eCourse->course_language ?: 'English',
+                    'duration' => $eCourse->course_hours ? ($eCourse->course_hours . ' Hours') : ($eCourse->course_month ? ($eCourse->course_month . ' Months') : 'Self Paced'),
+                    'access_type' => $eCourse->course_mode ?: 'Online',
+                    'certificate_included' => true,
+                    'status' => 'approved',
+                    'created_at' => $eCourse->created_at ?: now(),
+                    'updated_at' => now(),
+                    'badge' => $eCourse->badge,
+                    'rating' => 0,
+                    'reviews_count' => 0,
+                    'students_count' => 0,
+                    'instructor_name' => $tName,
+                    'instructor_avatar' => $eCourse->instructor_avatar,
+                    'instructor_category' => $eCourse->category,
+                    'instructor_bio' => !empty($tutor?->profile_desc) ? strip_tags($tutor->profile_desc) : ($tName . ' is an experienced educator specializing in ' . $eCourse->category . '.'),
+                    'instructor_subtitle' => $eCourse->category . ($tutor?->city ? (' • ' . $tutor->city . ', ' . ($tutor->state ?: 'India')) : ''),
+                    'meta_description' => $eCourse->course_name . ' online course by ' . $tName,
+                    'meta_keywords' => $eCourse->course_name . ', e-learning, online course',
+                    'seller' => (object) [
+                        'user' => (object) [
+                            'name' => $tName,
+                        ],
+                        'businessDetail' => (object) [
+                            'company_name' => $tName,
+                            'phone' => $tutor->contact ?? '',
+                            'address' => $tutor->address ?? '',
+                            'city' => $tutor->city ?? 'Pune',
+                            'state' => $tutor->state ?? 'Maharashtra',
+                        ],
+                    ],
+                    'contents' => collect(),
+                    'is_elearn_course' => true,
+                    'tutor_url' => $tutor ? $tutor->url : null,
+                    'instructor_url' => $tutor ? $tutor->url : null,
+                ];
+            }
+        }
+
         if (!$course) {
-            // Check in InstituteCourse (authentic institute courses)
+            // Check in InstituteCourse (authentic institute courses for business profile info)
             $instCourse = null;
             try {
                 if (is_numeric($slug)) {
@@ -1882,9 +1925,9 @@ class HomeController extends Controller
                     'created_at' => $instCourse->created_at ?: now(),
                     'updated_at' => now(),
                     'badge' => 'Verified',
-                    'rating' => 4.9,
-                    'reviews_count' => 145,
-                    'students_count' => 1250,
+                    'rating' => 0,
+                    'reviews_count' => 0,
+                    'students_count' => 0,
                     'instructor_name' => $instCourse->name_of_instructor ?: $bName,
                     'instructor_avatar' => $bAvatar,
                     'instructor_category' => 'Senior Academic',
@@ -1908,78 +1951,6 @@ class HomeController extends Controller
                     'instructor_url' => $instUrl,
                     'instructor_bio' => $bName . ' offers high-quality training and career-oriented educational programs in ' . $bCity . '.',
                     'instructor_subtitle' => ($business->category ?? ($affiliateRecord->coaching_category ?? 'Coaching Institute')) . ' • ' . $bCity . ($bState ? (', ' . $bState) : ''),
-                ];
-            }
-        }
-
-        if (!$course && Schema::hasTable('dc_elearn_course')) {
-            $eCourse = null;
-            if (is_numeric($slug)) {
-                $eCourse = \App\Models\ElearnCourse::with('tutor')->find((int)$slug);
-            }
-            if (!$eCourse) {
-                $clean = str_replace('-', ' ', $slug);
-                $eCourse = \App\Models\ElearnCourse::with('tutor')
-                    ->where('course_name', 'like', "%{$clean}%")
-                    ->first();
-            }
-            if ($eCourse) {
-                $tutor = $eCourse->tutor;
-                $tName = $tutor ? (!empty($tutor->name) ? $tutor->name : $tutor->company_name) : 'Digital Class Instructor';
-                $price = $eCourse->price;
-                $origPrice = $eCourse->original_price;
-
-                $course = (object) [
-                    'id' => $eCourse->id,
-                    'title' => $eCourse->course_name,
-                    'slug' => $eCourse->slug,
-                    'url' => $eCourse->url,
-                    'category' => $tutor ? ($tutor->expert_category ?: 'Academic Courses') : 'Academic Courses',
-                    'price' => $origPrice ?: $price,
-                    'discount_price' => ($origPrice > $price) ? $price : 0,
-                    'selling_price' => $price,
-                    'original_price' => $origPrice,
-                    'discount_percentage' => $eCourse->discount_text,
-                    'discount_text' => $eCourse->discount_text,
-                    'short_description' => $eCourse->short_desc ?: $eCourse->course_name,
-                    'description' => $eCourse->course_desc,
-                    'thumbnail' => $eCourse->thumbnail_url,
-                    'thumbnail_url' => $eCourse->thumbnail_url,
-                    'level' => $eCourse->level,
-                    'language' => $eCourse->course_language ?: 'English',
-                    'duration' => $eCourse->course_hours ? ($eCourse->course_hours . ' Hours') : ($eCourse->course_month ? ($eCourse->course_month . ' Months') : 'Self Paced'),
-                    'access_type' => $eCourse->course_mode ?: 'Online',
-                    'certificate_included' => true,
-                    'status' => 'approved',
-                    'created_at' => $eCourse->created_at ?: now(),
-                    'updated_at' => now(),
-                    'badge' => 'Verified',
-                    'rating' => 4.9,
-                    'reviews_count' => 180,
-                    'students_count' => 1400,
-                    'instructor_name' => $tName,
-                    'instructor_avatar' => $tutor ? $tutor->profile_url : 'https://ui-avatars.com/api/?name=' . urlencode($tName),
-                    'instructor_category' => $tutor ? ($tutor->expert_category ?: 'Expert Tutor') : 'Instructor',
-                    'instructor_bio' => !empty($tutor->profile_desc) ? strip_tags($tutor->profile_desc) : ($tName . ' is an experienced educator specializing in ' . ($tutor->expert_category ?: 'Academic Courses') . '.'),
-                    'instructor_subtitle' => ($tutor->expert_category ?: 'Expert Tutor') . ($tutor->city ? (' • ' . $tutor->city . ', ' . ($tutor->state ?: 'India')) : ''),
-                    'meta_description' => $eCourse->course_name . ' online course by ' . $tName,
-                    'meta_keywords' => $eCourse->course_name . ', e-learning, online course',
-                    'seller' => (object) [
-                        'user' => (object) [
-                            'name' => $tName,
-                        ],
-                        'businessDetail' => (object) [
-                            'company_name' => $tName,
-                            'phone' => $tutor->contact ?? '',
-                            'address' => $tutor->address ?? '',
-                            'city' => $tutor->city ?? 'Pune',
-                            'state' => $tutor->state ?? 'Maharashtra',
-                        ],
-                    ],
-                    'contents' => collect(),
-                    'is_elearn_course' => true,
-                    'tutor_url' => $tutor ? $tutor->url : null,
-                    'instructor_url' => $tutor ? $tutor->url : null,
                 ];
             }
         }

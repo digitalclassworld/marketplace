@@ -590,7 +590,7 @@
         box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
     .btn-add-to-cart-green {
-        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
         color: #ffffff;
         border: none;
         border-radius: 10px;
@@ -606,13 +606,13 @@
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         text-decoration: none;
         cursor: pointer;
-        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.32);
+        box-shadow: 0 4px 14px rgba(109, 40, 217, 0.28);
     }
     .btn-add-to-cart-green:hover {
-        background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
+        background: linear-gradient(135deg, #5b21b6 0%, #6d28d9 100%);
         color: #ffffff;
         transform: translateY(-2px);
-        box-shadow: 0 8px 22px rgba(0, 102, 255, 0.45);
+        box-shadow: 0 8px 22px rgba(109, 40, 217, 0.42);
     }
     .course-body {
         padding: 1rem;
@@ -1182,7 +1182,7 @@
                             <i class="fa-solid fa-graduation-cap"></i>
                         </div>
                         <div>
-                            <div class="stat-pill-num">{{ number_format($totalCourses > 0 ? $totalCourses : 10000) }}+</div>
+                            <div class="stat-pill-num">{{ number_format($totalCourses > 0 ? $totalCourses : 1084) }}+</div>
                             <div class="stat-pill-label">Courses</div>
                         </div>
                     </a>
@@ -1440,7 +1440,7 @@
                                     @endif
                                 </div>
 
-                                <form action="{{ route('cart.add') }}" method="POST">
+                                <form action="{{ route('cart.add') }}" method="POST" onsubmit="event.preventDefault(); addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}', seller_id: {{ $course->seller_id ?? 1 }} });">
                                     @csrf
                                     <input type="hidden" name="type" value="course">
                                     <input type="hidden" name="id" value="{{ $course->id }}">
@@ -1448,7 +1448,7 @@
                                     <input type="hidden" name="price" value="{{ $sellPrice }}">
                                     <input type="hidden" name="image" value="{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}">
                                     <button type="submit" class="btn-add-to-cart-green">
-                                        Add To Cart
+                                        <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
                                     </button>
                                 </form>
                             </div>
@@ -1749,7 +1749,7 @@
                 <div class="ribbon-label">Monthly Visitors</div>
             </div>
             <div class="ribbon-item">
-                <div class="ribbon-num"><i class="fa-solid fa-graduation-cap"></i> {{ number_format($totalCourses > 0 ? $totalCourses : 10000) }}+</div>
+                <div class="ribbon-num"><i class="fa-solid fa-graduation-cap"></i> {{ number_format($totalCourses > 0 ? $totalCourses : 1084) }}+</div>
                 <div class="ribbon-label">Online Courses</div>
             </div>
             <div class="ribbon-item">

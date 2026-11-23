@@ -41,11 +41,10 @@ class CoursesDirectoryTest extends TestCase
         $response = $this->get('/courses');
 
         $response->assertStatus(200);
-        $response->assertSee('All Courses');
+        $response->assertSee('Courses for you');
         $response->assertSee('Digital Marketing Complete Course 2026');
-        $response->assertSee('Computer &amp; IT', false);
-        $response->assertSee('Learning Mode');
-        $response->assertSee('Price Range');
+        $response->assertSee('Pricing');
+        $response->assertSee('Certification');
     }
 
     public function test_courses_search_filtering(): void
