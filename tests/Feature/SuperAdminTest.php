@@ -190,7 +190,7 @@ class SuperAdminTest extends TestCase
         $response->assertSee('Welcome Back,');
         $response->assertSee('Total Sellers');
         $response->assertSee('Total Users');
-        $response->assertSee('Total Orders');
+        $response->assertSee('Business Listings');
         $response->assertSee('Total Revenue');
     }
 

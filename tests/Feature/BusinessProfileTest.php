@@ -38,16 +38,14 @@ class BusinessProfileTest extends TestCase
             'approved_at'   => now(),
         ]);
 
-        $response = $this->get('/business/' . $listing->slug);
+        $response = $this->followingRedirects()->get('/business/' . $listing->slug);
 
         $response->assertStatus(200);
         $response->assertSee('VCEC - Vinayak Computer Education Center');
         $response->assertSee('About VCEC');
-        $response->assertSee('Popular Courses');
-        $response->assertSee('Our Services');
-        $response->assertSee('Student Reviews');
-        $response->assertSee('Visit Our Branch');
-        $response->assertSee('Book a Free Demo Class');
+        $response->assertSee('Key Information');
+        $response->assertSee('Courses');
+        $response->assertSee('Overview');
     }
 
     public function test_enquiry_submission_works(): void

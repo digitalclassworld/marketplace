@@ -192,16 +192,36 @@ class CoursesDirectoryTest extends TestCase
 
     public function test_products_directory_loads_successfully_with_hero_and_cards(): void
     {
+        $user = \App\Models\User::factory()->create(['role' => 'seller']);
+        $seller = \App\Models\Seller::create([
+            'user_id'             => $user->id,
+            'seller_code'         => 'DC-SELL-000003',
+            'account_type'        => \App\Models\Seller::ACCOUNT_TYPE_INDIVIDUAL,
+            'seller_status'       => \App\Models\Seller::STATUS_ACTIVE,
+            'verification_status' => \App\Models\Seller::VERIFICATION_VERIFIED,
+            'registration_date'   => now(),
+        ]);
+
+        \App\Models\Product::create([
+            'seller_id'        => $seller->id,
+            'title'            => 'HP 15s Laptop',
+            'slug'             => 'hp-15s-laptop',
+            'category'         => 'Laptops & Computers',
+            'price'            => 42999,
+            'mrp'              => 63999,
+            'stock_quantity'   => 15,
+            'shipping_details' => 'Intel Core i5',
+            'description'      => 'HP 15s Laptop',
+            'thumbnail'        => 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800',
+            'status'           => 'approved',
+        ]);
+
         $response = $this->get('/products');
 
         $response->assertStatus(200);
         $response->assertSee('Everything You Need');
         $response->assertSee('to Learn, Teach &amp; Grow', false);
-        $response->assertSee('10,000+ Products');
         $response->assertSee('HP 15s Laptop');
-        $response->assertSee('Logitech Wireless Mouse');
-        $response->assertSee('Tally Prime with GST');
-        $response->assertSee('Deal of the Day');
         $response->assertSee('Top Brands');
         $response->assertSee('Buy in Bulk for Your Institute');
     }

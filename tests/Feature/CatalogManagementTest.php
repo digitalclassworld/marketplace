@@ -56,19 +56,19 @@ class CatalogManagementTest extends TestCase
         [$user, $seller] = $this->createApprovedSeller();
 
         $courseRes = $this->actingAs($user)->get(route('seller.courses.create'))->assertStatus(200);
-        $courseRes->assertSee('step-content-6');
-        $courseRes->assertSee('step-content-8');
-        $courseRes->assertSee('Course Price');
+        $courseRes->assertSee('step-pane-1');
+        $courseRes->assertSee('step-pane-4');
+        $courseRes->assertSee('Price (₹)');
 
         $serviceRes = $this->actingAs($user)->get(route('seller.services.create'))->assertStatus(200);
-        $serviceRes->assertSee('step-content-6');
-        $serviceRes->assertSee('step-content-8');
-        $serviceRes->assertSee('Service Price');
+        $serviceRes->assertSee('step-pane-1');
+        $serviceRes->assertSee('step-pane-4');
+        $serviceRes->assertSee('Package Price');
 
         $productRes = $this->actingAs($user)->get(route('seller.products.create'))->assertStatus(200);
-        $productRes->assertSee('step-content-6');
-        $productRes->assertSee('step-content-8');
-        $productRes->assertSee('Product Price');
+        $productRes->assertSee('step-pane-1');
+        $productRes->assertSee('step-pane-4');
+        $productRes->assertSee('Selling Price');
 
         $listingRes = $this->actingAs($user)->get(route('seller.listings.create'))->assertStatus(200);
         $listingRes->assertSee('step-content-7');

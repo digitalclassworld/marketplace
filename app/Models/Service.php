@@ -38,6 +38,8 @@ class Service extends Model
         'delivery_days' => 'integer',
         'price' => 'decimal:2',
         'gallery' => 'array',
+        'tags' => 'array',
+        'package_features' => 'array',
         'is_featured' => 'boolean',
         'approved_at' => 'datetime',
     ];

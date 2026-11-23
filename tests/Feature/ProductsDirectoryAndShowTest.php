@@ -12,6 +12,77 @@ class ProductsDirectoryAndShowTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $user = User::factory()->create(['role' => 'seller']);
+        $seller = Seller::create([
+            'user_id'             => $user->id,
+            'seller_code'         => \App\Services\SellerIdService::generateTempCode(),
+            'account_type'        => Seller::ACCOUNT_TYPE_INDIVIDUAL,
+            'seller_status'       => Seller::STATUS_ACTIVE,
+            'verification_status' => Seller::VERIFICATION_VERIFIED,
+            'registration_date'   => now(),
+        ]);
+
+        Product::create([
+            'seller_id'        => $seller->id,
+            'title'            => 'HP 15s Laptop',
+            'slug'             => 'hp-15s-laptop',
+            'category'         => 'Laptops & Computers',
+            'price'            => 42999,
+            'mrp'              => 63999,
+            'stock_quantity'   => 15,
+            'shipping_details' => 'Intel Core i5 13th Gen, 16GB RAM, 512GB SSD',
+            'description'      => 'HP 15s Laptop with Intel Core i5 13th Gen, 16GB RAM, 512GB SSD for students and pros.',
+            'thumbnail'        => 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80',
+            'status'           => 'approved',
+        ]);
+
+        Product::create([
+            'seller_id'        => $seller->id,
+            'title'            => 'Logitech Wireless Mouse',
+            'slug'             => 'logitech-wireless-mouse',
+            'category'         => 'Accessories & Peripherals',
+            'price'            => 499,
+            'mrp'              => 999,
+            'stock_quantity'   => 50,
+            'shipping_details' => '1000 DPI Optical, 24-Month Battery',
+            'description'      => 'Logitech Wireless Mouse with 1000 DPI Optical and 24-Month Battery life.',
+            'thumbnail'        => 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&auto=format&fit=crop&q=80',
+            'status'           => 'approved',
+        ]);
+
+        Product::create([
+            'seller_id'        => $seller->id,
+            'title'            => 'Canon PIXMA G3010',
+            'slug'             => 'canon-g3010-all-in-one-ink-tank-printer',
+            'category'         => 'Printers & Scanners',
+            'price'            => 12499,
+            'mrp'              => 15999,
+            'stock_quantity'   => 10,
+            'shipping_details' => 'Integrated Ink Tank, WiFi Direct',
+            'description'      => 'Canon PIXMA G3010 All-in-One Ink Tank Color Printer with Integrated Ink Tank.',
+            'thumbnail'        => 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=800&auto=format&fit=crop&q=80',
+            'status'           => 'approved',
+        ]);
+
+        Product::create([
+            'seller_id'        => $seller->id,
+            'title'            => 'Epson EB-E01 Classroom Projector',
+            'slug'             => 'classroom-projector',
+            'category'         => 'Audio & Visual',
+            'price'            => 39999,
+            'mrp'              => 45999,
+            'stock_quantity'   => 8,
+            'shipping_details' => '3,600 ANSI Lumens, XGA resolution',
+            'description'      => 'Epson EB-E01 Classroom Projector with 3,600 ANSI Lumens for classrooms.',
+            'thumbnail'        => 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800&auto=format&fit=crop&q=80',
+            'status'           => 'approved',
+        ]);
+    }
+
     public function test_products_directory_page_loads_with_products(): void
     {
         $response = $this->get('/products');
@@ -71,7 +142,7 @@ class ProductsDirectoryAndShowTest extends TestCase
         $user = User::factory()->create(['role' => 'seller']);
         $seller = new Seller([
             'user_id'             => $user->id,
-            'seller_code'         => 'DC-SELL-000002',
+            'seller_code'         => \App\Services\SellerIdService::generateTempCode(),
             'account_type'        => Seller::ACCOUNT_TYPE_INDIVIDUAL,
             'seller_status'       => Seller::STATUS_ACTIVE,
             'verification_status' => Seller::VERIFICATION_VERIFIED,

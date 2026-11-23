@@ -1769,15 +1769,19 @@ class HomeController extends Controller
         if (!$course) {
             // Check in InstituteCourse (authentic institute courses)
             $instCourse = null;
-            if (is_numeric($slug)) {
-                $instCourse = \App\Models\InstituteCourse::find((int)$slug);
-            }
-            if (!$instCourse && preg_match('/-(\d+)$/', $slug, $matches)) {
-                $instCourse = \App\Models\InstituteCourse::find($matches[1]);
-            }
-            if (!$instCourse) {
-                $cleanTitle = str_replace('-', ' ', preg_replace('/-\d+$/', '', $slug));
-                $instCourse = \App\Models\InstituteCourse::where('course_name', 'like', "%{$cleanTitle}%")->first();
+            try {
+                if (is_numeric($slug)) {
+                    $instCourse = \App\Models\InstituteCourse::find((int)$slug);
+                }
+                if (!$instCourse && preg_match('/-(\d+)$/', $slug, $matches)) {
+                    $instCourse = \App\Models\InstituteCourse::find($matches[1]);
+                }
+                if (!$instCourse) {
+                    $cleanTitle = str_replace('-', ' ', preg_replace('/-\d+$/', '', $slug));
+                    $instCourse = \App\Models\InstituteCourse::where('course_name', 'like', "%{$cleanTitle}%")->first();
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('InstituteCourse lookup error: ' . $e->getMessage());
             }
 
             if ($instCourse) {

@@ -750,23 +750,25 @@
                         </div>
                     </div>
 
+                    @if(!empty($live_example))
                     <!-- Live Website Example -->
                     <div class="live-example-card" id="tabPortfolio">
                         <div class="live-example-header">
                             <div>
                                 <h6 class="fw-bold mb-0 text-dark">Live Website Example</h6>
-                                <small class="text-muted">{{ $live_example['title'] }}</small>
+                                <small class="text-muted">{{ $live_example['title'] ?? '' }}</small>
                             </div>
-                            <a href="{{ $live_example['live_url'] }}" target="_blank" class="btn btn-outline-primary btn-sm px-3 fw-bold">
+                            <a href="{{ $live_example['live_url'] ?? '#' }}" target="_blank" class="btn btn-outline-primary btn-sm px-3 fw-bold">
                                 View Live <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i>
                             </a>
                         </div>
-                        <img src="{{ $live_example['image'] }}" alt="{{ $live_example['title'] }}" class="live-example-img">
+                        <img src="{{ $live_example['image'] ?? '' }}" alt="{{ $live_example['title'] ?? '' }}" class="live-example-img">
                         <div class="p-3 bg-light d-flex justify-content-between align-items-center">
-                            <span class="small text-secondary">{{ $live_example['tagline'] }}</span>
+                            <span class="small text-secondary">{{ $live_example['tagline'] ?? '' }}</span>
                             <span class="badge bg-primary-subtle text-primary">+8 More Examples</span>
                         </div>
                     </div>
+                    @endif
 
                     <!-- About the Seller -->
                     <div class="about-seller-card">
