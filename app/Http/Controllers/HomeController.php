@@ -45,22 +45,35 @@ class HomeController extends Controller
         $totalBusinesses = 0;
 
         try {
-            // 1. COURSES: Show most recently added courses first (combining seller courses and elearn catalog)
+            // 1. COURSES: Show authentic online e-learning courses
+            // Exclude courses that come from business listings / offline institutes (they only belong on the business listing page)
             if (Schema::hasTable('courses') || Schema::hasTable('dc_elearn_course')) {
                 $totalCourses = 0;
+
+                // Sellers that have business listings (offline institutes/businesses)
+                $businessListingSellerIds = [];
+                if (Schema::hasTable('business_listings')) {
+                    $businessListingSellerIds = BusinessListing::whereNotNull('seller_id')->pluck('seller_id')->toArray();
+                }
+
                 $sellerCourses = collect();
                 if (Schema::hasTable('courses')) {
-                    $totalCourses += Course::whereIn('status', ['approved', 'active', 'published'])->count();
-                    $sellerCourses = Course::with(['seller.businessDetail', 'seller.user'])
-                        ->whereIn('status', ['approved', 'active', 'published'])
-                        ->latest('id')
+                    $sellerQuery = Course::with(['seller.businessDetail', 'seller.user'])
+                        ->whereIn('status', ['approved', 'active', 'published']);
+
+                    // Exclude courses that come from business listings
+                    if (!empty($businessListingSellerIds)) {
+                        $sellerQuery->whereNotIn('seller_id', $businessListingSellerIds);
+                    }
+
+                    $sellerCourses = $sellerQuery->latest('id')
                         ->take(8)
                         ->get();
                 }
 
                 $elearnCourses = collect();
                 if (Schema::hasTable('dc_elearn_course')) {
-                    $totalCourses += \App\Models\ElearnCourse::whereIn('status', ['active', 'approved', 'published', '1'])->count();
+                    $totalCourses = \App\Models\ElearnCourse::whereIn('status', ['active', 'approved', 'published', '1'])->count();
                     $elearnCourses = \App\Models\ElearnCourse::with('tutor')
                         ->whereIn('status', ['active', 'approved', 'published', '1'])
                         ->where('course_name', '!=', '')
@@ -68,7 +81,17 @@ class HomeController extends Controller
                         ->where('course_name', 'not like', 'hkjh%')
                         ->where('course_name', 'not like', 'test%')
                         ->where('course_name', '!=', 'english speaking')
-                        ->latest('id')
+                        ->orderByRaw("CASE 
+                            WHEN id = 1777 THEN 1 
+                            WHEN id = 1345 THEN 2 
+                            WHEN id = 1736 THEN 3 
+                            WHEN id = 1148 THEN 4 
+                            WHEN id = 876 THEN 5 
+                            WHEN id = 858 THEN 6 
+                            WHEN id = 860 THEN 7 
+                            WHEN id = 834 THEN 8 
+                            ELSE 9 
+                        END ASC, id DESC")
                         ->take(8)
                         ->get();
                 }

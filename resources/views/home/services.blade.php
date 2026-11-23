@@ -1499,10 +1499,12 @@
                                 <span class="badge-seller-level {{ $svc->provider_badge_class ?? 'badge-orange' }}">
                                     {{ $svc->provider_badge }}
                                 </span>
-                                <span class="provider-inline-rating">
-                                    <i class="fa-solid fa-star"></i> {{ number_format($svc->rating, 1) }}
-                                    <span class="text-muted fw-normal">({{ $svc->reviews_count }})</span>
-                                </span>
+                                @if($svc->rating > 0 && (int)$svc->reviews_count > 0)
+                                    <span class="provider-inline-rating">
+                                        <i class="fa-solid fa-star"></i> {{ number_format($svc->rating, 1) }}
+                                        <span class="text-muted fw-normal">({{ $svc->reviews_count }})</span>
+                                    </span>
+                                @endif
                                 <span class="provider-inline-meta">
                                     <i class="fa-solid fa-location-dot text-danger"></i> {{ $svc->provider_city }}
                                 </span>

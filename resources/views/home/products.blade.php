@@ -857,8 +857,8 @@
                             $price = is_array($p) ? $p['price'] : $p->price;
                             $mrp = is_array($p) ? $p['mrp'] : $p->mrp;
                             $discount = is_array($p) ? $p['discount'] : ($p->discount_percentage . '% OFF');
-                            $rating = is_array($p) ? $p['rating'] : 4.6;
-                            $reviewsCount = is_array($p) ? $p['reviews_count'] : '1.2K';
+                            $rating = is_array($p) ? ($p['rating'] ?? null) : ($p->rating ?? null);
+                            $reviewsCount = is_array($p) ? ($p['reviews_count'] ?? null) : ($p->reviews_count ?? null);
                             $sellerName = is_array($p) ? $p['seller_name'] : $p->seller_name;
                             $thumb = is_array($p) ? $p['thumbnail'] : $p->display_thumbnail;
                             $slug = is_array($p) ? \Illuminate\Support\Str::slug($p['title']) : ($p->slug ?: \Illuminate\Support\Str::slug($p->title));
@@ -892,11 +892,13 @@
                                     <div class="product-card-specs">&nbsp;</div>
                                 @endif
 
-                                <!-- Rating -->
-                                <div class="product-rating-row">
-                                    <span class="text-warning">★ {{ $rating }}</span>
-                                    <span class="text-muted">({{ $reviewsCount }})</span>
-                                </div>
+                                @if(!empty($rating) && (float)$rating > 0 && !empty($reviewsCount) && (int)$reviewsCount > 0)
+                                    <!-- Rating -->
+                                    <div class="product-rating-row">
+                                        <span class="text-warning">★ {{ $rating }}</span>
+                                        <span class="text-muted">({{ $reviewsCount }})</span>
+                                    </div>
+                                @endif
 
                                 <!-- Price -->
                                 <div class="product-price-row">

@@ -1223,14 +1223,14 @@
             <div class="col-lg-5 col-xl-5 d-none d-lg-block">
                 <div class="hero-thematic-showcase">
                     
-                    <!-- Floating Badge: Top-Left (Rating & Learners) -->
+                    <!-- Floating Badge: Top-Left (Verified Learners & Educators) -->
                     <div class="hero-floating-badge hero-badge-top-left">
-                        <div class="hero-badge-icon-wrap bg-warning bg-opacity-15 text-warning">
-                            <i class="fa-solid fa-star"></i>
+                        <div class="hero-badge-icon-wrap bg-primary bg-opacity-15 text-primary">
+                            <i class="fa-solid fa-graduation-cap"></i>
                         </div>
                         <div>
-                            <div class="fw-bold text-dark small" style="font-size: 0.82rem; line-height: 1.2;">4.9 / 5.0 Rating</div>
-                            <div class="text-muted" style="font-size: 0.68rem;">150,000+ Learners</div>
+                            <div class="fw-bold text-dark small" style="font-size: 0.82rem; line-height: 1.2;">100% Verified</div>
+                            <div class="text-muted" style="font-size: 0.68rem;">Educators &amp; Businesses</div>
                         </div>
                     </div>
 
@@ -1502,9 +1502,11 @@
                                     <div class="service-body">
                                         <div class="service-title" title="{{ $service->title }}">{{ $service->title }}</div>
                                         <div class="d-flex align-items-center gap-2 small text-muted mb-2">
-                                            <i class="fa-solid fa-star text-warning"></i>
-                                            <span class="fw-bold text-dark">4.8</span>
-                                            <span>&bull; {{ $service->seller?->businessDetail?->business_name ?? 'Certified Agency' }}</span>
+                                            @if(isset($service->rating) && (float)$service->rating > 0 && (int)($service->reviews_count ?? 0) > 0)
+                                                <i class="fa-solid fa-star text-warning"></i>
+                                                <span class="fw-bold text-dark">{{ number_format($service->rating, 1) }}</span>
+                                            @endif
+                                            <span class="text-truncate">&bull; {{ $service->seller?->businessDetail?->business_name ?? 'Certified Agency' }}</span>
                                         </div>
                                         <div class="service-price-tag">
                                             Starting at ₹{{ number_format($service->price, 0) }}
@@ -1552,8 +1554,10 @@
                                     <div class="product-body">
                                         <div class="product-title" title="{{ $product->title }}">{{ $product->title }}</div>
                                         <div class="d-flex align-items-center gap-2 small text-muted mb-2">
-                                            <i class="fa-solid fa-star text-warning"></i>
-                                            <span class="fw-bold text-dark">4.8</span>
+                                            @if(isset($product->rating) && (float)$product->rating > 0 && (int)($product->reviews_count ?? 0) > 0)
+                                                <i class="fa-solid fa-star text-warning"></i>
+                                                <span class="fw-bold text-dark">{{ number_format($product->rating, 1) }}</span>
+                                            @endif
                                             <span class="text-truncate">&bull; {{ $product->seller?->businessDetail?->business_name ?? 'Verified Merchant' }}</span>
                                         </div>
                                         <div class="product-price-row">
@@ -1623,9 +1627,13 @@
                                             {{ $b->city ?: 'India' }}{{ $b->state ? ', ' . $b->state : '' }}
                                         </div>
                                         <div class="d-flex align-items-center gap-1 small text-muted mt-auto pt-2 border-top">
-                                            <i class="fa-solid fa-star text-warning"></i>
-                                            <span class="fw-bold text-dark">{{ number_format($b->rating ?: 4.9, 1) }}</span>
-                                            <span>({{ $b->reviews_count ?: '120+' }})</span>
+                                            @if($b->rating > 0 && (int)$b->reviews_count > 0)
+                                                <i class="fa-solid fa-star text-warning"></i>
+                                                <span class="fw-bold text-dark">{{ number_format($b->rating, 1) }}</span>
+                                                <span>({{ $b->reviews_count }})</span>
+                                            @else
+                                                <span class="text-muted text-truncate" style="font-size: 0.72rem;">{{ $b->category ?? 'Verified Business' }}</span>
+                                            @endif
                                             @if($b->badge === 'Featured')
                                                 <span class="badge rounded-pill ms-auto" style="background: #fef3c7; color: #b45309; font-size: 0.65rem;"><i class="fa-solid fa-crown me-0.5"></i>Featured</span>
                                             @elseif($b->badge === 'Premium')
