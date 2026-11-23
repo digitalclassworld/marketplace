@@ -7,6 +7,7 @@ use App\Models\BusinessListing;
 use App\Models\Course;
 use App\Models\Product;
 use App\Models\Service;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -515,7 +516,7 @@ class AdminCatalogController extends Controller
         ]);
     }
 
-    public function approveCourse(int $id): RedirectResponse
+    public function approveCourse(int $id): RedirectResponse|JsonResponse
     {
         $course = Course::find($id);
         if ($course) {
@@ -530,10 +531,14 @@ class AdminCatalogController extends Controller
             $title = 'Digital Marketing Mastery';
         }
 
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'message' => "Course '{$title}' approved successfully!"]);
+        }
+
         return back()->with('success', "Course '{$title}' approved successfully and published to marketplace!");
     }
 
-    public function rejectCourse(Request $request, int $id): RedirectResponse
+    public function rejectCourse(Request $request, int $id): RedirectResponse|JsonResponse
     {
         $course = Course::find($id);
         $reason = $request->input('reason', 'Does not meet marketplace quality guidelines.');
@@ -546,6 +551,10 @@ class AdminCatalogController extends Controller
             $title = $course->title;
         } else {
             $title = 'AI Tools for Business';
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Course '{$title}' marked as rejected."]);
         }
 
         return back()->with('success', "Course '{$title}' has been marked as rejected.");
@@ -1059,7 +1068,7 @@ class AdminCatalogController extends Controller
         ]);
     }
 
-    public function approveService(int $id): RedirectResponse
+    public function approveService(int $id): RedirectResponse|JsonResponse
     {
         $service = Service::find($id);
         if ($service) {
@@ -1074,10 +1083,14 @@ class AdminCatalogController extends Controller
             $title = 'Website Development';
         }
 
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'message' => "Service '{$title}' approved successfully!"]);
+        }
+
         return back()->with('success', "Service gig '{$title}' approved successfully and published to marketplace!");
     }
 
-    public function rejectService(Request $request, int $id): RedirectResponse
+    public function rejectService(Request $request, int $id): RedirectResponse|JsonResponse
     {
         $reason = $request->input('reason', 'Service terms do not comply with platform standards.');
         $service = Service::find($id);
@@ -1089,6 +1102,10 @@ class AdminCatalogController extends Controller
             $title = $service->title;
         } else {
             $title = 'AI Chatbot Integration';
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Service '{$title}' marked as rejected."]);
         }
 
         return back()->with('success', "Service gig '{$title}' has been marked as rejected.");
@@ -1611,7 +1628,7 @@ class AdminCatalogController extends Controller
         ]);
     }
 
-    public function approveProduct(int $id): RedirectResponse
+    public function approveProduct(int $id): RedirectResponse|JsonResponse
     {
         $product = Product::find($id);
         if ($product) {
@@ -1626,10 +1643,14 @@ class AdminCatalogController extends Controller
             $title = 'HP Laptop 15s';
         }
 
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'message' => "Product '{$title}' approved successfully!"]);
+        }
+
         return back()->with('success', "Product '{$title}' approved successfully and published to marketplace!");
     }
 
-    public function rejectProduct(Request $request, int $id): RedirectResponse
+    public function rejectProduct(Request $request, int $id): RedirectResponse|JsonResponse
     {
         $reason = $request->input('reason', 'Product information is incomplete or rejected.');
         $product = Product::find($id);
@@ -1641,6 +1662,10 @@ class AdminCatalogController extends Controller
             $title = $product->title;
         } else {
             $title = 'Canon DSLR Camera';
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Product '{$title}' marked as rejected."]);
         }
 
         return back()->with('success', "Product '{$title}' has been rejected.");
@@ -1822,7 +1847,7 @@ class AdminCatalogController extends Controller
         ]);
     }
 
-    public function approveListing(int $id): RedirectResponse
+    public function approveListing(int $id): RedirectResponse|JsonResponse
     {
         $listing = BusinessListing::find($id);
         if ($listing) {
@@ -1837,10 +1862,14 @@ class AdminCatalogController extends Controller
             $title = 'VCEC - Vinayak Computer';
         }
 
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'message' => "Business listing '{$title}' approved successfully!"]);
+        }
+
         return back()->with('success', "Business listing '{$title}' approved and published!");
     }
 
-    public function rejectListing(Request $request, int $id): RedirectResponse
+    public function rejectListing(Request $request, int $id): RedirectResponse|JsonResponse
     {
         $reason = $request->input('reason', 'Business details could not be verified.');
         $listing = BusinessListing::find($id);
@@ -1852,6 +1881,10 @@ class AdminCatalogController extends Controller
             $title = $listing->business_name;
         } else {
             $title = 'Green Leaf Nursery';
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => "Business listing '{$title}' marked as rejected."]);
         }
 
         return back()->with('success', "Business listing '{$title}' has been rejected.");

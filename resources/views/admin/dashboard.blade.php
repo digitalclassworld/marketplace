@@ -900,7 +900,7 @@
     <!-- =========================================================================
          PENDING APPROVALS CENTRAL MODAL
          ========================================================================= -->
-    <div class="modal fade" id="pendingRequestsModal" tabindex="-1" aria-labelledby="pendingRequestsModalLabel" aria-hidden="true">
+    <div class="modal fade" id="pendingRequestsModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="pendingRequestsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header border-bottom py-3 px-4" style="background: #f8fafc;">
@@ -918,6 +918,8 @@
                 </div>
 
                 <div class="modal-body p-4">
+                    <div id="pendingModalFeedback" class="d-none"></div>
+
                     <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3" id="pendingTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active rounded-pill px-3 py-1.5 fw-bold" id="sellers-tab" data-bs-toggle="pill" data-bs-target="#tab-sellers" type="button" role="tab">
@@ -1482,6 +1484,156 @@ document.addEventListener('DOMContentLoaded', function() {
             applyUserFiltering();
         });
     });
+
+    // =========================================================================
+    // 4. PENDING APPROVALS CENTRAL: KEEP MODAL OPEN ON APPROVE/REJECT
+    //    The modal only closes when the admin explicitly clicks Close or X!
+    // =========================================================================
+    const pendingModalEl = document.getElementById('pendingRequestsModal');
+    if (pendingModalEl) {
+        pendingModalEl.addEventListener('submit', async function(e) {
+            const form = e.target.closest('form');
+            if (!form) return;
+
+            e.preventDefault();
+
+            const isApprove = form.action.includes('approve');
+            const submitBtn = form.querySelector('button[type="submit"]') || e.submitter;
+            const originalHtml = submitBtn ? submitBtn.innerHTML : '';
+            const row = form.closest('tr');
+            const tabPane = form.closest('.tab-pane');
+            const tabId = tabPane ? tabPane.id : null;
+
+            // Disable buttons in this row to prevent duplicate clicks
+            if (row) {
+                row.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            }
+            if (submitBtn) {
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            }
+
+            try {
+                const formData = new FormData(form);
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || formData.get('_token') || '';
+
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                if (response.ok) {
+                    let result = null;
+                    try {
+                        result = await response.json();
+                    } catch (parseErr) {
+                        result = { success: true };
+                    }
+
+                    // Visual badge in action column
+                    if (row) {
+                        const actionCol = row.querySelector('td:last-child');
+                        if (actionCol) {
+                            actionCol.innerHTML = isApprove
+                                ? '<span class="badge bg-success-subtle text-success py-1.5 px-2.5 rounded-pill fw-bold" style="font-size: 0.75rem;"><i class="fa-solid fa-check me-1"></i> Approved</span>'
+                                : '<span class="badge bg-danger-subtle text-danger py-1.5 px-2.5 rounded-pill fw-bold" style="font-size: 0.75rem;"><i class="fa-solid fa-xmark me-1"></i> Rejected</span>';
+                        }
+
+                        // Smoothly fade out and remove row
+                        row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                        setTimeout(() => {
+                            row.style.opacity = '0';
+                            row.style.transform = 'scale(0.96)';
+                            setTimeout(() => {
+                                row.remove();
+                                if (tabPane) {
+                                    const remainingRows = tabPane.querySelectorAll('tbody tr');
+                                    if (remainingRows.length === 0) {
+                                        const tableWrap = tabPane.querySelector('.table-responsive');
+                                        if (tableWrap) {
+                                            tableWrap.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-regular fa-circle-check fs-2 text-success mb-2 d-block"></i><strong>All pending items in this section reviewed!</strong></div>';
+                                        }
+                                    }
+                                }
+                            }, 350);
+                        }, 600);
+                    }
+
+                    // Decrement current Tab count (e.g. Sellers (393) -> Sellers (392))
+                    if (tabId) {
+                        const tabBtn = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                        if (tabBtn) {
+                            const countMatch = tabBtn.innerHTML.match(/\((\d+)\)/);
+                            if (countMatch) {
+                                const currentCount = parseInt(countMatch[1]);
+                                const newCount = Math.max(0, currentCount - 1);
+                                tabBtn.innerHTML = tabBtn.innerHTML.replace(/\(\d+\)/, `(${newCount})`);
+                            }
+                        }
+                    }
+
+                    // Decrement Modal Title Total Pending Badge (e.g. 840 Pending -> 839 Pending)
+                    const modalTotalBadge = pendingModalEl.querySelector('.modal-title .badge');
+                    if (modalTotalBadge) {
+                        const totalMatch = modalTotalBadge.textContent.match(/(\d+)/);
+                        if (totalMatch) {
+                            const newTotal = Math.max(0, parseInt(totalMatch[1]) - 1);
+                            modalTotalBadge.textContent = `${newTotal} Pending`;
+                        }
+                    }
+
+                    // Decrement Top Navbar Pending Requests Badge
+                    const navBadges = document.querySelectorAll('#navPendingApprovalsBadge, [title*="Pending Approvals"] .badge, [title*="Pending Requests"] .badge');
+                    navBadges.forEach(nb => {
+                        const val = parseInt(nb.textContent.trim());
+                        if (!isNaN(val)) {
+                            nb.textContent = Math.max(0, val - 1);
+                        }
+                    });
+
+                    // In-modal non-intrusive feedback alert
+                    const feedbackEl = document.getElementById('pendingModalFeedback');
+                    if (feedbackEl) {
+                        feedbackEl.className = `alert alert-${isApprove ? 'success' : 'warning'} alert-dismissible fade show py-2 px-3 small mb-3 rounded-3 d-flex align-items-center justify-content-between`;
+                        feedbackEl.innerHTML = `
+                            <div>
+                                <i class="fa-solid fa-${isApprove ? 'circle-check text-success' : 'circle-exclamation text-warning'} me-2"></i>
+                                <span>${result && result.message ? result.message : (isApprove ? 'Item approved successfully!' : 'Item rejected.')}</span>
+                            </div>
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        feedbackEl.classList.remove('d-none');
+                        setTimeout(() => {
+                            if (feedbackEl) feedbackEl.classList.add('d-none');
+                        }, 4000);
+                    }
+
+                } else {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalHtml;
+                    }
+                    if (row) {
+                        row.querySelectorAll('button').forEach(btn => btn.disabled = false);
+                    }
+                    alert('Action could not be completed. Please try again.');
+                }
+            } catch (err) {
+                console.error('Pending action submission failed:', err);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHtml;
+                }
+                if (row) {
+                    row.querySelectorAll('button').forEach(btn => btn.disabled = false);
+                }
+            }
+        });
+    }
 
     if (window.location.hash === '#pendingRequestsModal') {
         const modalEl = document.getElementById('pendingRequestsModal');

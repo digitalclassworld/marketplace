@@ -678,7 +678,7 @@
                         <i class="fa-solid fa-clock-rotate-left text-warning"></i>
                         <span class="d-none d-lg-inline">Pending Requests</span>
                         @if($navPendingCount > 0)
-                            <span class="badge bg-danger text-white rounded-pill ms-1" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                            <span class="badge bg-danger text-white rounded-pill ms-1" id="navPendingApprovalsBadge" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
                                 {{ $navPendingCount }}
                             </span>
                         @endif
@@ -688,7 +688,7 @@
                         <i class="fa-solid fa-clock-rotate-left text-warning"></i>
                         <span class="d-none d-lg-inline">Pending Requests</span>
                         @if($navPendingCount > 0)
-                            <span class="badge bg-danger text-white rounded-pill ms-1" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                            <span class="badge bg-danger text-white rounded-pill ms-1" id="navPendingApprovalsBadge" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
                                 {{ $navPendingCount }}
                             </span>
                         @endif

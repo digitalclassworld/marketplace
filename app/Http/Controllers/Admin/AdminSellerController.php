@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Seller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -396,11 +397,14 @@ class AdminSellerController extends Controller
      * Approve a seller account.
      * Transitions seller_status to Active and records audit trail.
      */
-    public function approve(Request $request, $id): RedirectResponse
+    public function approve(Request $request, $id): RedirectResponse|JsonResponse
     {
         $seller = is_numeric($id) ? Seller::with('user')->find($id) : Seller::with('user')->where('seller_code', $id)->first();
 
         if (!$seller) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => true, 'message' => "Seller has been approved successfully!"]);
+            }
             return redirect()->back()->with('success', "Seller has been approved successfully! Selling and publishing permissions are now unlocked.");
         }
 
@@ -416,9 +420,19 @@ class AdminSellerController extends Controller
 
             DB::commit();
 
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Seller {$seller->seller_code} (" . ($seller->user?->name ?? 'Seller') . ") approved successfully!"
+                ]);
+            }
+
             return redirect()->back()->with('success', "Seller {$seller->seller_code} ({$seller->user->name}) has been approved successfully! Selling and publishing permissions are now unlocked.");
         } catch (\Exception $e) {
             DB::rollBack();
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Failed to approve seller: ' . $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', 'Failed to approve seller: ' . $e->getMessage());
         }
     }
@@ -426,11 +440,14 @@ class AdminSellerController extends Controller
     /**
      * Reject a seller application.
      */
-    public function reject(Request $request, $id): RedirectResponse
+    public function reject(Request $request, $id): RedirectResponse|JsonResponse
     {
         $seller = is_numeric($id) ? Seller::with('user')->find($id) : Seller::with('user')->where('seller_code', $id)->first();
 
         if (!$seller) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => true, 'message' => "Seller application has been rejected."]);
+            }
             return redirect()->back()->with('warning', "Seller application has been rejected. Selling access is restricted.");
         }
 
@@ -449,9 +466,19 @@ class AdminSellerController extends Controller
 
             DB::commit();
 
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Seller {$seller->seller_code} (" . ($seller->user?->name ?? 'Seller') . ") rejected."
+                ]);
+            }
+
             return redirect()->back()->with('warning', "Seller {$seller->seller_code} ({$seller->user->name}) has been rejected. Selling access is restricted.");
         } catch (\Exception $e) {
             DB::rollBack();
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Failed to reject seller: ' . $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', 'Failed to reject seller: ' . $e->getMessage());
         }
     }
