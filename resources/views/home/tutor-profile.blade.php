@@ -334,19 +334,7 @@
                         </div>
                     @endif
 
-                    @if(!empty($tutor->city))
-                        <div class="col-md-6">
-                            <div class="tutor-cred-item">
-                                <div class="tutor-cred-icon bg-danger bg-opacity-10 text-danger">
-                                    <i class="fa-solid fa-location-dot"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-semibold text-dark">Location:</span>
-                                    <span class="text-secondary ms-1">{{ $tutor->city }}{{ !empty($tutor->country) ? ', ' . $tutor->country : ', India' }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+
 
                     @if(!empty($tutor->website))
                         <div class="col-md-6">

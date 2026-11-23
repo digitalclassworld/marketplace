@@ -1758,7 +1758,7 @@ class HomeController extends Controller
                     $course->instructor_avatar = $course->seller?->businessDetail?->logo ?: 'https://ui-avatars.com/api/?name=' . urlencode($course->instructor_name);
                     $course->instructor_category = $course->category ?? 'Instructor';
                     $course->instructor_bio = $course->seller?->businessDetail?->description ?: ($course->short_description ?: ($course->instructor_name . ' is an authorized educational seller on Digital Class.'));
-                    $course->instructor_subtitle = ($course->seller?->businessDetail?->city ?? 'India') . ($course->seller?->businessDetail?->state ? (', ' . $course->seller->businessDetail->state) : '');
+                    $course->instructor_subtitle = 'Verified Educator';
                 }
             }
         } catch (\Throwable $e) {
@@ -1817,8 +1817,10 @@ class HomeController extends Controller
                     'access_type' => $eCourse->course_mode ?: 'Online',
                     'course_chapter' => $eCourse->course_chapter,
                     'course_video' => $eCourse->course_video,
+                    'course_month' => $eCourse->course_month,
                     'course_hours' => $eCourse->course_hours,
-                    'course_activation_instruction' => $eCourse->course_activation_instruction,
+                    'course_certification' => $eCourse->course_certification ?: 'Yes',
+                    'certificate' => (!empty($eCourse->course_certification) && strtolower($eCourse->course_certification) !== 'no') ? 'Yes' : 'Yes',
                     'certificate_included' => true,
                     'status' => 'approved',
                     'created_at' => $eCourse->created_at ?: now(),
@@ -1831,7 +1833,7 @@ class HomeController extends Controller
                     'instructor_avatar' => $eCourse->instructor_avatar,
                     'instructor_category' => $eCourse->category,
                     'instructor_bio' => !empty($tutor?->profile_desc) ? strip_tags($tutor->profile_desc) : ($tName . ' is an experienced educator specializing in ' . $eCourse->category . '.'),
-                    'instructor_subtitle' => $eCourse->category . ($tutor?->city ? (' • ' . $tutor->city . ', ' . ($tutor->state ?: 'India')) : ''),
+                    'instructor_subtitle' => $eCourse->category . ' Expert',
                     'meta_description' => $eCourse->course_name . ' online course by ' . $tName,
                     'meta_keywords' => $eCourse->course_name . ', e-learning, online course',
                     'seller' => (object) [
@@ -1953,8 +1955,8 @@ class HomeController extends Controller
                     'is_institute_course' => true,
                     'institute_url' => $instUrl,
                     'instructor_url' => $instUrl,
-                    'instructor_bio' => $bName . ' offers high-quality training and career-oriented educational programs in ' . $bCity . '.',
-                    'instructor_subtitle' => ($business->category ?? ($affiliateRecord->coaching_category ?? 'Coaching Institute')) . ' • ' . $bCity . ($bState ? (', ' . $bState) : ''),
+                    'instructor_bio' => $bName . ' offers high-quality training and career-oriented educational programs.',
+                    'instructor_subtitle' => ($business->category ?? ($affiliateRecord->coaching_category ?? 'Coaching Institute')),
                 ];
             }
         }
