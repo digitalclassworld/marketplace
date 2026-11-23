@@ -336,21 +336,7 @@
 
 
 
-                    @if(!empty($tutor->website))
-                        <div class="col-md-6">
-                            <div class="tutor-cred-item">
-                                <div class="tutor-cred-icon bg-info bg-opacity-10 text-info">
-                                    <i class="fa-solid fa-globe"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-semibold text-dark">Website:</span>
-                                    <a href="{{ str_starts_with($tutor->website, 'http') ? $tutor->website : 'https://' . $tutor->website }}" target="_blank" class="ms-1 text-decoration-none fw-semibold">
-                                        {{ $tutor->website }}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+
                 </div>
             </div>
         </div>
