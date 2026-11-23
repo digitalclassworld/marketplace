@@ -224,14 +224,26 @@
                          class="tutor-avatar-img mb-3"
                          onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($tutor->name) }}&background=008060&color=fff&size=250';">
                     
-                    <div class="d-flex align-items-center justify-content-center gap-1 text-warning mb-2">
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star"></i>
-                        <i class="fa-solid fa-star-half-stroke"></i>
-                        <span class="ms-1 fw-bold text-dark small">4.8 / 5.0</span>
-                    </div>
+                    @if(isset($tutorReviewsCount) && $tutorReviewsCount > 0)
+                        <div class="d-flex align-items-center justify-content-center gap-1 text-warning mb-2">
+                            @for($s = 1; $s <= 5; $s++)
+                                @if(($tutorRating ?? 0) >= $s)
+                                    <i class="fa-solid fa-star"></i>
+                                @elseif(($tutorRating ?? 0) >= ($s - 0.5))
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                @else
+                                    <i class="fa-regular fa-star text-muted"></i>
+                                @endif
+                            @endfor
+                            <span class="ms-1 fw-bold text-dark small">{{ number_format($tutorRating, 1) }} / 5.0</span>
+                            <span class="text-muted small">({{ $tutorReviewsCount }})</span>
+                        </div>
+                    @else
+                        <div class="d-flex align-items-center justify-content-center gap-1 text-muted mb-2">
+                            <i class="fa-regular fa-star text-muted"></i>
+                            <span class="ms-1 text-secondary small fw-medium">No ratings yet</span>
+                        </div>
+                    @endif
 
                     @if(!empty($tutor->contact))
                         <a href="tel:{{ $tutor->contact }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold mb-2">

@@ -488,10 +488,18 @@
                         <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.7rem;">Bestseller</span>
                     @endif
 
-                    <div class="d-flex align-items-center gap-1 text-warning small fw-bold">
-                        <i class="fa-solid fa-star"></i> {{ number_format($course->rating, 1) }}
-                        <span class="text-muted fw-normal">({{ $course->reviews_count }} reviews)</span>
-                    </div>
+                    @if(!empty($course->reviews_count) && $course->reviews_count > 0)
+                        <div class="d-flex align-items-center gap-1 text-warning small fw-bold">
+                            <i class="fa-solid fa-star"></i> {{ number_format($course->rating, 1) }}
+                            <span class="text-muted fw-normal">({{ $course->reviews_count }} reviews)</span>
+                        </div>
+                    @else
+                        <div class="d-flex align-items-center gap-1 text-muted small">
+                            <span class="badge bg-light text-muted border px-2 py-0.5" style="font-size: 0.72rem;">
+                                <i class="fa-regular fa-star me-1 text-muted"></i> No reviews yet
+                            </span>
+                        </div>
+                    @endif
                 </div>
 
                 <h1 class="fw-bold text-dark mb-2" style="font-size: 1.65rem; letter-spacing: -0.02em; line-height: 1.25;">
@@ -580,6 +588,37 @@
                     @endif
                 </div>
 
+                @php
+                    $overviewLearnPoints = !empty($topics) ? $topics : (!empty($learningPoints) ? $learningPoints : []);
+                @endphp
+                @if(!empty($overviewLearnPoints) && count($overviewLearnPoints) > 0)
+                    <!-- What You'll Learn Card (Authentic to DC Course Overview) -->
+                    <div class="section-card-white mb-3 p-3.5 rounded-3" style="background: #f8fdf9; border: 1px solid #bbf7d0;">
+                        <h3 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 1.15rem;">
+                            <i class="fa-solid fa-graduation-cap text-success"></i> What Will You Learn?
+                        </h3>
+                        @php $halfWl = ceil(count($overviewLearnPoints) / 2); @endphp
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                @foreach(array_slice($overviewLearnPoints, 0, $halfWl) as $pt)
+                                    <div class="d-flex align-items-start gap-2 mb-2">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                        <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $pt }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="col-md-6">
+                                @foreach(array_slice($overviewLearnPoints, $halfWl) as $pt)
+                                    <div class="d-flex align-items-start gap-2 mb-2">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                        <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $pt }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Course Highlights Grid -->
                 <div class="section-card-white mb-3 p-3">
                     <div class="row g-2">
@@ -641,32 +680,24 @@
                 </div>
             </div>
 
-            <!-- PANE 2: Topics Section -->
+            <!-- PANE 2: Topics Section (Vertical Numbered Sequence) -->
             <div id="tab-pane-topics" class="course-tab-pane">
                 <div id="topics" class="section-card-white mb-3">
-                    <h2 class="section-card-title mb-3" style="font-size: 1.35rem; font-weight: 700;">Topics</h2>
-                    
                     @php
                         $displayTopics = !empty($topics) ? $topics : $learningPoints;
-                        $halfLp = ceil(count($displayTopics) / 2);
                     @endphp
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            @foreach(array_slice($displayTopics, 0, $halfLp) as $t)
-                                <div class="learn-point-check d-flex align-items-start gap-2 mb-2.5">
-                                    <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
-                                    <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $t }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-                        <div class="col-md-6">
-                            @foreach(array_slice($displayTopics, $halfLp) as $t)
-                                <div class="learn-point-check d-flex align-items-start gap-2 mb-2.5">
-                                    <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
-                                    <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $t }}</span>
-                                </div>
-                            @endforeach
-                        </div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 class="section-card-title mb-0" style="font-size: 1.35rem; font-weight: 700;">Topics</h2>
+                        <span class="text-muted small" style="font-size: 0.78rem;">{{ count($displayTopics) }} Covered Topics</span>
+                    </div>
+
+                    <div class="topics-vertical-list d-flex flex-column gap-2">
+                        @foreach($displayTopics as $idx => $t)
+                            <div class="d-flex align-items-start gap-2.5 p-2.5 rounded-2" style="background: #f8fafc; border: 1px solid #eef2f6;">
+                                <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="width: 26px; height: 26px; font-size: 0.78rem; background: #0066ff; color: #ffffff;">{{ $loop->iteration }}</span>
+                                <span style="font-size: 0.9rem; color: #1e293b; line-height: 1.55;">{{ $t }}</span>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -783,6 +814,27 @@
                                 <span class="badge bg-primary text-white py-1 px-2" style="font-size: 0.65rem;">Top Instructor</span>
                             </div>
                             <div class="text-primary small fw-semibold" style="font-size: 0.78rem;">{{ $course->instructor_subtitle ?? ($course->instructor_category . ' Expert') }}</div>
+                            
+                            @if(!empty($course->instructor_reviews_count) && $course->instructor_reviews_count > 0)
+                                <div class="d-flex align-items-center gap-1 text-warning my-1" style="font-size: 0.8rem;">
+                                    @for($s = 1; $s <= 5; $s++)
+                                        @if(($course->instructor_rating ?? 0) >= $s)
+                                            <i class="fa-solid fa-star"></i>
+                                        @elseif(($course->instructor_rating ?? 0) >= ($s - 0.5))
+                                            <i class="fa-solid fa-star-half-stroke"></i>
+                                        @else
+                                            <i class="fa-regular fa-star text-muted"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="ms-1 fw-bold text-dark">{{ number_format($course->instructor_rating, 1) }}</span>
+                                    <span class="text-muted fw-normal">({{ $course->instructor_reviews_count }} instructor reviews)</span>
+                                </div>
+                            @else
+                                <div class="text-muted my-1" style="font-size: 0.75rem;">
+                                    <i class="fa-regular fa-star text-muted me-1"></i> No instructor reviews yet
+                                </div>
+                            @endif
+
                             <div class="text-muted small" style="font-size: 0.72rem;">Authentic educator &amp; course creator on Digital Class</div>
 
                             <div class="mt-2">
@@ -1125,11 +1177,6 @@
         const target = document.getElementById(`tab-pane-${tabKey}`);
         if (target) {
             target.classList.add('active');
-        }
-
-        // 3. Update URL hash
-        if (history.replaceState) {
-            history.replaceState(null, null, `#${tabKey}`);
         }
     }
 

@@ -1995,6 +1995,45 @@ class HomeController extends Controller
         $faqs                  = $resolved['faqs'];
 
         $reviews = [];
+        $reviewsCount = 0;
+        $rating = 0.0;
+        $instructorRating = 0.0;
+        $instructorReviewsCount = 0;
+
+        try {
+            if (Schema::hasTable('reviews') && $course) {
+                $courseReviews = \App\Models\Review::where('review_type', 'course')
+                    ->where('item_id', $course->id)
+                    ->where('status', 'approved')
+                    ->latest()
+                    ->get();
+                $reviewsCount = $courseReviews->count();
+                if ($reviewsCount > 0) {
+                    $rating = round((float)$courseReviews->avg('rating'), 1);
+                    $reviews = $courseReviews->all();
+                }
+
+                $tutorId = $course->tutor_id ?? ($course->seller_id ?? null);
+                if ($tutorId) {
+                    $instQuery = \App\Models\Review::where(function($q) use ($tutorId) {
+                        $q->where('seller_id', $tutorId);
+                    })->where('status', 'approved');
+                    $instructorReviewsCount = $instQuery->count();
+                    if ($instructorReviewsCount > 0) {
+                        $instructorRating = round((float)$instQuery->avg('rating'), 1);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Error loading course reviews: ' . $e->getMessage());
+        }
+
+        if ($course) {
+            $course->rating = $rating;
+            $course->reviews_count = $reviewsCount;
+            $course->instructor_rating = $instructorRating;
+            $course->instructor_reviews_count = $instructorReviewsCount;
+        }
 
         return view('home.course-show', [
             'seller'                => $seller,
@@ -2030,6 +2069,52 @@ class HomeController extends Controller
             'rating' => 'required|numeric|min:1|max:5',
             'comment' => 'required|string|max:600',
         ]);
+
+        $courseId = null;
+        $courseTitle = $slug;
+        $sellerId = null;
+        $sellerName = null;
+
+        try {
+            if (is_numeric($slug)) {
+                $eCourse = \App\Models\ElearnCourse::find((int)$slug);
+                if ($eCourse) {
+                    $courseId = $eCourse->id;
+                    $courseTitle = $eCourse->course_name;
+                    $sellerId = $eCourse->tutor_id;
+                    $sellerName = $eCourse->instructor_name;
+                }
+            }
+
+            if (!$courseId) {
+                $stdCourse = \App\Models\Course::where('slug', $slug)->first();
+                if ($stdCourse) {
+                    $courseId = $stdCourse->id;
+                    $courseTitle = $stdCourse->title;
+                    $sellerId = $stdCourse->seller_id;
+                }
+            }
+
+            if (Schema::hasTable('reviews')) {
+                \App\Models\Review::create([
+                    'user_id' => Auth::id() ?? null,
+                    'user_name' => $validated['author'],
+                    'user_email' => Auth::user()?->email ?? null,
+                    'rating' => (float)$validated['rating'],
+                    'review_text' => $validated['comment'],
+                    'review_type' => 'course',
+                    'item_id' => $courseId ?: 0,
+                    'item_title' => $courseTitle,
+                    'seller_id' => $sellerId,
+                    'seller_name' => $sellerName,
+                    'status' => 'approved',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Error submitting course review: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Thank you! Your course review has been submitted successfully.');
     }
@@ -2275,7 +2360,29 @@ class HomeController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        return view('home.tutor-profile', compact('seller', 'tutor', 'courses'));
+        $tutorReviewsCount = 0;
+        $tutorRating = 0.0;
+        try {
+            if (Schema::hasTable('reviews')) {
+                $courseIds = $courses->pluck('id')->toArray();
+                $revQ = \App\Models\Review::where(function($q) use ($tutor, $courseIds) {
+                    $q->where('seller_id', $tutor->id);
+                    if (!empty($courseIds)) {
+                        $q->orWhere(function($sub) use ($courseIds) {
+                            $sub->where('review_type', 'course')->whereIn('item_id', $courseIds);
+                        });
+                    }
+                })->where('status', 'approved');
+                $tutorReviewsCount = $revQ->count();
+                if ($tutorReviewsCount > 0) {
+                    $tutorRating = round((float)$revQ->avg('rating'), 1);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Error computing tutor ratings: ' . $e->getMessage());
+        }
+
+        return view('home.tutor-profile', compact('seller', 'tutor', 'courses', 'tutorRating', 'tutorReviewsCount'));
     }
 
     /**
