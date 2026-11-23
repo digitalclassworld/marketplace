@@ -71,6 +71,7 @@ class CourseContentResolver
      */
     public static function resolve(object $course): array
     {
+        $courseId   = (int)($course->id ?? 0);
         $title      = trim($course->title ?? $course->course_name ?? 'Online Course');
         $rawDesc    = $course->description ?? $course->course_desc ?? '';
         $desc       = trim(strip_tags($rawDesc));
@@ -82,23 +83,89 @@ class CourseContentResolver
 
         $subLow = strtolower($title . ' ' . $category . ' ' . $desc);
 
-        // First: attempt to parse real structured sections from the course description
+        // ---------------------------------------------------------------------
+        // 0. FETCH REAL OLD DATA FROM DATABASE (IF AVAILABLE)
+        // ---------------------------------------------------------------------
+        $dbIncludes = [];
+        $dbTopics = [];
+        $dbCurriculum = [];
+        $dbFaqs = [];
+
+        if ($courseId > 0) {
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('dc_elearn_course_include')) {
+                    $dbIncludes = \Illuminate\Support\Facades\DB::table('dc_elearn_course_include')
+                        ->where('course_id', $courseId)
+                        ->pluck('title')
+                        ->map(fn($t) => trim(ltrim($t, "-*• ")))
+                        ->filter(fn($t) => !empty($t) && strlen($t) > 2)
+                        ->values()
+                        ->all();
+                }
+                if (\Illuminate\Support\Facades\Schema::hasTable('dc_elearn_covering_topics')) {
+                    $dbTopics = \Illuminate\Support\Facades\DB::table('dc_elearn_covering_topics')
+                        ->where('course_id', $courseId)
+                        ->pluck('title')
+                        ->map(fn($t) => trim(ltrim($t, "-*• ")))
+                        ->filter(fn($t) => !empty($t) && strlen($t) > 2)
+                        ->values()
+                        ->all();
+                }
+                if (\Illuminate\Support\Facades\Schema::hasTable('dc_elearn_course_curriculam')) {
+                    $dbCurriculum = \Illuminate\Support\Facades\DB::table('dc_elearn_course_curriculam')
+                        ->where('course_id', $courseId)
+                        ->pluck('title')
+                        ->map(fn($t) => trim($t))
+                        ->filter(fn($t) => !empty($t))
+                        ->values()
+                        ->all();
+                }
+                if (\Illuminate\Support\Facades\Schema::hasTable('dc_elearn_couse_faq')) {
+                    $dbFaqs = \Illuminate\Support\Facades\DB::table('dc_elearn_couse_faq')
+                        ->where('course_id', $courseId)
+                        ->get()
+                        ->map(fn($f) => ['q' => trim($f->title), 'a' => trim($f->message)])
+                        ->filter(fn($f) => !empty($f['q']) && !empty($f['a']))
+                        ->values()
+                        ->all();
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // Attempt to parse real structured sections from the course description
         $parsedSections = self::parseSectionsFromDesc($rawDesc);
 
         $learningPoints = [];
         $curriculum = [];
 
         // ---------------------------------------------------------------------
-        // CASE A: Description has 2 or more real structured sections (like course 1324)
-        // In the original system, section headers become "What you'll learn" items!
+        // 1. TOPICS ("WHAT YOU'LL LEARN")
         // ---------------------------------------------------------------------
-        if (count($parsedSections) >= 2) {
-            foreach ($parsedSections as $secIdx => $sec) {
+        if (!empty($dbIncludes)) {
+            // Priority 1: Real includes from dc_elearn_course_include (Matches course 1324 screenshot)
+            $learningPoints = $dbIncludes;
+        } elseif (count($parsedSections) >= 2) {
+            // Priority 2: Parsed section headers from course description
+            foreach ($parsedSections as $sec) {
                 $cleanTitle = preg_replace('/^\d+[\.\)]\s*/', '', $sec['title']);
                 $cleanTitle = trim($cleanTitle, " \t\n\r\0\x0B:-");
                 if (!empty($cleanTitle)) {
                     $learningPoints[] = $cleanTitle;
                 }
+            }
+        } elseif (!empty($dbTopics)) {
+            // Priority 3: Real covering topics from dc_elearn_covering_topics
+            $learningPoints = array_slice($dbTopics, 0, 12);
+        }
+
+        // ---------------------------------------------------------------------
+        // 2. CURRICULUM (MODULES & LECTURES)
+        // ---------------------------------------------------------------------
+        if (count($parsedSections) >= 2) {
+            // Structured sections with sub-bullets (Exact module titles + lectures)
+            foreach ($parsedSections as $secIdx => $sec) {
+                $cleanTitle = preg_replace('/^\d+[\.\)]\s*/', '', $sec['title']);
+                $cleanTitle = trim($cleanTitle, " \t\n\r\0\x0B:-");
 
                 $items = [];
                 foreach ($sec['items'] as $itIdx => $it) {
@@ -116,9 +183,65 @@ class CourseContentResolver
                     'items' => $items,
                 ];
             }
+        } elseif (!empty($dbCurriculum)) {
+            // Real curriculum items from dc_elearn_course_curriculam
+            foreach ($dbCurriculum as $cIdx => $cText) {
+                $lines = array_filter(array_map('trim', explode("\n", $cText)));
+                $secTitle = array_shift($lines) ?: ('Module ' . ($cIdx + 1));
+                if (strlen($secTitle) > 75) {
+                    $fullText = $secTitle;
+                    $secTitle = 'Module ' . ($cIdx + 1) . ': ' . substr($fullText, 0, 45) . '...';
+                    array_unshift($lines, $fullText);
+                }
+
+                $items = [];
+                if (!empty($lines)) {
+                    foreach ($lines as $lIdx => $line) {
+                        $items[] = [
+                            'title' => ltrim($line, "-*• "),
+                            'duration' => sprintf('%02d:%02d', 10 + (($lIdx * 4) % 15), 20 + (($lIdx * 9) % 35)),
+                            'preview' => ($cIdx === 0 && $lIdx === 0),
+                        ];
+                    }
+                } else {
+                    $items[] = [
+                        'title' => $secTitle,
+                        'duration' => '15:00',
+                        'preview' => ($cIdx === 0),
+                    ];
+                }
+
+                $curriculum[] = [
+                    'section' => ($cIdx + 1) . '. ' . $secTitle,
+                    'lectures' => count($items) . ' Lectures',
+                    'duration' => (count($items) * 12) . 'm',
+                    'items' => $items,
+                ];
+            }
+        } elseif (!empty($dbTopics)) {
+            // Real covering topics chunked into modules
+            $chunked = array_chunk($dbTopics, max(3, (int)ceil(count($dbTopics) / 4)));
+            foreach ($chunked as $idx => $chunk) {
+                $items = [];
+                foreach ($chunk as $itIdx => $it) {
+                    $items[] = [
+                        'title' => $it,
+                        'duration' => sprintf('%02d:%02d', 9 + (($itIdx * 3) % 12), 15 + (($itIdx * 7) % 40)),
+                        'preview' => ($idx === 0 && $itIdx === 0),
+                    ];
+                }
+                $curriculum[] = [
+                    'section' => ($idx + 1) . '. ' . ($chunk[0] ?? 'Module ' . ($idx + 1)),
+                    'lectures' => count($items) . ' Lectures',
+                    'duration' => (count($items) * 10) . 'm',
+                    'items' => $items,
+                ];
+            }
         } elseif (count($parsedSections) === 1 && count($parsedSections[0]['items']) >= 4) {
-            // Case B: One section with multiple items (e.g. course 858: 13 bundled courses/modules)
-            $learningPoints = array_slice($parsedSections[0]['items'], 0, 10);
+            // One section with multiple items
+            if (empty($learningPoints)) {
+                $learningPoints = array_slice($parsedSections[0]['items'], 0, 10);
+            }
 
             $chunked = array_chunk($parsedSections[0]['items'], 4);
             foreach ($chunked as $idx => $chunk) {
@@ -425,48 +548,77 @@ class CourseContentResolver
         $cleanSub = preg_replace('/[:\-\|].*$/', '', $cleanSub);
         $sub = trim($cleanSub);
 
-        $faqs = [
-            [
-                'q' => "How do I access \"{$title}\" after enrollment?",
-                'a' => "You will receive instant lifetime access immediately after checkout. You can log in anytime to your Digital Class student account and access all video lessons, project files, and study resources on your computer, laptop, tablet, or smartphone."
-            ],
-            [
-                'q' => "Are there any prerequisites or prior experience required?",
-                'a' => "No prior advanced experience is necessary unless specifically noted. The course is structured progressively from fundamentals to advanced concepts, making it accessible to beginners while providing valuable insights for experienced learners."
-            ],
-            [
-                'q' => "Will I receive an official certificate upon course completion?",
-                'a' => "Yes! Once you complete all the lessons and course modules, you will be issued an official verified Digital Class Certificate of Completion. You can download the PDF, share it on LinkedIn, or attach it to your resume."
-            ],
-            [
-                'q' => "Is this course self-paced or does it follow a fixed schedule?",
-                'a' => "This is a 100% self-paced online course. You can study whenever it fits your schedule, pause and replay complex sections as many times as you want, with no deadlines or expiry dates."
-            ],
-            [
-                'q' => "How can I ask questions if I get stuck while learning?",
-                'a' => "You can post your queries directly in the course Q&A discussion tab. The course educator and academic support team actively review and respond to student inquiries to ensure you never get stuck."
-            ],
-            [
-                'q' => "What is the refund policy for this course?",
-                'a' => "Digital Class offers a 30-day satisfaction guarantee. If the course does not meet your expectations, simply reach out to our customer support within 30 days of purchase for a prompt refund."
-            ],
-        ];
+        if (!empty($dbFaqs)) {
+            // Prioritize authentic FAQs from dc_elearn_couse_faq
+            $faqs = $dbFaqs;
+        } else {
+            $faqs = [
+                [
+                    'q' => "How do I access \"{$title}\" after enrollment?",
+                    'a' => "You will receive instant lifetime access immediately after checkout. You can log in anytime to your Digital Class student account and access all video lessons, project files, and study resources on your computer, laptop, tablet, or smartphone."
+                ],
+                [
+                    'q' => "Are there any prerequisites or prior experience required?",
+                    'a' => "No prior advanced experience is necessary unless specifically noted. The course is structured progressively from fundamentals to advanced concepts, making it accessible to beginners while providing valuable insights for experienced learners."
+                ],
+                [
+                    'q' => "Will I receive an official certificate upon course completion?",
+                    'a' => "Yes! Once you complete all the lessons and course modules, you will be issued an official verified Digital Class Certificate of Completion. You can download the PDF, share it on LinkedIn, or attach it to your resume."
+                ],
+                [
+                    'q' => "Is this course self-paced or does it follow a fixed schedule?",
+                    'a' => "This is a 100% self-paced online course. You can study whenever it fits your schedule, pause and replay complex sections as many times as you want, with no deadlines or expiry dates."
+                ],
+                [
+                    'q' => "How can I ask questions if I get stuck while learning?",
+                    'a' => "You can post your queries directly in the course Q&A discussion tab. The course educator and academic support team actively review and respond to student inquiries to ensure you never get stuck."
+                ],
+                [
+                    'q' => "What is the refund policy for this course?",
+                    'a' => "Digital Class offers a 30-day satisfaction guarantee. If the course does not meet your expectations, simply reach out to our customer support within 30 days of purchase for a prompt refund."
+                ],
+            ];
+        }
 
         // ---------------------------------------------------------------------
         // 4. TARGET AUDIENCE & REQUIREMENTS
         // ---------------------------------------------------------------------
-        $targetAudience = [
-            "Students and beginners eager to build practical expertise in {$sub}",
-            "Working professionals aiming to upgrade their skills in {$category}",
-            "Freelancers, entrepreneurs and creators wanting actionable knowledge",
-            "Anyone seeking an industry-recognized certification to boost their career",
-        ];
+        $targetAudience = [];
+        $requirements = [];
 
-        $requirements = [
-            "A desktop computer, laptop, tablet or smartphone with internet connection",
-            "Basic computer familiarity and a desire to learn new practical skills",
-            "No prior advanced experience required; all core principles are taught step-by-step",
-        ];
+        foreach ($faqs as $f) {
+            $qLow = strtolower($f['q']);
+            if (str_contains($qLow, 'who this course is for') || str_contains($qLow, 'audience') || str_contains($qLow, 'who can join')) {
+                $lines = array_filter(array_map('trim', explode("\n", $f['a'])));
+                foreach ($lines as $l) {
+                    $lClean = ltrim($l, "-*• 1234567890.) ");
+                    if (!empty($lClean)) $targetAudience[] = $lClean;
+                }
+            } elseif (str_contains($qLow, 'requirement') || str_contains($qLow, 'prerequisite')) {
+                $lines = array_filter(array_map('trim', explode("\n", $f['a'])));
+                foreach ($lines as $l) {
+                    $lClean = ltrim($l, "-*• 1234567890.) ");
+                    if (!empty($lClean)) $requirements[] = $lClean;
+                }
+            }
+        }
+
+        if (empty($targetAudience)) {
+            $targetAudience = [
+                "Students and beginners eager to build practical expertise in {$sub}",
+                "Working professionals aiming to upgrade their skills in {$category}",
+                "Freelancers, entrepreneurs and creators wanting actionable knowledge",
+                "Anyone seeking an industry-recognized certification to boost their career",
+            ];
+        }
+
+        if (empty($requirements)) {
+            $requirements = [
+                "A desktop computer, laptop, tablet or smartphone with internet connection",
+                "Basic computer familiarity and a desire to learn new practical skills",
+                "No prior advanced experience required; all core principles are taught step-by-step",
+            ];
+        }
 
         return [
             'learningPoints' => $learningPoints,
