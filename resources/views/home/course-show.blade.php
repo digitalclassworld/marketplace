@@ -227,13 +227,51 @@
         margin-bottom: 0.85rem;
     }
 
-    /* What Will You Learn Box */
+    /* Course Description Collapse */
+    .course-desc-wrapper {
+        position: relative;
+        max-height: 220px;
+        overflow: hidden;
+        transition: max-height 0.35s ease;
+    }
+    .course-desc-wrapper.expanded {
+        max-height: none;
+    }
+    .course-desc-wrapper:not(.expanded)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.95) 100%);
+        pointer-events: none;
+    }
+    .btn-toggle-see-more {
+        color: #6d28d9;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        margin-top: 0.65rem;
+        margin-bottom: 0.5rem;
+    }
+    .btn-toggle-see-more:hover {
+        color: #5b21b6;
+        text-decoration: underline;
+    }
+
+    /* What you'll learn Box */
     .what-you-learn-box {
-        background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 100%);
-        border: 1px solid #bbf7d0;
-        border-radius: 14px;
-        padding: 1.25rem 1.4rem;
-        margin-bottom: 1.25rem;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1.5rem 1.65rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     }
 
     .learn-point-check {
@@ -505,9 +543,14 @@
             <div id="overview" class="section-card-white mb-3">
                 <h2 class="section-card-title mb-3">Course Overview</h2>
                 
-                <div class="course-desc-content text-secondary" style="font-size: 0.86rem; line-height: 1.65;">
-                    {!! nl2br(e($course->description)) !!}
+                <div class="course-desc-wrapper" id="courseDescWrap">
+                    <div class="course-desc-content text-secondary" style="font-size: 0.86rem; line-height: 1.65;">
+                        {!! nl2br(e($course->description)) !!}
+                    </div>
                 </div>
+                <a href="javascript:void(0)" class="btn-toggle-see-more" id="descSeeMoreBtn" onclick="toggleCourseDescription()">
+                    <span id="descToggleText">See more</span> <i class="fa-solid fa-chevron-down" id="descToggleIcon" style="font-size: 0.72rem;"></i>
+                </a>
 
                 @if(!empty($course->course_activation_instruction))
                     <div class="alert alert-info mt-3 p-3 rounded-3 border-0 bg-primary-subtle" style="font-size: 0.8rem;">
@@ -515,9 +558,38 @@
                         <div class="text-secondary">{!! nl2br(e($course->course_activation_instruction)) !!}</div>
                     </div>
                 @endif
+            </div>
 
-                <!-- Course Highlights Grid -->
-                <div class="row g-2 mt-3 pt-3 border-top">
+            <!-- Topics: What you'll learn -->
+            <div id="topics" class="what-you-learn-box mb-3">
+                <h2 class="section-card-title mb-3" style="font-size: 1.2rem; font-weight: 700;">What you'll learn</h2>
+                
+                @php
+                    $halfLp = ceil(count($learningPoints) / 2);
+                @endphp
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        @foreach(array_slice($learningPoints, 0, $halfLp) as $lp)
+                            <div class="learn-point-check d-flex align-items-start gap-2 mb-2">
+                                <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                <span style="font-size: 0.86rem; color: #1e293b; line-height: 1.45;">{{ $lp }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="col-md-6">
+                        @foreach(array_slice($learningPoints, $halfLp) as $lp)
+                            <div class="learn-point-check d-flex align-items-start gap-2 mb-2">
+                                <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                <span style="font-size: 0.86rem; color: #1e293b; line-height: 1.45;">{{ $lp }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Highlights Grid -->
+            <div class="section-card-white mb-3 p-3">
+                <div class="row g-2">
                     <div class="col-sm-6 col-md-4">
                         <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
                             <i class="fa-regular fa-clock text-primary fs-5"></i>
@@ -571,33 +643,6 @@
                                 <div class="fw-bold text-dark" style="font-size: 0.78rem;">Official Verified</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Topics: What Will You Learn Box -->
-            <div id="topics" class="what-you-learn-box mb-3">
-                <h2 class="fw-bold text-dark mb-3" style="font-size: 1.15rem;">What Will You Learn?</h2>
-                
-                @php
-                    $halfLp = ceil(count($learningPoints) / 2);
-                @endphp
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        @foreach(array_slice($learningPoints, 0, $halfLp) as $lp)
-                            <div class="learn-point-check">
-                                <i class="fa-solid fa-circle-check text-success fs-6 mt-1 flex-shrink-0"></i>
-                                <span>{{ $lp }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="col-md-6">
-                        @foreach(array_slice($learningPoints, $halfLp) as $lp)
-                            <div class="learn-point-check">
-                                <i class="fa-solid fa-circle-check text-success fs-6 mt-1 flex-shrink-0"></i>
-                                <span>{{ $lp }}</span>
-                            </div>
-                        @endforeach
                     </div>
                 </div>
             </div>
@@ -1051,6 +1096,35 @@
         const modal = new bootstrap.Modal(document.getElementById('trailerModal'));
         modal.show();
     }
+
+    function toggleCourseDescription() {
+        const wrap = document.getElementById('courseDescWrap');
+        const text = document.getElementById('descToggleText');
+        const icon = document.getElementById('descToggleIcon');
+        if (!wrap || !text || !icon) return;
+
+        const isExpanded = wrap.classList.toggle('expanded');
+        if (isExpanded) {
+            text.textContent = 'See less';
+            icon.className = 'fa-solid fa-chevron-up';
+        } else {
+            text.textContent = 'See more';
+            icon.className = 'fa-solid fa-chevron-down';
+            wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const wrap = document.getElementById('courseDescWrap');
+        const btn = document.getElementById('descSeeMoreBtn');
+        if (wrap && btn) {
+            // Only show toggle if description is taller than collapsed threshold
+            if (wrap.scrollHeight <= 230) {
+                btn.style.display = 'none';
+                wrap.classList.add('expanded');
+            }
+        }
+    });
 
     function showToast(title, message) {
         let toastEl = document.getElementById('dcLiveToast');

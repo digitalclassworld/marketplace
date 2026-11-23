@@ -116,7 +116,7 @@ class CoursesDirectoryTest extends TestCase
         $response->assertSee('Hitesh Mohkar');
         $response->assertSee('2,999');
         $response->assertSee('5,999');
-        $response->assertSee('What Will You Learn?');
+        $response->assertSee("What you'll learn", false);
         $response->assertSee('Curriculum');
         $response->assertSee('About the Instructor');
         $response->assertSee('Student Reviews');

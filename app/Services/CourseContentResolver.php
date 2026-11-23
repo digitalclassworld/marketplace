@@ -7,13 +7,73 @@ use Illuminate\Support\Str;
 class CourseContentResolver
 {
     /**
+     * Parse structured sections and bulleted lecture items from a course description.
+     */
+    public static function parseSectionsFromDesc(string $desc): array
+    {
+        $lines = explode("\n", str_replace("\r", "", $desc));
+        $sections = [];
+        $currentSection = null;
+        $currentItems = [];
+
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if (empty($trimmed)) continue;
+
+            // Bullet items (- item, * item, • item, > item)
+            if (preg_match('/^[\-\*\•\·\>]\s*(.+)/u', $trimmed, $m)) {
+                $itemTitle = trim($m[1]);
+                if ($currentSection === null) {
+                    $currentSection = 'Course Overview';
+                }
+                $currentItems[] = $itemTitle;
+            } elseif (preg_match('/^\d+[\.\)]\s*(.+)/', $trimmed, $m)) {
+                $itemTitle = trim($m[1]);
+                // If the numbered line is short and looks like a header, start a new section
+                if (strlen($itemTitle) < 40 && !str_contains($itemTitle, ':') && !str_contains($itemTitle, ' - ')) {
+                    if ($currentSection !== null && !empty($currentItems)) {
+                        $sections[] = ['title' => $currentSection, 'items' => $currentItems];
+                        $currentItems = [];
+                    }
+                    $currentSection = $itemTitle;
+                } else {
+                    if ($currentSection === null) {
+                        $currentSection = 'Course Curriculum';
+                    }
+                    $currentItems[] = $itemTitle;
+                }
+            } else {
+                // Non-bullet line: check if it's a section header followed by bullet items
+                $isIntro = preg_match('/^(dear|welcome|this is|if you|we will|hello|hi|please|note|program\s|device\s|no\.?\s*of|lecture duration)/i', $trimmed);
+                $hasColon = str_ends_with($trimmed, ':');
+                $cleanHeader = rtrim($trimmed, ':');
+
+                if (!$isIntro && strlen($cleanHeader) <= 65 && (!str_ends_with($trimmed, '.') || $hasColon)) {
+                    if ($currentSection !== null && !empty($currentItems)) {
+                        $sections[] = ['title' => $currentSection, 'items' => $currentItems];
+                        $currentItems = [];
+                    }
+                    $currentSection = $cleanHeader;
+                }
+            }
+        }
+
+        if ($currentSection !== null && !empty($currentItems)) {
+            $sections[] = ['title' => $currentSection, 'items' => $currentItems];
+        }
+
+        return $sections;
+    }
+
+    /**
      * Resolve dynamic, subject-specific course details: Overview, Topics (What Will You Learn),
      * Curriculum (Modules & Lectures), FAQs, Audience and Requirements.
      */
     public static function resolve(object $course): array
     {
         $title      = trim($course->title ?? $course->course_name ?? 'Online Course');
-        $desc       = trim(strip_tags($course->description ?? $course->course_desc ?? ''));
+        $rawDesc    = $course->description ?? $course->course_desc ?? '';
+        $desc       = trim(strip_tags($rawDesc));
         $category   = trim($course->category ?? 'General Education');
         $duration   = $course->duration ?? 'Self Paced';
         $chapters   = (int)($course->course_chapter ?? 0);
@@ -22,37 +82,90 @@ class CourseContentResolver
 
         $subLow = strtolower($title . ' ' . $category . ' ' . $desc);
 
-        // ---------------------------------------------------------------------
-        // 1. TOPICS ("WHAT WILL YOU LEARN?")
-        // ---------------------------------------------------------------------
+        // First: attempt to parse real structured sections from the course description
+        $parsedSections = self::parseSectionsFromDesc($rawDesc);
+
         $learningPoints = [];
+        $curriculum = [];
 
-        // Check for bullet points or numbered lists in course description
-        $rawDesc = $course->description ?? $course->course_desc ?? '';
-        $lines = preg_split('/[\r\n]+/', $rawDesc);
-        foreach ($lines as $line) {
-            $line = trim(strip_tags($line));
-            if (empty($line)) continue;
-
-            // Skip technical metadata lines
-            if (preg_match('/^(program|device|language|contains|usage|validity|no\.?\s*of\s*lecture|lecture duration|encrypted)/i', $line)) {
-                continue;
-            }
-
-            if (preg_match('/^[\x{2022}\x{2023}\x{25E6}\x{2043}\x{2219}\*\-\•\·\>]\s*(.+)/u', $line, $m)) {
-                $pt = trim($m[1]);
-                if (strlen($pt) >= 10 && strlen($pt) <= 120 && !str_contains(strtolower($pt), 'http')) {
-                    $learningPoints[] = $pt;
+        // ---------------------------------------------------------------------
+        // CASE A: Description has 2 or more real structured sections (like course 1324)
+        // In the original system, section headers become "What you'll learn" items!
+        // ---------------------------------------------------------------------
+        if (count($parsedSections) >= 2) {
+            foreach ($parsedSections as $secIdx => $sec) {
+                $cleanTitle = preg_replace('/^\d+[\.\)]\s*/', '', $sec['title']);
+                $cleanTitle = trim($cleanTitle, " \t\n\r\0\x0B:-");
+                if (!empty($cleanTitle)) {
+                    $learningPoints[] = $cleanTitle;
                 }
-            } elseif (preg_match('/^\d+[\.\)]\s*(.+)/', $line, $m)) {
-                $pt = trim($m[1]);
-                if (strlen($pt) >= 10 && strlen($pt) <= 120 && !str_contains(strtolower($pt), 'http')) {
-                    $learningPoints[] = $pt;
+
+                $items = [];
+                foreach ($sec['items'] as $itIdx => $it) {
+                    $items[] = [
+                        'title' => $it,
+                        'duration' => sprintf('%02d:%02d', 8 + (($itIdx * 3) % 15), 15 + (($itIdx * 7) % 40)),
+                        'preview' => ($secIdx === 0 && $itIdx === 0),
+                    ];
+                }
+
+                $curriculum[] = [
+                    'section' => ($secIdx + 1) . '. ' . $cleanTitle,
+                    'lectures' => count($items) . ' Lectures',
+                    'duration' => (count($items) * 11) . 'm',
+                    'items' => $items,
+                ];
+            }
+        } elseif (count($parsedSections) === 1 && count($parsedSections[0]['items']) >= 4) {
+            // Case B: One section with multiple items (e.g. course 858: 13 bundled courses/modules)
+            $learningPoints = array_slice($parsedSections[0]['items'], 0, 10);
+
+            $chunked = array_chunk($parsedSections[0]['items'], 4);
+            foreach ($chunked as $idx => $chunk) {
+                $items = [];
+                foreach ($chunk as $itIdx => $it) {
+                    $items[] = [
+                        'title' => $it,
+                        'duration' => '12:00',
+                        'preview' => ($idx === 0 && $itIdx === 0),
+                    ];
+                }
+                $curriculum[] = [
+                    'section' => ($idx + 1) . '. ' . ($chunk[0] ?? 'Module ' . ($idx + 1)),
+                    'lectures' => count($items) . ' Lectures',
+                    'duration' => (count($items) * 12) . 'm',
+                    'items' => $items,
+                ];
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // CASE C: Fallback to bullet point extraction or domain-specific generation
+        // ---------------------------------------------------------------------
+        if (empty($learningPoints)) {
+            $lines = preg_split('/[\r\n]+/', $rawDesc);
+            foreach ($lines as $line) {
+                $line = trim(strip_tags($line));
+                if (empty($line)) continue;
+
+                if (preg_match('/^(program|device|language|contains|usage|validity|no\.?\s*of\s*lecture|lecture duration|encrypted)/i', $line)) {
+                    continue;
+                }
+
+                if (preg_match('/^[\x{2022}\x{2023}\x{25E6}\x{2043}\x{2219}\*\-\•\·\>]\s*(.+)/u', $line, $m)) {
+                    $pt = trim($m[1]);
+                    if (strlen($pt) >= 10 && strlen($pt) <= 120 && !str_contains(strtolower($pt), 'http')) {
+                        $learningPoints[] = $pt;
+                    }
+                } elseif (preg_match('/^\d+[\.\)]\s*(.+)/', $line, $m)) {
+                    $pt = trim($m[1]);
+                    if (strlen($pt) >= 10 && strlen($pt) <= 120 && !str_contains(strtolower($pt), 'http')) {
+                        $learningPoints[] = $pt;
+                    }
                 }
             }
         }
 
-        // If not enough bullet points in description, extract sentences or generate domain-specific topics
         if (count($learningPoints) < 6) {
             $cleanTitle = preg_replace('/^(the|learn|master|complete|ultimate|guide to|training course for)\s+/i', '', $title);
             $cleanTitle = preg_replace('/[:\-\|].*$/', '', $cleanTitle);
@@ -153,7 +266,7 @@ class CourseContentResolver
                     "Paid advertising campaigns across Google Ads, Meta Ads and YouTube",
                     "Social media growth strategies, content scheduling and community engagement",
                     "High-converting email marketing automation and customer lead funnels",
-                    "AI tools integration (ChatGPT, Canva, Midjourney) to accelerate content creation",
+                    "AI tools integration to accelerate content creation and campaign analysis",
                     "Analytics, conversion tracking, ROI measurement and reporting dashboards",
                     "Verified Digital Class certification to showcase your digital marketing expertise"
                 ]);
@@ -181,26 +294,26 @@ class CourseContentResolver
                 ]);
             }
         }
-        $learningPoints = array_slice(array_unique($learningPoints), 0, 8);
+        $learningPoints = array_values(array_unique($learningPoints));
 
         // ---------------------------------------------------------------------
-        // 2. CURRICULUM (MODULES & LECTURES)
+        // CURRICULUM FALLBACK (IF NOT ALREADY POPULATED VIA PARSED SECTIONS)
         // ---------------------------------------------------------------------
-        $curriculum = [];
-
-        // Check if database course has custom contents
-        if (isset($course->contents) && $course->contents->isNotEmpty()) {
-            foreach ($course->contents->groupBy('section_title') as $secTitle => $lectures) {
-                $curriculum[] = [
-                    'section' => $secTitle,
-                    'lectures' => $lectures->count() . ' Lectures',
-                    'duration' => ($lectures->count() * 12) . 'm',
-                    'items' => $lectures->map(fn($l) => [
-                        'title' => $l->lecture_title,
-                        'duration' => $l->duration ?: '10:00',
-                        'preview' => (bool)$l->video_url,
-                    ])->toArray(),
-                ];
+        if (empty($curriculum)) {
+            // Check if database course has custom contents
+            if (isset($course->contents) && $course->contents->isNotEmpty()) {
+                foreach ($course->contents->groupBy('section_title') as $secTitle => $lectures) {
+                    $curriculum[] = [
+                        'section' => $secTitle,
+                        'lectures' => $lectures->count() . ' Lectures',
+                        'duration' => ($lectures->count() * 12) . 'm',
+                        'items' => $lectures->map(fn($l) => [
+                            'title' => $l->lecture_title,
+                            'duration' => $l->duration ?: '10:00',
+                            'preview' => (bool)$l->video_url,
+                        ])->toArray(),
+                    ];
+                }
             }
         }
 
@@ -270,127 +383,7 @@ class CourseContentResolver
                         ['title' => 'Scaling Roadmap: Automating Operations and Next Steps', 'duration' => '08:00', 'preview' => false],
                     ]],
                 ];
-            } elseif (str_contains($subLow, 'java')) {
-                $curriculum = [
-                    ['section' => '1. Java Architecture & Object-Oriented Principles', 'lectures' => '5 Lectures', 'duration' => '46m', 'items' => [
-                        ['title' => 'Java Platform Overview: JVM, JRE, JDK & Development Setup', 'duration' => '08:30', 'preview' => true],
-                        ['title' => 'Classes, Objects, Methods, Encapsulation & Access Modifiers', 'duration' => '11:20', 'preview' => true],
-                        ['title' => 'Inheritance, Method Overriding, Polymorphism & Abstraction', 'duration' => '12:45', 'preview' => false],
-                        ['title' => 'Constructors, static, final & super Keywords Explained', 'duration' => '07:40', 'preview' => false],
-                        ['title' => 'Packages, Interfaces and Java Naming Conventions', 'duration' => '06:10', 'preview' => false],
-                    ]],
-                    ['section' => '2. Exception Handling, Collections & Modern Java APIs', 'lectures' => '5 Lectures', 'duration' => '52m', 'items' => [
-                        ['title' => 'Exception Handling: try-catch-finally, throw, throws & Custom Exceptions', 'duration' => '11:10', 'preview' => false],
-                        ['title' => 'Collections Framework: ArrayList, LinkedList, HashSet and HashMap', 'duration' => '13:40', 'preview' => false],
-                        ['title' => 'Iterating Collections: Iterators, For-Each & Lambda Expressions', 'duration' => '09:20', 'preview' => false],
-                        ['title' => 'Multithreading Basics, Thread Lifecycle and Synchronization', 'duration' => '10:50', 'preview' => false],
-                        ['title' => 'Java Stream API: Filter, Map, Reduce and Collectors', 'duration' => '07:30', 'preview' => false],
-                    ]],
-                    ['section' => '3. Web Applications with Servlets, JSP & Database (JDBC)', 'lectures' => '5 Lectures', 'duration' => '58m', 'items' => [
-                        ['title' => 'Web Architecture, HTTP Protocol and Servlet Lifecycle', 'duration' => '12:15', 'preview' => true],
-                        ['title' => 'Session Management: Cookies, HttpSession and URL Rewriting', 'duration' => '11:30', 'preview' => false],
-                        ['title' => 'JSP Directives, Scriptlets, Actions and JSTL Standard Tags', 'duration' => '10:45', 'preview' => false],
-                        ['title' => 'JDBC: Connecting Java Applications to MySQL Databases', 'duration' => '14:20', 'preview' => false],
-                        ['title' => 'CRUD Operations Project using MVC Architecture', 'duration' => '09:40', 'preview' => false],
-                    ]],
-                    ['section' => '4. Enterprise Java: Spring Framework & Hibernate ORM', 'lectures' => '5 Lectures', 'duration' => '1h 05m', 'items' => [
-                        ['title' => 'Introduction to Spring Framework & Inversion of Control (IoC)', 'duration' => '13:45', 'preview' => false],
-                        ['title' => 'Spring MVC Architecture and Building RESTful Web APIs', 'duration' => '14:20', 'preview' => false],
-                        ['title' => 'Hibernate ORM: Entity Mapping and Database Operations', 'duration' => '15:10', 'preview' => false],
-                        ['title' => 'Full-Stack Enterprise Java Project Deployment Walkthrough', 'duration' => '22:15', 'preview' => false],
-                    ]],
-                ];
-            } elseif (str_contains($subLow, 'account') || str_contains($subLow, 'ca foundation') || str_contains($subLow, 'tally') || str_contains($subLow, 'finance')) {
-                $curriculum = [
-                    ['section' => '1. Theoretical Framework & Accounting Fundamentals', 'lectures' => '5 Lectures', 'duration' => '45m', 'items' => [
-                        ['title' => 'Meaning and Scope of Accounting: Principles, Concepts & Conventions', 'duration' => '09:15', 'preview' => true],
-                        ['title' => 'Accounting Standards and Framework for Preparation of Financial Statements', 'duration' => '10:30', 'preview' => true],
-                        ['title' => 'Capital and Revenue Expenditures and Receipts', 'duration' => '08:45', 'preview' => false],
-                        ['title' => 'Double Entry System and Recording of Business Transactions', 'duration' => '09:20', 'preview' => false],
-                        ['title' => 'Rules of Debit and Credit: Golden Rules Explained with Examples', 'duration' => '07:30', 'preview' => false],
-                    ]],
-                    ['section' => '2. Accounting Process: Journals, Ledgers & Trial Balance', 'lectures' => '5 Lectures', 'duration' => '52m', 'items' => [
-                        ['title' => 'Journal Entries for Complex Business Transactions', 'duration' => '11:40', 'preview' => false],
-                        ['title' => 'Ledger Posting, Balancing Accounts and Subsidiary Books', 'duration' => '10:15', 'preview' => false],
-                        ['title' => 'Cash Book Preparation: Single, Double & Triple Column Formats', 'duration' => '11:20', 'preview' => false],
-                        ['title' => 'Trial Balance Preparation and Methods of Locating Errors', 'duration' => '09:45', 'preview' => false],
-                        ['title' => 'Rectification of Accounting Errors Before and After Trial Balance', 'duration' => '09:30', 'preview' => false],
-                    ]],
-                    ['section' => '3. Bank Reconciliation (BRS), Depreciation & Inventories', 'lectures' => '5 Lectures', 'duration' => '56m', 'items' => [
-                        ['title' => 'Bank Reconciliation Statement (BRS): Causes of Differences & Formats', 'duration' => '12:30', 'preview' => false],
-                        ['title' => 'Comprehensive Practice Problems on BRS with Overdraft Balances', 'duration' => '13:10', 'preview' => false],
-                        ['title' => 'Depreciation Accounting: Straight Line vs Written Down Value (WDV)', 'duration' => '11:45', 'preview' => false],
-                        ['title' => 'Inventory Valuation: FIFO, LIFO, Weighted Average and Cost Methods', 'duration' => '10:20', 'preview' => false],
-                        ['title' => 'Provisions, Reserves and Contingent Liabilities', 'duration' => '08:45', 'preview' => false],
-                    ]],
-                    ['section' => '4. Final Accounts & Specialized Transactions', 'lectures' => '5 Lectures', 'duration' => '1h 04m', 'items' => [
-                        ['title' => 'Bills of Exchange: Promissory Notes, Discounting and Dishonor Entries', 'duration' => '12:15', 'preview' => false],
-                        ['title' => 'Consignment Accounts: Invoicing at Cost vs Selling Price', 'duration' => '13:40', 'preview' => false],
-                        ['title' => 'Preparation of Trading Account and Profit & Loss Account', 'duration' => '12:20', 'preview' => false],
-                        ['title' => 'Balance Sheet Preparation with Year-End Adjustments', 'duration' => '14:15', 'preview' => false],
-                        ['title' => 'Exam Review: Master Question Solving and Answering Strategies', 'duration' => '11:50', 'preview' => false],
-                    ]],
-                ];
-            } elseif (str_contains($subLow, 'hack') || str_contains($subLow, 'cyber') || str_contains($subLow, 'security') || str_contains($subLow, 'comptia')) {
-                $curriculum = [
-                    ['section' => '1. Cybersecurity Fundamentals & Lab Setup', 'lectures' => '4 Lectures', 'duration' => '38m', 'items' => [
-                        ['title' => 'Introduction to Ethical Hacking, Laws & Penetration Testing Methodologies', 'duration' => '08:45', 'preview' => true],
-                        ['title' => 'Setting Up Your Virtual Attack Lab with Kali Linux & Metasploitable', 'duration' => '12:30', 'preview' => true],
-                        ['title' => 'Linux Command Line Mastery for Security Professionals', 'duration' => '09:15', 'preview' => false],
-                        ['title' => 'TCP/IP, OSI Model, Subnetting and Networking Fundamentals', 'duration' => '08:00', 'preview' => false],
-                    ]],
-                    ['section' => '2. Information Gathering & Vulnerability Scanning', 'lectures' => '5 Lectures', 'duration' => '50m', 'items' => [
-                        ['title' => 'Passive Reconnaissance: OSINT, Google Dorking & Domain Footprinting', 'duration' => '10:15', 'preview' => false],
-                        ['title' => 'Active Reconnaissance: Nmap Port Scanning, Timing & Service Detection', 'duration' => '12:40', 'preview' => false],
-                        ['title' => 'Banner Grabbing, Vulnerability Enumeration and Searchsploit', 'duration' => '09:20', 'preview' => false],
-                        ['title' => 'Automated Vulnerability Scanning with Nessus and OpenVAS', 'duration' => '10:15', 'preview' => false],
-                        ['title' => 'Network Sniffing and Packet Analysis using Wireshark', 'duration' => '08:10', 'preview' => false],
-                    ]],
-                    ['section' => '3. Web Application Penetration Testing (OWASP Top 10)', 'lectures' => '5 Lectures', 'duration' => '58m', 'items' => [
-                        ['title' => 'Burp Suite Setup: Intercepting Proxies, Spidering & Repeater Workflows', 'duration' => '12:10', 'preview' => false],
-                        ['title' => 'SQL Injection (SQLi): Authentication Bypass and Database Extraction', 'duration' => '14:20', 'preview' => false],
-                        ['title' => 'Cross-Site Scripting (XSS): Reflected, Stored and DOM XSS Attacks', 'duration' => '11:45', 'preview' => false],
-                        ['title' => 'Broken Authentication, CSRF and Insecure Direct Object References (IDOR)', 'duration' => '11:15', 'preview' => false],
-                        ['title' => 'File Upload Vulnerabilities and Remote Code Execution (RCE)', 'duration' => '09:10', 'preview' => false],
-                    ]],
-                    ['section' => '4. System Exploitation & Defensive Hardening', 'lectures' => '4 Lectures', 'duration' => '45m', 'items' => [
-                        ['title' => 'Metasploit Framework: Exploits, Payloads and Meterpreter Sessions', 'duration' => '13:20', 'preview' => false],
-                        ['title' => 'Password Cracking Methodologies using John the Ripper and Hashcat', 'duration' => '11:10', 'preview' => false],
-                        ['title' => 'Post-Exploitation, Privilege Escalation and Maintaining Access', 'duration' => '11:45', 'preview' => false],
-                        ['title' => 'Remediation Reporting, Defensive Best Practices & Certification Path', 'duration' => '09:15', 'preview' => false],
-                    ]],
-                ];
-            } elseif (str_contains($subLow, 'biology') || str_contains($subLow, 'science') || str_contains($subLow, 'ncert') || str_contains($subLow, 'cbse')) {
-                $curriculum = [
-                    ['section' => '1. Core Concepts & Curriculum Foundation', 'lectures' => '4 Lectures', 'duration' => '35m', 'items' => [
-                        ['title' => "Curriculum Blueprint: Syllabus Overview & High-Yield Marks Weightage", 'duration' => '07:15', 'preview' => true],
-                        ['title' => 'Fundamental Principles and Foundational Terminology', 'duration' => '09:40', 'preview' => true],
-                        ['title' => 'Visualizing Key Biological Processes with Labeled Diagram Walkthroughs', 'duration' => '10:20', 'preview' => false],
-                        ['title' => 'Key Scientific Definitions and Formula Flashcards', 'duration' => '08:15', 'preview' => false],
-                    ]],
-                    ['section' => '2. Detailed Concept Exploration & Mechanism Analysis', 'lectures' => '5 Lectures', 'duration' => '52m', 'items' => [
-                        ['title' => 'In-Depth Breakdown of Primary Biological Mechanisms', 'duration' => '12:10', 'preview' => false],
-                        ['title' => 'Step-by-Step Flowcharts and Reaction Pathways Explained', 'duration' => '11:30', 'preview' => false],
-                        ['title' => 'Comparative Studies: Tabular Differences Frequently Asked in Exams', 'duration' => '09:40', 'preview' => false],
-                        ['title' => 'Important Diagram Drawing Practice and Marking Scheme Guidelines', 'duration' => '10:50', 'preview' => false],
-                        ['title' => 'Conceptual Questions and NCERT Textbook In-Text Solutions', 'duration' => '08:30', 'preview' => false],
-                    ]],
-                    ['section' => '3. High-Yield Topic Modules & Exemplar Solutions', 'lectures' => '5 Lectures', 'duration' => '55m', 'items' => [
-                        ['title' => 'Detailed Analysis of Complex Chapter Sections', 'duration' => '12:45', 'preview' => false],
-                        ['title' => 'Solving NCERT Exemplar and Previous Years Board Exam Questions', 'duration' => '13:20', 'preview' => false],
-                        ['title' => 'Case-Based and Assertion-Reasoning Question Solving Strategies', 'duration' => '11:10', 'preview' => false],
-                        ['title' => 'Common Conceptual Traps and Mistakes Students Make', 'duration' => '09:15', 'preview' => false],
-                        ['title' => 'Quick Revision Notes and Mind Maps for Rapid Retention', 'duration' => '09:10', 'preview' => false],
-                    ]],
-                    ['section' => '4. Exam Preparation, Model Papers & Final Review', 'lectures' => '4 Lectures', 'duration' => '44m', 'items' => [
-                        ['title' => 'Full-Length Model Question Paper Discussion and Model Answers', 'duration' => '14:20', 'preview' => false],
-                        ['title' => 'Time Management Strategies for 3-Hour Board Examinations', 'duration' => '09:40', 'preview' => false],
-                        ['title' => 'Last-Minute Revision Checklist and Essential Diagram Review', 'duration' => '11:15', 'preview' => false],
-                        ['title' => 'Course Wrap-Up and Verified Completion Certificate', 'duration' => '09:15', 'preview' => false],
-                    ]],
-                ];
             } else {
-                // Adaptive Fallback for any other title
                 $cleanSub = preg_replace('/^(the|learn|master|complete|ultimate|guide to)\s+/i', '', $title);
                 $cleanSub = preg_replace('/[:\-\|].*$/', '', $cleanSub);
                 $sub = trim($cleanSub);
