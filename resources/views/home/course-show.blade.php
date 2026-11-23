@@ -533,44 +533,33 @@
                         <span id="descToggleText">See more</span> <i class="fa-solid fa-chevron-down" id="descToggleIcon" style="font-size: 0.72rem;"></i>
                     </a>
 
+                    @php
+                        // "What you'll learn" points (Priority 1: real course includes, Priority 2: real topics, Priority 3: learning points)
+                        $overviewLearnPoints = !empty($courseIncludes) ? $courseIncludes : (!empty($topics) ? $topics : (!empty($learningPoints) ? $learningPoints : []));
+                    @endphp
+
+                    @if(!empty($overviewLearnPoints) && count($overviewLearnPoints) > 0)
+                        <!-- What you’ll learn Section (Matching authentic DC screenshot media_1795429241970_3e30eeae.jpg exactly) -->
+                        <div class="what-youll-learn-section mt-4 pt-2">
+                            <h3 class="fw-bold mb-3 text-dark" style="font-size: 1.35rem; letter-spacing: -0.01em;">What you’ll learn</h3>
+                            <div class="d-flex flex-column gap-2.5">
+                                @foreach($overviewLearnPoints as $pt)
+                                    <div class="d-flex align-items-start gap-2.5">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
+                                        <span style="font-size: 0.92rem; color: #334155; line-height: 1.55;">{{ $pt }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     @if(!empty($course->course_activation_instruction))
-                        <div class="alert alert-info mt-3 p-3 rounded-3 border-0 bg-primary-subtle" style="font-size: 0.8rem;">
+                        <div class="alert alert-info mt-4 p-3 rounded-3 border-0 bg-primary-subtle" style="font-size: 0.8rem;">
                             <div class="fw-bold text-primary mb-1"><i class="fa-solid fa-circle-info me-1"></i> Course Access & Activation Instructions</div>
                             <div class="text-secondary">{!! nl2br(e($course->course_activation_instruction)) !!}</div>
                         </div>
                     @endif
                 </div>
-
-                @php
-                    $overviewLearnPoints = !empty($topics) ? $topics : (!empty($learningPoints) ? $learningPoints : []);
-                @endphp
-                @if(!empty($overviewLearnPoints) && count($overviewLearnPoints) > 0)
-                    <!-- What You'll Learn Card (Authentic to DC Course Overview) -->
-                    <div class="section-card-white mb-3 p-3.5 rounded-3" style="background: #f8fdf9; border: 1px solid #bbf7d0;">
-                        <h3 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2" style="font-size: 1.15rem;">
-                            <i class="fa-solid fa-graduation-cap text-success"></i> What Will You Learn?
-                        </h3>
-                        @php $halfWl = ceil(count($overviewLearnPoints) / 2); @endphp
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                @foreach(array_slice($overviewLearnPoints, 0, $halfWl) as $pt)
-                                    <div class="d-flex align-items-start gap-2 mb-2">
-                                        <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
-                                        <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $pt }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <div class="col-md-6">
-                                @foreach(array_slice($overviewLearnPoints, $halfWl) as $pt)
-                                    <div class="d-flex align-items-start gap-2 mb-2">
-                                        <i class="fa-solid fa-circle-check text-success mt-1 flex-shrink-0" style="font-size: 0.95rem;"></i>
-                                        <span style="font-size: 0.88rem; color: #1e293b; line-height: 1.5;">{{ $pt }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @endif
 
                 <!-- Course Highlights Grid -->
                 <div class="section-card-white mb-3 p-3">
