@@ -800,6 +800,14 @@
                                     <span>Get verified badge</span>
                                 </li>
                                 <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-headset text-success"></i></span>
+                                    <span class="fw-bold text-success">High Support Assistance</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-bolt text-warning"></i></span>
+                                    <span class="fw-bold text-dark">Suggested First in Search & Listings</span>
+                                </li>
+                                <li class="plan-feature-item">
                                     <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
                                     <span>Priority in listings</span>
                                 </li>
@@ -840,6 +848,14 @@
                                 <li class="plan-feature-item">
                                     <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>
                                     <span>More visibility & leads</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-headset text-success"></i></span>
+                                    <span class="fw-bold text-success">High Priority 24/7 Support</span>
+                                </li>
+                                <li class="plan-feature-item">
+                                    <span class="plan-feature-check"><i class="fa-solid fa-bolt text-warning"></i></span>
+                                    <span class="fw-bold text-dark">Top Suggestion First Everywhere</span>
                                 </li>
                                 <li class="plan-feature-item">
                                     <span class="plan-feature-check"><i class="fa-solid fa-check"></i></span>

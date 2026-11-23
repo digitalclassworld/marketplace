@@ -133,8 +133,12 @@ class SellerBusinessListingController extends Controller
         }
         if ($listingType === 'Featured') {
             $features['badge'] = 'Featured';
+            $features['high_support'] = true;
+            $features['suggestion_first'] = true;
         } elseif ($listingType === 'Premium') {
             $features['badge'] = 'Premium';
+            $features['high_support'] = true;
+            $features['suggestion_first'] = true;
         }
 
         $seller->businessListings()->create([

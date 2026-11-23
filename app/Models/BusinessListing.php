@@ -157,6 +157,22 @@ class BusinessListing extends Model
             || (float)($this->plan_price ?? 0) >= 1499;
     }
 
+    public function hasHighSupport(): bool
+    {
+        if (isset($this->features['high_support']) && $this->features['high_support']) {
+            return true;
+        }
+        return $this->isPremium();
+    }
+
+    public function isSuggestedFirst(): bool
+    {
+        if (isset($this->features['suggestion_first']) && $this->features['suggestion_first']) {
+            return true;
+        }
+        return $this->isPremium();
+    }
+
     public function hasVerifiedBadge(): bool
     {
         if ($this->isPremium()) {

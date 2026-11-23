@@ -406,6 +406,11 @@
         color: #ffffff;
         box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
     }
+    .card-badge-high-support {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.98) 0%, rgba(5, 150, 105, 1) 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+    }
 
     .card-heart-btn {
         position: absolute;
@@ -1171,7 +1176,7 @@
                         <div class="d-flex align-items-center gap-1 small text-muted">
                             <span>Sort by:</span>
                             <select class="form-select form-select-sm" style="font-size: 0.75rem; width: auto;" onchange="submitWithSort(this.value)">
-                                <option value="popular" {{ $sortBy === 'popular' ? 'selected' : '' }}>Most Popular</option>
+                                <option value="suggested" {{ ($sortBy === 'suggested' || $sortBy === 'popular' || empty($sortBy)) ? 'selected' : '' }}>Suggested First (High Support)</option>
                                 <option value="rating" {{ $sortBy === 'rating' ? 'selected' : '' }}>Highest Rated</option>
                                 <option value="newest" {{ $sortBy === 'newest' ? 'selected' : '' }}>Recently Added</option>
                             </select>
@@ -1207,13 +1212,19 @@
                                 <div class="card-thumb-wrapper">
                                     <img src="{{ $b->display_image }}" alt="{{ $b->business_name }}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80';">
                                     
-                                    @if($b->badge === 'Featured')
-                                        <span class="card-badge-pill card-badge-featured"><i class="fa-solid fa-crown me-1 text-warning"></i>Featured</span>
-                                    @elseif($b->badge === 'Premium')
-                                        <span class="card-badge-pill card-badge-premium"><i class="fa-solid fa-gem me-1"></i>Premium</span>
-                                    @elseif($b->badge === 'Verified')
-                                        <span class="card-badge-pill card-badge-verified"><i class="fa-solid fa-circle-check me-1"></i>Verified</span>
-                                    @endif
+                                    <div class="d-flex flex-column gap-1 position-absolute" style="top: 10px; left: 10px; z-index: 2;">
+                                        @if($b->badge === 'Featured')
+                                            <span class="card-badge-pill card-badge-featured position-static"><i class="fa-solid fa-crown me-1 text-warning"></i>Featured</span>
+                                        @elseif($b->badge === 'Premium')
+                                            <span class="card-badge-pill card-badge-premium position-static"><i class="fa-solid fa-gem me-1"></i>Premium</span>
+                                        @elseif($b->badge === 'Verified')
+                                            <span class="card-badge-pill card-badge-verified position-static"><i class="fa-solid fa-circle-check me-1"></i>Verified</span>
+                                        @endif
+
+                                        @if($b->hasHighSupport())
+                                            <span class="card-badge-pill card-badge-high-support position-static" title="Dedicated High Priority Customer Support"><i class="fa-solid fa-headset me-1"></i>High Support</span>
+                                        @endif
+                                    </div>
 
                                     <button class="card-heart-btn" onclick="toggleFavorite(this, '{{ addslashes($b->business_name) }}')" title="Save to favorites">
                                         <i class="fa-regular fa-heart"></i>
@@ -1244,6 +1255,18 @@
                                             </span>
                                         @endif
                                     </div>
+
+                                    <!-- High Support & Top Suggestion Badges -->
+                                    @if($b->hasHighSupport())
+                                        <div class="d-flex align-items-center gap-1.5 my-1 flex-wrap">
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-1.5 py-0.5 fw-bold" style="font-size: 0.65rem;" title="Premium Business with High Support">
+                                                <i class="fa-solid fa-headset me-0.5"></i> High Support
+                                            </span>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-1.5 py-0.5 fw-bold" style="font-size: 0.65rem;" title="Suggested First in Search & Directory">
+                                                <i class="fa-solid fa-bolt me-0.5"></i> Top Suggestion
+                                            </span>
+                                        </div>
+                                    @endif
 
                                     <!-- Location & Distance -->
                                     <div class="card-location-row d-flex align-items-center justify-content-between">

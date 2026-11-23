@@ -430,16 +430,41 @@
                     <button type="button" class="btn btn-send-inquiry" data-bs-toggle="modal" data-bs-target="#inquiryModal">
                         <i class="fa-solid fa-circle-info"></i> Send Inquiry
                     </button>
+
+                    @if($business->hasHighSupport())
+                        <div class="mt-3 p-2.5 rounded-3 border bg-light text-start shadow-2xs" style="max-width: 220px;">
+                            <div class="d-flex align-items-center gap-1.5 text-success fw-bold small mb-1">
+                                <i class="fa-solid fa-shield-halved"></i> High Support
+                            </div>
+                            <div class="text-secondary small" style="font-size: 0.72rem; line-height: 1.35;">
+                                This verified premium business provides dedicated high priority customer support & quick response.
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Right Column: Details & Social Share -->
                 <div class="flex-grow-1">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
-                        <h1 class="institute-title">{{ $business->business_name }}</h1>
+                        <h1 class="institute-title mb-0">{{ $business->business_name }}</h1>
                         <button type="button" class="btn-claim-business" data-bs-toggle="modal" data-bs-target="#claimModal">
                             Claim This Business
                         </button>
                     </div>
+
+                    @if($business->hasHighSupport())
+                        <div class="d-flex align-items-center gap-2 my-2 flex-wrap">
+                            <span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">
+                                <i class="fa-solid fa-crown me-1"></i> Premium Business
+                            </span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">
+                                <i class="fa-solid fa-headset me-1"></i> High Support Included
+                            </span>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill fw-bold" style="font-size: 0.72rem;">
+                                <i class="fa-solid fa-bolt me-1"></i> Top Suggested
+                            </span>
+                        </div>
+                    @endif
 
                     <!-- Category & Subcategory -->
                     <div class="institute-category-sub">

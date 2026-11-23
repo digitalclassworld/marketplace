@@ -138,12 +138,18 @@ class BusinessProfileTest extends TestCase
         $this->assertEquals(2, $premiumListing->priority_rank);
         $this->assertEquals(3, $freeListing->priority_rank);
 
+        $this->assertTrue($premiumListing->hasHighSupport());
+        $this->assertTrue($featuredListing->hasHighSupport());
+        $this->assertFalse($freeListing->hasHighSupport());
+
         $response = $this->get('/businesses');
         $response->assertStatus(200);
 
         // Verify Featured and Premium badges render
         $response->assertSee('Featured');
         $response->assertSee('Premium');
+        $response->assertSee('High Support');
+        $response->assertSee('Top Suggestion');
 
         // Check relative ordering in the HTML response
         $content = $response->getContent();
