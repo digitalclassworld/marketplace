@@ -14,13 +14,13 @@
     /* Left Promo Column */
     .hero-badge-pill {
         display: inline-block;
-        background-color: #eff6ff;
-        color: #0066ff;
+        background-color: #f1f5f9;
+        color: #0f172a;
         font-size: 0.825rem;
         font-weight: 700;
         padding: 0.35rem 0.95rem;
         border-radius: 999px;
-        border: 1px solid #dbeafe;
+        border: 1px solid #cbd5e1;
         margin-bottom: 1rem;
     }
 
@@ -38,7 +38,7 @@
         font-family: var(--dc-font-heading);
         font-size: 1.35rem;
         font-weight: 700;
-        color: #0066ff;
+        color: #0f172a;
         line-height: 1.3;
         margin-bottom: 1rem;
     }
@@ -160,8 +160,8 @@
     }
 
     .reg-form-card .form-control:focus {
-        border-color: #0066ff;
-        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+        border-color: #0f172a;
+        box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
     }
 
     .reg-form-card .input-group-text,
@@ -218,10 +218,10 @@
     }
 
     .step-item.active .step-circle {
-        background: #0066ff;
-        border-color: #0066ff;
+        background: #0f172a;
+        border-color: #0f172a;
         color: #ffffff;
-        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+        box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15);
     }
 
     .step-label {
@@ -231,7 +231,7 @@
     }
 
     .step-item.active .step-label {
-        color: #0066ff;
+        color: #0f172a;
         font-weight: 700;
     }
 
@@ -255,19 +255,19 @@
     }
 
     .account-type-card:hover {
-        border-color: #93c5fd;
+        border-color: #94a3b8;
         background: #f8fafc;
     }
 
     .account-type-card.selected {
-        border-color: #0066ff;
-        background: #eff6ff;
-        box-shadow: 0 2px 8px rgba(0, 102, 255, 0.12);
+        border-color: #0f172a;
+        background: #f8fafc;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
     }
 
     .account-type-card .icon-box {
         font-size: 1rem;
-        color: #0066ff;
+        color: #0f172a;
         margin-bottom: 0.15rem;
     }
 
@@ -683,15 +683,15 @@
                         </div>
 
                         <!-- Submit Continue Button (Matching Screenshot) -->
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2 mt-2" style="background-color: #0066ff; border-radius: 8px; font-size: 0.9rem;">
+                        <button type="submit" class="btn btn-dark w-100 fw-bold py-2.5 shadow-sm d-flex align-items-center justify-content-center gap-2 mt-2" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: none; border-radius: 10px; font-size: 0.95rem;">
                             <span>Continue</span>
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
 
                         <!-- Already have an account link -->
-                        <div class="text-center mt-2">
+                        <div class="text-center mt-2.5">
                             <span class="text-muted" style="font-size: 0.775rem;">Already have a seller account? </span>
-                            <a href="{{ route('seller.login') }}" class="fw-bold text-primary text-decoration-none" style="font-size: 0.775rem;">Login here</a>
+                            <a href="{{ route('seller.login') }}" class="fw-bold text-dark text-decoration-none" style="font-size: 0.775rem;">Login here &rarr;</a>
                         </div>
                     </form>
                 </div>

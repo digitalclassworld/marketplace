@@ -14,13 +14,13 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background-color: #eff6ff;
-        color: #0066ff;
+        background-color: #ecfdf5;
+        color: #047857;
         font-size: 0.8rem;
         font-weight: 700;
         padding: 0.35rem 0.95rem;
         border-radius: 999px;
-        border: 1px solid #bfdbfe;
+        border: 1px solid #a7f3d0;
         margin-bottom: 1.25rem;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -78,7 +78,7 @@
     }
 
     .auth-card-header {
-        background: linear-gradient(135deg, #0066ff 0%, #004ecc 100%);
+        background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #059669 100%);
         padding: 2rem 2.25rem;
         color: #ffffff;
         position: relative;
@@ -92,9 +92,9 @@
         background: #f8fafc;
     }
     .custom-auth-input-group:focus-within {
-        border-color: #0066ff;
+        border-color: #059669;
         background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
     }
     .custom-auth-input-group .input-group-text {
         background: transparent;
@@ -130,13 +130,13 @@
         user-select: none;
     }
     .interest-chip-input:checked + .interest-chip-label {
-        background-color: #eff6ff;
-        border-color: #0066ff;
-        color: #0066ff;
+        background-color: #ecfdf5;
+        border-color: #059669;
+        color: #047857;
     }
 
     .btn-submit-customer {
-        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
         border: none;
         color: #ffffff;
         font-weight: 700;
@@ -144,8 +144,8 @@
         transition: all 0.2s ease;
     }
     .btn-submit-customer:hover {
-        background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
-        box-shadow: 0 6px 20px -3px rgba(0, 102, 255, 0.35);
+        background: linear-gradient(135deg, #047857 0%, #064e3b 100%);
+        box-shadow: 0 6px 20px -3px rgba(5, 150, 105, 0.35);
         color: #ffffff;
         transform: translateY(-1px);
     }
@@ -198,7 +198,7 @@
                     </div>
 
                     <div class="benefit-item">
-                        <div class="benefit-icon-box bg-primary bg-opacity-10 text-primary">
+                        <div class="benefit-icon-box" style="background-color: #ecfdf5; color: #047857;">
                             <i class="fa-solid fa-graduation-cap"></i>
                         </div>
                         <div>
@@ -487,7 +487,7 @@
                             <div class="form-check mb-4">
                                 <input class="form-check-input" type="checkbox" id="termsCheck" required checked>
                                 <label class="form-check-label small text-muted" for="termsCheck" style="font-size: 0.8rem;">
-                                    I agree to the <a href="#" class="text-primary text-decoration-none fw-semibold">Terms of Service</a> and <a href="#" class="text-primary text-decoration-none fw-semibold">Privacy Policy</a> of Digital Class Marketplace.
+                                    I agree to the <a href="#" class="text-decoration-none fw-semibold" style="color: #059669;">Terms of Service</a> and <a href="#" class="text-decoration-none fw-semibold" style="color: #059669;">Privacy Policy</a> of Digital Class Marketplace.
                                 </label>
                             </div>
 
@@ -500,7 +500,7 @@
                             <!-- LOGIN REDIRECT FOOTER -->
                             <div class="text-center small text-muted py-2">
                                 Already have an account? 
-                                <a href="{{ route('customer.login') }}" class="text-primary fw-bold text-decoration-none ms-1">
+                                <a href="{{ route('customer.login') }}" class="fw-bold text-decoration-none ms-1" style="color: #059669;">
                                     Log In Here &rarr;
                                 </a>
                             </div>

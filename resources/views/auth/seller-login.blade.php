@@ -15,15 +15,16 @@
     .dc-auth-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        padding: 2.5rem 2rem;
+        border-radius: 22px;
+        box-shadow: 0 15px 40px -10px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.04);
+        padding: 2.75rem 2.25rem;
     }
 
     .dc-auth-title {
-        font-weight: 700;
-        color: #0e1726;
-        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        font-size: 1.6rem;
+        letter-spacing: -0.02em;
         margin-bottom: 0.35rem;
     }
 
@@ -31,17 +32,19 @@
         background-color: #f8fafc;
         border-color: #cbd5e1;
         color: #64748b;
+        border-radius: 12px 0 0 12px;
     }
 
     .dc-form-input {
         border-color: #cbd5e1;
-        padding: 0.7rem 0.95rem;
+        padding: 0.75rem 1rem;
         font-size: 0.9375rem;
+        border-radius: 0 12px 12px 0;
     }
 
     .dc-form-input:focus {
-        border-color: #0066ff;
-        box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+        border-color: #0f172a;
+        box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
     }
 
     .dc-demo-box {
@@ -162,8 +165,8 @@
 
                         <!-- Submit Button -->
                         <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary py-2 fw-semibold" style="background-color: #0066ff; border-color: #0066ff;">
-                                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Sign In to Seller Dashboard
+                            <button type="submit" class="btn btn-dark py-2.5 fw-bold shadow-sm" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: none; border-radius: 12px; font-size: 0.95rem;">
+                                <i class="fa-solid fa-arrow-right-to-bracket me-1.5"></i> Sign In to Seller Dashboard
                             </button>
                         </div>
                     </form>
@@ -172,7 +175,7 @@
                     <div class="text-center pt-3 border-top">
                         <span class="small text-muted">New seller on Digital Class?</span>
                         <div class="mt-2">
-                            <a href="{{ route('seller.register') }}" class="btn btn-outline-primary btn-sm px-3 fw-semibold">
+                            <a href="{{ route('seller.register') }}" class="btn btn-outline-dark btn-sm px-3 fw-semibold rounded-pill">
                                 <i class="fa-solid fa-store me-1"></i> Register New Seller Account
                             </a>
                         </div>
@@ -182,7 +185,7 @@
                     <div class="text-center mt-3 pt-3 border-top">
                         <span class="small text-muted d-block mb-1.5">Looking to learn, enroll, or buy as a student/client?</span>
                         <div class="d-flex align-items-center justify-content-center gap-2">
-                            <a href="{{ route('customer.register') }}" class="btn btn-primary btn-sm px-3 fw-bold rounded-pill" style="background-color: #0066ff;">
+                            <a href="{{ route('customer.register') }}" class="btn btn-sm px-3 fw-bold rounded-pill text-white" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border: none;">
                                 <i class="fa-solid fa-user-plus me-1"></i> Customer Sign Up
                             </a>
                             <a href="{{ route('customer.login') }}" class="btn btn-outline-secondary btn-sm px-3 fw-semibold rounded-pill">

@@ -283,12 +283,12 @@
                         To activate this seller and unlock their full working dashboard:
                     </p>
                     <ol class="small text-muted ps-3 mb-3">
-                        <li class="mb-1">Log in to the <strong>Super Admin Portal</strong> (<code>superadmin@gmail.com</code> / <code>Admin@123</code>).</li>
+                        <li class="mb-1">Log in to the <strong>Super Admin Portal</strong>.</li>
                         <li class="mb-1">Open <strong>Sellers &rarr; Pending Approvals</strong>.</li>
                         <li>Click <strong>Approve</strong> on seller <code>{{ $seller->seller_code }}</code>.</li>
                     </ol>
-                    <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary fw-semibold mt-auto" style="background-color: #0066ff;">
-                        <i class="fa-solid fa-shield-halved me-1"></i> Open Super Admin Portal &rarr;
+                    <a href="{{ $superAdminUrl ?? (config('app.super_admin_url') ?: url('/super/admin/login')) }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-dark fw-semibold mt-auto" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: none;">
+                        <i class="fa-solid fa-shield-halved me-1 text-warning"></i> Open Super Admin Portal &rarr;
                     </a>
                 </div>
             </div>
