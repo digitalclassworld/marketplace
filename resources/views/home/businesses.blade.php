@@ -702,18 +702,27 @@
                         <i class="fa-solid fa-location-dot text-primary ms-2 me-1"></i>
                         <select name="city" class="hero-location-select" id="heroCitySelect" onchange="handleHeroCityChange(this)">
                             <option value="near_me" {{ in_array($selectedCity, ['Near Me', 'near_me']) ? 'selected' : '' }}>📍 Near Me (GPS)</option>
-                            <option value="Ahmedabad" {{ $selectedCity === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
-                            <option value="Surat" {{ $selectedCity === 'Surat' ? 'selected' : '' }}>Surat</option>
-                            <option value="Vadodara" {{ $selectedCity === 'Vadodara' ? 'selected' : '' }}>Vadodara</option>
-                            <option value="Rajkot" {{ $selectedCity === 'Rajkot' ? 'selected' : '' }}>Rajkot</option>
-                            <option value="Gandhinagar" {{ $selectedCity === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
-                            <option value="Mumbai" {{ $selectedCity === 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
-                            <option value="Delhi NCR" {{ $selectedCity === 'Delhi NCR' ? 'selected' : '' }}>Delhi NCR</option>
-                            <option value="Bengaluru" {{ $selectedCity === 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
-                            <option value="Pune" {{ $selectedCity === 'Pune' ? 'selected' : '' }}>Pune</option>
-                            <option value="Jaipur" {{ $selectedCity === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
-                            <option value="Indore" {{ $selectedCity === 'Indore' ? 'selected' : '' }}>Indore</option>
-                            <option value="All Locations" {{ $selectedCity === 'All Locations' ? 'selected' : '' }}>All India</option>
+                            <option value="All Locations" {{ ($selectedCity === 'All Locations' || !$selectedCity) ? 'selected' : '' }}>All India</option>
+                            <optgroup label="Popular Cities">
+                                <option value="Mumbai" {{ $selectedCity === 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
+                                <option value="Delhi NCR" {{ $selectedCity === 'Delhi NCR' ? 'selected' : '' }}>Delhi NCR</option>
+                                <option value="Bengaluru" {{ $selectedCity === 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
+                                <option value="Ahmedabad" {{ $selectedCity === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
+                                <option value="Pune" {{ $selectedCity === 'Pune' ? 'selected' : '' }}>Pune</option>
+                                <option value="Surat" {{ $selectedCity === 'Surat' ? 'selected' : '' }}>Surat</option>
+                                <option value="Vadodara" {{ $selectedCity === 'Vadodara' ? 'selected' : '' }}>Vadodara</option>
+                                <option value="Jaipur" {{ $selectedCity === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
+                                <option value="Indore" {{ $selectedCity === 'Indore' ? 'selected' : '' }}>Indore</option>
+                                <option value="Rajkot" {{ $selectedCity === 'Rajkot' ? 'selected' : '' }}>Rajkot</option>
+                                <option value="Gandhinagar" {{ $selectedCity === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
+                            </optgroup>
+                            <optgroup label="States & Territories">
+                                @foreach($sidebarStates as $st)
+                                    <option value="{{ $st['name'] }}" {{ ($selectedCity === $st['name'] || ($selectedState ?? '') === $st['name']) ? 'selected' : '' }}>
+                                        {{ $st['name'] }} ({{ number_format($st['count']) }})
+                                    </option>
+                                @endforeach
+                            </optgroup>
                         </select>
                         <input type="hidden" name="lat" id="heroLat" value="{{ request('lat') }}">
                         <input type="hidden" name="lng" id="heroLng" value="{{ request('lng') }}">
@@ -851,18 +860,27 @@
                         </button>
                         <select name="city" id="sidebarCitySelect" class="form-select form-select-sm mb-2" onchange="handleSidebarCityChange(this)">
                             <option value="near_me" {{ in_array($selectedCity, ['Near Me', 'near_me']) ? 'selected' : '' }}>📍 Near Me (GPS)</option>
-                            <option value="Ahmedabad" {{ $selectedCity === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
-                            <option value="Surat" {{ $selectedCity === 'Surat' ? 'selected' : '' }}>Surat</option>
-                            <option value="Vadodara" {{ $selectedCity === 'Vadodara' ? 'selected' : '' }}>Vadodara</option>
-                            <option value="Rajkot" {{ $selectedCity === 'Rajkot' ? 'selected' : '' }}>Rajkot</option>
-                            <option value="Gandhinagar" {{ $selectedCity === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
-                            <option value="Mumbai" {{ $selectedCity === 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
-                            <option value="Delhi NCR" {{ $selectedCity === 'Delhi NCR' ? 'selected' : '' }}>Delhi NCR</option>
-                            <option value="Bengaluru" {{ $selectedCity === 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
-                            <option value="Pune" {{ $selectedCity === 'Pune' ? 'selected' : '' }}>Pune</option>
-                            <option value="Jaipur" {{ $selectedCity === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
-                            <option value="Indore" {{ $selectedCity === 'Indore' ? 'selected' : '' }}>Indore</option>
-                            <option value="All Locations" {{ $selectedCity === 'All Locations' ? 'selected' : '' }}>All India</option>
+                            <option value="All Locations" {{ ($selectedCity === 'All Locations' || !$selectedCity) ? 'selected' : '' }}>All India</option>
+                            <optgroup label="Popular Cities">
+                                <option value="Mumbai" {{ $selectedCity === 'Mumbai' ? 'selected' : '' }}>Mumbai</option>
+                                <option value="Delhi NCR" {{ $selectedCity === 'Delhi NCR' ? 'selected' : '' }}>Delhi NCR</option>
+                                <option value="Bengaluru" {{ $selectedCity === 'Bengaluru' ? 'selected' : '' }}>Bengaluru</option>
+                                <option value="Ahmedabad" {{ $selectedCity === 'Ahmedabad' ? 'selected' : '' }}>Ahmedabad</option>
+                                <option value="Pune" {{ $selectedCity === 'Pune' ? 'selected' : '' }}>Pune</option>
+                                <option value="Surat" {{ $selectedCity === 'Surat' ? 'selected' : '' }}>Surat</option>
+                                <option value="Vadodara" {{ $selectedCity === 'Vadodara' ? 'selected' : '' }}>Vadodara</option>
+                                <option value="Jaipur" {{ $selectedCity === 'Jaipur' ? 'selected' : '' }}>Jaipur</option>
+                                <option value="Indore" {{ $selectedCity === 'Indore' ? 'selected' : '' }}>Indore</option>
+                                <option value="Rajkot" {{ $selectedCity === 'Rajkot' ? 'selected' : '' }}>Rajkot</option>
+                                <option value="Gandhinagar" {{ $selectedCity === 'Gandhinagar' ? 'selected' : '' }}>Gandhinagar</option>
+                            </optgroup>
+                            <optgroup label="States & Territories">
+                                @foreach($sidebarStates as $st)
+                                    <option value="{{ $st['name'] }}" {{ ($selectedCity === $st['name'] || ($selectedState ?? '') === $st['name']) ? 'selected' : '' }}>
+                                        {{ $st['name'] }} ({{ number_format($st['count']) }})
+                                    </option>
+                                @endforeach
+                            </optgroup>
                         </select>
                         <select name="distance" class="form-select form-select-sm text-muted" onchange="document.getElementById('homeFilterForm').submit()">
                             <option value="all" {{ ($selectedDistance ?? 'all') === 'all' ? 'selected' : '' }}>Any Distance</option>
@@ -873,6 +891,46 @@
                         </select>
                         <input type="hidden" name="lat" id="sidebarLat" value="{{ request('lat') }}">
                         <input type="hidden" name="lng" id="sidebarLng" value="{{ request('lng') }}">
+                    </div>
+
+                    <!-- State Filter (All Indian States with real listing counts) -->
+                    <div class="mb-3">
+                        <div class="filter-section-title d-flex align-items-center justify-content-between">
+                            <span>State</span>
+                            @if(!empty($selectedState))
+                                <a href="javascript:void(0)" onclick="clearStateFilter()" class="text-primary small text-decoration-none" style="font-size: 0.72rem;">Clear</a>
+                            @endif
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="text" id="stateFilterSearch" class="form-control" placeholder="Search states..." onkeyup="filterStateCheckboxes(this.value)">
+                        </div>
+                        <div id="stateCheckboxesContainer" style="max-height: 220px; overflow-y: auto; padding-right: 4px;">
+                            <div class="filter-check-item">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" name="state" value="" id="state_all"
+                                           {{ empty($selectedState) ? 'checked' : '' }}
+                                           onchange="document.getElementById('homeFilterForm').submit()">
+                                    <label class="form-check-label" for="state_all">
+                                        All States
+                                    </label>
+                                </div>
+                            </div>
+                            @foreach($sidebarStates as $st)
+                                <div class="filter-check-item state-check-row">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="state" value="{{ $st['name'] }}" id="state_{{ Str::slug($st['name']) }}"
+                                               {{ ($selectedState === $st['name']) ? 'checked' : '' }}
+                                               onchange="document.getElementById('homeFilterForm').submit()">
+                                        <label class="form-check-label" for="state_{{ Str::slug($st['name']) }}">
+                                            {{ $st['name'] }}
+                                        </label>
+                                    </div>
+                                    @if(!empty($st['count']))
+                                        <span class="filter-count">({{ number_format($st['count']) }})</span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <!-- Business Category -->
@@ -1610,6 +1668,24 @@
             alert('Unable to retrieve location: ' + err.message + '. Please ensure location permissions are enabled.');
             if (btnText) btnText.textContent = orig;
         }, { timeout: 10000, enableHighAccuracy: true });
+    }
+
+    // State filter search inside sidebar
+    function filterStateCheckboxes(query) {
+        const q = (query || '').toLowerCase().trim();
+        document.querySelectorAll('.state-check-row').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
+        });
+    }
+
+    // Clear state filter
+    function clearStateFilter() {
+        const checked = document.querySelector('input[name="state"]:checked');
+        if (checked) checked.checked = false;
+        const allRadio = document.getElementById('state_all');
+        if (allRadio) allRadio.checked = true;
+        document.getElementById('homeFilterForm').submit();
     }
 </script>
 

@@ -852,6 +852,22 @@
                             <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Pune' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Pune']) }}">Pune</a></li>
                             <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Jaipur' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Jaipur']) }}">Jaipur</a></li>
                             <li><a class="dropdown-item small py-1.5 rounded-2 {{ request('city') === 'Indore' ? 'active' : '' }}" href="{{ route($navCityTarget, ['city' => 'Indore']) }}">Indore</a></li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li class="dropdown-header small text-muted fw-bold py-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">STATES &amp; REGIONS</li>
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                @php
+                                    $topNavStates = [
+                                        'Maharashtra', 'Karnataka', 'Delhi', 'Gujarat', 'Uttar Pradesh', 'Rajasthan',
+                                        'Punjab', 'Tamil Nadu', 'Madhya Pradesh', 'Bihar', 'West Bengal', 'Haryana',
+                                        'Kerala', 'Andhra Pradesh', 'Telangana', 'Jharkhand', 'Chhattisgarh',
+                                        'Uttarakhand', 'Odisha', 'Assam', 'Jammu & Kashmir', 'Himachal Pradesh',
+                                        'Goa', 'Puducherry', 'Tripura', 'Sikkim', 'Manipur', 'Arunachal Pradesh'
+                                    ];
+                                @endphp
+                                @foreach($topNavStates as $stName)
+                                    <li><a class="dropdown-item small py-1 rounded-2 {{ (request('city') === $stName || request('state') === $stName) ? 'active' : '' }}" href="{{ route('businesses', ['city' => $stName]) }}">{{ $stName }}</a></li>
+                                @endforeach
+                            </div>
                         </ul>
                     </div>
                     @endif

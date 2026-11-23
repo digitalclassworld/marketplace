@@ -178,6 +178,7 @@ class HomeController extends Controller
         $searchQuery = $request->input('search');
         $selectedCategory = $request->input('category');
         $selectedCity = $request->input('city', 'All Locations');
+        $selectedState = $request->input('state');
         $selectedRating = $request->input('rating');
         $selectedFacilities = (array) $request->input('facility', []);
         $selectedBusinessTypes = (array) $request->input('business_type', []);
@@ -204,9 +205,10 @@ class HomeController extends Controller
 
                 $hasAreaCol = Schema::hasColumn('business_listings', 'area');
                 $hasLandmarkCol = Schema::hasColumn('business_listings', 'landmark');
+                $hasStateCol = Schema::hasColumn('business_listings', 'state');
 
                 if (!empty($searchQuery)) {
-                    $query->where(function ($q) use ($searchQuery, $hasAreaCol, $hasLandmarkCol) {
+                    $query->where(function ($q) use ($searchQuery, $hasAreaCol, $hasLandmarkCol, $hasStateCol) {
                         $q->where('business_name', 'like', "%{$searchQuery}%")
                           ->orWhere('category', 'like', "%{$searchQuery}%")
                           ->orWhere('sub_category', 'like', "%{$searchQuery}%")
@@ -214,6 +216,9 @@ class HomeController extends Controller
                           ->orWhere('address', 'like', "%{$searchQuery}%")
                           ->orWhere('pincode', 'like', "%{$searchQuery}%");
 
+                        if ($hasStateCol) {
+                            $q->orWhere('state', 'like', "%{$searchQuery}%");
+                        }
                         if ($hasAreaCol) {
                             $q->orWhere('area', 'like', "%{$searchQuery}%");
                         }
@@ -231,13 +236,37 @@ class HomeController extends Controller
                 }
 
                 if (!empty($selectedCity) && !in_array($selectedCity, ['All Locations', 'all', 'Near Me', 'near_me'])) {
-                    $query->where(function ($q) use ($selectedCity, $hasAreaCol) {
+                    $query->where(function ($q) use ($selectedCity, $hasAreaCol, $hasStateCol) {
                         $q->where('city', 'like', "%{$selectedCity}%")
                           ->orWhere('address', 'like', "%{$selectedCity}%")
                           ->orWhere('pincode', 'like', "%{$selectedCity}%");
 
+                        if ($hasStateCol) {
+                            $q->orWhere('state', 'like', "%{$selectedCity}%");
+                            if (stripos($selectedCity, 'Tamil') !== false) {
+                                $q->orWhere('state', 'like', '%Tamil%');
+                            } elseif (stripos($selectedCity, 'Jammu') !== false) {
+                                $q->orWhere('state', 'like', '%Jammu%');
+                            } elseif (stripos($selectedCity, 'Uttar') !== false && stripos($selectedCity, 'Pradesh') === false) {
+                                $q->orWhere('state', 'like', '%Uttar%');
+                            }
+                        }
+
                         if ($hasAreaCol) {
                             $q->orWhere('area', 'like', "%{$selectedCity}%");
+                        }
+                    });
+                }
+
+                if (!empty($selectedState) && !in_array($selectedState, ['All States', 'all']) && $hasStateCol) {
+                    $query->where(function ($q) use ($selectedState) {
+                        $q->where('state', 'like', "%{$selectedState}%");
+                        if (stripos($selectedState, 'Tamil') !== false) {
+                            $q->orWhere('state', 'like', '%Tamil%');
+                        } elseif (stripos($selectedState, 'Jammu') !== false) {
+                            $q->orWhere('state', 'like', '%Jammu%');
+                        } elseif (stripos($selectedState, 'Uttar') !== false && stripos($selectedState, 'Pradesh') === false) {
+                            $q->orWhere('state', 'like', '%Uttar%');
                         }
                     });
                 }
@@ -348,14 +377,75 @@ class HomeController extends Controller
             ['name' => 'Restaurant & Food',  'count' => \App\Models\BusinessListing::where('category', 'like', '%Restaurant%')->count()],
         ];
 
+        // Sidebar states with real counts from database
+        $sidebarStates = [];
+        try {
+            $rawStates = DB::table('business_listings')
+                ->whereIn('status', ['approved', 'active', 'published'])
+                ->select('state', DB::raw('count(*) as cnt'))
+                ->whereNotNull('state')
+                ->where('state', '!=', '')
+                ->whereNotIn('state', ['Please wait', 'State', 'rajkot', 'New York'])
+                ->groupBy('state')
+                ->orderByDesc('cnt')
+                ->get();
+
+            $aliasMap = [
+                'Tamilnadu' => 'Tamil Nadu',
+                'Jammu and Kashmir' => 'Jammu & Kashmir',
+                'Uttaranchal' => 'Uttarakhand',
+            ];
+
+            $stateCounts = [];
+            foreach ($rawStates as $rs) {
+                $canonical = $aliasMap[$rs->state] ?? $rs->state;
+                $stateCounts[$canonical] = ($stateCounts[$canonical] ?? 0) + $rs->cnt;
+            }
+            arsort($stateCounts);
+
+            foreach ($stateCounts as $state => $cnt) {
+                $sidebarStates[] = ['name' => $state, 'count' => $cnt];
+            }
+        } catch (\Throwable $e) {
+            $sidebarStates = [
+                ['name' => 'Maharashtra', 'count' => 2848],
+                ['name' => 'Karnataka', 'count' => 1768],
+                ['name' => 'Delhi', 'count' => 1663],
+                ['name' => 'Gujarat', 'count' => 913],
+                ['name' => 'Uttar Pradesh', 'count' => 688],
+                ['name' => 'Rajasthan', 'count' => 448],
+                ['name' => 'Punjab', 'count' => 446],
+                ['name' => 'Tamil Nadu', 'count' => 423],
+                ['name' => 'Madhya Pradesh', 'count' => 342],
+                ['name' => 'Bihar', 'count' => 282],
+                ['name' => 'West Bengal', 'count' => 223],
+                ['name' => 'Haryana', 'count' => 206],
+                ['name' => 'Kerala', 'count' => 194],
+                ['name' => 'Andhra Pradesh', 'count' => 192],
+                ['name' => 'Telangana', 'count' => 192],
+                ['name' => 'Jharkhand', 'count' => 122],
+                ['name' => 'Chhattisgarh', 'count' => 80],
+                ['name' => 'Uttarakhand', 'count' => 75],
+                ['name' => 'Odisha', 'count' => 71],
+                ['name' => 'Assam', 'count' => 44],
+                ['name' => 'Jammu & Kashmir', 'count' => 41],
+                ['name' => 'Himachal Pradesh', 'count' => 33],
+                ['name' => 'Puducherry', 'count' => 15],
+                ['name' => 'Goa', 'count' => 12],
+                ['name' => 'Tripura', 'count' => 5],
+            ];
+        }
+
         return view('home.businesses', [
             'seller'                => $seller,
             'businesses'            => $businesses,
             'horizontalCategories'  => $horizontalCategories,
             'sidebarCategories'     => $sidebarCategories,
+            'sidebarStates'         => $sidebarStates,
             'searchQuery'           => $searchQuery,
             'selectedCategory'      => $selectedCategory ?: 'All Businesses',
             'selectedCity'          => $selectedCity,
+            'selectedState'         => $selectedState,
             'selectedDistance'      => $selectedDistance,
             'selectedRating'        => $selectedRating,
             'selectedFacilities'    => $selectedFacilities,
