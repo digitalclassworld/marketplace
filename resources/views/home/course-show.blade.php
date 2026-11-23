@@ -442,7 +442,7 @@
                 </h1>
 
                 <p class="text-secondary small mb-3" style="font-size: 0.825rem; line-height: 1.5; max-width: 720px;">
-                    {{ $course->short_description ?: 'Learn SEO, Social Media, Google Ads, Content Marketing, Email Marketing and AI Tools. Step by step practical training with live projects and certification.' }}
+                    {{ $course->short_description ?: ($course->title . ' - comprehensive online training program by ' . $course->instructor_name . '.') }}
                 </p>
 
                 <!-- Instructor Byline -->
@@ -486,10 +486,11 @@
          ======================================================================== -->
     <div class="course-subnav-tabs">
         <a href="#overview" class="course-subnav-link active">Overview</a>
+        <a href="#topics" class="course-subnav-link">Topics</a>
         <a href="#curriculum" class="course-subnav-link">Curriculum</a>
         <a href="#instructor" class="course-subnav-link">Instructor</a>
-        <a href="#reviews" class="course-subnav-link">Reviews</a>
         <a href="#faqs" class="course-subnav-link">FAQs</a>
+        <a href="#reviews" class="course-subnav-link">Reviews</a>
     </div>
 
     <!-- ========================================================================
@@ -500,13 +501,90 @@
         <!-- Left Column: Course In-Depth Details -->
         <div class="col-lg-8">
             
-            <!-- What Will You Learn Box -->
-            <div id="overview" class="what-you-learn-box">
+            <!-- Course Overview Section -->
+            <div id="overview" class="section-card-white mb-3">
+                <h2 class="section-card-title mb-3">Course Overview</h2>
+                
+                <div class="course-desc-content text-secondary" style="font-size: 0.86rem; line-height: 1.65;">
+                    {!! nl2br(e($course->description)) !!}
+                </div>
+
+                @if(!empty($course->course_activation_instruction))
+                    <div class="alert alert-info mt-3 p-3 rounded-3 border-0 bg-primary-subtle" style="font-size: 0.8rem;">
+                        <div class="fw-bold text-primary mb-1"><i class="fa-solid fa-circle-info me-1"></i> Course Access & Activation Instructions</div>
+                        <div class="text-secondary">{!! nl2br(e($course->course_activation_instruction)) !!}</div>
+                    </div>
+                @endif
+
+                <!-- Course Highlights Grid -->
+                <div class="row g-2 mt-3 pt-3 border-top">
+                    <div class="col-sm-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                            <i class="fa-regular fa-clock text-primary fs-5"></i>
+                            <div>
+                                <div class="text-muted" style="font-size: 0.68rem;">Duration</div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->duration }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                            <i class="fa-solid fa-layer-group text-success fs-5"></i>
+                            <div>
+                                <div class="text-muted" style="font-size: 0.68rem;">Chapters / Modules</div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_chapter ?: count($curriculum) }} Modules</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                            <i class="fa-solid fa-video text-info fs-5"></i>
+                            <div>
+                                <div class="text-muted" style="font-size: 0.68rem;">Video Lessons</div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_video ?: 24 }} Lectures</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                            <i class="fa-solid fa-signal text-warning fs-5"></i>
+                            <div>
+                                <div class="text-muted" style="font-size: 0.68rem;">Skill Level</div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->level }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                            <i class="fa-solid fa-language text-purple fs-5" style="color: #9333ea;"></i>
+                            <div>
+                                <div class="text-muted" style="font-size: 0.68rem;">Language</div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->language }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
+                            <i class="fa-solid fa-certificate text-danger fs-5"></i>
+                            <div>
+                                <div class="text-muted" style="font-size: 0.68rem;">Certificate</div>
+                                <div class="fw-bold text-dark" style="font-size: 0.78rem;">Official Verified</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topics: What Will You Learn Box -->
+            <div id="topics" class="what-you-learn-box mb-3">
                 <h2 class="fw-bold text-dark mb-3" style="font-size: 1.15rem;">What Will You Learn?</h2>
                 
+                @php
+                    $halfLp = ceil(count($learningPoints) / 2);
+                @endphp
                 <div class="row g-2">
                     <div class="col-md-6">
-                        @foreach(array_slice($learningPoints, 0, 5) as $lp)
+                        @foreach(array_slice($learningPoints, 0, $halfLp) as $lp)
                             <div class="learn-point-check">
                                 <i class="fa-solid fa-circle-check text-success fs-6 mt-1 flex-shrink-0"></i>
                                 <span>{{ $lp }}</span>
@@ -514,7 +592,7 @@
                         @endforeach
                     </div>
                     <div class="col-md-6">
-                        @foreach(array_slice($learningPoints, 5, 5) as $lp)
+                        @foreach(array_slice($learningPoints, $halfLp) as $lp)
                             <div class="learn-point-check">
                                 <i class="fa-solid fa-circle-check text-success fs-6 mt-1 flex-shrink-0"></i>
                                 <span>{{ $lp }}</span>
@@ -563,11 +641,19 @@
             </div>
 
             <!-- Course Curriculum Section -->
-            <div id="curriculum" class="section-card-white">
+            <div id="curriculum" class="section-card-white mb-3">
+                @php
+                    $totalCurriculumLectures = 0;
+                    foreach($curriculum as $m) {
+                        $totalCurriculumLectures += count($m['items'] ?? []);
+                    }
+                    $displayModules = !empty($course->course_chapter) ? $course->course_chapter : count($curriculum);
+                    $displayLectures = !empty($course->course_video) ? $course->course_video : ($totalCurriculumLectures ?: 24);
+                @endphp
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h2 class="section-card-title mb-0">Course Curriculum</h2>
                     <span class="text-muted small" style="font-size: 0.75rem;">
-                        {{ count($curriculum) }} Modules &bull; 60+ Lectures &bull; 45h Total Length
+                        {{ $displayModules }} Modules &bull; {{ $displayLectures }} Lectures &bull; {{ $course->duration }} Total Length
                     </span>
                 </div>
 
@@ -608,7 +694,7 @@
             </div>
 
             <!-- About the Instructor Section -->
-            <div id="instructor" class="section-card-white">
+            <div id="instructor" class="section-card-white mb-3">
                 <h2 class="section-card-title mb-3">About the Instructor</h2>
                 
                 <div class="d-flex align-items-start gap-3 mb-3">
@@ -624,14 +710,6 @@
                         <div class="text-primary small fw-semibold" style="font-size: 0.78rem;">{{ $course->instructor_subtitle ?? ($course->instructor_category . ' Expert') }}</div>
                         <div class="text-muted small" style="font-size: 0.72rem;">Authentic educator &amp; course creator on Digital Class</div>
 
-                        <!-- 4 Instructor Stats -->
-                        <div class="d-flex flex-wrap gap-3 mt-2 font-monospace" style="font-size: 0.72rem;">
-                            <span><i class="fa-solid fa-users text-primary me-1"></i> <strong>50,000+</strong> Students</span>
-                            <span><i class="fa-solid fa-book text-success me-1"></i> <strong>15+</strong> Courses</span>
-                            <span><i class="fa-solid fa-star text-warning me-1"></i> <strong>4.8</strong> Rating</span>
-                            <span><i class="fa-solid fa-briefcase text-info me-1"></i> <strong>200+</strong> Live Projects</span>
-                        </div>
-
                         <div class="mt-2">
                             <a href="{{ $course->instructor_url ?: '#' }}" class="btn btn-sm btn-outline-primary fw-bold" style="font-size: 0.75rem;">
                                 <i class="fa-solid fa-store me-1"></i> View Instructor / Institute Profile &rarr;
@@ -645,8 +723,32 @@
                 </p>
             </div>
 
+            <!-- Frequently Asked Questions Section -->
+            <div id="faqs" class="section-card-white mb-3">
+                <h2 class="section-card-title mb-3">Frequently Asked Questions</h2>
+                <div class="accordion accordion-curriculum" id="courseFaqAccordion">
+                    @foreach($faqs as $fIdx => $faq)
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading{{ $fIdx }}">
+                                <button class="accordion-button {{ $fIdx > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ $fIdx }}" aria-expanded="{{ $fIdx === 0 ? 'true' : 'false' }}">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-regular fa-circle-question text-primary"></i>
+                                        <span class="fw-bold">{{ $faq['q'] }}</span>
+                                    </div>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse{{ $fIdx }}" class="accordion-collapse collapse {{ $fIdx === 0 ? 'show' : '' }}" data-bs-parent="#courseFaqAccordion">
+                                <div class="accordion-body text-secondary" style="font-size: 0.82rem; line-height: 1.6;">
+                                    {{ $faq['a'] }}
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             <!-- Student Reviews Section -->
-            <div id="reviews" class="section-card-white">
+            <div id="reviews" class="section-card-white mb-3">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h2 class="section-card-title mb-0">Student Reviews</h2>
                     <button type="button" class="btn btn-outline-primary btn-sm py-1 px-3 fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#reviewCourseModal">
@@ -654,84 +756,42 @@
                     </button>
                 </div>
 
-                <div class="row align-items-center g-3 mb-4">
-                    <!-- Left Score Box -->
-                    <div class="col-md-4 text-center border-end">
-                        <div class="fw-bold text-dark" style="font-size: 2.75rem; line-height: 1;">4.8</div>
-                        <div class="text-warning small my-1">
-                            @for($i=1; $i<=5; $i++)
-                                <i class="fa-solid fa-star"></i>
-                            @endfor
-                        </div>
-                        <div class="text-muted small" style="font-size: 0.75rem;">1,250 reviews</div>
-                    </div>
-
-                    <!-- Middle Rating Bars -->
-                    <div class="col-md-8">
-                        <div class="rating-bar-container">
-                            <span style="width: 45px;">5 Star</span>
-                            <div class="rating-progress-track">
-                                <div class="rating-progress-fill" style="width: 82%;"></div>
-                            </div>
-                            <span style="width: 30px;">82%</span>
-                        </div>
-                        <div class="rating-bar-container">
-                            <span style="width: 45px;">4 Star</span>
-                            <div class="rating-progress-track">
-                                <div class="rating-progress-fill" style="width: 13%;"></div>
-                            </div>
-                            <span style="width: 30px;">13%</span>
-                        </div>
-                        <div class="rating-bar-container">
-                            <span style="width: 45px;">3 Star</span>
-                            <div class="rating-progress-track">
-                                <div class="rating-progress-fill" style="width: 3%;"></div>
-                            </div>
-                            <span style="width: 30px;">3%</span>
-                        </div>
-                        <div class="rating-bar-container">
-                            <span style="width: 45px;">2 Star</span>
-                            <div class="rating-progress-track">
-                                <div class="rating-progress-fill" style="width: 1%;"></div>
-                            </div>
-                            <span style="width: 30px;">1%</span>
-                        </div>
-                        <div class="rating-bar-container">
-                            <span style="width: 45px;">1 Star</span>
-                            <div class="rating-progress-track">
-                                <div class="rating-progress-fill" style="width: 1%;"></div>
-                            </div>
-                            <span style="width: 30px;">1%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testimonial Cards Row -->
-                <div class="row g-2">
-                    @foreach($reviews as $r)
-                        <div class="col-md-4">
-                            <div class="p-3 bg-light rounded-3 h-100 d-flex flex-direction-column justify-content-between border">
-                                <div>
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <img src="{{ $r['avatar'] }}" alt="{{ $r['author'] }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
-                                        <div>
-                                            <div class="fw-bold text-dark" style="font-size: 0.75rem;">{{ $r['author'] }}</div>
-                                            <div class="text-warning" style="font-size: 0.65rem;">
-                                                @for($i=1; $i<=5; $i++)
-                                                    <i class="fa-solid fa-star"></i>
-                                                @endfor
-                                                <span class="text-muted ms-1" style="font-size: 0.6rem;">{{ $r['time_ago'] }}</span>
+                @if(!empty($reviews) && count($reviews) > 0)
+                    <div class="row g-2">
+                        @foreach($reviews as $r)
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-3 h-100 d-flex flex-direction-column justify-content-between border">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <img src="{{ $r['avatar'] }}" alt="{{ $r['author'] }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold text-dark" style="font-size: 0.75rem;">{{ $r['author'] }}</div>
+                                                <div class="text-warning" style="font-size: 0.65rem;">
+                                                    @for($i=1; $i<=5; $i++)
+                                                        <i class="fa-solid fa-star"></i>
+                                                    @endfor
+                                                    <span class="text-muted ms-1" style="font-size: 0.6rem;">{{ $r['time_ago'] }}</span>
+                                                </div>
                                             </div>
                                         </div>
+                                        <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.4;">
+                                            {{ $r['text'] }}
+                                        </p>
                                     </div>
-                                    <p class="text-secondary small mb-0" style="font-size: 0.72rem; line-height: 1.4;">
-                                        {{ $r['text'] }}
-                                    </p>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-4 bg-light rounded-3 border">
+                        <i class="fa-regular fa-star text-muted fs-3 mb-2"></i>
+                        <div class="fw-bold text-dark small">No Reviews Yet</div>
+                        <p class="text-muted small mb-3" style="font-size: 0.78rem;">Be the first student to review this course and share your learning feedback!</p>
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#reviewCourseModal" style="font-size: 0.78rem;">
+                            <i class="fa-regular fa-pen-to-square me-1"></i> Write First Review
+                        </button>
+                    </div>
+                @endif
             </div>
 
         </div>
@@ -779,12 +839,12 @@
                 <!-- CTA Action Buttons -->
                 <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="mb-2">
                     @csrf
-                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm" style="background-color: #0066ff; border: none; font-size: 0.875rem; border-radius: 8px;">
+                    <button type="submit" class="btn w-100 fw-bold py-2 shadow-sm text-white" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); border: none; font-size: 0.875rem; border-radius: 8px;">
                         Buy Now
                     </button>
                 </form>
 
-                <button type="button" class="btn btn-outline-primary w-100 fw-semibold py-2 mb-3" style="font-size: 0.8rem; border-radius: 8px;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
+                <button type="button" class="btn w-100 fw-bold py-2 mb-3" style="border: 2px solid #7c3aed; color: #6d28d9; background: #ffffff; font-size: 0.82rem; border-radius: 8px; transition: all 0.2s;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
                     <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
                 </button>
 
