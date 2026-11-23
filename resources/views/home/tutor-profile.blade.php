@@ -377,7 +377,7 @@
                                     <img src="{{ $course->thumbnail_url }}" 
                                          alt="{{ $course->course_name }}" 
                                          loading="lazy" 
-                                         onerror="this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                         onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
                                 </a>
                                 <span class="course-badge-flag">{{ $course->level ?: 'All level' }}</span>
                                 <button type="button" class="course-wish-btn" title="Add to Wishlist">

@@ -150,7 +150,7 @@ class Course extends Model
 
     public function getThumbnailAttribute(?string $value): string
     {
-        if (empty($value)) {
+        if (empty($value) || str_contains($value, 'camera_placeholder')) {
             $seed = abs(crc32($this->title ?: ($this->id ?: 'edu_thumb')));
             return self::$educationCourseThumbnails[$seed % count(self::$educationCourseThumbnails)];
         }
@@ -160,9 +160,14 @@ class Course extends Model
         return asset($value);
     }
 
+    public function getThumbnailUrlAttribute(): string
+    {
+        return $this->thumbnail;
+    }
+
     public function getCoverImageAttribute(?string $value): string
     {
-        if (empty($value)) {
+        if (empty($value) || str_contains($value, 'camera_placeholder')) {
             return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80';
         }
         if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {

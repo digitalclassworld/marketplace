@@ -573,7 +573,7 @@
                                                         <a href="{{ $course['url'] }}" class="d-block w-100 h-100 text-decoration-none">
                                                     @endif
                                                     @if(!empty($course['thumbnail']))
-                                                        <img src="{{ $course['thumbnail'] }}" alt="{{ $course['title'] }}" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                                        <img src="{{ $course['thumbnail'] }}" alt="{{ $course['title'] }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
                                                     @else
                                                         <div class="text-center text-primary py-3">
                                                             <i class="fa-solid fa-graduation-cap fa-3x mb-1"></i>
@@ -717,7 +717,7 @@
                                     @foreach($galleryImages as $img)
                                         <div class="col">
                                             <div class="gallery-img-box" onclick="window.open('{{ $img->image }}', '_blank')">
-                                                <img src="{{ $img->image }}" alt="{{ $business->business_name }} Photo" onerror="this.onerror=null; this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                                <img src="{{ $img->image }}" alt="{{ $business->business_name }} Photo" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80';">
                                             </div>
                                         </div>
                                     @endforeach

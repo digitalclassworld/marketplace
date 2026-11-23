@@ -127,6 +127,20 @@ class ElearnCourse extends Model
     }
 
     /**
+     * Curated Education-Related Course Thumbnails
+     */
+    public static array $educationCourseThumbnails = [
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80', // Online digital study
+        'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&auto=format&fit=crop&q=80', // Study desk with notes
+        'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&auto=format&fit=crop&q=80', // Web Development & Coding
+        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=80', // Student studying with laptop
+        'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&auto=format&fit=crop&q=80', // Classroom seminar & workshop
+        'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&auto=format&fit=crop&q=80', // Group academic study
+        'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&auto=format&fit=crop&q=80', // Teacher teaching class
+        'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&auto=format&fit=crop&q=80', // Modern classroom
+    ];
+
+    /**
      * Skill level (e.g. "All level")
      */
     public function getLevelAttribute(): string
@@ -136,19 +150,25 @@ class ElearnCourse extends Model
     }
 
     /**
-     * Safe thumbnail URL
+     * Safe thumbnail URL (guarantees a rich educational image, never a placeholder icon)
      */
     public function getThumbnailUrlAttribute(): string
     {
         $thumb = trim($this->course_thumbnail ?? '');
-        if (!empty($thumb)) {
+        if (!empty($thumb) && !str_contains($thumb, 'camera_placeholder')) {
             return preg_replace('/^http:\/\//i', 'https://', $thumb);
         }
         $self = trim($this->course_self_thumbnail ?? $this->self_thumbnail ?? '');
-        if (!empty($self)) {
+        if (!empty($self) && !str_contains($self, 'camera_placeholder')) {
             return preg_replace('/^http:\/\//i', 'https://', $self);
         }
-        return 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png';
+        $seed = abs(crc32($this->course_name ?: ($this->id ?: 'edu_elearn')));
+        return self::$educationCourseThumbnails[$seed % count(self::$educationCourseThumbnails)];
+    }
+
+    public function getThumbnailAttribute(): string
+    {
+        return $this->getThumbnailUrlAttribute();
     }
 }
 

@@ -198,12 +198,12 @@ class BusinessListing extends Model
 
     public function getDisplayImageAttribute(): string
     {
-        if (!empty($this->cover_image)) {
+        if (!empty($this->cover_image) && !str_contains($this->cover_image, 'camera_placeholder')) {
             $img = $this->cover_image;
             return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
         }
 
-        if (!empty($this->attributes['logo'])) {
+        if (!empty($this->attributes['logo']) && !str_contains($this->attributes['logo'], 'camera_placeholder')) {
             $img = $this->attributes['logo'];
             return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
         }
@@ -311,7 +311,7 @@ class BusinessListing extends Model
 
     public function getLogoAttribute(?string $value): string
     {
-        if (!empty($value)) {
+        if (!empty($value) && !str_contains($value, 'camera_placeholder')) {
             if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
                 return $value;
             }

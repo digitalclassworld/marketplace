@@ -199,7 +199,7 @@ class MarketplaceDataSeeder extends Seeder
                 'level' => 'All Levels',
                 'price' => 4999,
                 'discount_price' => 2499,
-                'thumbnail' => 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=500&auto=format&fit=crop&q=80',
+                'thumbnail' => 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
             ],
             [
                 'title' => 'Website Development with WordPress',

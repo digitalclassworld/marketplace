@@ -413,7 +413,7 @@
             <!-- Video Preview Thumbnail with Glowing Play Overlay -->
             <div class="col-lg-4 col-md-5">
                 <div class="video-preview-thumbnail-box" onclick="openTrailerModal()">
-                    <img src="{{ $course->thumbnail ?? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80' }}" alt="{{ $course->title }}">
+                    <img src="{{ $course->thumbnail ?? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80' }}" alt="{{ $course->title }}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
                     <div class="video-play-center-btn">
                         <i class="fa-solid fa-play ms-1"></i>
                     </div>
@@ -885,7 +885,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="related-course-card">
                         <a href="{{ route('course.show', $rc->slug) }}">
-                            <img src="{{ $rc->thumbnail }}" alt="{{ $rc->title }}" class="related-thumb-img">
+                            <img src="{{ $rc->thumbnail }}" alt="{{ $rc->title }}" class="related-thumb-img" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
                         </a>
                         <div class="p-3 d-flex flex-column flex-grow-1">
                             <h4 class="fw-bold mb-1" style="font-size: 0.825rem; line-height: 1.3;">

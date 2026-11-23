@@ -1384,10 +1384,10 @@
                     <div class="trending-course-card">
                         <div class="trending-course-thumb-box">
                             <a href="{{ !empty($course->url) ? $course->url : route('course.show', $course->slug) }}" class="d-block w-100 h-100">
-                                <img src="{{ $course->thumbnail_url ?: ($course->thumbnail ?: 'https://digitalclassworld.com/business-listing/public/camera_placeholder.png') }}"
+                                <img src="{{ $course->thumbnail_url ?: ($course->thumbnail ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80') }}"
                                      alt="{{ $course->title }}"
                                      loading="lazy"
-                                     onerror="this.src='https://digitalclassworld.com/business-listing/public/camera_placeholder.png';">
+                                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80';">
                             </a>
                             <div class="trending-crown-badge">
                                 <i class="fa-solid fa-crown"></i>
