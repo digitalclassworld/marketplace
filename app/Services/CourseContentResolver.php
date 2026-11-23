@@ -180,7 +180,7 @@ class CourseContentResolver
 
                 $curriculum[] = [
                     'section' => ($secIdx + 1) . '. ' . $cleanTitle,
-                    'lectures' => count($items) . ' Lectures',
+                    'lectures' => count($items) . ' Lessons',
                     'duration' => (count($items) * 11) . 'm',
                     'items' => $items,
                 ];
@@ -215,7 +215,7 @@ class CourseContentResolver
 
                 $curriculum[] = [
                     'section' => ($cIdx + 1) . '. ' . $secTitle,
-                    'lectures' => count($items) . ' Lectures',
+                    'lectures' => count($items) . ' Lessons',
                     'duration' => (count($items) * 12) . 'm',
                     'items' => $items,
                 ];
@@ -234,7 +234,7 @@ class CourseContentResolver
                 }
                 $curriculum[] = [
                     'section' => ($idx + 1) . '. ' . ($chunk[0] ?? 'Module ' . ($idx + 1)),
-                    'lectures' => count($items) . ' Lectures',
+                    'lectures' => count($items) . ' Lessons',
                     'duration' => (count($items) * 10) . 'm',
                     'items' => $items,
                 ];
@@ -257,7 +257,7 @@ class CourseContentResolver
                 }
                 $curriculum[] = [
                     'section' => ($idx + 1) . '. ' . ($chunk[0] ?? 'Module ' . ($idx + 1)),
-                    'lectures' => count($items) . ' Lectures',
+                    'lectures' => count($items) . ' Lessons',
                     'duration' => (count($items) * 12) . 'm',
                     'items' => $items,
                 ];
@@ -430,7 +430,7 @@ class CourseContentResolver
                 foreach ($course->contents->groupBy('section_title') as $secTitle => $lectures) {
                     $curriculum[] = [
                         'section' => $secTitle,
-                        'lectures' => $lectures->count() . ' Lectures',
+                        'lectures' => $lectures->count() . ' Lessons',
                         'duration' => ($lectures->count() * 12) . 'm',
                         'items' => $lectures->map(fn($l) => [
                             'title' => $l->lecture_title,
@@ -445,27 +445,27 @@ class CourseContentResolver
         if (empty($curriculum)) {
             if (str_contains($subLow, 'python')) {
                 $curriculum = [
-                    ['section' => '1. Course Orientation & Animated Coding Paradigm', 'lectures' => '4 Lectures', 'duration' => '32m', 'items' => [
+                    ['section' => '1. Course Orientation & Animated Coding Paradigm', 'lectures' => '4 Lessons', 'duration' => '32m', 'items' => [
                         ['title' => 'Welcome to Python with Animation: The 3-Layer Learning Model', 'duration' => '07:45', 'preview' => true],
                         ['title' => 'Installing Python & Configuring Your Development Environment', 'duration' => '10:20', 'preview' => true],
                         ['title' => 'Writing & Running Your First Python Script', 'duration' => '06:50', 'preview' => false],
                         ['title' => 'How Python Interprets Code Behind the Scenes', 'duration' => '07:15', 'preview' => false],
                     ]],
-                    ['section' => '2. Core Syntax: Variables, Data Types & Operators', 'lectures' => '5 Lectures', 'duration' => '48m', 'items' => [
+                    ['section' => '2. Core Syntax: Variables, Data Types & Operators', 'lectures' => '5 Lessons', 'duration' => '48m', 'items' => [
                         ['title' => 'Visualizing Strings, Integers, Floats & Booleans with Animation', 'duration' => '11:10', 'preview' => true],
                         ['title' => 'Arithmetic, Comparison and Logical Operators Explained', 'duration' => '08:40', 'preview' => false],
                         ['title' => 'User Input Handling and Type Casting', 'duration' => '09:20', 'preview' => false],
                         ['title' => 'String Formatting (f-strings) and Built-In Methods', 'duration' => '09:50', 'preview' => false],
                         ['title' => 'Hands-on Practice: Building an Interactive Calculator', 'duration' => '09:10', 'preview' => false],
                     ]],
-                    ['section' => '3. Control Flow: Logic Building with Conditions & Loops', 'lectures' => '6 Lectures', 'duration' => '54m', 'items' => [
+                    ['section' => '3. Control Flow: Logic Building with Conditions & Loops', 'lectures' => '6 Lessons', 'duration' => '54m', 'items' => [
                         ['title' => 'If-Else Conditionals: Making Decisions in Python', 'duration' => '10:15', 'preview' => false],
                         ['title' => 'Nested Conditionals and Elif Statements with Visual Decision Trees', 'duration' => '08:45', 'preview' => false],
                         ['title' => 'For Loops: Iterating Over Sequences and Ranges', 'duration' => '09:30', 'preview' => false],
                         ['title' => 'While Loops: Loop Control, Break and Continue Keywords', 'duration' => '11:20', 'preview' => false],
                         ['title' => 'Coding Exercise: Automated Number Guessing Game', 'duration' => '14:10', 'preview' => false],
                     ]],
-                    ['section' => '4. Data Structures: Lists, Tuples, Dictionaries & Sets', 'lectures' => '6 Lectures', 'duration' => '1h 02m', 'items' => [
+                    ['section' => '4. Data Structures: Lists, Tuples, Dictionaries & Sets', 'lectures' => '6 Lessons', 'duration' => '1h 02m', 'items' => [
                         ['title' => 'Python Lists: Indexing, Slicing, Appending and Sorting', 'duration' => '12:45', 'preview' => false],
                         ['title' => 'Tuples vs Lists: Immutability and Memory Optimization', 'duration' => '08:15', 'preview' => false],
                         ['title' => 'Dictionaries: Key-Value Mapping and Data Lookup', 'duration' => '13:20', 'preview' => false],
@@ -473,7 +473,7 @@ class CourseContentResolver
                         ['title' => 'List Comprehensions for Clean, Idiomatic Python Code', 'duration' => '08:40', 'preview' => false],
                         ['title' => 'Project: Student Database & Grade Calculator', 'duration' => '10:10', 'preview' => false],
                     ]],
-                    ['section' => '5. Functions, Modules & Real-World Capstone Project', 'lectures' => '5 Lectures', 'duration' => '50m', 'items' => [
+                    ['section' => '5. Functions, Modules & Real-World Capstone Project', 'lectures' => '5 Lessons', 'duration' => '50m', 'items' => [
                         ['title' => 'Defining Functions with Parameters, Return Values and Variable Scope', 'duration' => '11:30', 'preview' => false],
                         ['title' => 'Standard Library Modules: math, random, datetime and os', 'duration' => '09:45', 'preview' => false],
                         ['title' => 'File Handling: Reading and Writing Text and CSV Files', 'duration' => '11:15', 'preview' => false],
@@ -482,26 +482,26 @@ class CourseContentResolver
                 ];
             } elseif (str_contains($subLow, 'shopify') || str_contains($subLow, 'ecommerce')) {
                 $curriculum = [
-                    ['section' => '1. The Shopify Sales Machine Framework', 'lectures' => '4 Lectures', 'duration' => '36m', 'items' => [
+                    ['section' => '1. The Shopify Sales Machine Framework', 'lectures' => '4 Lessons', 'duration' => '36m', 'items' => [
                         ['title' => 'Overview: The 3 Pillars of a Predictable Shopify Machine', 'duration' => '08:10', 'preview' => true],
                         ['title' => 'Store Architecture: Selecting & Configuring High-Converting Themes', 'duration' => '11:30', 'preview' => true],
                         ['title' => 'Designing Frictionless Product Pages That Drive Add-to-Cart', 'duration' => '09:40', 'preview' => false],
                         ['title' => 'Payment Gateways, Tax Rules and Currency Setup', 'duration' => '07:15', 'preview' => false],
                     ]],
-                    ['section' => '2. Building Your Tribe & Organic Customer Loyalty', 'lectures' => '5 Lectures', 'duration' => '48m', 'items' => [
+                    ['section' => '2. Building Your Tribe & Organic Customer Loyalty', 'lectures' => '5 Lessons', 'duration' => '48m', 'items' => [
                         ['title' => 'What is Brand Tribe Building and Why Paid Ads Alone Fail', 'duration' => '09:30', 'preview' => true],
                         ['title' => 'Developing Your Irresistible Brand Story & Value Proposition', 'duration' => '10:15', 'preview' => false],
                         ['title' => 'Building Engaged Social Media Communities around Your Niche', 'duration' => '11:45', 'preview' => false],
                         ['title' => 'Creating VIP Customer Clubs & Automated Referral Reward Loops', 'duration' => '10:10', 'preview' => false],
                         ['title' => 'Case Study: How Organic Tribe Building Generated 6-Figure Sales', 'duration' => '07:10', 'preview' => false],
                     ]],
-                    ['section' => '3. Zero-Cost Free Traffic Engine', 'lectures' => '5 Lectures', 'duration' => '45m', 'items' => [
+                    ['section' => '3. Zero-Cost Free Traffic Engine', 'lectures' => '5 Lessons', 'duration' => '45m', 'items' => [
                         ['title' => 'Content Marketing Blueprint for E-Commerce Products', 'duration' => '08:45', 'preview' => false],
                         ['title' => 'Short-Form Video Strategy (Reels & TikTok) for Viral Product Reach', 'duration' => '11:20', 'preview' => false],
                         ['title' => 'Micro-Influencer Gifting Partnerships Without Upfront Cash', 'duration' => '10:50', 'preview' => false],
                         ['title' => 'Shopify SEO Fundamentals to Rank Organically on Google', 'duration' => '14:10', 'preview' => false],
                     ]],
-                    ['section' => '4. Retention, Upsells & Scaling Lifetime Value', 'lectures' => '4 Lectures', 'duration' => '42m', 'items' => [
+                    ['section' => '4. Retention, Upsells & Scaling Lifetime Value', 'lectures' => '4 Lessons', 'duration' => '42m', 'items' => [
                         ['title' => 'Automated Abandoned Cart Sequences That Recover 15%+ Lost Sales', 'duration' => '11:15', 'preview' => false],
                         ['title' => 'Post-Purchase 1-Click Upsells and Average Order Value (AOV) Boosters', 'duration' => '10:40', 'preview' => false],
                         ['title' => 'Customer Lifecycle Email Flows: Welcome, Post-Purchase & Re-engagement', 'duration' => '12:30', 'preview' => false],
@@ -514,26 +514,26 @@ class CourseContentResolver
                 $sub = trim($cleanSub);
 
                 $curriculum = [
-                    ['section' => "1. Foundations & Overview of {$sub}", 'lectures' => '4 Lectures', 'duration' => '35m', 'items' => [
+                    ['section' => "1. Foundations & Overview of {$sub}", 'lectures' => '4 Lessons', 'duration' => '35m', 'items' => [
                         ['title' => "Welcome to {$title}: Learning Roadmap & Outcomes", 'duration' => '07:15', 'preview' => true],
                         ['title' => "Core Principles, Terminology and Essential Tools", 'duration' => '10:30', 'preview' => true],
                         ['title' => "Setting Up Your Workspace and Study Resources", 'duration' => '08:45', 'preview' => false],
                         ['title' => "Foundational Concepts Every Practitioner Must Know", 'duration' => '09:10', 'preview' => false],
                     ]],
-                    ['section' => "2. Core Frameworks & Practical Implementation", 'lectures' => '5 Lectures', 'duration' => '50m', 'items' => [
+                    ['section' => "2. Core Frameworks & Practical Implementation", 'lectures' => '5 Lessons', 'duration' => '50m', 'items' => [
                         ['title' => "Step-by-Step Breakdown of Key Methodologies", 'duration' => '11:20', 'preview' => false],
                         ['title' => "Detailed Guided Examples and Practical Demonstrations", 'duration' => '12:15', 'preview' => false],
                         ['title' => "Deep Dive into Fundamental Components and Operations", 'duration' => '10:40', 'preview' => false],
                         ['title' => "Common Pitfalls to Avoid and Industry Best Practices", 'duration' => '08:50', 'preview' => false],
                         ['title' => "Hands-on Exercise with Instructor Guidance", 'duration' => '07:35', 'preview' => false],
                     ]],
-                    ['section' => "3. Intermediate Techniques & Case Studies", 'lectures' => '4 Lectures', 'duration' => '46m', 'items' => [
+                    ['section' => "3. Intermediate Techniques & Case Studies", 'lectures' => '4 Lessons', 'duration' => '46m', 'items' => [
                         ['title' => "Real-World Case Study Analysis and Problem Solving", 'duration' => '12:40', 'preview' => false],
                         ['title' => "Efficiency Shortcuts and Pro Techniques for Best Results", 'duration' => '11:15', 'preview' => false],
                         ['title' => "Troubleshooting, Optimization and Refinement Workflows", 'duration' => '12:30', 'preview' => false],
                         ['title' => "Interactive Review of Practical Project Deliverables", 'duration' => '09:55', 'preview' => false],
                     ]],
-                    ['section' => "4. Advanced Strategies & Final Capstone Project", 'lectures' => '4 Lectures', 'duration' => '45m', 'items' => [
+                    ['section' => "4. Advanced Strategies & Final Capstone Project", 'lectures' => '4 Lessons', 'duration' => '45m', 'items' => [
                         ['title' => "Advanced Frameworks and Future Trends in {$category}", 'duration' => '12:10', 'preview' => false],
                         ['title' => "Full Project Execution from Strategy to Completion", 'duration' => '15:30', 'preview' => false],
                         ['title' => "Comprehensive Knowledge Check and Summary Points", 'duration' => '09:40', 'preview' => false],
@@ -557,7 +557,7 @@ class CourseContentResolver
             $faqs = [
                 [
                     'q' => "How do I access \"{$title}\" after enrollment?",
-                    'a' => "You will receive instant lifetime access immediately after checkout. You can log in anytime to your Digital Class student account and access all video lessons, project files, and study resources on your computer, laptop, tablet, or smartphone."
+                    'a' => "You will receive instant lifetime access immediately after checkout. You can log in anytime to your Digital Class student account and access all course lessons, project files, and study resources on your computer, laptop, tablet, or smartphone."
                 ],
                 [
                     'q' => "Are there any prerequisites or prior experience required?",

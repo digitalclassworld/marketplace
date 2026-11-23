@@ -562,6 +562,15 @@
                 </div>
 
                 <!-- Course Highlights Grid -->
+                @php
+                    $courseMonthTime = '1 Month';
+                    if (!empty($course->course_month) && is_numeric($course->course_month) && (float)$course->course_month > 0) {
+                        $val = (float)$course->course_month;
+                        $courseMonthTime = $val . ($val == 1.0 ? ' Month' : ' Months');
+                    } elseif (!empty($course->duration) && str_contains(strtolower($course->duration), 'month')) {
+                        $courseMonthTime = $course->duration;
+                    }
+                @endphp
                 <div class="section-card-white mb-3 p-3">
                     <div class="row g-2">
                         <div class="col-sm-6 col-md-4">
@@ -584,10 +593,10 @@
                         </div>
                         <div class="col-sm-6 col-md-4">
                             <div class="d-flex align-items-center gap-2 p-2 rounded-2 bg-light">
-                                <i class="fa-solid fa-video text-info fs-5"></i>
+                                <i class="fa-regular fa-calendar-days text-info fs-5"></i>
                                 <div>
-                                    <div class="text-muted" style="font-size: 0.68rem;">Video Lessons</div>
-                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $course->course_video ?: 24 }} Lectures</div>
+                                    <div class="text-muted" style="font-size: 0.68rem;">Month Time</div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $courseMonthTime }}</div>
                                 </div>
                             </div>
                         </div>
@@ -658,7 +667,7 @@
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <h2 class="section-card-title mb-0" style="font-size: 1.35rem; font-weight: 700;">Curriculum</h2>
                         <span class="text-muted small" style="font-size: 0.75rem;">
-                            {{ $displayModules }} Modules &bull; {{ $displayLectures }} Lectures &bull; {{ $course->duration }} Total Length
+                            {{ $displayModules }} Modules &bull; {{ $displayLectures }} Lessons &bull; {{ $courseMonthTime }} Duration
                         </span>
                     </div>
 
@@ -694,12 +703,12 @@
                                             @foreach($mod['items'] as $item)
                                                 <div class="lecture-item-row">
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <i class="fa-regular fa-circle-play text-primary"></i>
+                                                        <i class="fa-regular fa-file-lines text-primary"></i>
                                                         <span>{{ $item['title'] }}</span>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         @if(!empty($item['preview']))
-                                                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.65rem;">Lecture</span>
+                                                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.65rem;">Lesson</span>
                                                         @endif
                                                         <span class="text-muted">{{ $item['duration'] }}</span>
                                                     </div>
