@@ -262,39 +262,27 @@
             </div>
         </div>
     </div>
-                    <span class="text-muted small fw-medium">Payout Due</span>
-                    <div class="kpi-icon-circle kpi-icon-sky">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                </div>
-                <div class="d-flex align-items-baseline gap-2">
-                    <span class="fs-4 fw-bold text-dark">{{ $stats['payout_due'] ?? '₹4,32,120' }}</span>
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem;">67 sellers</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Navigation Tabs matching Screenshot 2 -->
     <div class="mb-3">
         <nav class="nav nav-tabs-sellers">
             <a href="{{ route('admin.sellers.index') }}" class="nav-link {{ (!request('status') || request('status') === 'all') && !request('tab') ? 'active' : '' }}">
-                All Sellers ({{ number_format($counts['all'] ?? 1248) }})
+                All Sellers ({{ number_format($counts['all'] ?? 0) }})
             </a>
             <a href="{{ route('admin.sellers.index', ['status' => 'pending']) }}" class="nav-link {{ request('status') === 'pending' || request('tab') === 'pending' ? 'active' : '' }}">
-                Pending ({{ number_format($counts['pending'] ?? 86) }})
+                Pending ({{ number_format($counts['pending'] ?? 0) }})
             </a>
             <a href="{{ route('admin.sellers.index', ['status' => 'active']) }}" class="nav-link {{ request('status') === 'active' || request('tab') === 'active' ? 'active' : '' }}">
-                Active ({{ number_format($counts['active'] ?? 982) }})
+                Active ({{ number_format($counts['active'] ?? 0) }})
             </a>
             <a href="{{ route('admin.sellers.index', ['status' => 'suspended']) }}" class="nav-link {{ request('status') === 'suspended' || request('tab') === 'suspended' ? 'active' : '' }}">
-                Suspended ({{ number_format($counts['suspended'] ?? 34) }})
+                Suspended ({{ number_format($counts['suspended'] ?? 0) }})
             </a>
             <a href="{{ route('admin.sellers.index', ['status' => 'top_sellers']) }}" class="nav-link {{ request('status') === 'top_sellers' ? 'active' : '' }}">
-                Top Sellers (50)
+                Top Sellers ({{ number_format($counts['top_sellers'] ?? 0) }})
             </a>
             <a href="{{ route('admin.sellers.index', ['status' => 'new_sellers']) }}" class="nav-link {{ request('status') === 'new_sellers' ? 'active' : '' }}">
-                New Sellers (120)
+                New Sellers ({{ number_format($counts['new_sellers'] ?? 0) }})
             </a>
         </nav>
     </div>

@@ -201,12 +201,17 @@ class AdminSellerController extends Controller
 
             'payout_due'     => '₹' . number_format($totalRevenueAmount * 0.85, 2),
         ];
+        $topCount = Seller::where('verification_status', Seller::VERIFICATION_VERIFIED)->count();
+        $newCount = Seller::where('created_at', '>=', now()->subDays(14))->count();
+
         $counts = [
-            'all'       => $totalCount,
-            'pending'   => $pendingCount,
-            'active'    => $activeCount,
-            'suspended' => $suspendedCount,
-            'rejected'  => $rejectedCount,
+            'all'         => $totalCount,
+            'pending'     => $pendingCount,
+            'active'      => $activeCount,
+            'suspended'   => $suspendedCount,
+            'rejected'    => $rejectedCount,
+            'top_sellers' => $topCount,
+            'new_sellers' => $newCount,
         ];
 
         return view('admin.sellers.index', [
