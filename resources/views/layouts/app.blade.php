@@ -1355,6 +1355,10 @@
                                             <span>Subtotal</span>
                                             <span id="checkoutSubtotal">₹0.00</span>
                                         </div>
+                                        <div class="d-flex justify-content-between text-success small mb-1 d-none" id="checkoutDiscountRow">
+                                            <span><i class="fa-solid fa-tag me-1"></i> Coupon Discount (<span id="checkoutDiscountCode"></span>)</span>
+                                            <span id="checkoutDiscountAmount" class="fw-bold">-₹0.00</span>
+                                        </div>
                                         <div class="d-flex justify-content-between text-muted small mb-2">
                                             <span>Platform Handling</span>
                                             <span class="text-success fw-bold">FREE</span>
@@ -2043,6 +2047,11 @@
 
             if (existingIdx > -1) {
                 items[existingIdx].quantity = (items[existingIdx].quantity || 1) + (item.quantity || 1);
+                if (item.coupon_code) {
+                    items[existingIdx].coupon_code = item.coupon_code;
+                    items[existingIdx].price = parseFloat(item.price) || 0;
+                    items[existingIdx].discount_amount = parseFloat(item.discount_amount) || 0;
+                }
             } else {
                 items.push({
                     key: key,
@@ -2050,6 +2059,9 @@
                     type: item.type || 'Course',
                     title: item.title || 'Marketplace Item',
                     price: parseFloat(item.price) || 0,
+                    original_price: parseFloat(item.original_price || item.price) || 0,
+                    coupon_code: item.coupon_code || null,
+                    discount_amount: parseFloat(item.discount_amount) || 0,
                     thumbnail: item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&auto=format&fit=crop&q=80',
                     seller_id: item.seller_id || 1,
                     quantity: item.quantity || 1
@@ -2158,19 +2170,37 @@
             // Render items preview in checkout modal
             const previewContainer = document.getElementById('checkoutItemsPreview');
             let subtotal = 0;
+            let totalDiscount = 0;
+            let appliedCoupon = null;
             let previewHtml = '';
 
             items.forEach(item => {
                 const itemTotal = (item.price || 0) * (item.quantity || 1);
-                subtotal += itemTotal;
+                const originalTotal = (item.original_price || item.price || 0) * (item.quantity || 1);
+                subtotal += (item.original_price ? originalTotal : itemTotal);
+                if (item.discount_amount) {
+                    totalDiscount += (parseFloat(item.discount_amount) * (item.quantity || 1));
+                } else if (item.original_price && item.original_price > item.price) {
+                    totalDiscount += (originalTotal - itemTotal);
+                }
+                if (item.coupon_code) {
+                    appliedCoupon = item.coupon_code;
+                }
+
                 previewHtml += `
                     <div class="d-flex align-items-center gap-2 bg-white p-2 rounded-2 border">
                         <img src="${item.thumbnail}" alt="${item.title}" style="width: 36px; height: 36px; object-fit: cover; border-radius: 6px;">
                         <div class="flex-grow-1" style="min-width: 0;">
                             <div class="text-dark small fw-bold text-truncate">${item.title}</div>
-                            <small class="text-muted" style="font-size: 0.7rem;">${item.type} &bull; Qty: ${item.quantity}</small>
+                            <small class="text-muted" style="font-size: 0.7rem;">
+                                ${item.type} &bull; Qty: ${item.quantity}
+                                ${item.coupon_code ? '<span class="badge bg-purple-subtle text-primary ms-1" style="font-size:0.62rem; background:#f3e8ff; color:#7c3aed;"><i class="fa-solid fa-tag me-0.5"></i>' + item.coupon_code + '</span>' : ''}
+                            </small>
                         </div>
-                        <strong class="text-dark small">₹${itemTotal.toLocaleString('en-IN')}</strong>
+                        <div class="text-end">
+                            <strong class="text-dark small d-block">₹${itemTotal.toLocaleString('en-IN')}</strong>
+                            ${item.original_price && item.original_price > item.price ? '<small class="text-muted text-decoration-line-through" style="font-size:0.65rem;">₹' + originalTotal.toLocaleString('en-IN') + '</small>' : ''}
+                        </div>
                     </div>
                 `;
             });
@@ -2178,8 +2208,27 @@
             if (previewContainer) previewContainer.innerHTML = previewHtml;
             const subtotalEl = document.getElementById('checkoutSubtotal');
             const totalEl = document.getElementById('checkoutTotal');
+            const discountRow = document.getElementById('checkoutDiscountRow');
+            const discountCodeEl = document.getElementById('checkoutDiscountCode');
+            const discountAmountEl = document.getElementById('checkoutDiscountAmount');
+
+            const finalDue = Math.max(0, subtotal - totalDiscount);
+
             if (subtotalEl) subtotalEl.textContent = '₹' + subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-            if (totalEl) totalEl.textContent = '₹' + subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            if (discountRow) {
+                if (totalDiscount > 0) {
+                    discountRow.classList.remove('d-none');
+                    if (discountCodeEl) discountCodeEl.textContent = appliedCoupon || 'COUPON';
+                    if (discountAmountEl) discountAmountEl.textContent = '-₹' + totalDiscount.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                } else {
+                    discountRow.classList.add('d-none');
+                }
+            }
+            if (totalEl) totalEl.textContent = '₹' + finalDue.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+            // Store current checkout coupon info on window for submit
+            window.activeCheckoutCoupon = appliedCoupon;
+            window.activeCheckoutDiscount = totalDiscount;
 
             // Reset screens
             document.getElementById('checkoutFormScreen').style.display = 'block';
@@ -2219,6 +2268,8 @@
                 city: document.getElementById('checkoutCity').value,
                 address: document.getElementById('checkoutAddress').value,
                 payment_method: document.querySelector('input[name="paymentMethod"]:checked')?.value || 'Online UPI',
+                coupon_code: window.activeCheckoutCoupon || null,
+                discount: window.activeCheckoutDiscount || 0,
                 items: items
             };
 

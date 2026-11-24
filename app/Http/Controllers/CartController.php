@@ -49,13 +49,16 @@ class CartController extends Controller
         }
 
         $validated = $request->validate([
-            'id'        => 'required',
-            'type'      => 'required|string', // Course, Service, Product
-            'title'     => 'required|string|max:255',
-            'price'     => 'required|numeric|min:0',
-            'thumbnail' => 'nullable|string',
-            'seller_id' => 'nullable|integer',
-            'quantity'  => 'nullable|integer|min:1',
+            'id'              => 'required',
+            'type'            => 'required|string', // Course, Service, Product
+            'title'           => 'required|string|max:255',
+            'price'           => 'required|numeric|min:0',
+            'thumbnail'       => 'nullable|string',
+            'seller_id'       => 'nullable|integer',
+            'quantity'        => 'nullable|integer|min:1',
+            'coupon_code'     => 'nullable|string|max:50',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'original_price'  => 'nullable|numeric|min:0',
         ]);
 
         $cart = session()->get('marketplace_cart', []);
@@ -63,16 +66,24 @@ class CartController extends Controller
 
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['quantity'] += ($validated['quantity'] ?? 1);
+            if (!empty($validated['coupon_code'])) {
+                $cart[$cartKey]['coupon_code'] = $validated['coupon_code'];
+                $cart[$cartKey]['price'] = (float) $validated['price'];
+                $cart[$cartKey]['discount_amount'] = (float) ($validated['discount_amount'] ?? 0);
+            }
         } else {
             $cart[$cartKey] = [
-                'key'       => $cartKey,
-                'id'        => $validated['id'],
-                'type'      => ucfirst($validated['type']),
-                'title'     => $validated['title'],
-                'price'     => (float) $validated['price'],
-                'thumbnail' => $validated['thumbnail'] ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&auto=format&fit=crop&q=80',
-                'seller_id' => $validated['seller_id'] ?? 1,
-                'quantity'  => $validated['quantity'] ?? 1,
+                'key'             => $cartKey,
+                'id'              => $validated['id'],
+                'type'            => ucfirst($validated['type']),
+                'title'           => $validated['title'],
+                'price'           => (float) $validated['price'],
+                'original_price'  => (float) ($validated['original_price'] ?? $validated['price']),
+                'coupon_code'     => $validated['coupon_code'] ?? null,
+                'discount_amount' => (float) ($validated['discount_amount'] ?? 0),
+                'thumbnail'       => (!empty($validated['thumbnail'])) ? $validated['thumbnail'] : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&auto=format&fit=crop&q=80',
+                'seller_id'       => $validated['seller_id'] ?? 1,
+                'quantity'        => $validated['quantity'] ?? 1,
             ];
         }
 
@@ -181,6 +192,8 @@ class CartController extends Controller
             'city'           => 'nullable|string|max:100',
             'address'        => 'nullable|string|max:255',
             'payment_method' => 'nullable|string|max:50',
+            'coupon_code'    => 'nullable|string|max:50',
+            'discount'       => 'nullable|numeric|min:0',
             'items'          => 'nullable|array',
         ]);
 
@@ -210,7 +223,19 @@ class CartController extends Controller
                 $qty = (int) ($item['quantity'] ?? 1);
                 $unitPrice = (float) ($item['price'] ?? 0.00);
                 $subtotal = $unitPrice * $qty;
-                $totalAmount += $subtotal;
+                $itemDiscount = floatval($item['discount_amount'] ?? 0);
+
+                if (!empty($item['original_price']) && $item['original_price'] > $unitPrice) {
+                    $originalSubtotal = floatval($item['original_price']) * $qty;
+                    $itemDiscount = max(0, $originalSubtotal - $subtotal);
+                    $finalAmount = $subtotal;
+                } else {
+                    if ($itemDiscount == 0 && !empty($validated['discount']) && count($cartItems) === 1) {
+                        $itemDiscount = floatval($validated['discount']);
+                    }
+                    $finalAmount = max(0, $subtotal - $itemDiscount);
+                }
+                $totalAmount += $finalAmount;
 
                 $sellerId = !empty($item['seller_id']) ? (int)$item['seller_id'] : $defaultSellerId;
                 // Verify seller exists
@@ -219,6 +244,8 @@ class CartController extends Controller
                 }
 
                 $orderNumber = '#DC' . rand(10000, 99999);
+                $couponTag = !empty($item['coupon_code']) ? $item['coupon_code'] : ($validated['coupon_code'] ?? null);
+                $subtext = ($item['type'] ?? 'Item') . ' (Qty: ' . $qty . ')' . ($couponTag ? " [Coupon: {$couponTag}]" : '');
 
                 $order = Order::create([
                     'seller_id'       => $sellerId,
@@ -230,11 +257,11 @@ class CartController extends Controller
                     'customer_avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($validated['name']) . '&background=0066ff&color=fff',
                     'order_type'      => ucfirst($item['type'] ?? 'Course'),
                     'item_title'      => $item['title'] ?? 'Marketplace Item',
-                    'item_subtext'    => ($item['type'] ?? 'Item') . ' (Qty: ' . $qty . ')',
+                    'item_subtext'    => $subtext,
                     'item_thumbnail'  => $item['thumbnail'] ?? 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&auto=format&fit=crop&q=80',
-                    'amount'          => $subtotal,
+                    'amount'          => $finalAmount,
                     'subtotal'        => $subtotal,
-                    'discount'        => 0.00,
+                    'discount'        => $itemDiscount,
                     'status'          => 'confirmed',
                     'placed_at'       => now(),
                     'timeline'        => [

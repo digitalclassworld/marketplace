@@ -185,7 +185,7 @@ class CouponController extends Controller
      */
     public function getAvailableCoupons(Request $request): JsonResponse
     {
-        $context = strtolower(trim($request->input('context', 'business_listing')));
+        $context = strtolower(trim($request->input('context', 'all')));
 
         $dbCoupons = DiscountCoupon::where('status', 'Active')
             ->where(function ($q) {
@@ -196,7 +196,20 @@ class CouponController extends Controller
         $coupons = [];
         foreach ($dbCoupons as $c) {
             $app = strtolower(trim($c->applicable_to ?: 'all'));
-            if ($app === 'all' || str_contains($app, 'business') || $context === 'all') {
+            $matches = ($app === 'all' || $context === 'all');
+            if (!$matches) {
+                if ($context === 'course' || $context === 'courses') {
+                    $matches = str_contains($app, 'course');
+                } elseif ($context === 'business_listing' || $context === 'listings') {
+                    $matches = str_contains($app, 'business') || str_contains($app, 'listing');
+                } elseif ($context === 'service' || $context === 'services') {
+                    $matches = str_contains($app, 'service');
+                } elseif ($context === 'product' || $context === 'products') {
+                    $matches = str_contains($app, 'product');
+                }
+            }
+
+            if ($matches) {
                 $coupons[] = [
                     'code'             => strtoupper($c->coupon_code),
                     'discount_type'    => $c->discount_type,
@@ -205,6 +218,14 @@ class CouponController extends Controller
                     'label'            => ($c->discount_type === 'percentage' ? intval($c->discount_value) . '% OFF' : '₹' . number_format($c->discount_value, 0) . ' OFF') . ' (Min ₹' . number_format($c->min_order_amount, 0) . ')',
                 ];
             }
+        }
+
+        if (empty($coupons)) {
+            $coupons = [
+                ['code' => 'WELCOME10', 'discount_type' => 'percentage', 'discount_value' => 10, 'min_order_amount' => 499, 'label' => '10% OFF (Min ₹499)'],
+                ['code' => 'DIGITAL20', 'discount_type' => 'percentage', 'discount_value' => 20, 'min_order_amount' => 1999, 'label' => '20% OFF (Min ₹1,999)'],
+                ['code' => 'DIWALI50',  'discount_type' => 'percentage', 'discount_value' => 50, 'min_order_amount' => 1500, 'label' => '50% OFF (Min ₹1,500)'],
+            ];
         }
 
         return response()->json([

@@ -916,27 +916,74 @@
                                 <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
                             @endif
                         @else
-                            <span class="huge-price-display">₹{{ number_format($sellPrice) }}</span>
+                            <span class="huge-price-display" id="courseDisplayFinalPrice">₹{{ number_format($sellPrice) }}</span>
                             @if($mrpPrice > $sellPrice)
-                                <span class="text-muted text-decoration-line-through small">₹{{ number_format($mrpPrice) }}</span>
-                                <span class="badge bg-success-subtle text-success fw-bold" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
+                                <span class="text-muted text-decoration-line-through small" id="courseDisplayOriginalPrice">₹{{ number_format($mrpPrice) }}</span>
+                                <span class="badge bg-success-subtle text-success fw-bold" id="courseDisplayDiscountBadge" style="font-size: 0.7rem;">{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . '% OFF' }}</span>
+                            @else
+                                <span class="text-muted text-decoration-line-through small" id="courseDisplayOriginalPrice" style="display: none;">₹{{ number_format($sellPrice) }}</span>
+                                <span class="badge bg-success-subtle text-success fw-bold d-none" id="courseDisplayDiscountBadge" style="font-size: 0.7rem;"></span>
                             @endif
                         @endif
+                    </div>
+
+                    <div id="courseCouponSavingsBanner" class="text-success fw-bold small mb-2 d-none" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-gift me-1"></i> Coupon applied: You save <span id="courseCouponSavingsAmount">₹0</span>!
                     </div>
 
                     <div class="text-danger small fw-semibold mb-3" style="font-size: 0.72rem;">
                         <i class="fa-regular fa-clock me-1"></i> Offer ends in 2 days
                     </div>
 
-                    <!-- CTA Action Buttons -->
-                    <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="mb-2">
-                        @csrf
-                        <button type="submit" class="btn w-100 fw-bold py-2 shadow-sm text-white" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); border: none; font-size: 0.875rem; border-radius: 8px;">
-                            Buy Now
-                        </button>
-                    </form>
+                    <!-- Coupon Code Apply Box (Before Cart / Buy Option) -->
+                    <div class="course-coupon-container mb-3 p-2.5 rounded-3 border" style="background: #faf5ff; border-color: #e9d5ff !important;">
+                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                            <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 0.78rem;">
+                                <i class="fa-solid fa-tags text-primary"></i> Have a Coupon Code?
+                            </span>
+                            <span class="badge fw-semibold" style="font-size: 0.65rem; background: #f3e8ff; color: #7c3aed;">Save Extra</span>
+                        </div>
 
-                    <button type="button" class="btn w-100 fw-bold py-2 mb-3" style="border: 2px solid #7c3aed; color: #6d28d9; background: #ffffff; font-size: 0.82rem; border-radius: 8px; transition: all 0.2s;" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })">
+                        <!-- Coupon Input Group -->
+                        <div class="input-group input-group-sm mb-1.5" id="courseCouponInputRow">
+                            <input type="text" id="courseCouponCodeInput" class="form-control text-uppercase fw-bold shadow-none" placeholder="Enter coupon code" style="font-size: 0.78rem; letter-spacing: 0.5px; border-color: #d8b4fe;" value="">
+                            <button class="btn text-white fw-bold px-3 shadow-none" type="button" id="btnApplyCourseCoupon" onclick="applyCourseCouponAction()" style="background: #7c3aed; font-size: 0.75rem;">
+                                Apply
+                            </button>
+                        </div>
+
+                        <!-- Applied Coupon Pill -->
+                        <div id="courseAppliedCouponCard" class="d-none align-items-center justify-content-between bg-white px-2 py-1.5 rounded-2 border border-success mb-1.5 shadow-sm">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-circle-check text-success fs-6"></i>
+                                <div>
+                                    <strong class="text-success text-uppercase" id="courseAppliedCodeText" style="font-size: 0.78rem;"></strong>
+                                    <div class="text-muted" id="courseAppliedSavingsText" style="font-size: 0.68rem;"></div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none fw-semibold" onclick="removeCourseCouponAction()" style="font-size: 0.72rem;">
+                                Remove
+                            </button>
+                        </div>
+
+                        <!-- Feedback Message -->
+                        <div id="courseCouponAlert" class="small mb-1 py-1 px-2 rounded-2" style="font-size: 0.72rem; display: none;"></div>
+
+                        <!-- Quick Available Coupons Pills -->
+                        <div class="d-flex align-items-center gap-1 flex-wrap pt-1 border-top" style="border-color: #f3e8ff !important;" id="quickCourseCouponsList">
+                            <span class="text-muted" style="font-size: 0.68rem;">Available Offers:</span>
+                            <button type="button" class="badge rounded-pill border-0 text-primary py-1 px-2 fw-semibold cursor-pointer" style="background: #eedafc; font-size: 0.65rem;" onclick="applyQuickCoupon('WELCOME10')">WELCOME10 (10% OFF)</button>
+                            <button type="button" class="badge rounded-pill border-0 text-primary py-1 px-2 fw-semibold cursor-pointer" style="background: #eedafc; font-size: 0.65rem;" onclick="applyQuickCoupon('DIGITAL20')">DIGITAL20 (20% OFF)</button>
+                            <button type="button" class="badge rounded-pill border-0 text-primary py-1 px-2 fw-semibold cursor-pointer" style="background: #eedafc; font-size: 0.65rem;" onclick="applyQuickCoupon('DIWALI50')">DIWALI50 (50% OFF)</button>
+                        </div>
+                    </div>
+
+                    <!-- CTA Action Buttons -->
+                    <button type="button" class="btn w-100 fw-bold py-2 mb-2 shadow-sm text-white" id="btnCourseBuyNow" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); border: none; font-size: 0.875rem; border-radius: 8px;" onclick="handleCourseDirectBuy()">
+                        Buy Now
+                    </button>
+
+                    <button type="button" class="btn w-100 fw-bold py-2 mb-3" id="btnCourseAddToCart" style="border: 2px solid #7c3aed; color: #6d28d9; background: #ffffff; font-size: 0.82rem; border-radius: 8px; transition: all 0.2s;" onclick="handleCourseAddToCart()">
                         <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
                     </button>
 
@@ -1305,6 +1352,206 @@
             toastEl.style.transform = 'translateY(10px)';
         }, 2500);
     }
+
+    let baseCoursePrice = {{ (float)$sellPrice }};
+    let activeCoursePrice = {{ (float)$sellPrice }};
+    let activeCourseCoupon = null;
+    let activeCourseDiscount = 0;
+
+    function applyQuickCoupon(code) {
+        const input = document.getElementById('courseCouponCodeInput');
+        if (input) {
+            input.value = code;
+            applyCourseCouponAction();
+        }
+    }
+
+    async function applyCourseCouponAction() {
+        const input = document.getElementById('courseCouponCodeInput');
+        const alertEl = document.getElementById('courseCouponAlert');
+        const btn = document.getElementById('btnApplyCourseCoupon');
+        const code = (input ? input.value : '').trim().toUpperCase();
+
+        if (!code) {
+            if (alertEl) {
+                alertEl.className = 'small mb-1 py-1 px-2 rounded-2 text-danger bg-danger-subtle';
+                alertEl.textContent = 'Please enter a coupon code';
+                alertEl.style.display = 'block';
+            }
+            return;
+        }
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        }
+
+        try {
+            const response = await fetch('{{ route("coupons.validate") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify({
+                    code: code,
+                    total: baseCoursePrice,
+                    context: 'course'
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                activeCourseCoupon = data.code;
+                activeCourseDiscount = parseFloat(data.discount_amount) || 0;
+                activeCoursePrice = Math.max(0, parseFloat(data.total) || (baseCoursePrice - activeCourseDiscount));
+
+                // Update price displays
+                const finalPriceEl = document.getElementById('courseDisplayFinalPrice');
+                const origPriceEl = document.getElementById('courseDisplayOriginalPrice');
+                const discountBadgeEl = document.getElementById('courseDisplayDiscountBadge');
+                const savingsBanner = document.getElementById('courseCouponSavingsBanner');
+                const savingsAmount = document.getElementById('courseCouponSavingsAmount');
+
+                if (finalPriceEl) finalPriceEl.textContent = '₹' + Math.round(activeCoursePrice).toLocaleString('en-IN');
+                if (origPriceEl) {
+                    origPriceEl.textContent = '₹' + Math.round(baseCoursePrice).toLocaleString('en-IN');
+                    origPriceEl.style.display = 'inline';
+                }
+                if (discountBadgeEl) {
+                    const discountPct = Math.round((activeCourseDiscount / (baseCoursePrice || 1)) * 100);
+                    discountBadgeEl.textContent = discountPct + '% EXTRA OFF';
+                    discountBadgeEl.classList.remove('d-none');
+                }
+                if (savingsBanner && savingsAmount) {
+                    savingsAmount.textContent = '₹' + activeCourseDiscount.toLocaleString('en-IN', {minimumFractionDigits: 2});
+                    savingsBanner.classList.remove('d-none');
+                }
+
+                // Update mobile sticky price if present
+                const mobilePriceEl = document.querySelector('.mobile-sticky-purchase-bar .fs-5');
+                if (mobilePriceEl) {
+                    mobilePriceEl.textContent = '₹' + Math.round(activeCoursePrice).toLocaleString('en-IN');
+                }
+
+                // Show active coupon card & hide input row
+                const inputRow = document.getElementById('courseCouponInputRow');
+                if (inputRow) inputRow.classList.add('d-none');
+                const card = document.getElementById('courseAppliedCouponCard');
+                if (card) {
+                    card.classList.remove('d-none');
+                    card.classList.add('d-flex');
+                }
+                const codeText = document.getElementById('courseAppliedCodeText');
+                if (codeText) codeText.textContent = data.code;
+                const savingsText = document.getElementById('courseAppliedSavingsText');
+                if (savingsText) savingsText.textContent = 'Saved ₹' + activeCourseDiscount.toLocaleString('en-IN', {minimumFractionDigits: 2});
+
+                if (alertEl) {
+                    alertEl.className = 'small mb-1 py-1 px-2 rounded-2 text-success bg-success-subtle';
+                    alertEl.textContent = data.message || 'Coupon applied successfully!';
+                    alertEl.style.display = 'block';
+                }
+
+                showToast('Coupon Applied', `Code ${data.code} applied! Saved ₹${activeCourseDiscount.toFixed(2)}`);
+            } else {
+                if (alertEl) {
+                    alertEl.className = 'small mb-1 py-1 px-2 rounded-2 text-danger bg-danger-subtle';
+                    alertEl.textContent = data.message || 'Invalid coupon code';
+                    alertEl.style.display = 'block';
+                }
+            }
+        } catch (err) {
+            if (alertEl) {
+                alertEl.className = 'small mb-1 py-1 px-2 rounded-2 text-danger bg-danger-subtle';
+                alertEl.textContent = 'Failed to validate coupon. Please try again.';
+                alertEl.style.display = 'block';
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Apply';
+            }
+        }
+    }
+
+    function removeCourseCouponAction() {
+        activeCourseCoupon = null;
+        activeCourseDiscount = 0;
+        activeCoursePrice = baseCoursePrice;
+
+        // Reset price displays
+        const finalPriceEl = document.getElementById('courseDisplayFinalPrice');
+        const origPriceEl = document.getElementById('courseDisplayOriginalPrice');
+        const discountBadgeEl = document.getElementById('courseDisplayDiscountBadge');
+        const savingsBanner = document.getElementById('courseCouponSavingsBanner');
+
+        if (finalPriceEl) finalPriceEl.textContent = '₹' + Math.round(baseCoursePrice).toLocaleString('en-IN');
+        if (origPriceEl) {
+            @if($mrpPrice > $sellPrice)
+                origPriceEl.textContent = '₹{{ number_format($mrpPrice) }}';
+                origPriceEl.style.display = 'inline';
+            @else
+                origPriceEl.style.display = 'none';
+            @endif
+        }
+        if (discountBadgeEl) {
+            @if($mrpPrice > $sellPrice)
+                discountBadgeEl.textContent = '{{ $course->discount_percentage ?? $course->discount_text ?? round((($mrpPrice - $sellPrice)/$mrpPrice)*100) . "% OFF" }}';
+            @else
+                discountBadgeEl.classList.add('d-none');
+            @endif
+        }
+        if (savingsBanner) savingsBanner.classList.add('d-none');
+
+        // Reset mobile bar
+        const mobilePriceEl = document.querySelector('.mobile-sticky-purchase-bar .fs-5');
+        if (mobilePriceEl) {
+            mobilePriceEl.textContent = '₹' + Math.round(baseCoursePrice).toLocaleString('en-IN');
+        }
+
+        // Toggle card / input
+        const card = document.getElementById('courseAppliedCouponCard');
+        if (card) {
+            card.classList.remove('d-flex');
+            card.classList.add('d-none');
+        }
+        const inputRow = document.getElementById('courseCouponInputRow');
+        if (inputRow) inputRow.classList.remove('d-none');
+        const codeInput = document.getElementById('courseCouponCodeInput');
+        if (codeInput) codeInput.value = '';
+
+        const alertEl = document.getElementById('courseCouponAlert');
+        if (alertEl) alertEl.style.display = 'none';
+
+        showToast('Coupon Removed', 'Standard course pricing restored.');
+    }
+
+    function handleCourseAddToCart() {
+        const item = {
+            id: '{{ $course->id }}',
+            type: 'Course',
+            title: '{{ addslashes($course->title) }}',
+            price: activeCoursePrice,
+            original_price: baseCoursePrice,
+            thumbnail: '{{ $course->thumbnail }}',
+            seller_id: {{ $course->seller_id ?? 1 }},
+            coupon_code: activeCourseCoupon,
+            discount_amount: activeCourseDiscount
+        };
+        addToCart(item);
+    }
+
+    function handleCourseDirectBuy() {
+        handleCourseAddToCart();
+        setTimeout(() => {
+            if (typeof openCheckoutModal === 'function') {
+                openCheckoutModal();
+            }
+        }, 300);
+    }
 </script>
 
 @if(!$isBusinessListingCourse)
@@ -1329,15 +1576,12 @@
             @endif
         </div>
         <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold" onclick="addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail }}', seller_id: {{ $course->seller_id ?? 1 }} })" title="Add to Cart">
+            <button type="button" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold" onclick="handleCourseAddToCart()" title="Add to Cart">
                 <i class="fa-solid fa-cart-shopping"></i>
             </button>
-            <form action="{{ route('course.enroll', $course->slug) }}" method="POST" class="m-0">
-                @csrf
-                <button type="submit" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" style="background-color: #0066ff;">
-                    Buy Now
-                </button>
-            </form>
+            <button type="button" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold" style="background-color: #0066ff;" onclick="handleCourseDirectBuy()">
+                Buy Now
+            </button>
         </div>
     </div>
 </div>

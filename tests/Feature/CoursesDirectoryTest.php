@@ -116,6 +116,7 @@ class CoursesDirectoryTest extends TestCase
         $response->assertSee('Hitesh Mohkar');
         $response->assertSee('2,999');
         $response->assertSee('5,999');
+        $response->assertSee('Have a Coupon Code?');
         $response->assertSee("What you'll learn", false);
         $response->assertSee('Curriculum');
         $response->assertSee('About the Instructor');
@@ -231,6 +232,56 @@ class CoursesDirectoryTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Accessories');
+    }
+
+    public function test_course_coupon_can_be_applied_and_used_in_cart(): void
+    {
+        // 1. Validate course coupon
+        $couponRes = $this->postJson('/coupons/validate', [
+            'code'    => 'WELCOME10',
+            'total'   => 2999,
+            'context' => 'course',
+        ]);
+
+        $couponRes->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('code', 'WELCOME10')
+            ->assertJsonPath('discount_amount', 299.9);
+
+        // 2. Add course with coupon to cart
+        $customer = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($customer);
+
+        $addRes = $this->postJson('/cart/add', [
+            'id'              => 55,
+            'type'            => 'Course',
+            'title'           => 'Mastering SEO',
+            'price'           => 2699.1,
+            'original_price'  => 2999,
+            'coupon_code'     => 'WELCOME10',
+            'discount_amount' => 299.9,
+            'quantity'        => 1,
+        ]);
+
+        $addRes->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('count', 1);
+
+        // 3. Checkout with coupon
+        $checkoutRes = $this->postJson('/cart/checkout', [
+            'name'           => 'Test Customer',
+            'email'          => $customer->email,
+            'phone'          => '9876543210',
+            'city'           => 'Ahmedabad',
+            'address'        => '123 High Street',
+            'payment_method' => 'Online UPI',
+            'coupon_code'    => 'WELCOME10',
+            'discount'       => 299.9,
+        ]);
+
+        $checkoutRes->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('total_amount', '2,699.10');
     }
 }
 
