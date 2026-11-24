@@ -912,7 +912,14 @@
                             </button>
                         </form>
 
-                        <button type="button" class="btn-cart-service" onclick="addToCart({ id: '{{ $service->id ?? 1 }}', type: 'Service', title: '{{ addslashes($service->title ?? ($title ?? 'Service')) }}', price: {{ (float)(isset($service) && $service && $service->discount_price > 0 ? $service->discount_price : (isset($service) && $service ? ($service->price ?? 999) : ($packages['standard']['price'] ?? 999))) }}, thumbnail: '{{ $service->thumbnail ?? ($gallery[0] ?? '') }}', seller_id: {{ $service->seller_id ?? 1 }} })">
+                        <button type="button" class="btn-cart-service" onclick='addToCart({!! htmlspecialchars(json_encode([
+                            "id" => $service->id ?? 1,
+                            "type" => "Service",
+                            "title" => $service->title ?? ($title ?? "Service"),
+                            "price" => (float)(isset($service) && $service && $service->discount_price > 0 ? $service->discount_price : (isset($service) && $service ? ($service->price ?? 999) : ($packages["standard"]["price"] ?? 999))),
+                            "thumbnail" => $service->thumbnail ?? ($gallery[0] ?? ""),
+                            "seller_id" => $service->seller_id ?? 1
+                        ]), ENT_QUOTES, "UTF-8") !!})'>
                             <i class="fa-solid fa-cart-shopping"></i>
                             <span>Add to Cart</span>
                         </button>

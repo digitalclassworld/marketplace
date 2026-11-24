@@ -916,7 +916,14 @@
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button type="button" class="btn-add-cart" onclick="addToCart({ id: '{{ is_array($p) ? ($p['id'] ?? 1) : $p->id }}', type: 'Product', title: '{{ addslashes($title) }}', price: {{ (float)$price }}, thumbnail: '{{ $thumb }}', seller_id: {{ is_array($p) ? ($p['seller_id'] ?? 1) : ($p->seller_id ?? 1) }} })">
+                            <button type="button" class="btn-add-cart" onclick='addToCart({!! htmlspecialchars(json_encode([
+                                "id" => is_array($p) ? ($p["id"] ?? 1) : $p->id,
+                                "type" => "Product",
+                                "title" => $title,
+                                "price" => (float)$price,
+                                "thumbnail" => $thumb,
+                                "seller_id" => is_array($p) ? ($p["seller_id"] ?? 1) : ($p->seller_id ?? 1)
+                            ]), ENT_QUOTES, "UTF-8") !!})'>
                                 <span>Add to Cart</span>
                                 <i class="fa-solid fa-cart-shopping"></i>
                             </button>

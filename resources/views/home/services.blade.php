@@ -1534,7 +1534,14 @@
                             </div>
 
                             <div class="d-flex align-items-center gap-2 mt-2">
-                                <button type="button" class="btn btn-outline-success btn-sm rounded-circle p-1.5" title="Add Service to Cart" onclick="addToCart({ id: '{{ $svc->id }}', type: 'Service', title: '{{ addslashes($svc->title) }}', price: {{ (float)($svc->price ?? 999) }}, thumbnail: '{{ $svc->thumbnail }}', seller_id: {{ $svc->seller_id ?? 1 }} })" style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <button type="button" class="btn btn-outline-success btn-sm rounded-circle p-1.5" title="Add Service to Cart" onclick='addToCart({!! htmlspecialchars(json_encode([
+                                    "id" => $svc->id,
+                                    "type" => "Service",
+                                    "title" => $svc->title,
+                                    "price" => (float)($svc->price ?? 999),
+                                    "thumbnail" => $svc->thumbnail ?: "",
+                                    "seller_id" => $svc->seller_id ?? 1
+                                ]), ENT_QUOTES, "UTF-8") !!})' style="width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                     <i class="fa-solid fa-cart-plus" style="font-size: 0.8rem;"></i>
                                 </button>
                                 <a href="{{ route('service.show', $svc->slug) }}" class="btn-view-service flex-grow-1 text-center justify-content-center">

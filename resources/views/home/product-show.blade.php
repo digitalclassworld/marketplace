@@ -1585,9 +1585,9 @@
         addToCart({
             id: '{{ $product->id }}',
             type: 'Product',
-            title: '{{ addslashes($product->title) }}',
+            title: {!! json_encode($product->title) !!},
             price: {{ (float)($product->price ?? 499) }},
-            thumbnail: '{{ $product->thumbnail }}',
+            thumbnail: {!! json_encode($product->thumbnail ?: '') !!},
             seller_id: {{ $product->seller_id ?? 1 }},
             quantity: qty
         });

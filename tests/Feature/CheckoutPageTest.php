@@ -80,4 +80,32 @@ class CheckoutPageTest extends TestCase
             'discount'       => 225.00,
         ]);
     }
+
+    public function test_guest_can_add_item_to_cart_and_normalize_params(): void
+    {
+        // JSON API add to cart with name/image aliases
+        $response = $this->postJson('/cart/add', [
+            'id'    => '999',
+            'type'  => 'Course',
+            'name'  => 'Python Full Masterclass',
+            'price' => 1999,
+            'image' => 'https://example.com/course.jpg',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('success', true);
+        $response->assertJsonPath('count', 1);
+
+        // Standard form submission redirect
+        $formResponse = $this->post('/cart/add', [
+            'id'    => '1000',
+            'type'  => 'Product',
+            'name'  => 'Data Science Handbook',
+            'price' => 499,
+            'image' => 'https://example.com/book.jpg',
+        ]);
+
+        $formResponse->assertRedirect(route('checkout'));
+    }
 }
+

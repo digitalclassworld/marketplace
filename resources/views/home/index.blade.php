@@ -1440,17 +1440,17 @@
                                     @endif
                                 </div>
 
-                                <form action="{{ route('cart.add') }}" method="POST" onsubmit="event.preventDefault(); addToCart({ id: '{{ $course->id }}', type: 'Course', title: '{{ addslashes($course->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}', seller_id: {{ $course->seller_id ?? 1 }} });">
-                                    @csrf
-                                    <input type="hidden" name="type" value="course">
-                                    <input type="hidden" name="id" value="{{ $course->id }}">
-                                    <input type="hidden" name="name" value="{{ $course->title }}">
-                                    <input type="hidden" name="price" value="{{ $sellPrice }}">
-                                    <input type="hidden" name="image" value="{{ $course->thumbnail_url ?: ($course->thumbnail ?? '') }}">
-                                    <button type="submit" class="btn-add-to-cart-green">
-                                        <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
-                                    </button>
-                                </form>
+                                <button type="button" class="btn-add-to-cart-green w-100" onclick='addToCart({!! htmlspecialchars(json_encode([
+                                    "id" => $course->id,
+                                    "type" => "Course",
+                                    "title" => $course->title,
+                                    "price" => (float)$sellPrice,
+                                    "original_price" => (float)$mrpPrice,
+                                    "thumbnail" => $course->thumbnail_url ?: ($course->thumbnail ?? ""),
+                                    "seller_id" => $course->seller_id ?? 1
+                                ]), ENT_QUOTES, "UTF-8") !!})'>
+                                    <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -791,7 +791,15 @@
 
                                     <!-- Luxury Add To Cart Button -->
                                     <button type="button" class="btn-cart-luxury"
-                                            onclick="addToCart({ id: '{{ $c->id }}', type: 'Course', title: '{{ addslashes($c->title) }}', price: {{ (float)$sellPrice }}, thumbnail: '{{ $c->thumbnail_url ?: ($c->thumbnail ?: '') }}', seller_id: {{ $c->seller_id ?? 1 }} })">
+                                            onclick='addToCart({!! htmlspecialchars(json_encode([
+                                                "id" => $c->id,
+                                                "type" => "Course",
+                                                "title" => $c->title,
+                                                "price" => (float)$sellPrice,
+                                                "original_price" => (float)$mrpPrice,
+                                                "thumbnail" => $c->thumbnail_url ?: ($c->thumbnail ?: ""),
+                                                "seller_id" => $c->seller_id ?? 1
+                                            ]), ENT_QUOTES, "UTF-8") !!})'>
                                         <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
                                     </button>
                                 </div>

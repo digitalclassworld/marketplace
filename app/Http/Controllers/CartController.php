@@ -51,16 +51,27 @@ class CartController extends Controller
     /**
      * Add item to cart.
      */
-    public function add(Request $request): JsonResponse
+    public function add(Request $request)
     {
         if (Auth::check() && !Auth::user()->isCustomer()) {
-            return response()->json([
-                'success'       => false,
-                'auth_required' => true,
-                'is_logged_in'  => true,
-                'current_role'  => Auth::user()->role,
-                'message'       => 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to add items to cart and place orders.',
-            ], 403);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success'       => false,
+                    'auth_required' => true,
+                    'is_logged_in'  => true,
+                    'current_role'  => Auth::user()->role,
+                    'message'       => 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to add items to cart and place orders.',
+                ], 403);
+            }
+            return redirect()->back()->with('error', 'Please login with your Customer account to add items to cart.');
+        }
+
+        // Normalize legacy or alternate form parameter names
+        if ($request->has('name') && !$request->has('title')) {
+            $request->merge(['title' => $request->input('name')]);
+        }
+        if ($request->has('image') && !$request->has('thumbnail')) {
+            $request->merge(['thumbnail' => $request->input('image')]);
         }
 
         $validated = $request->validate([
@@ -103,6 +114,10 @@ class CartController extends Controller
         }
 
         session()->put('marketplace_cart', $cart);
+
+        if (!$request->expectsJson() && !$request->ajax()) {
+            return redirect()->route('checkout')->with('success', 'Item added to cart!');
+        }
 
         return response()->json([
             'success' => true,

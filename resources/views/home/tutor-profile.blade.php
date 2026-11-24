@@ -403,17 +403,16 @@
                                         @endif
                                     </div>
 
-                                    <form action="{{ route('cart.add') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="type" value="course">
-                                        <input type="hidden" name="id" value="{{ $course->id }}">
-                                        <input type="hidden" name="name" value="{{ $course->course_name }}">
-                                        <input type="hidden" name="price" value="{{ $tSellPrice }}">
-                                        <input type="hidden" name="image" value="{{ $course->thumbnail_url }}">
-                                        <button type="submit" class="btn-add-to-cart-green">
-                                            <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn-add-to-cart-green w-100" onclick='addToCart({!! htmlspecialchars(json_encode([
+                                        "id" => $course->id,
+                                        "type" => "Course",
+                                        "title" => $course->course_name,
+                                        "price" => (float)$tSellPrice,
+                                        "thumbnail" => $course->thumbnail_url ?: "",
+                                        "seller_id" => $tutor->id ?? 1
+                                    ]), ENT_QUOTES, "UTF-8") !!})'>
+                                        <i class="fa-solid fa-cart-shopping me-1"></i> Add To Cart
+                                    </button>
                                 </div>
                             </div>
                         </div>
