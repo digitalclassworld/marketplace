@@ -7,16 +7,33 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Seller;
 use App\Models\Service;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class CartController extends Controller
 {
+    /**
+     * Display the dedicated full-page checkout.
+     */
+    public function checkoutPage(Request $request): View
+    {
+        $customer = Auth::check() && Auth::user()->isCustomer() ? Auth::user() : null;
+        $cart = session()->get('marketplace_cart', []);
+
+        return view('cart.checkout', [
+            'customer' => $customer,
+            'cart'     => $cart,
+        ]);
+    }
+
     /**
      * Get current cart data from session or request.
      */
@@ -32,20 +49,18 @@ class CartController extends Controller
     }
 
     /**
-     * Add item to cart (Requires customer login).
+     * Add item to cart.
      */
     public function add(Request $request): JsonResponse
     {
-        if (!Auth::check() || !Auth::user()->isCustomer()) {
+        if (Auth::check() && !Auth::user()->isCustomer()) {
             return response()->json([
                 'success'       => false,
                 'auth_required' => true,
-                'is_logged_in'  => Auth::check(),
-                'current_role'  => Auth::check() ? Auth::user()->role : null,
-                'message'       => Auth::check()
-                    ? 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to add items to cart and place orders.'
-                    : 'Customer login required. Please login or create a customer account to add items to cart.',
-            ], 401);
+                'is_logged_in'  => true,
+                'current_role'  => Auth::user()->role,
+                'message'       => 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to add items to cart and place orders.',
+            ], 403);
         }
 
         $validated = $request->validate([
@@ -173,16 +188,14 @@ class CartController extends Controller
      */
     public function checkout(Request $request): JsonResponse
     {
-        if (!Auth::check() || !Auth::user()->isCustomer()) {
+        if (Auth::check() && !Auth::user()->isCustomer()) {
             return response()->json([
                 'success'       => false,
                 'auth_required' => true,
-                'is_logged_in'  => Auth::check(),
-                'current_role'  => Auth::check() ? Auth::user()->role : null,
-                'message'       => Auth::check()
-                    ? 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to complete your purchase.'
-                    : 'Customer login required. Please login or create a customer account to complete your checkout.',
-            ], 401);
+                'is_logged_in'  => true,
+                'current_role'  => Auth::user()->role,
+                'message'       => 'You are currently logged in as a ' . ucfirst(Auth::user()->role) . '. Please login with your Customer account to complete your purchase.',
+            ], 403);
         }
 
         $validated = $request->validate([
@@ -196,6 +209,25 @@ class CartController extends Controller
             'discount'       => 'nullable|numeric|min:0',
             'items'          => 'nullable|array',
         ]);
+
+        if (!Auth::check()) {
+            $user = User::whereRaw('LOWER(email) = ?', [strtolower(trim($validated['email']))])->first();
+            if (!$user) {
+                $user = User::create([
+                    'name'              => $validated['name'],
+                    'email'             => strtolower(trim($validated['email'])),
+                    'phone'             => $validated['phone'],
+                    'city'              => $validated['city'] ?? 'Ahmedabad',
+                    'role'              => 'customer',
+                    'profession'        => 'Learner / Buyer',
+                    'password'          => Hash::make(Str::random(16)),
+                    'email_verified_at' => now(),
+                ]);
+            }
+            if ($user && $user->isCustomer()) {
+                Auth::login($user);
+            }
+        }
 
         // Accept items from either JSON payload or session
         $cartItems = $request->input('items');

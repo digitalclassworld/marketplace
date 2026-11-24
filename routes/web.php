@@ -52,7 +52,10 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::get('/checkout', [CartController::class, 'checkoutPage'])->name('checkout');
+Route::get('/cart/checkout', [CartController::class, 'checkoutPage']);
 Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+Route::post('/checkout', [CartController::class, 'checkout']);
 
 // Coupon Validation API
 Route::post('/coupons/validate', [CouponController::class, 'validateCoupon'])->name('coupons.validate');

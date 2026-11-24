@@ -1596,7 +1596,7 @@
     function proceedToBuy() {
         addToCartLive();
         setTimeout(() => {
-            openCartDrawer();
+            window.location.href = "{{ route('checkout') }}";
         }, 300);
     }
 

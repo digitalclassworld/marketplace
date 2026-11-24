@@ -1547,10 +1547,8 @@
     function handleCourseDirectBuy() {
         handleCourseAddToCart();
         setTimeout(() => {
-            if (typeof openCheckoutModal === 'function') {
-                openCheckoutModal();
-            }
-        }, 300);
+            window.location.href = "{{ route('checkout') }}";
+        }, 150);
     }
 </script>
 

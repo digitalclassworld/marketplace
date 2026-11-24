@@ -1254,10 +1254,10 @@
                     </div>
                     <h4 class="fw-bold text-primary mb-0" id="cartTotalAmount">₹0.00</h4>
                 </div>
-                <button type="button" class="btn btn-primary w-100 fw-bold py-2.5 rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="openCheckoutModal()">
+                <a href="{{ route('checkout') }}" class="btn btn-primary w-100 fw-bold py-2.5 rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2 text-decoration-none">
                     <span>Proceed to Checkout</span>
                     <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                </a>
                 <div class="text-center mt-2">
                     <button type="button" class="btn btn-link text-muted p-0 text-decoration-none" style="font-size: 0.725rem;" onclick="clearCart()">
                         <i class="fa-regular fa-trash-can me-1"></i> Clear Cart
@@ -2137,25 +2137,10 @@
             }
         }
 
-        // Open Checkout Modal (Customer Login REQUIRED)
+        // Navigate to dedicated Checkout Page
         function openCheckoutModal() {
-            if (!window.DC_AUTH || !window.DC_AUTH.isCustomer) {
-                openCustomerAuthModal('login');
-                return;
-            }
-
-            const items = getCartItems();
-            if (!items.length) {
-                alert('Your cart is empty! Please add items before checking out.');
-                return;
-            }
-
-            // Close offcanvas if open
-            const offcanvasEl = document.getElementById('cartOffcanvas');
-            if (offcanvasEl) {
-                const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
-                if (bsOffcanvas) bsOffcanvas.hide();
-            }
+            window.location.href = "{{ route('checkout') }}";
+        }
 
             // Pre-fill fields from DC_AUTH
             if (window.DC_AUTH) {
