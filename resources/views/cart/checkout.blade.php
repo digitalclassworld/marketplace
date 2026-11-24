@@ -681,15 +681,26 @@
                                             <!-- Popular Quick Chips -->
                                             <div class="d-flex align-items-center gap-1.5 flex-wrap pt-1 border-top border-light">
                                                 <span class="text-muted" style="font-size: 0.68rem; font-weight: 600;">Offers:</span>
-                                                <button type="button" class="offer-pill" onclick="applyQuickPageCoupon('WELCOME10')">
-                                                    WELCOME10 <span class="offer-pill-badge">10% OFF</span>
-                                                </button>
-                                                <button type="button" class="offer-pill" onclick="applyQuickPageCoupon('DIGITAL20')">
-                                                    DIGITAL20 <span class="offer-pill-badge">20% OFF</span>
-                                                </button>
-                                                <button type="button" class="offer-pill" onclick="applyQuickPageCoupon('DIWALI50')">
-                                                    DIWALI50 <span class="offer-pill-badge">50% OFF</span>
-                                                </button>
+                                                @forelse($availableCoupons ?? [] as $ac)
+                                                    @php
+                                                        $offText = $ac->discount_type === 'percentage' 
+                                                            ? (intval($ac->discount_value) . '% OFF') 
+                                                            : ('₹' . number_format($ac->discount_value, 0) . ' OFF');
+                                                    @endphp
+                                                    <button type="button" class="offer-pill" onclick="applyQuickPageCoupon('{{ $ac->coupon_code }}')">
+                                                        {{ $ac->coupon_code }} <span class="offer-pill-badge">{{ $offText }}</span>
+                                                    </button>
+                                                @empty
+                                                    <button type="button" class="offer-pill" onclick="applyQuickPageCoupon('WELCOME10')">
+                                                        WELCOME10 <span class="offer-pill-badge">10% OFF</span>
+                                                    </button>
+                                                    <button type="button" class="offer-pill" onclick="applyQuickPageCoupon('DIGITAL20')">
+                                                        DIGITAL20 <span class="offer-pill-badge">20% OFF</span>
+                                                    </button>
+                                                    <button type="button" class="offer-pill" onclick="applyQuickPageCoupon('DIWALI50')">
+                                                        DIWALI50 <span class="offer-pill-badge">50% OFF</span>
+                                                    </button>
+                                                @endforelse
                                             </div>
 
                                             <!-- Feedback Alert for invalid coupon -->
@@ -1007,6 +1018,15 @@
                 checkoutActiveCoupon = data.code;
                 checkoutTotalDiscount = parseFloat(data.discount_amount) || 0;
 
+                // Sync new active coupon to items in cart
+                checkoutItems.forEach(item => {
+                    item.coupon_code = data.code;
+                    item.discount_amount = (checkoutItems.length === 1) ? checkoutTotalDiscount : 0;
+                });
+                if (typeof saveCartItems === 'function') {
+                    saveCartItems(checkoutItems);
+                }
+
                 // Seamless transition to single Luxury Applied Card
                 document.getElementById('couponInputSection').classList.add('d-none');
                 const appliedSec = document.getElementById('couponAppliedSection');
@@ -1021,6 +1041,16 @@
             } else {
                 checkoutActiveCoupon = null;
                 checkoutTotalDiscount = 0;
+
+                // Clear coupon on items since it is invalid or expired
+                checkoutItems.forEach(item => {
+                    item.coupon_code = null;
+                    item.discount_amount = 0;
+                });
+                if (typeof saveCartItems === 'function') {
+                    saveCartItems(checkoutItems);
+                }
+
                 updateTotalsDisplay();
 
                 if (!silent && alertEl) {
@@ -1044,6 +1074,15 @@
     function removePageCouponAction() {
         checkoutActiveCoupon = null;
         checkoutTotalDiscount = 0;
+
+        // Clear coupon code from all items in cart and persist
+        checkoutItems.forEach(item => {
+            item.coupon_code = null;
+            item.discount_amount = 0;
+        });
+        if (typeof saveCartItems === 'function') {
+            saveCartItems(checkoutItems);
+        }
 
         // Switch back to clean input section
         document.getElementById('couponAppliedSection').classList.add('d-none');

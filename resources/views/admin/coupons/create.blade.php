@@ -501,7 +501,7 @@
                                     <div class="col-7">
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text bg-transparent border-end-0 text-muted p-1"><i class="fa-regular fa-calendar" style="font-size:0.75rem;"></i></span>
-                                            <input type="date" name="start_date" class="form-control border-start-0 ps-0" value="{{ $coupon['start_date'] ?? '2026-10-01' }}" required>
+                                            <input type="date" name="start_date" class="form-control border-start-0 ps-0" value="{{ $coupon['start_date'] ?? date('Y-m-d') }}" required>
                                         </div>
                                     </div>
                                     <div class="col-5">
@@ -520,7 +520,7 @@
                                     <div class="col-7">
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text bg-transparent border-end-0 text-muted p-1"><i class="fa-regular fa-calendar" style="font-size:0.75rem;"></i></span>
-                                            <input type="date" name="end_date" class="form-control border-start-0 ps-0" value="{{ $coupon['end_date'] ?? '2026-11-15' }}" required>
+                                            <input type="date" name="end_date" class="form-control border-start-0 ps-0" value="{{ $coupon['end_date'] ?? date('Y-m-d', strtotime('+90 days')) }}" required>
                                         </div>
                                     </div>
                                     <div class="col-5">

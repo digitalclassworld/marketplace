@@ -40,11 +40,21 @@ class CartController extends Controller
         unset($item);
         session()->put('marketplace_cart', $cart);
 
+        // Fetch active available coupons from DB
+        $availableCoupons = \App\Models\DiscountCoupon::where('status', 'Active')
+            ->where(function ($q) {
+                $q->whereNull('valid_until')->orWhere('valid_until', '>=', now()->startOfDay());
+            })
+            ->latest()
+            ->take(6)
+            ->get();
+
         return view('cart.checkout', [
-            'customer'  => $customer,
-            'cart'      => $cart,
-            'cartCount' => count($cart),
-            'cartTotal' => $this->calculateTotal($cart),
+            'customer'         => $customer,
+            'cart'             => $cart,
+            'cartCount'        => count($cart),
+            'cartTotal'        => $this->calculateTotal($cart),
+            'availableCoupons' => $availableCoupons,
         ]);
     }
 

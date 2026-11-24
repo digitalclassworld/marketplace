@@ -317,8 +317,8 @@ class AdminCouponController extends Controller
                 'applicable_to'    => is_array($request->applicable_to ?: $request->categories) ? implode(',', $request->applicable_to ?: $request->categories) : ($request->applicable_to ?: ($request->categories ?: 'all')),
                 'usage_limit'      => $request->usage_limit ?: 500,
                 'used_count'       => 0,
-                'valid_from'       => $request->start_date ? \Carbon\Carbon::parse($request->start_date) : now(),
-                'valid_until'      => $request->end_date ? \Carbon\Carbon::parse($request->end_date) : now()->addDays(30),
+                'valid_from'       => $request->start_date ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : now()->startOfDay(),
+                'valid_until'      => $request->end_date ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : now()->addDays(90)->endOfDay(),
                 'status'           => 'Active',
             ]);
         } catch (\Throwable $e) {

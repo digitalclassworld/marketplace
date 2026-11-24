@@ -147,5 +147,63 @@ class CheckoutPageTest extends TestCase
             'subtotal'       => 10000.00,
         ]);
     }
+
+    public function test_checkout_can_apply_new_coupon_and_replace_old(): void
+    {
+        // 1. Create a dynamic coupon in DB
+        \App\Models\DiscountCoupon::create([
+            'seller_id'        => 1,
+            'coupon_code'      => 'SPECIAL25',
+            'discount_type'    => 'percentage',
+            'discount_value'   => 25.00,
+            'min_order_amount' => 500.00,
+            'applicable_to'    => 'all',
+            'usage_limit'      => 500,
+            'used_count'       => 0,
+            'valid_from'       => now()->subDay(),
+            'valid_until'      => now()->addDays(30),
+            'status'           => 'Active',
+        ]);
+
+        // 2. Validate coupon endpoint
+        $validateRes = $this->postJson('/coupons/validate', [
+            'code'  => 'SPECIAL25',
+            'total' => 2000.00,
+        ]);
+        $validateRes->assertStatus(200);
+        $validateRes->assertJsonPath('success', true);
+        $validateRes->assertJsonPath('discount_amount', 500);
+
+        // 3. Checkout with this new coupon
+        $payload = [
+            'name'           => 'Test Learner',
+            'email'          => 'learner@example.com',
+            'phone'          => '9876543210',
+            'city'           => 'Ahmedabad',
+            'coupon_code'    => 'SPECIAL25',
+            'discount'       => 500.00,
+            'items'          => [
+                [
+                    'id'          => 2014,
+                    'type'        => 'Course',
+                    'title'       => 'Java Program Training Course',
+                    'price'       => 2000.00,
+                    'coupon_code' => 'SPECIAL25',
+                    'quantity'    => 1,
+                ]
+            ],
+        ];
+
+        $checkoutRes = $this->postJson('/cart/checkout', $payload);
+        $checkoutRes->assertStatus(200);
+        $checkoutRes->assertJsonPath('success', true);
+        $checkoutRes->assertJsonPath('total_amount', '1,500.00');
+
+        $this->assertDatabaseHas('orders', [
+            'customer_email' => 'learner@example.com',
+            'amount'         => 1500.00,
+            'discount'       => 500.00,
+        ]);
+    }
 }
 
