@@ -214,6 +214,11 @@ class SuperAdminTest extends TestCase
         $responsePending->assertStatus(200);
         $responsePending->assertSee($pendingSeller->seller->seller_code);
         $responsePending->assertDontSee($activeSeller->seller->seller_code);
+
+        // View with search and per_page pagination
+        $responseSearch = $this->actingAs($admin)->get('/admin/sellers?q=Active&per_page=10');
+        $responseSearch->assertStatus(200);
+        $responseSearch->assertSee($activeSeller->seller->seller_code);
     }
 
     /**

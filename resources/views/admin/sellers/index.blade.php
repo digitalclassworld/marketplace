@@ -119,6 +119,20 @@
         border-radius: 8px;
         padding: 0.75rem;
     }
+
+    /* Custom Sellers Pagination */
+    .sellers-pagination-links nav > div:first-child {
+        display: none !important;
+    }
+    .sellers-pagination-links .pagination {
+        margin-bottom: 0;
+    }
+    .sellers-pagination-links .page-link {
+        padding: 0.25rem 0.55rem;
+        font-size: 0.78rem;
+        border-radius: 6px;
+        margin: 0 1px;
+    }
 </style>
 @endsection
 
@@ -454,7 +468,7 @@
                                 @endphp
                                 <tr class="seller-row {{ $idx === 0 ? 'selected-row' : '' }}" onclick='inspectSeller(@json($sellerPayload), this)' ondblclick="window.location='{{ route('admin.sellers.show', $id) }}'" title="Click to inspect, double-click for full dossier">
                                     <td onclick="event.stopPropagation();"><input type="checkbox" class="form-check-input"></td>
-                                    <td class="text-muted">{{ $idx + 1 }}</td>
+                                    <td class="text-muted">{{ ($sellers instanceof \Illuminate\Pagination\LengthAwarePaginator ? $sellers->firstItem() : 1) + $idx }}</td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <img src="{{ $logo }}" alt="{{ $name }}" class="rounded border" style="width: 38px; height: 38px; object-fit: contain; background: #f8fafc;">
@@ -566,19 +580,31 @@
                 </div>
 
                 <!-- Footer Pagination Bar -->
-                <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light small">
-                    <span class="text-muted">Showing 1 to {{ count($sellers) }} of {{ number_format($counts['all'] ?? 1248) }} sellers</span>
-                    <nav>
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">4</a></li>
-                            <li class="page-item"><a class="page-link" href="#">5</a></li>
-                            <li class="page-item"><a class="page-link" href="#">›</a></li>
-                        </ul>
-                    </nav>
+                <div class="d-flex flex-wrap justify-content-between align-items-center p-3 border-top bg-light small gap-2">
+                    <span class="text-muted">
+                        @if($sellers instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                            Showing {{ $sellers->firstItem() ?? 0 }} to {{ $sellers->lastItem() ?? 0 }} of {{ number_format($sellers->total()) }} sellers
+                        @else
+                            Showing 1 to {{ count($sellers) }} of {{ number_format($counts['all'] ?? 0) }} sellers
+                        @endif
+                    </span>
+                    <div class="d-flex align-items-center gap-2">
+                        @if($sellers instanceof \Illuminate\Pagination\LengthAwarePaginator && $sellers->hasPages())
+                            <div class="sellers-pagination-links">
+                                {{ $sellers->links('pagination::bootstrap-5') }}
+                            </div>
+                        @endif
+                        <div class="d-flex align-items-center gap-1 text-muted ms-2">
+                            <span>Show</span>
+                            <select class="form-select form-select-sm" style="width: 75px;" onchange="const url = new URL(window.location.href); url.searchParams.set('per_page', this.value); url.searchParams.set('page', 1); window.location.href = url.toString();">
+                                <option value="10" {{ ($perPage ?? 20) == 10 ? 'selected' : '' }}>10</option>
+                                <option value="20" {{ ($perPage ?? 20) == 20 ? 'selected' : '' }}>20</option>
+                                <option value="50" {{ ($perPage ?? 20) == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ ($perPage ?? 20) == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                            <span>per page</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

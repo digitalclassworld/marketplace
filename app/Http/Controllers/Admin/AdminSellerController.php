@@ -20,33 +20,70 @@ class AdminSellerController extends Controller
     public function index(Request $request): View
     {
         $status = $request->query('status') ?: $request->query('tab', 'all');
-        $search = $request->query('q') ?: $request->query('search');
+        $search = trim((string)($request->query('q') ?: $request->query('search', '')));
         $accountType = $request->query('type');
         $category = $request->query('category');
         $location = $request->query('location');
+        $perPage = (int) $request->query('per_page', 20);
+        if ($perPage < 5 || $perPage > 100) {
+            $perPage = 20;
+        }
 
-        $query = Seller::with(['user', 'businessDetail'])->latest();
+        $query = Seller::with(['user', 'businessDetail'])
+            ->withCount(['courses', 'services', 'products', 'orders'])
+            ->latest('id');
 
-        // Status filtering
+        // Status filtering directly in SQL
         if ($status && $status !== 'all') {
-            if (strtolower($status) === 'pending') {
-                $query->whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending', 'pending']);
-            } elseif (strtolower($status) === 'active') {
+            $st = strtolower($status);
+            if ($st === 'pending') {
+                $query->whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending Approval', 'Pending', 'pending']);
+            } elseif ($st === 'active') {
                 $query->whereIn('seller_status', [Seller::STATUS_ACTIVE, 'Active', 'active']);
-            } elseif (strtolower($status) === 'suspended') {
+            } elseif ($st === 'suspended') {
                 $query->whereIn('seller_status', [Seller::STATUS_SUSPENDED, 'Suspended', 'suspended']);
+            } elseif ($st === 'rejected') {
+                $query->whereIn('seller_status', [Seller::STATUS_REJECTED, 'Rejected', 'rejected']);
+            } elseif ($st === 'top_sellers') {
+                $query->where('verification_status', Seller::VERIFICATION_VERIFIED);
+            } elseif ($st === 'new_sellers') {
+                $query->where('created_at', '>=', now()->subDays(14));
             } else {
                 $query->where('seller_status', $status);
             }
         }
 
-        // Account type filtering
+        // Account type filtering directly in SQL
         if ($accountType && $accountType !== 'all') {
             $query->where('account_type', 'LIKE', "%{$accountType}%");
         }
 
-        // Search query across Seller ID, User Name, User Email, Phone, Business Name
-        if ($search) {
+        // Category filtering directly in SQL
+        if ($category && $category !== 'all') {
+            if ($category === 'Courses') {
+                $query->whereHas('courses');
+            } elseif ($category === 'Services') {
+                $query->whereHas('services');
+            } elseif ($category === 'Products') {
+                $query->whereHas('products');
+            } else {
+                $query->whereHas('businessDetail', function ($bq) use ($category) {
+                    $bq->where('business_category', 'LIKE', "%{$category}%");
+                });
+            }
+        }
+
+        // Location filtering directly in SQL
+        if ($location && $location !== 'all') {
+            $query->whereHas('businessDetail', function ($bq) use ($location) {
+                $bq->where('city', 'LIKE', "%{$location}%")
+                   ->orWhere('state', 'LIKE', "%{$location}%")
+                   ->orWhere('address', 'LIKE', "%{$location}%");
+            });
+        }
+
+        // Search query across Seller ID, User Name, User Email, Phone, Business Name in SQL
+        if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('seller_code', 'LIKE', "%{$search}%")
                   ->orWhereHas('user', function ($uq) use ($search) {
@@ -62,21 +99,34 @@ class AdminSellerController extends Controller
             });
         }
 
-        $dbSellers = $query->get();
+        // Fast paginated query bounded by $perPage
+        $paginatedSellers = $query->paginate($perPage)->withQueryString();
 
-        $allSellersList = [];
-        foreach ($dbSellers as $s) {
+        // Batch aggregate revenue ONLY for sellers on current page
+        $sellerIds = $paginatedSellers->getCollection()->pluck('id')->values();
+        $revenues = collect();
+        if ($sellerIds->isNotEmpty()) {
+            try {
+                $revenues = Order::whereIn('seller_id', $sellerIds)
+                    ->where('status', '!=', 'cancelled')
+                    ->groupBy('seller_id')
+                    ->selectRaw('seller_id, sum(amount) as total_revenue')
+                    ->pluck('total_revenue', 'seller_id');
+            } catch (\Throwable $e) {}
+        }
+
+        $formattedSellers = $paginatedSellers->getCollection()->map(function ($s) use ($revenues) {
             $sellerName = $s->businessDetail?->business_name ?? $s->user?->name ?? 'Store';
             $city = $s->businessDetail?->city ?? 'Ahmedabad';
             $state = $s->businessDetail?->state ?? 'Gujarat';
-            $ordersCount = $s->orders()->count();
-            $revenueAmount = (float) $s->orders()->where('status', '!=', 'cancelled')->sum('amount');
-            $productsCount = $s->courses()->count() + $s->services()->count() + $s->products()->count();
+            $ordersCount = $s->orders_count ?? 0;
+            $revenueAmount = (float) ($revenues->get($s->id, 0));
+            $productsCount = ($s->courses_count ?? 0) + ($s->services_count ?? 0) + ($s->products_count ?? 0);
 
-            $allSellersList[] = [
+            return [
                 'id' => $s->id,
                 'name' => $sellerName,
-                'seller_code' => $s->seller_code,
+                'seller_code' => $s->seller_code ?: ('DC-SELL-' . str_pad((string)$s->id, 6, '0', STR_PAD_LEFT)),
                 'email' => $s->user?->email ?? ($s->businessDetail?->business_email ?? 'seller@example.com'),
                 'mobile' => $s->user?->phone ?? 'N/A',
                 'type' => ucfirst($s->account_type ?? 'Institute'),
@@ -98,45 +148,9 @@ class AdminSellerController extends Controller
                 'is_top' => false,
                 'is_new' => $s->created_at ? $s->created_at->gt(now()->subDays(14)) : true,
             ];
-        }
+        });
 
-        $allSellers = collect($allSellersList);
-
-        // Filter by Tab / Status
-        if ($status && $status !== 'all') {
-            if (strtolower($status) === 'pending') {
-                $allSellers = $allSellers->filter(fn($s) => strtolower($s['status']) === 'pending');
-            } elseif (strtolower($status) === 'active') {
-                $allSellers = $allSellers->filter(fn($s) => strtolower($s['status']) === 'active');
-            } elseif (strtolower($status) === 'suspended') {
-                $allSellers = $allSellers->filter(fn($s) => strtolower($s['status']) === 'suspended');
-            } elseif ($status === 'top_sellers') {
-                $allSellers = $allSellers->filter(fn($s) => !empty($s['is_top']));
-            } elseif ($status === 'new_sellers') {
-                $allSellers = $allSellers->filter(fn($s) => !empty($s['is_new']));
-            }
-        }
-
-        // Filter by Search
-        if ($search) {
-            $q = strtolower($search);
-            $allSellers = $allSellers->filter(function ($s) use ($q) {
-                return str_contains(strtolower($s['name']), $q)
-                    || str_contains(strtolower($s['email']), $q)
-                    || str_contains(strtolower($s['seller_code']), $q)
-                    || str_contains(strtolower($s['location']), $q);
-            });
-        }
-
-        // Filter by Type
-        if ($accountType && $accountType !== 'all') {
-            $allSellers = $allSellers->filter(fn($s) => strtolower($s['type']) === strtolower($accountType));
-        }
-
-        // Filter by Location
-        if ($location && $location !== 'all') {
-            $allSellers = $allSellers->filter(fn($s) => str_contains(strtolower($s['location']), strtolower($location)));
-        }
+        $paginatedSellers->setCollection($formattedSellers);
 
         // Real database statistics and counts
         $totalCount = Seller::count();
@@ -154,8 +168,15 @@ class AdminSellerController extends Controller
 
         $rejectedCount = Seller::whereIn('seller_status', [Seller::STATUS_REJECTED, 'Rejected', 'rejected'])->count();
 
-        $totalRevenueAmount = (float) (Order::where('status', '!=', 'cancelled')->sum('amount') ?? 0);
-        $revenueThisMonth = (float) (Order::where('status', '!=', 'cancelled')->where('created_at', '>=', now()->startOfMonth())->sum('amount') ?? 0);
+        $totalRevenueAmount = 0;
+        $revenueThisMonth = 0;
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('orders')) {
+                $totalRevenueAmount = (float) (Order::where('status', '!=', 'cancelled')->sum('amount') ?? 0);
+                $revenueThisMonth = (float) (Order::where('status', '!=', 'cancelled')->where('created_at', '>=', now()->startOfMonth())->sum('amount') ?? 0);
+            }
+        } catch (\Throwable $e) {}
+
         $revenueGrowth = $totalRevenueAmount > 0 ? round(($revenueThisMonth / $totalRevenueAmount) * 100) : 0;
 
         $stats = [
@@ -189,13 +210,14 @@ class AdminSellerController extends Controller
         ];
 
         return view('admin.sellers.index', [
-            'sellers'      => $allSellers->values(),
+            'sellers'      => $paginatedSellers,
             'stats'        => $stats,
             'counts'       => $counts,
             'status'       => $status,
             'search'       => $search,
             'accountType'  => $accountType,
             'selectedLoc'  => $location,
+            'perPage'      => $perPage,
             'isPendingTab' => strtolower($status) === 'pending',
         ]);
     }
