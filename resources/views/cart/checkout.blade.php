@@ -818,6 +818,16 @@
 
         checkoutItems = localItems || [];
 
+        // Sanitize items: ensure item.price is selling price and item.original_price is MRP
+        checkoutItems.forEach(item => {
+            let p = parseFloat(item.price) || 0;
+            let op = parseFloat(item.original_price) || 0;
+            if (op > 0 && p > op) {
+                item.price = op;
+                item.original_price = p;
+            }
+        });
+
         if (!checkoutItems || !checkoutItems.length) {
             document.getElementById('checkoutPageFormScreen').style.display = 'none';
             document.getElementById('checkoutPageEmptyScreen').style.display = 'block';
@@ -849,13 +859,19 @@
         let html = '';
 
         checkoutItems.forEach((item, idx) => {
-            const unitPrice = parseFloat(item.price) || 0;
-            const originalPrice = parseFloat(item.original_price || item.price) || 0;
+            let unitPrice = parseFloat(item.price) || 0;
+            let originalPrice = parseFloat(item.original_price || item.price) || 0;
+            if (originalPrice > 0 && unitPrice > originalPrice) {
+                const tmp = unitPrice;
+                unitPrice = originalPrice;
+                originalPrice = tmp;
+            }
             const qty = parseInt(item.quantity) || 1;
             const itemTotal = unitPrice * qty;
             const originalTotal = originalPrice * qty;
 
-            checkoutSubtotal += (item.original_price ? originalTotal : itemTotal);
+            // Subtotal is strictly based on the discounted selling price (itemTotal)
+            checkoutSubtotal += itemTotal;
             const thumbUrl = item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&auto=format&fit=crop&q=80';
             const badgeBg = item.type === 'Product' ? 'bg-danger-subtle text-danger' : (item.type === 'Service' ? 'bg-success-subtle text-success' : 'bg-primary-subtle text-primary');
 

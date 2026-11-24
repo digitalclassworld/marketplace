@@ -28,6 +28,18 @@ class CartController extends Controller
         $customer = Auth::check() && Auth::user()->isCustomer() ? Auth::user() : null;
         $cart = session()->get('marketplace_cart', []);
 
+        // Sanitize cart items so price is selling price and original_price is MRP
+        foreach ($cart as $key => &$item) {
+            $p = (float)($item['price'] ?? 0);
+            $op = (float)($item['original_price'] ?? 0);
+            if ($op > 0 && $p > $op) {
+                $item['price'] = $op;
+                $item['original_price'] = $p;
+            }
+        }
+        unset($item);
+        session()->put('marketplace_cart', $cart);
+
         return view('cart.checkout', [
             'customer'  => $customer,
             'cart'      => $cart,
@@ -88,6 +100,17 @@ class CartController extends Controller
             'discount_amount' => 'nullable|numeric|min:0',
             'original_price'  => 'nullable|numeric|min:0',
         ]);
+
+        // Normalize price & original_price: ensure price is selling price and original_price is MRP
+        $inPrice = (float) $validated['price'];
+        $inOrigPrice = (float) ($validated['original_price'] ?? $inPrice);
+        if ($inOrigPrice > 0 && $inPrice > $inOrigPrice) {
+            $temp = $inPrice;
+            $inPrice = $inOrigPrice;
+            $inOrigPrice = $temp;
+        }
+        $validated['price'] = $inPrice;
+        $validated['original_price'] = $inOrigPrice;
 
         $cart = session()->get('marketplace_cart', []);
         $cartKey = strtolower($validated['type']) . '_' . $validated['id'];
@@ -268,22 +291,47 @@ class CartController extends Controller
             $defaultSeller = Seller::first();
             $defaultSellerId = $defaultSeller ? $defaultSeller->id : 1;
 
+            $couponDiscount = floatval($validated['discount'] ?? 0);
+            $totalCartSubtotal = 0.00;
+            foreach ($cartItems as $ci) {
+                $totalCartSubtotal += ((float) ($ci['price'] ?? 0.00)) * ((int) ($ci['quantity'] ?? 1));
+            }
+
             foreach ($cartItems as $item) {
                 $qty = (int) ($item['quantity'] ?? 1);
                 $unitPrice = (float) ($item['price'] ?? 0.00);
+                $origPrice = (float) ($item['original_price'] ?? $unitPrice);
+
+                // Sanitize inverted prices if any
+                if ($origPrice > 0 && $unitPrice > $origPrice) {
+                    $temp = $unitPrice;
+                    $unitPrice = $origPrice;
+                    $origPrice = $temp;
+                }
+
                 $subtotal = $unitPrice * $qty;
                 $itemDiscount = floatval($item['discount_amount'] ?? 0);
 
-                if (!empty($item['original_price']) && $item['original_price'] > $unitPrice) {
-                    $originalSubtotal = floatval($item['original_price']) * $qty;
-                    $itemDiscount = max(0, $originalSubtotal - $subtotal);
-                    $finalAmount = $subtotal;
-                } else {
-                    if ($itemDiscount == 0 && !empty($validated['discount']) && count($cartItems) === 1) {
-                        $itemDiscount = floatval($validated['discount']);
+                if ($couponDiscount > 0 && ($itemDiscount == 0 || $itemDiscount == $couponDiscount)) {
+                    if (count($cartItems) === 1 || $totalCartSubtotal == 0) {
+                        $allocatedCoupon = $couponDiscount;
+                    } else {
+                        $allocatedCoupon = round(($subtotal / $totalCartSubtotal) * $couponDiscount, 2);
                     }
+
+                    // If unit price was already discounted before checkout by this coupon amount
+                    if ($origPrice > $unitPrice && abs(($origPrice - $unitPrice) * $qty - $allocatedCoupon) < 0.01) {
+                        $finalAmount = $subtotal;
+                        $itemDiscount = $allocatedCoupon;
+                    } else {
+                        $itemDiscount = $allocatedCoupon;
+                        $finalAmount = max(0, $subtotal - $allocatedCoupon);
+                    }
+                } else {
+                    $itemDiscount = floatval($item['discount_amount'] ?? 0);
                     $finalAmount = max(0, $subtotal - $itemDiscount);
                 }
+
                 $totalAmount += $finalAmount;
 
                 $sellerId = !empty($item['seller_id']) ? (int)$item['seller_id'] : $defaultSellerId;

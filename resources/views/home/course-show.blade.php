@@ -1535,7 +1535,7 @@
             type: 'Course',
             title: {!! json_encode($course->title) !!},
             price: activeCoursePrice,
-            original_price: baseCoursePrice,
+            original_price: {{ (float)($mrpPrice > $sellPrice ? $mrpPrice : 0) }},
             thumbnail: {!! json_encode($course->thumbnail_url ?: ($course->thumbnail ?: '')) !!},
             seller_id: {{ $course->seller_id ?? 1 }},
             coupon_code: activeCourseCoupon,

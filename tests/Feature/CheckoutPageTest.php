@@ -112,5 +112,40 @@ class CheckoutPageTest extends TestCase
 
         $formResponse->assertRedirect(route('checkout'));
     }
+
+    public function test_course_with_mrp_charges_selling_price_not_mrp(): void
+    {
+        // Course: Selling price = 10,000, MRP = 12,000
+        $payload = [
+            'name'           => 'Student Learner',
+            'email'          => 'student@example.com',
+            'phone'          => '9876543210',
+            'city'           => 'Ahmedabad',
+            'address'        => 'Navrangpura',
+            'payment_method' => 'Razorpay / UPI',
+            'items'          => [
+                [
+                    'id'             => 2014,
+                    'type'           => 'Course',
+                    'title'          => 'Java Program Training Course',
+                    'price'          => 10000.00, // Selling price
+                    'original_price' => 12000.00, // MRP
+                    'quantity'       => 1,
+                ]
+            ],
+        ];
+
+        $response = $this->postJson('/cart/checkout', $payload);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('success', true);
+        $response->assertJsonPath('total_amount', '10,000.00');
+
+        $this->assertDatabaseHas('orders', [
+            'customer_email' => 'student@example.com',
+            'amount'         => 10000.00,
+            'subtotal'       => 10000.00,
+        ]);
+    }
 }
 
