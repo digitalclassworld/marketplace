@@ -723,6 +723,7 @@
         }
     </style>
     @yield('styles')
+    @stack('styles')
 </head>
 <body>
 
@@ -2169,6 +2170,7 @@
     </nav>
 
     @yield('scripts')
+    @stack('scripts')
 </body>
 </html>
 

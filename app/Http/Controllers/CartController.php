@@ -29,8 +29,10 @@ class CartController extends Controller
         $cart = session()->get('marketplace_cart', []);
 
         return view('cart.checkout', [
-            'customer' => $customer,
-            'cart'     => $cart,
+            'customer'  => $customer,
+            'cart'      => $cart,
+            'cartCount' => count($cart),
+            'cartTotal' => $this->calculateTotal($cart),
         ]);
     }
 

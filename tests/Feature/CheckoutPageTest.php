@@ -19,8 +19,13 @@ class CheckoutPageTest extends TestCase
         $response->assertSee('Instant Marketplace Checkout');
         $response->assertSee('Customer Information');
         $response->assertSee('Payment Method');
+        $response->assertSee('Razorpay Secure Checkout');
+        $response->assertSee('Direct Bank Transfer');
         $response->assertSee('Order Review');
         $response->assertSee('Have a Coupon Code?');
+        $response->assertSee('WELCOME10');
+        $response->assertSee('DIGITAL20');
+        $response->assertSee('DIWALI50');
         $response->assertSee('Confirm &amp; Place Order', false);
     }
 
