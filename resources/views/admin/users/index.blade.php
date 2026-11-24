@@ -253,6 +253,20 @@
     .badge-status-pending { background: #fef3c7; color: #b45309; }
     .badge-status-inactive { background: #fee2e2; color: #b91c1c; }
 
+    /* Custom Users Pagination */
+    .users-pagination-links nav > div:first-child {
+        display: none !important;
+    }
+    .users-pagination-links .pagination {
+        margin-bottom: 0;
+    }
+    .users-pagination-links .page-link {
+        padding: 0.25rem 0.55rem;
+        font-size: 0.78rem;
+        border-radius: 6px;
+        margin: 0 1px;
+    }
+
     /* Right-side Inspector Panel */
     .user-inspector-panel {
         background: #ffffff;
@@ -706,7 +720,7 @@
                             <td onclick="event.stopPropagation();">
                                 <input type="checkbox" class="form-check-input">
                             </td>
-                            <td class="text-muted small">{{ $index + 1 }}</td>
+                            <td class="text-muted small">{{ ($users instanceof \Illuminate\Pagination\LengthAwarePaginator ? $users->firstItem() : 1) + $index }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <img src="{{ $u['avatar'] }}" alt="{{ $u['name'] }}" class="user-avatar-xs">
@@ -766,27 +780,26 @@
 
         <!-- Table Pagination Footer -->
         <div class="p-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-2 small">
-            <span class="text-muted">Showing 1 to {{ count($users) }} of {{ $stats['total_users'] }} users</span>
+            <span class="text-muted">
+                @if($users instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ number_format($users->total()) }} users
+                @else
+                    Showing 1 to {{ count($users) }} of {{ $stats['total_users'] }} users
+                @endif
+            </span>
             <div class="d-flex align-items-center gap-2">
-                <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                        <li class="page-item active"><span class="page-link">1</span></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                        <li class="page-item disabled"><span class="page-link">...</span></li>
-                        <li class="page-item"><a class="page-link" href="#">12,456</a></li>
-                        <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                    </ul>
-                </nav>
+                @if($users instanceof \Illuminate\Pagination\LengthAwarePaginator && $users->hasPages())
+                    <div class="users-pagination-links">
+                        {{ $users->links('pagination::bootstrap-5') }}
+                    </div>
+                @endif
                 <div class="d-flex align-items-center gap-1 text-muted ms-2">
                     <span>Show</span>
-                    <select class="form-select form-select-sm" style="width: 70px;">
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
+                    <select class="form-select form-select-sm" style="width: 75px;" onchange="const url = new URL(window.location.href); url.searchParams.set('per_page', this.value); url.searchParams.set('page', 1); window.location.href = url.toString();">
+                        <option value="10" {{ ($perPage ?? 20) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="20" {{ ($perPage ?? 20) == 20 ? 'selected' : '' }}>20</option>
+                        <option value="50" {{ ($perPage ?? 20) == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ ($perPage ?? 20) == 100 ? 'selected' : '' }}>100</option>
                     </select>
                     <span>per page</span>
                 </div>
@@ -796,7 +809,7 @@
 
     <!-- RIGHT: USER INSPECTOR DETAIL PANEL -->
     @php
-        $firstUser = $users[0] ?? [
+        $firstUser = $firstUser ?? ($users instanceof \Illuminate\Pagination\LengthAwarePaginator ? $users->first() : ($users[0] ?? null)) ?? [
             'id'             => 1,
             'name'           => 'customer 1',
             'code'           => 'UDC00008',

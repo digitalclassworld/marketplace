@@ -44,23 +44,183 @@ class AdminUserController extends Controller
         self::ensureNotesTableExists();
 
         $tab = $request->input('tab', 'all');
-        $search = $request->input('search');
+        $search = trim((string)$request->input('search', ''));
         $userType = $request->input('user_type');
         $status = $request->input('status');
         $location = $request->input('location');
-
-        // Fetch DB users (latest first so newly created testing accounts appear immediately at the top)
-        $dbUsers = collect();
-        try {
-            if (Schema::hasTable('users')) {
-                $dbUsers = User::with('seller.businessDetail')->latest('id')->get();
-            }
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('DB error in AdminUserController: ' . $e->getMessage());
+        $perPage = (int) $request->input('per_page', 20);
+        if ($perPage < 5 || $perPage > 100) {
+            $perPage = 20;
         }
 
-        $realUsers = [];
-        foreach ($dbUsers as $u) {
+        // Base Query with eager loaded seller & businessDetail relationships
+        $query = User::with(['seller.businessDetail'])->latest('id');
+
+        // Apply Tab Filter directly in SQL
+        if ($tab === 'students') {
+            $query->where(function ($q) {
+                $q->whereIn('role', ['user', 'student', 'customer'])
+                  ->orWhere('profession', 'like', '%student%');
+            });
+        } elseif ($tab === 'professionals') {
+            $query->where(function ($q) {
+                $q->whereIn('role', ['professional', 'teacher'])
+                  ->orWhere(function ($sub) {
+                      $sub->whereNotNull('profession')
+                          ->where('profession', '!=', '')
+                          ->where('profession', 'not like', '%student%');
+                  });
+            });
+        } elseif ($tab === 'institutes') {
+            $query->whereHas('seller', function ($q) {
+                $q->where('account_type', 'like', '%Institute%')
+                  ->orWhere('account_type', 'like', '%Company%');
+            });
+        } elseif ($tab === 'sellers') {
+            $query->where(function ($q) {
+                $q->where('role', 'seller')
+                  ->orWhereHas('seller');
+            });
+        } elseif ($tab === 'inactive') {
+            $query->whereHas('seller', function ($q) {
+                $q->whereIn('seller_status', ['Inactive', 'Suspended', 'inactive', 'suspended']);
+            });
+        }
+
+        // Apply Search Filter directly in SQL
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('id', $search);
+
+                if (Schema::hasTable('sellers')) {
+                    $q->orWhereHas('seller', function ($sq) use ($search) {
+                        $sq->where('seller_code', 'like', "%{$search}%");
+                    });
+                }
+            });
+        }
+
+        // Apply User Type Filter directly in SQL
+        if (!empty($userType) && $userType !== 'All') {
+            $uType = strtolower($userType);
+            if ($uType === 'student') {
+                $query->where(function ($q) {
+                    $q->whereIn('role', ['user', 'student', 'customer'])
+                      ->orWhere('profession', 'like', '%student%');
+                });
+            } elseif ($uType === 'professional') {
+                $query->where(function ($q) {
+                    $q->whereIn('role', ['professional', 'teacher'])
+                      ->orWhere(function ($sub) {
+                          $sub->whereNotNull('profession')
+                              ->where('profession', '!=', '')
+                              ->where('profession', 'not like', '%student%');
+                      });
+                });
+            } elseif ($uType === 'institute') {
+                $query->whereHas('seller', function ($q) {
+                    $q->where('account_type', 'like', '%Institute%')
+                      ->orWhere('account_type', 'like', '%Company%');
+                });
+            } elseif ($uType === 'seller') {
+                $query->where(function ($q) {
+                    $q->where('role', 'seller')
+                      ->orWhereHas('seller');
+                });
+            }
+        }
+
+        // Apply Status Filter directly in SQL
+        if (!empty($status) && $status !== 'All') {
+            $st = strtolower($status);
+            if ($st === 'inactive') {
+                $query->whereHas('seller', function ($q) {
+                    $q->whereIn('seller_status', ['Inactive', 'Suspended', 'inactive', 'suspended']);
+                });
+            } elseif ($st === 'pending') {
+                $query->whereHas('seller', function ($q) {
+                    $q->whereIn('seller_status', [Seller::STATUS_PENDING_APPROVAL, 'Pending', 'pending']);
+                });
+            } elseif ($st === 'active') {
+                $query->where(function ($q) {
+                    $q->whereDoesntHave('seller')
+                      ->orWhereHas('seller', function ($sq) {
+                          $sq->whereNotIn('seller_status', ['Inactive', 'Suspended', 'inactive', 'suspended', 'Pending', Seller::STATUS_PENDING_APPROVAL]);
+                      });
+                });
+            }
+        }
+
+        // Apply Location Filter directly in SQL
+        if (!empty($location) && $location !== 'All') {
+            $query->where(function ($q) use ($location) {
+                $q->where('city', 'like', "%{$location}%")
+                  ->orWhere('state', 'like', "%{$location}%");
+
+                if (Schema::hasTable('seller_business_details')) {
+                    $q->orWhereHas('seller.businessDetail', function ($sq) use ($location) {
+                        $sq->where('city', 'like', "%{$location}%")
+                          ->orWhere('state', 'like', "%{$location}%");
+                    });
+                }
+            });
+        }
+
+        // Fast bounded pagination (e.g. 20 users per page)
+        $paginatedUsers = $query->paginate($perPage)->withQueryString();
+
+        // Batch fetch orders, reviews, and notes ONLY for users on the current page (eliminates 100k queries)
+        $userItems = $paginatedUsers->getCollection();
+        $emails = $userItems->pluck('email')->filter()->values();
+        $phones = $userItems->pluck('phone')->filter()->values();
+        $userIds = $userItems->pluck('id')->values();
+        $sellerIds = $userItems->pluck('seller.id')->filter()->values();
+
+        $allCustomerOrders = collect();
+        if (Schema::hasTable('orders') && ($emails->isNotEmpty() || $phones->isNotEmpty())) {
+            try {
+                $allCustomerOrders = Order::where(function ($q) use ($emails, $phones) {
+                    if ($emails->isNotEmpty()) {
+                        $q->whereIn('customer_email', $emails);
+                    }
+                    if ($phones->isNotEmpty()) {
+                        $q->orWhereIn('customer_phone', $phones);
+                    }
+                })->latest('placed_at')->latest('id')->get()->groupBy(function ($o) {
+                    return strtolower($o->customer_email ?? '');
+                });
+            } catch (\Throwable $e) {}
+        }
+
+        $allSellerOrders = collect();
+        if (Schema::hasTable('orders') && $sellerIds->isNotEmpty()) {
+            try {
+                $allSellerOrders = Order::whereIn('seller_id', $sellerIds)
+                    ->latest('placed_at')->latest('id')->get()->groupBy('seller_id');
+            } catch (\Throwable $e) {}
+        }
+
+        $allReviews = collect();
+        if (Schema::hasTable('reviews') && $userIds->isNotEmpty()) {
+            try {
+                $allReviews = Review::whereIn('user_id', $userIds)
+                    ->latest('created_at')->get()->groupBy('user_id');
+            } catch (\Throwable $e) {}
+        }
+
+        $allNotes = collect();
+        if (Schema::hasTable('user_admin_notes') && $userIds->isNotEmpty()) {
+            try {
+                $allNotes = UserAdminNote::whereIn('user_id', $userIds)
+                    ->latest('created_at')->get()->groupBy('user_id');
+            } catch (\Throwable $e) {}
+        }
+
+        // Format each user in the current page collection
+        $formattedUsers = $userItems->map(function ($u) use ($allCustomerOrders, $allSellerOrders, $allReviews, $allNotes) {
             $sellerObj = $u->seller;
             $type = 'Student';
 
@@ -83,43 +243,10 @@ class AdminUserController extends Controller
                 $type = $u->profession;
             }
 
-            // 1. DYNAMIC ORDERS FETCHING (From both customer checkouts AND seller sales)
-            $customerOrders = collect();
-            try {
-                if (Schema::hasTable('orders')) {
-                    $customerOrders = Order::where(function ($q) use ($u) {
-                        $hasCond = false;
-                        if (!empty($u->email)) {
-                            $q->where('customer_email', $u->email);
-                            $hasCond = true;
-                        }
-                        if (!empty($u->phone)) {
-                            if ($hasCond) {
-                                $q->orWhere('customer_phone', $u->phone);
-                            } else {
-                                $q->where('customer_phone', $u->phone);
-                                $hasCond = true;
-                            }
-                        }
-                        if (!empty($u->name)) {
-                            if ($hasCond) {
-                                $q->orWhere('customer_name', $u->name);
-                            } else {
-                                $q->where('customer_name', $u->name);
-                            }
-                        }
-                    })->latest('placed_at')->latest('id')->get();
-                }
-            } catch (\Throwable $e) {}
+            $userEmailLower = strtolower($u->email ?? '');
+            $customerOrders = $allCustomerOrders->get($userEmailLower, collect());
+            $sellerOrders = $sellerObj ? $allSellerOrders->get($sellerObj->id, collect()) : collect();
 
-            $sellerOrders = collect();
-            if ($sellerObj) {
-                try {
-                    $sellerOrders = $sellerObj->orders()->latest('placed_at')->latest('id')->get();
-                } catch (\Throwable $e) {}
-            }
-
-            // Primary orders list to display for this user
             $isSeller = ($u->role === 'seller' || $sellerObj !== null);
             $primaryOrders = $customerOrders->isNotEmpty() ? $customerOrders : ($isSeller ? $sellerOrders : collect());
 
@@ -137,7 +264,6 @@ class AdminUserController extends Controller
                 $spentSummary  = '₹0 spent';
             }
 
-            // Format each order cleanly for frontend JSON serialization
             $formattedOrders = [];
             foreach ($primaryOrders as $ord) {
                 $statusStr = ucfirst(strtolower($ord->status ?? 'confirmed'));
@@ -161,13 +287,10 @@ class AdminUserController extends Controller
                 ];
             }
 
-            // 2. DYNAMIC ACTIVITIES STREAM
             $city = $u->city ?: ($sellerObj?->businessDetail?->city ?: 'Ahmedabad');
             $state = $u->state ?: ($sellerObj?->businessDetail?->state ?: 'Gujarat');
 
             $activities = [];
-
-            // Account Created Event
             $activities[] = [
                 'title'       => 'Account Created',
                 'description' => "Joined Digital Class Educational World as {$type} ({$u->email}).",
@@ -178,7 +301,6 @@ class AdminUserController extends Controller
                 'bg'          => 'bg-success-subtle',
             ];
 
-            // Real Order Activities
             foreach ($primaryOrders as $ord) {
                 $isBuyer = $customerOrders->isNotEmpty();
                 $actionWord = $isBuyer ? 'Placed order' : 'Received sale';
@@ -193,7 +315,6 @@ class AdminUserController extends Controller
                 ];
             }
 
-            // Verification or Session Event
             if ($u->email_verified_at) {
                 $activities[] = [
                     'title'       => 'Email Verified',
@@ -216,48 +337,31 @@ class AdminUserController extends Controller
                 'bg'          => 'bg-secondary-subtle',
             ];
 
-            // 3. DYNAMIC REVIEWS FETCHING
+            $userReviews = $allReviews->get($u->id, collect());
             $reviewsList = [];
-            try {
-                if (Schema::hasTable('reviews')) {
-                    $revQuery = Review::query()->where(function ($q) use ($u, $sellerObj) {
-                        $q->where('user_id', $u->id);
-                        if (!empty($u->email)) {
-                            $q->orWhere('user_email', $u->email);
-                        }
-                        if ($sellerObj) {
-                            $q->orWhere('seller_id', $sellerObj->id);
-                        }
-                    });
-                    $dbReviews = $revQuery->latest('created_at')->get();
-                    foreach ($dbReviews as $rev) {
-                        $reviewsList[] = [
-                            'id'         => $rev->id,
-                            'rating'     => (float)($rev->rating ?? 5.0),
-                            'item_title' => $rev->item_title ?: 'Platform Item',
-                            'text'       => $rev->review_text ?: 'Good product.',
-                            'status'     => $rev->status ?: 'Approved',
-                            'date'       => $rev->created_at ? $rev->created_at->format('d M Y') : now()->format('d M Y'),
-                            'ago'        => $rev->created_at ? $rev->created_at->diffForHumans() : 'Recently',
-                        ];
-                    }
-                }
-            } catch (\Throwable $e) {}
+            foreach ($userReviews as $rev) {
+                $reviewsList[] = [
+                    'id'         => $rev->id,
+                    'rating'     => (float)($rev->rating ?? 5.0),
+                    'item_title' => $rev->item_title ?: 'Platform Item',
+                    'text'       => $rev->review_text ?: 'Good product.',
+                    'status'     => $rev->status ?: 'Approved',
+                    'date'       => $rev->created_at ? $rev->created_at->format('d M Y') : now()->format('d M Y'),
+                    'ago'        => $rev->created_at ? $rev->created_at->diffForHumans() : 'Recently',
+                ];
+            }
 
-            // 4. DYNAMIC ADMIN NOTES FETCHING
+            $userNotes = $allNotes->get($u->id, collect());
             $notesList = [];
-            try {
-                $dbNotes = UserAdminNote::where('user_id', $u->id)->latest('created_at')->get();
-                foreach ($dbNotes as $n) {
-                    $notesList[] = [
-                        'id'         => $n->id,
-                        'admin_name' => $n->admin_name ?: 'Super Admin',
-                        'note'       => $n->note,
-                        'created_at' => $n->created_at ? $n->created_at->format('d M Y, h:i A') : now()->format('d M Y, h:i A'),
-                        'ago'        => $n->created_at ? $n->created_at->diffForHumans() : 'Recently',
-                    ];
-                }
-            } catch (\Throwable $e) {}
+            foreach ($userNotes as $n) {
+                $notesList[] = [
+                    'id'         => $n->id,
+                    'admin_name' => $n->admin_name ?: 'Super Admin',
+                    'note'       => $n->note,
+                    'created_at' => $n->created_at ? $n->created_at->format('d M Y, h:i A') : now()->format('d M Y, h:i A'),
+                    'ago'        => $n->created_at ? $n->created_at->diffForHumans() : 'Recently',
+                ];
+            }
 
             $statusStr = 'Active';
             if ($sellerObj && in_array($sellerObj->seller_status, ['Inactive', 'Suspended'])) {
@@ -266,7 +370,7 @@ class AdminUserController extends Controller
                 $statusStr = 'Pending';
             }
 
-            $realUsers[] = [
+            return [
                 'id'             => $u->id,
                 'code'           => $sellerObj?->seller_code ?: ('UDC' . str_pad((string)$u->id, 5, '0', STR_PAD_LEFT)),
                 'name'           => $u->name,
@@ -293,49 +397,10 @@ class AdminUserController extends Controller
                 'notes'          => $notesList,
                 'seller_id'      => $sellerObj?->id,
             ];
-        }
+        });
 
-        // 100% Real Database Users - No fake/dummy fallback
-        $allUsers = collect($realUsers);
-
-        // Apply Tab Filter
-        if ($tab === 'students') {
-            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Student', 'Student / Learner']));
-        } elseif ($tab === 'professionals') {
-            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Professional', 'Working Professional', 'Working Employee / Professional', 'Business Owner', 'Teacher / Educator', 'Freelancer / Agency', 'Freelancer / Consultant', 'Job Seeker', 'Parent / Guardian']));
-        } elseif ($tab === 'institutes') {
-            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Institute', 'Institute Representative', 'Institute / Organization']));
-        } elseif ($tab === 'sellers') {
-            $allUsers = $allUsers->filter(fn($u) => in_array($u['type'], ['Seller', 'Institute']));
-        } elseif ($tab === 'inactive') {
-            $allUsers = $allUsers->filter(fn($u) => $u['status'] === 'Inactive');
-        }
-
-        // Apply Search Filter
-        if (!empty($search)) {
-            $q = strtolower($search);
-            $allUsers = $allUsers->filter(function ($u) use ($q) {
-                return str_contains(strtolower($u['name']), $q)
-                    || str_contains(strtolower($u['email']), $q)
-                    || str_contains(strtolower($u['phone']), $q)
-                    || str_contains(strtolower($u['code']), $q);
-            });
-        }
-
-        // Apply User Type Filter
-        if (!empty($userType) && $userType !== 'All') {
-            $allUsers = $allUsers->filter(fn($u) => strtolower($u['type']) === strtolower($userType));
-        }
-
-        // Apply Status Filter
-        if (!empty($status) && $status !== 'All') {
-            $allUsers = $allUsers->filter(fn($u) => strtolower($u['status']) === strtolower($status));
-        }
-
-        // Apply Location Filter
-        if (!empty($location) && $location !== 'All') {
-            $allUsers = $allUsers->filter(fn($u) => str_contains(strtolower($u['location']), strtolower($location)));
-        }
+        $paginatedUsers->setCollection($formattedUsers);
+        $firstUser = $formattedUsers->first();
 
         // Live Real Database KPI Statistics
         $totalUsers = User::count();
@@ -399,13 +464,15 @@ class AdminUserController extends Controller
         ];
 
         return view('admin.users.index', [
-            'users'          => $allUsers->values(),
+            'users'          => $paginatedUsers,
+            'firstUser'      => $firstUser,
             'stats'          => $stats,
             'currentTab'     => $tab,
             'searchQuery'    => $search,
             'selectedType'   => $userType,
             'selectedStatus' => $status,
             'selectedLoc'    => $location,
+            'perPage'        => $perPage,
         ]);
     }
 

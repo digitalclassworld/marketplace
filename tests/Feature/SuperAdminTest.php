@@ -395,6 +395,11 @@ class SuperAdminTest extends TestCase
         $response->assertSee('Basic Information');
         $response->assertSee('Platform Activity');
         $response->assertSee('Recent Orders');
+
+        // Test pagination and filters
+        $filteredResponse = $this->actingAs($admin)->get('/admin/users?search=Rahul&per_page=10');
+        $filteredResponse->assertStatus(200);
+        $filteredResponse->assertSee('Rahul Sharma');
     }
 
     /**
