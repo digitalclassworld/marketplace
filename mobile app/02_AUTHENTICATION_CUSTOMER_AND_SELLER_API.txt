@@ -1,0 +1,509 @@
+================================================================================
+DIGITAL CLASS - COMPLETE AUTHENTICATION & REGISTRATION API SPECIFICATION
+(CUSTOMER SIGNUP / LOGIN & SELLER SIGNUP / LOGIN)
+================================================================================
+Base URL: https://web.digitalclassworld.in
+All Endpoints Format: JSON (REST API)
+Standard Headers:
+  Accept: application/json
+  Content-Type: application/json
+Protected Endpoints Header:
+  Authorization: Bearer <AUTH_TOKEN>
+
+================================================================================
+PART 1: CUSTOMER (STUDENT / BUYER) AUTHENTICATION & SIGNUP
+================================================================================
+
+1.1 POST /api/auth/register
+--------------------------------------------------------------------------------
+Purpose:
+Register a new customer / student account. Customers can immediately start 
+browsing courses, services, and products, applying coupons, and placing orders.
+
+HTTP Method:
+POST
+
+URL:
+https://web.digitalclassworld.in/api/auth/register
+
+Request Headers:
+  Accept: application/json
+  Content-Type: application/json
+
+Request Body Parameters:
+  - name                  (string, required, max: 100): Full customer name
+  - email                 (string, required, email, max: 100, unique in users): Email address
+  - phone                 (string, required, min: 10, max: 20): Mobile number
+  - password              (string, required, min: 6): Account password
+  - password_confirmation (string, optional): Must match password if provided
+  - profession            (string, required): Student, Teacher, Professional, Job Seeker, etc.
+  - city                  (string, optional, default: "Ahmedabad"): City name
+  - state                 (string, optional, default: "Gujarat"): State name
+
+cURL Example:
+curl -X POST "https://web.digitalclassworld.in/api/auth/register" \
+     -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "Vaibhavi Shah",
+       "email": "vaibhavi.customer@gmail.com",
+       "phone": "9876543210",
+       "profession": "Student",
+       "city": "Ahmedabad",
+       "state": "Gujarat",
+       "password": "Password@123"
+     }'
+
+Success Response (201 Created):
+{
+  "success": true,
+  "message": "Account created successfully!",
+  "token": "MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "email": "vaibhavi.customer@gmail.com",
+    "phone": "9876543210",
+    "profession": "Student",
+    "avatar": "https://ui-avatars.com/api/?name=Vaibhavi+Shah&background=0066ff&color=fff&size=128&bold=true",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "role": "customer"
+  }
+}
+
+Validation Error Response (422 Unprocessable Entity):
+{
+  "success": false,
+  "message": "The email has already been taken.",
+  "errors": {
+    "email": ["The email has already been taken."]
+  }
+}
+
+--------------------------------------------------------------------------------
+1.2 POST /api/auth/login
+--------------------------------------------------------------------------------
+Purpose:
+Sign in to an existing customer account via Email OR Mobile Phone.
+
+HTTP Method:
+POST
+
+URL:
+https://web.digitalclassworld.in/api/auth/login
+
+Request Headers:
+  Accept: application/json
+  Content-Type: application/json
+
+Request Body Parameters:
+  - email    (string, required): Customer email address OR 10-digit mobile phone
+  - password (string, required): Account password
+
+cURL Example:
+curl -X POST "https://web.digitalclassworld.in/api/auth/login" \
+     -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "email": "vaibhavi.customer@gmail.com",
+       "password": "Password@123"
+     }'
+
+Success Response (200 OK):
+{
+  "success": true,
+  "message": "Login successful",
+  "token": "MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "email": "vaibhavi.customer@gmail.com",
+    "phone": "9876543210",
+    "profession": "Student",
+    "avatar": "https://ui-avatars.com/api/?name=Vaibhavi+Shah&background=0066ff&color=fff&size=128&bold=true",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "role": "customer"
+  }
+}
+
+Invalid Credentials Response (401 Unauthorized):
+{
+  "success": false,
+  "message": "Invalid credentials. Please verify your email/phone and password."
+}
+
+--------------------------------------------------------------------------------
+1.3 GET /api/auth/profile
+--------------------------------------------------------------------------------
+Purpose:
+Retrieve the logged-in customer's profile details using the Bearer token.
+
+HTTP Method:
+GET
+
+URL:
+https://web.digitalclassworld.in/api/auth/profile
+
+Request Headers:
+  Accept: application/json
+  Authorization: Bearer <CUSTOMER_TOKEN>
+
+cURL Example:
+curl -X GET "https://web.digitalclassworld.in/api/auth/profile" \
+     -H "Accept: application/json" \
+     -H "Authorization: Bearer MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw=="
+
+Success Response (200 OK):
+{
+  "success": true,
+  "user": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "email": "vaibhavi.customer@gmail.com",
+    "phone": "9876543210",
+    "profession": "Student",
+    "avatar": "https://ui-avatars.com/api/?name=Vaibhavi+Shah&background=0066ff&color=fff&size=128&bold=true",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "interests": "Technology, 3D Design",
+    "role": "customer",
+    "created_at": "2026-11-24T10:00:00+05:30"
+  }
+}
+
+--------------------------------------------------------------------------------
+1.4 PUT /api/auth/profile
+--------------------------------------------------------------------------------
+Purpose:
+Update the customer's profile fields.
+
+HTTP Method:
+PUT
+
+URL:
+https://web.digitalclassworld.in/api/auth/profile
+
+Request Headers:
+  Accept: application/json
+  Content-Type: application/json
+  Authorization: Bearer <CUSTOMER_TOKEN>
+
+Request Body:
+{
+  "name": "Vaibhavi Shah",
+  "phone": "9876543210",
+  "profession": "Senior Educator",
+  "city": "Ahmedabad",
+  "state": "Gujarat",
+  "interests": "UI/UX, 3D Animation, Web Development"
+}
+
+Success Response (200 OK):
+{
+  "success": true,
+  "message": "Profile updated successfully!",
+  "user": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "email": "vaibhavi.customer@gmail.com",
+    "phone": "9876543210",
+    "profession": "Senior Educator",
+    "avatar": "https://ui-avatars.com/api/?name=Vaibhavi+Shah&background=0066ff&color=fff&size=128&bold=true",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "interests": "UI/UX, 3D Animation, Web Development",
+    "role": "customer"
+  }
+}
+
+--------------------------------------------------------------------------------
+1.5 POST /api/auth/logout
+--------------------------------------------------------------------------------
+Purpose:
+Invalidate the customer's mobile session and revoke authentication tokens.
+
+HTTP Method:
+POST
+
+URL:
+https://web.digitalclassworld.in/api/auth/logout
+
+Request Headers:
+  Accept: application/json
+  Authorization: Bearer <CUSTOMER_TOKEN>
+
+Success Response (200 OK):
+{
+  "success": true,
+  "message": "Logged out successfully."
+}
+
+
+================================================================================
+PART 2: SELLER (INSTRUCTOR / INSTITUTE / STORE) AUTHENTICATION & SIGNUP
+================================================================================
+
+2.1 POST /api/seller/auth/register
+--------------------------------------------------------------------------------
+Purpose:
+Register a new seller account (Instructor, Coaching Institute, or Business Store)
+to publish courses, offer professional services, and sell products.
+
+HTTP Method:
+POST
+
+URL:
+https://web.digitalclassworld.in/api/seller/auth/register
+
+Request Headers:
+  Accept: application/json
+  Content-Type: application/json
+
+Request Body Parameters:
+  - name                  (string, required, max: 100): Full contact person name
+  - email                 (string, required, email, max: 100, unique in users): Official email
+  - phone                 (string, required, max: 20): Official phone / WhatsApp
+  - password              (string, required, min: 6): Account password
+  - account_type          (string, optional): "Institute / Company" | "Individual / Freelancer" | "Agency"
+                          (Defaults to "Individual / Freelancer")
+  - business_name         (string, optional, max: 150): Institute or Store display name
+  - business_category     (string, optional, max: 100): Primary category (e.g., "IT & Software Training")
+  - business_email        (string, optional, email): Public store email
+  - business_phone        (string, optional): Public store phone
+  - business_description  (string, optional): About the institute / academy
+  - website               (string, optional): Official website link
+  - address               (string, optional): Physical address
+  - city                  (string, optional, default: "Ahmedabad"): City
+  - state                 (string, optional, default: "Gujarat"): State
+  - pincode               (string, optional): Area pincode
+
+cURL Example:
+curl -X POST "https://web.digitalclassworld.in/api/seller/auth/register" \
+     -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "Apex Skill Institute",
+       "email": "apex.institute@gmail.com",
+       "phone": "9876501234",
+       "password": "SellerPassword@123",
+       "account_type": "Institute / Company",
+       "business_name": "Apex Learning Center",
+       "business_category": "Courses & Training",
+       "city": "Ahmedabad",
+       "state": "Gujarat",
+       "address": "401, Sapphire Complex, C.G. Road",
+       "pincode": "380009"
+     }'
+
+Success Response (201 Created):
+{
+  "success": true,
+  "message": "Seller registered successfully! Welcome to Digital Class Seller Partner Program.",
+  "token": "Mjg6ZjQ3YTQ3YWJjZDAxY2VmOTg4MDcyOWE3YjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": {
+    "id": 28,
+    "name": "Apex Skill Institute",
+    "email": "apex.institute@gmail.com",
+    "phone": "9876501234",
+    "role": "seller"
+  },
+  "seller": {
+    "id": 14,
+    "seller_code": "DC-SELL-000028",
+    "store_name": "Apex Learning Center",
+    "account_type": "Institute / Company",
+    "seller_status": "Pending Approval",
+    "verification_status": "Not Verified"
+  }
+}
+
+Validation Error Response (422 Unprocessable Entity):
+{
+  "success": false,
+  "message": "The email has already been taken.",
+  "errors": {
+    "email": ["The email has already been taken."],
+    "phone": ["The phone field is required."]
+  }
+}
+
+--------------------------------------------------------------------------------
+2.2 POST /api/seller/auth/login
+--------------------------------------------------------------------------------
+Purpose:
+Sign in to a Seller Portal account using:
+  - Seller ID (e.g. "DC-SELL-000028" or "28")
+  - OR Registered Email
+  - OR Registered Mobile Phone
+
+HTTP Method:
+POST
+
+URL:
+https://web.digitalclassworld.in/api/seller/auth/login
+
+Request Headers:
+  Accept: application/json
+  Content-Type: application/json
+
+Request Body Parameters:
+  - login    (string, required): Seller ID, Email, or Mobile Phone
+  - password (string, required): Password
+
+cURL Example (Login with Seller ID):
+curl -X POST "https://web.digitalclassworld.in/api/seller/auth/login" \
+     -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "login": "DC-SELL-000028",
+       "password": "SellerPassword@123"
+     }'
+
+cURL Example (Login with Email):
+curl -X POST "https://web.digitalclassworld.in/api/seller/auth/login" \
+     -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "login": "apex.institute@gmail.com",
+       "password": "SellerPassword@123"
+     }'
+
+Success Response (200 OK):
+{
+  "success": true,
+  "message": "Seller login successful",
+  "token": "Mjg6ZjQ3YTQ3YWJjZDAxY2VmOTg4MDcyOWE3YjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": {
+    "id": 28,
+    "name": "Apex Skill Institute",
+    "email": "apex.institute@gmail.com",
+    "phone": "9876501234",
+    "role": "seller",
+    "avatar": "https://ui-avatars.com/api/?name=Apex+Skill+Institute&background=0066ff&color=fff&size=128&bold=true"
+  },
+  "seller": {
+    "id": 14,
+    "seller_code": "DC-SELL-000028",
+    "store_name": "Apex Learning Center",
+    "account_type": "Institute / Company",
+    "seller_status": "Active",
+    "verification_status": "Verified",
+    "is_verified": true,
+    "can_sell": true,
+    "business_detail": {
+      "business_name": "Apex Learning Center",
+      "business_category": "Courses & Training",
+      "business_email": "apex.institute@gmail.com",
+      "business_phone": "9876501234",
+      "city": "Ahmedabad",
+      "state": "Gujarat",
+      "address": "401, Sapphire Complex, C.G. Road",
+      "website": "https://apexlearning.in"
+    }
+  }
+}
+
+Inactive Seller Account Response (403 Forbidden):
+{
+  "success": false,
+  "message": "Your seller account has been deactivated. Please contact support."
+}
+
+Invalid Credentials Response (401 Unauthorized):
+{
+  "success": false,
+  "message": "Invalid seller credentials. Please verify your Email, Phone or Seller ID and password."
+}
+
+--------------------------------------------------------------------------------
+2.3 GET /api/seller/auth/profile
+--------------------------------------------------------------------------------
+Purpose:
+Get the authenticated seller's store profile, verification status, and live catalog &
+revenue metrics (total courses, services, products, orders, and total earnings).
+
+HTTP Method:
+GET
+
+URL:
+https://web.digitalclassworld.in/api/seller/auth/profile
+
+Request Headers:
+  Accept: application/json
+  Authorization: Bearer <SELLER_TOKEN>
+
+cURL Example:
+curl -X GET "https://web.digitalclassworld.in/api/seller/auth/profile" \
+     -H "Accept: application/json" \
+     -H "Authorization: Bearer Mjg6ZjQ3YTQ3YWJjZDAxY2VmOTg4MDcyOWE3YjM5MmM2MzE3ODQ0OTBhOGY3Nw=="
+
+Success Response (200 OK):
+{
+  "success": true,
+  "user": {
+    "id": 28,
+    "name": "Apex Skill Institute",
+    "email": "apex.institute@gmail.com",
+    "phone": "9876501234",
+    "avatar": "https://ui-avatars.com/api/?name=Apex+Skill+Institute&background=0066ff&color=fff&size=128&bold=true",
+    "role": "seller"
+  },
+  "seller": {
+    "id": 14,
+    "seller_code": "DC-SELL-000028",
+    "store_name": "Apex Learning Center",
+    "account_type": "Institute / Company",
+    "seller_status": "Active",
+    "verification_status": "Verified",
+    "is_verified": true,
+    "can_sell": true,
+    "metrics": {
+      "courses_count": 8,
+      "services_count": 4,
+      "products_count": 2,
+      "total_catalog": 14,
+      "orders_count": 42,
+      "total_earnings": "₹84,500.00",
+      "raw_earnings": 84500.00
+    },
+    "business_detail": {
+      "business_name": "Apex Learning Center",
+      "business_category": "Courses & Training",
+      "business_email": "apex.institute@gmail.com",
+      "business_phone": "9876501234",
+      "business_description": "Premier professional coaching and skill certifications.",
+      "website": "https://apexlearning.in",
+      "address": "401, Sapphire Complex, C.G. Road",
+      "city": "Ahmedabad",
+      "state": "Gujarat",
+      "pincode": "380009"
+    }
+  }
+}
+
+
+================================================================================
+PART 3: COMMON SECURITY & INTEGRATION NOTES
+================================================================================
+
+1. Authentication Token Format:
+   The token is returned in the "token" attribute of the response. Mobile apps
+   must save this token locally (e.g. SharedPreferences on Android, Keychain on iOS)
+   and supply it in the header for all protected endpoints:
+   Authorization: Bearer <token>
+
+2. Multi-Role Capability:
+   If a user registers as a customer and later registers or logs into the seller portal,
+   their role automatically updates to "seller" and their seller profile is activated.
+
+3. Cross-Platform Login Identifiers:
+   Both login endpoints accept:
+   - Case-insensitive Email
+   - Mobile Phone Number (with or without +91)
+   - Seller ID (e.g. DC-SELL-000028) on seller endpoints.
+
+================================================================================
+END OF SPECIFICATION
+================================================================================

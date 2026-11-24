@@ -192,6 +192,87 @@ Returns current authenticated user details.
 #### `PUT /api/auth/profile`
 Updates user profile fields (`name`, `phone`, `profession`, `city`, `state`, `interests`).
 
+#### `POST /api/auth/logout`
+Revokes user session and bearer tokens.
+
+---
+
+### 3.2b. Seller Authentication & Partner Onboarding
+
+#### `POST /api/seller/auth/register`
+Onboards a new Instructor, Coaching Institute, or Business Seller.
+- **Request Body (JSON):**
+```json
+{
+  "name": "Apex Skill Institute",
+  "email": "apex.institute@gmail.com",
+  "phone": "9876501234",
+  "password": "SellerPassword@123",
+  "account_type": "Institute / Company",
+  "business_name": "Apex Learning Center",
+  "business_category": "Courses & Training",
+  "city": "Ahmedabad",
+  "state": "Gujarat",
+  "address": "401, Sapphire Complex, C.G. Road",
+  "pincode": "380009"
+}
+```
+- **Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Seller registered successfully! Welcome to Digital Class Seller Partner Program.",
+  "token": "Mjg6ZjQ3YTQ3YWJjZDAxY2VmOTg4MDcyOWE3YjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": {
+    "id": 28,
+    "name": "Apex Skill Institute",
+    "email": "apex.institute@gmail.com",
+    "phone": "9876501234",
+    "role": "seller"
+  },
+  "seller": {
+    "id": 14,
+    "seller_code": "DC-SELL-000028",
+    "store_name": "Apex Learning Center",
+    "account_type": "Institute / Company",
+    "seller_status": "Pending Approval",
+    "verification_status": "Not Verified"
+  }
+}
+```
+
+#### `POST /api/seller/auth/login`
+Allows Sellers to log in using their **Seller ID** (e.g. `DC-SELL-000028`), **Email**, or **Phone**.
+- **Request Body (JSON):**
+```json
+{
+  "login": "DC-SELL-000028",
+  "password": "SellerPassword@123"
+}
+```
+- **Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Seller login successful",
+  "token": "<SELLER_BEARER_TOKEN>",
+  "user": { "id": 28, "name": "Apex Skill Institute", "email": "apex.institute@gmail.com", "role": "seller" },
+  "seller": {
+    "id": 14,
+    "seller_code": "DC-SELL-000028",
+    "store_name": "Apex Learning Center",
+    "seller_status": "Active",
+    "verification_status": "Verified",
+    "is_verified": true,
+    "can_sell": true
+  }
+}
+```
+
+#### `GET /api/seller/auth/profile`
+Returns the authenticated seller's store profile, metrics (courses count, services count, products count, orders count, total earnings), and business details.
+- **Headers:** `Authorization: Bearer <SELLER_TOKEN>`
+
 ---
 
 ### 3.3. Courses Catalog

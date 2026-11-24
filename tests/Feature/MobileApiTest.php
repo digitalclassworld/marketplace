@@ -180,4 +180,52 @@ class MobileApiTest extends TestCase
         $clearResponse->assertStatus(200)
             ->assertJsonPath('count', 0);
     }
+
+    public function test_seller_registration_and_login_flow(): void
+    {
+        $uniqueEmail = 'mobileseller_' . time() . '@example.com';
+
+        // 1. Seller Register
+        $regResponse = $this->postJson('/api/seller/auth/register', [
+            'name'              => 'Apex Skill Institute',
+            'email'             => $uniqueEmail,
+            'phone'             => '9876501234',
+            'password'          => 'password123',
+            'account_type'      => 'Institute / Company',
+            'business_name'     => 'Apex Learning Center',
+            'business_category' => 'Courses & Training',
+            'city'              => 'Ahmedabad',
+            'state'             => 'Gujarat',
+        ]);
+
+        $regResponse->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure([
+                'success',
+                'token',
+                'user' => ['id', 'name', 'email', 'role'],
+                'seller' => ['id', 'seller_code', 'store_name'],
+            ]);
+
+        $token = $regResponse->json('token');
+        $sellerCode = $regResponse->json('seller.seller_code');
+
+        // 2. Seller Profile using Bearer token
+        $profileResponse = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/seller/auth/profile');
+
+        $profileResponse->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('seller.seller_code', $sellerCode);
+
+        // 3. Seller Login using Seller Code
+        $loginResponse = $this->postJson('/api/seller/auth/login', [
+            'login'    => $sellerCode,
+            'password' => 'password123',
+        ]);
+
+        $loginResponse->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('seller.seller_code', $sellerCode);
+    }
 }

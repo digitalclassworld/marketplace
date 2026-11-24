@@ -24,6 +24,13 @@ Route::prefix('auth')->group(function () {
     Route::post('/logout', [MobileApiController::class, 'authLogout']);
 });
 
+// 2b. Seller Authentication & Partner Onboarding
+Route::prefix('seller/auth')->group(function () {
+    Route::post('/login', [MobileApiController::class, 'sellerLogin']);
+    Route::post('/register', [MobileApiController::class, 'sellerRegister']);
+    Route::get('/profile', [MobileApiController::class, 'sellerProfile']);
+});
+
 // 3. Online Courses Catalog
 Route::prefix('courses')->group(function () {
     Route::get('/', [MobileApiController::class, 'courses']);
