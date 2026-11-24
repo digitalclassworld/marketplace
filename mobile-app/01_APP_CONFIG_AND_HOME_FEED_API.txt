@@ -1,0 +1,155 @@
+================================================================================
+MODULE 01: APP CONFIGURATION & HOME SCREEN FEED API
+================================================================================
+
+1. GET /api/app/config
+--------------------------------------------------------------------------------
+Purpose:
+Fetch client configuration, active feature toggles, maintenance mode flags, and minimum
+supported version for force-update workflows on app launch.
+
+HTTP Method:
+GET
+
+Query Parameters:
+- platform (string, optional): "android" or "ios" (default: "android")
+
+Headers:
+Accept: application/json
+
+cURL Example:
+curl -X GET "https://web.digitalclassworld.in/api/app/config?platform=android" \
+     -H "Accept: application/json"
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "app_name": "Digital Class",
+    "platform": "android",
+    "package_name": "com.digitalclass.app",
+    "latest_version": "2.4.0",
+    "min_version": "1.0.0",
+    "force_update": false,
+    "maintenance_mode": false,
+    "maintenance_message": null,
+    "support_email": "support@digitalclassworld.in",
+    "support_phone": "+919173860404",
+    "whatsapp_support": "+919173860404",
+    "currency": {
+      "code": "INR",
+      "symbol": "₹",
+      "exchange_rate": 1.0
+    },
+    "features": [
+      {
+        "key": "courses_directory",
+        "name": "Courses Directory",
+        "is_enabled": true
+      },
+      {
+        "key": "direct_checkout",
+        "name": "Instant Checkout",
+        "is_enabled": true
+      },
+      {
+        "key": "razorpay_gateway",
+        "name": "Razorpay & UPI Payments",
+        "is_enabled": true
+      },
+      {
+        "key": "coupons_system",
+        "name": "Discount Coupons",
+        "is_enabled": true
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+2. GET /api/home/feed
+--------------------------------------------------------------------------------
+Purpose:
+Aggregates all critical sections required to render the app's rich landing / home screen 
+in a single round-trip.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+
+Query Parameters:
+- city (string, optional): Filter institutes/businesses by city (e.g., "Ahmedabad")
+
+cURL Example:
+curl -X GET "https://web.digitalclassworld.in/api/home/feed?city=Ahmedabad" \
+     -H "Accept: application/json"
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "banners": [
+      {
+        "id": 1,
+        "title": "Master Full-Stack Web Development 2026",
+        "subtitle": "Get certified with 100% placement guidance",
+        "image_url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+        "action_type": "course",
+        "action_id": "1",
+        "action_url": "/courses/digital-marketing"
+      }
+    ],
+    "featured_courses": [
+      {
+        "id": 1,
+        "title": "Digital Marketing Complete Course 2026",
+        "slug": "digital-marketing-complete-course-2026",
+        "instructor": "Vaibhavi Shah",
+        "thumbnail": "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07",
+        "price": 2699.10,
+        "original_price": 2999.00,
+        "discount_text": "10% off",
+        "rating": 4.9,
+        "enrolled_count": 1280
+      }
+    ],
+    "popular_services": [
+      {
+        "id": 4,
+        "title": "Full Stack Web Application Development (Laravel + React)",
+        "slug": "web-application-development",
+        "thumbnail": "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+        "price": 4999.00,
+        "rating": 4.8
+      }
+    ],
+    "verified_institutes": [
+      {
+        "id": 1238,
+        "name": "AlmaMate Info Tech",
+        "slug": "almamate-info-tech",
+        "city": "Ahmedabad",
+        "is_featured": true,
+        "rating": 4.9,
+        "logo": "https://images.unsplash.com/photo-1562774053-701939374585"
+      }
+    ],
+    "top_categories": [
+      { "id": 1, "name": "IT & Software", "icon": "laptop-code" },
+      { "id": 2, "name": "Digital Marketing", "icon": "bullhorn" },
+      { "id": 3, "name": "Business & Management", "icon": "briefcase" }
+    ],
+    "trending_products": [
+      {
+        "id": 1,
+        "title": "Python Programming Complete Study Kit & Lab Manual",
+        "slug": "python-study-kit",
+        "price": 499.00,
+        "thumbnail": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c"
+      }
+    ]
+  }
+}
+================================================================================

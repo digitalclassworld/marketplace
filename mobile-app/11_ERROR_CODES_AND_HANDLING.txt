@@ -1,0 +1,53 @@
+================================================================================
+MODULE 11: HTTP STATUS CODES, ERROR HANDLING & MOBILE CLIENT GUIDELINES
+================================================================================
+
+1. HTTP STATUS CODE DEFINITIONS
+--------------------------------------------------------------------------------
+Code   Meaning                 Description
+--------------------------------------------------------------------------------
+200    OK                      Request succeeded and response payload is returned.
+201    Created                 Resource created successfully (e.g. Account registered).
+400    Bad Request             Malformed request payload or missing parameters.
+401    Unauthorized            Bearer token missing, expired, or invalid credentials.
+403    Forbidden               Permission denied (e.g. Seller trying to buy with seller role).
+404    Not Found               Requested item (Course, Product, Service) does not exist.
+422    Unprocessable Entity    Form validation failed. Specific field errors returned.
+429    Too Many Requests       Rate limit exceeded. Retry after cooldown period.
+500    Internal Server Error   Server encountered an unhandled exception.
+
+2. UNIFIED ERROR FORMAT SCHEMA
+--------------------------------------------------------------------------------
+Whenever a request fails, the API responds with a consistent JSON envelope:
+
+{
+  "success": false,
+  "message": "Human readable error summary",
+  "errors": {
+    "field_name": [
+      "Specific validation message 1",
+      "Specific validation message 2"
+    ]
+  }
+}
+
+3. CLIENT-SIDE RETRY & TOKEN RECOVERY STRATEGY
+--------------------------------------------------------------------------------
+For Android / iOS / Flutter / React Native networking:
+
+a) On 401 Unauthorized:
+   - Clear locally cached "auth_token".
+   - Navigate user to Login Screen.
+   - Retain pending cart items in local SQLite / Hive / Async storage.
+
+b) On 422 Unprocessable Entity:
+   - Extract the "errors" dictionary and display inline error banners below inputs.
+
+c) On 403 Forbidden (Role Conflict):
+   - Occurs when a seller account attempts customer checkout.
+   - Display a dialog prompting: "You are logged in as a Seller. Please switch to your Customer account to purchase."
+
+d) Timeout & Network Retry:
+   - Configure HTTP client timeout: 15-30 seconds.
+   - For idempotent GET requests, perform exponential backoff retry (max 3 attempts).
+================================================================================

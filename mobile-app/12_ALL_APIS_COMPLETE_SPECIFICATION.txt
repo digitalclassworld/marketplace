@@ -1,0 +1,253 @@
+================================================================================
+DIGITAL CLASS MARKETPLACE - ALL APIS MASTER SPECIFICATION (COMPLETE MANUAL)
+================================================================================
+Production Base URL: https://web.digitalclassworld.in/api
+Main Base URL:       https://digitalclassworld.com/api
+Local Testing URL:   http://localhost:8000/api
+
+Headers:
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer <TOKEN> (When user is logged in)
+
+--------------------------------------------------------------------------------
+INDEX OF ALL 24 REST API ENDPOINTS
+--------------------------------------------------------------------------------
+1.  GET  /api/app/config                  -> App version, feature flags, maintenance
+2.  GET  /api/home/feed                   -> Full landing screen feed
+3.  POST /api/auth/register               -> Register customer account with profession
+4.  POST /api/auth/login                  -> Customer login via email or phone
+5.  GET  /api/auth/profile                -> Current customer profile and stats
+6.  PUT  /api/auth/profile                -> Update customer profile details
+7.  POST /api/auth/logout                 -> Invalidate bearer token
+8.  GET  /api/courses                     -> Search, filter, paginate online courses
+9.  GET  /api/courses/{id}                -> Course detail with curriculum & instructor
+10. GET  /api/services                    -> Search & filter professional services
+11. GET  /api/services/{id}               -> Service details, multi-tier packages
+12. POST /api/services/{id}/book          -> Submit booking or quote inquiry
+13. GET  /api/products                    -> Search physical & digital study products
+14. GET  /api/products/{id}               -> Product details, specs, stock
+15. GET  /api/businesses                  -> Business listings directory (Premium first)
+16. GET  /api/businesses/{id}             -> Full institute profile & branches
+17. POST /api/businesses/{id}/enquiry     -> Send direct student inquiry lead
+18. POST /api/businesses/{id}/demo        -> Book free demo session
+19. GET  /api/categories                  -> Hierarchical marketplace categories
+20. GET  /api/cart                        -> View active shopping cart items
+21. POST /api/cart/add                    -> Add course, product, or service to cart
+22. POST /api/cart/update                 -> Update item quantity
+23. POST /api/cart/remove                 -> Remove single item from cart
+24. POST /api/cart/clear                  -> Clear shopping cart
+25. POST /api/cart/checkout               -> Submit order (Razorpay, Bank Transfer, COD)
+26. GET  /api/orders                      -> Customer purchase history & enrollments
+27. GET  /api/coupons/available           -> List active promotional coupons
+28. POST /api/coupons/validate            -> Check promo code & calculate discount
+
+--------------------------------------------------------------------------------
+DETAILED ENDPOINTS & SAMPLE PAYLOADS
+--------------------------------------------------------------------------------
+
+[1] GET /api/app/config
+Query: platform=android
+Response:
+{
+  "success": true,
+  "data": {
+    "app_name": "Digital Class",
+    "platform": "android",
+    "latest_version": "2.4.0",
+    "min_version": "1.0.0",
+    "force_update": false,
+    "maintenance_mode": false,
+    "support_email": "support@digitalclassworld.in",
+    "features": [
+      { "key": "courses_directory", "is_enabled": true },
+      { "key": "direct_checkout", "is_enabled": true }
+    ]
+  }
+}
+
+[2] GET /api/home/feed
+Response:
+{
+  "success": true,
+  "data": {
+    "banners": [...],
+    "featured_courses": [...],
+    "popular_services": [...],
+    "verified_institutes": [...],
+    "top_categories": [...],
+    "trending_products": [...]
+  }
+}
+
+[3] POST /api/auth/register
+Body:
+{
+  "name": "Vaibhavi Shah",
+  "email": "vaibhavi@gmail.com",
+  "phone": "5874142536",
+  "password": "Password123!",
+  "password_confirmation": "Password123!",
+  "profession": "Teacher",
+  "city": "Ahmedabad"
+}
+Response (201 Created):
+{
+  "success": true,
+  "message": "Account created successfully!",
+  "token": "MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": { "id": 25, "name": "Vaibhavi Shah", "email": "vaibhavi@gmail.com", "role": "customer" }
+}
+
+[4] POST /api/auth/login
+Body:
+{
+  "email": "vaibhavi@gmail.com",
+  "password": "Password123!"
+}
+Response (200 OK):
+{
+  "success": true,
+  "token": "MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": { "id": 25, "name": "Vaibhavi Shah", "email": "vaibhavi@gmail.com" }
+}
+
+[5] GET /api/courses
+Query: search=Python&category=it-software&sort=popular&page=1
+Response:
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "total": 1084,
+    "items": [
+      {
+        "id": 12,
+        "title": "Complete Python Masterclass for Data Science & AI",
+        "slug": "complete-python-masterclass-data-science-ai",
+        "instructor": "Dr. Rajesh K. Varma",
+        "price": 1999.00,
+        "original_price": 4999.00,
+        "rating": 4.9,
+        "thumbnail": "https://..."
+      }
+    ]
+  }
+}
+
+[6] GET /api/courses/{id}
+Response:
+{
+  "success": true,
+  "data": {
+    "id": 12,
+    "title": "Complete Python Masterclass for Data Science & AI",
+    "curriculum": [
+      {
+        "section_title": "Section 1: Basics",
+        "lectures": [
+          { "title": "1. Intro", "duration": "10:00", "is_free_preview": true }
+        ]
+      }
+    ]
+  }
+}
+
+[7] GET /api/services
+Query: category=web-development
+Response:
+{
+  "success": true,
+  "data": { "items": [ { "id": 4, "title": "Full Stack Web App", "price": 4999.00 } ] }
+}
+
+[8] POST /api/services/{id}/book
+Body:
+{
+  "package": "standard",
+  "name": "Vaibhavi Shah",
+  "email": "vaibhavi@gmail.com",
+  "phone": "5874142536",
+  "project_brief": "We need custom CRM software"
+}
+
+[9] GET /api/businesses
+Query: city=Ahmedabad
+Response:
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": 1238,
+        "name": "AlmaMate Info Tech",
+        "is_premium_partner": true,
+        "priority_support": true,
+        "rating": 4.9
+      }
+    ]
+  }
+}
+
+[10] POST /api/businesses/{id}/enquiry
+Body:
+{
+  "name": "Vaibhavi Shah",
+  "email": "vaibhavi@gmail.com",
+  "phone": "5874142536",
+  "course_interested": "Salesforce Developer",
+  "message": "Send course details"
+}
+
+[11] POST /api/cart/add
+Body:
+{
+  "id": "12",
+  "type": "Course",
+  "title": "3D Epoxy Design And Installation",
+  "price": 2250.00,
+  "quantity": 1
+}
+
+[12] POST /api/cart/checkout
+Body:
+{
+  "name": "Vaibhavi Shah",
+  "email": "vaibhavi@gmail.com",
+  "phone": "5874142536",
+  "city": "Ahmedabad",
+  "address": "Navrangpura, C.G. Road",
+  "payment_method": "Razorpay / UPI / Net Banking",
+  "coupon_code": "WELCOME10",
+  "discount": 304.90,
+  "items": [
+    { "id": "12", "type": "Course", "title": "3D Epoxy Design", "price": 2250.00, "quantity": 1 },
+    { "id": "18", "type": "Course", "title": "Sales Strategies", "price": 799.00, "quantity": 1 }
+  ]
+}
+Response:
+{
+  "success": true,
+  "order_number": "#DC-84920",
+  "total_amount": "2,744.10",
+  "status": "confirmed"
+}
+
+[13] POST /api/coupons/validate
+Body:
+{
+  "code": "WELCOME10",
+  "total": 3049.00
+}
+Response:
+{
+  "success": true,
+  "code": "WELCOME10",
+  "discount_percentage": 10,
+  "discount_amount": 304.90,
+  "final_total": 2744.10
+}
+
+================================================================================
+END OF SPECIFICATION
+================================================================================

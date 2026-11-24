@@ -1,0 +1,153 @@
+================================================================================
+MODULE 06: BUSINESS DIRECTORY & VERIFIED COACHING INSTITUTES API
+================================================================================
+
+1. GET /api/businesses
+--------------------------------------------------------------------------------
+Purpose:
+Search and list verified coaching institutes, schools, tutoring centers, and educational
+businesses.
+NOTE: Institutes subscribed to Premium/Pro subscription plans are automatically 
+ranked first with priority suggestion badges.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+
+Query Parameters:
+- search (string, optional): Keyword query (institute name, specialty, address)
+- city (string, optional): Filter by city (e.g. "Ahmedabad", "Bangalore")
+- category (string, optional): Category filter
+- page (integer, optional): Page number
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "total": 446,
+    "items": [
+      {
+        "id": 1238,
+        "name": "AlmaMate Info Tech",
+        "slug": "almamate-info-tech",
+        "category": "IT & Software Training",
+        "city": "Ahmedabad",
+        "address": "Navrangpura, Near C.G. Road",
+        "phone": "+91 98765 43210",
+        "email": "contact@almamate.in",
+        "rating": 4.9,
+        "reviews_count": 86,
+        "is_verified": true,
+        "is_premium_partner": true,
+        "priority_support": true,
+        "logo": "https://images.unsplash.com/photo-1562774053-701939374585",
+        "courses_offered_count": 14
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+2. GET /api/businesses/{id}
+--------------------------------------------------------------------------------
+Purpose:
+Fetch comprehensive institute profile: contact details, branch addresses, facilities,
+faculty, photo gallery, and complete list of classroom & online courses offered.
+
+HTTP Method:
+GET
+
+URL Parameter:
+- id: Numeric business listing ID or slug (e.g., "1238" or "almamate-info-tech")
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "id": 1238,
+    "name": "AlmaMate Info Tech",
+    "slug": "almamate-info-tech",
+    "tagline": "India's Premier Salesforce & IT Certification Academy",
+    "description": "AlmaMate Info Tech provides industry-leading training programs with 100% placement support...",
+    "logo": "https://images.unsplash.com/photo-1562774053-701939374585",
+    "cover_banner": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655",
+    "phone": "+91 98765 43210",
+    "email": "info@almamate.in",
+    "website": "https://almamate.in",
+    "city": "Ahmedabad",
+    "address": "402 Corporate Park, C.G. Road, Ahmedabad",
+    "established_year": 2014,
+    "rating": 4.9,
+    "is_verified": true,
+    "courses_offered": [
+      {
+        "id": 84,
+        "title": "Salesforce Certified Administrator & Developer",
+        "duration": "3 Months",
+        "fee": 25000.00,
+        "mode": "Classroom & Live Online"
+      }
+    ],
+    "facilities": [
+      "AC Computer Labs",
+      "Free High-Speed Wi-Fi",
+      "Placement Cell",
+      "Mock Interviews",
+      "Official Certification Exam Center"
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+3. POST /api/businesses/{id}/enquiry
+--------------------------------------------------------------------------------
+Purpose:
+Submit a student enquiry lead directly to the coaching institute.
+
+HTTP Method:
+POST
+
+Request Body:
+{
+  "name": "Vaibhavi Shah",
+  "email": "vaibhavi@gmail.com",
+  "phone": "5874142536",
+  "course_interested": "Salesforce Administrator",
+  "message": "Please send batch timings and fee structure."
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Enquiry submitted successfully! The institute counselor will call you within 24 hours.",
+  "enquiry_id": 9182
+}
+
+--------------------------------------------------------------------------------
+4. POST /api/businesses/{id}/demo
+--------------------------------------------------------------------------------
+Purpose:
+Book a Free Demo Class at the institute.
+
+HTTP Method:
+POST
+
+Request Body:
+{
+  "name": "Vaibhavi Shah",
+  "email": "vaibhavi@gmail.com",
+  "phone": "5874142536",
+  "preferred_date": "2026-12-01",
+  "preferred_time": "10:00 AM",
+  "mode": "online" // or "classroom"
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Free demo session confirmed! Pass and meeting link sent to your email & mobile.",
+  "booking_code": "DEMO-8472"
+}
+================================================================================

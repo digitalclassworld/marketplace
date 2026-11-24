@@ -1,0 +1,134 @@
+================================================================================
+MODULE 04: PROFESSIONAL SERVICES & DIRECT BOOKING API
+================================================================================
+
+1. GET /api/services
+--------------------------------------------------------------------------------
+Purpose:
+Search and filter professional gigs & freelance services (Web Development, SEO, 
+Graphic Design, App Development, Content Writing, Digital Marketing).
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+
+Query Parameters:
+- search (string, optional): Keyword query
+- category (string, optional): Service category filter
+- min_price (numeric, optional): Minimum budget
+- max_price (numeric, optional): Maximum budget
+- page (integer, optional): Page number
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "total": 128,
+    "items": [
+      {
+        "id": 4,
+        "title": "Full Stack Web Application Development (Laravel + React)",
+        "slug": "web-application-development",
+        "category": "Web Development",
+        "price": 4999.00,
+        "original_price": 9999.00,
+        "thumbnail": "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+        "seller_name": "Arjun Mehta (Senior Architect)",
+        "rating": 4.9,
+        "completed_orders": 85,
+        "delivery_time_days": 5
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+2. GET /api/services/{id}
+--------------------------------------------------------------------------------
+Purpose:
+Retrieve service gig details, multi-tier pricing packages (Basic, Standard, Premium), 
+service deliverables, client reviews, and seller profile.
+
+HTTP Method:
+GET
+
+URL Parameter:
+- id: Numeric service ID or slug
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "id": 4,
+    "title": "Full Stack Web Application Development (Laravel + React)",
+    "slug": "web-application-development",
+    "description": "I will engineer a responsive, production-ready web application with API integration...",
+    "thumbnail": "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    "gallery": [
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f"
+    ],
+    "packages": {
+      "basic": {
+        "name": "Starter Package",
+        "price": 1999.00,
+        "delivery_days": 3,
+        "revisions": "2 Revisions",
+        "features": ["Single Page App", "Responsive Layout", "Contact Form"]
+      },
+      "standard": {
+        "name": "Standard Business App",
+        "price": 4999.00,
+        "delivery_days": 7,
+        "revisions": "5 Revisions",
+        "features": ["Multi-page App", "Database Setup", "REST API integration", "Admin Panel"]
+      },
+      "premium": {
+        "name": "Enterprise Complete Solution",
+        "price": 14999.00,
+        "delivery_days": 14,
+        "revisions": "Unlimited",
+        "features": ["Full Stack App", "Payment Gateway", "SEO Optimization", "30-Day Support"]
+      }
+    },
+    "seller": {
+      "id": 8,
+      "name": "Arjun Mehta",
+      "rating": 4.9,
+      "location": "Ahmedabad, India",
+      "orders_completed": 112
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+3. POST /api/services/{id}/book
+--------------------------------------------------------------------------------
+Purpose:
+Submit a direct booking request or quote enquiry for a service.
+
+HTTP Method:
+POST
+
+Headers:
+Accept: application/json
+Content-Type: application/json
+
+Request Body:
+{
+  "package": "standard",                   // Required: basic, standard, or premium
+  "name": "Vaibhavi Shah",                 // Required
+  "email": "vaibhavi@gmail.com",           // Required
+  "phone": "5874142536",                   // Required
+  "project_brief": "We need an LMS app..." // Required
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Service booking request submitted! The service provider will contact you shortly.",
+  "booking_reference": "#SB-84920"
+}
+================================================================================

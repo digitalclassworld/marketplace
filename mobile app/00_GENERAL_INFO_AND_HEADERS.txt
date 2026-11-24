@@ -1,0 +1,69 @@
+================================================================================
+MODULE 00: GENERAL INFORMATION, HEADERS & AUTHENTICATION SPECIFICATION
+================================================================================
+
+1. BASE URLS
+--------------------------------------------------------------------------------
+Production Server:        https://web.digitalclassworld.in/api
+Main Domain Server:       https://digitalclassworld.com/api
+Local Testing Server:     http://localhost:8000/api
+
+2. STANDARD REQUEST HEADERS
+--------------------------------------------------------------------------------
+Every HTTP request issued by the mobile application must supply the following headers:
+
+Header Name          Value                     Notes
+--------------------------------------------------------------------------------
+Accept               application/json          Mandatory. Ensures Laravel returns JSON.
+Content-Type         application/json          Required for POST, PUT, PATCH requests.
+Authorization        Bearer <API_TOKEN>        Required for protected endpoints.
+X-Platform           android | ios             Optional. Specifies client operating system.
+X-App-Version        1.0.0                     Optional. Helps backend track outdated apps.
+X-Device-Id          <UUID>                    Optional. Useful for device session audit.
+
+3. STATELESS ARCHITECTURE & CSRF EXEMPTION
+--------------------------------------------------------------------------------
+- All routes declared inside "routes/api.php" reside outside the standard web session 
+  middleware group.
+- CSRF validation is disabled for all "/api/*" routes. Mobile apps do NOT need to fetch 
+  or include CSRF cookies or "_token" fields in API payloads.
+
+4. AUTHENTICATION & TOKEN RESOLUTION
+--------------------------------------------------------------------------------
+When a customer registers or logs in via "/api/auth/register" or "/api/auth/login", 
+the server responds with a secure token:
+
+{
+  "success": true,
+  "token": "MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": { ... }
+}
+
+Mobile Implementation:
+- Store this token securely in client storage (e.g., Flutter FlutterSecureStorage, 
+  Android EncryptedSharedPreferences, iOS Keychain, or React Native Keychain).
+- Attach this token in subsequent API requests via the "Authorization" header:
+  Authorization: Bearer MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==
+- The backend automatically resolves the authenticated customer from this header.
+- Alternatively, "X-User-Id: <ID>" is supported for internal microservice calls.
+
+5. STANDARD JSON RESPONSE ENVELOPE
+--------------------------------------------------------------------------------
+Success Response Schema (HTTP 200 / 201):
+{
+  "success": true,
+  "message": "Optional human-readable confirmation message",
+  "data": { ... } or [ ... ]
+}
+
+Error Response Schema (HTTP 400 / 401 / 403 / 404 / 422 / 500):
+{
+  "success": false,
+  "message": "Descriptive reason why request failed",
+  "errors": {
+    "field_name": [
+      "The field_name is required."
+    ]
+  }
+}
+================================================================================

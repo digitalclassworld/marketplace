@@ -1,0 +1,60 @@
+================================================================================
+MODULE 09: CUSTOMER ORDERS, ENROLLMENTS & INVOICES API
+================================================================================
+
+1. GET /api/orders
+--------------------------------------------------------------------------------
+Purpose:
+Retrieve purchase history, active course enrollments, service gig orders, and product 
+shipping statuses for the authenticated customer.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+Authorization: Bearer <TOKEN> (Or query parameter: ?email=vaibhavi@gmail.com)
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "total_orders": 2,
+    "orders": [
+      {
+        "id": 84,
+        "order_number": "#DC-84920",
+        "created_at": "2026-11-24T11:00:00.000000Z",
+        "total_amount": 2744.10,
+        "discount_applied": 304.90,
+        "coupon_code": "WELCOME10",
+        "status": "confirmed", // "confirmed", "processing", "completed", "cancelled"
+        "payment_method": "Razorpay / UPI",
+        "items": [
+          {
+            "id": 12,
+            "title": "3D Epoxy Design And Installation Masterclass",
+            "type": "Course",
+            "price": 2250.00,
+            "quantity": 1,
+            "thumbnail": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+            "access_granted": true,
+            "course_classroom_url": "https://web.digitalclassworld.in/courses/learn/12"
+          },
+          {
+            "id": 18,
+            "title": "Sales Strategies Complete Blueprint",
+            "type": "Course",
+            "price": 799.00,
+            "quantity": 1,
+            "thumbnail": "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
+            "access_granted": true,
+            "course_classroom_url": "https://web.digitalclassworld.in/courses/learn/18"
+          }
+        ],
+        "invoice_download_url": "https://web.digitalclassworld.in/customer/orders/84/invoice"
+      }
+    ]
+  }
+}
+================================================================================

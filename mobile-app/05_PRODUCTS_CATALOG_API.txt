@@ -1,0 +1,93 @@
+================================================================================
+MODULE 05: PRODUCTS CATALOG API (BOOKS, KITS & HARDWARE)
+================================================================================
+
+1. GET /api/products
+--------------------------------------------------------------------------------
+Purpose:
+Search and filter physical study materials, educational books, electronics/robotics kits,
+and digital learning resources.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+
+Query Parameters:
+- search (string, optional): Keyword query
+- category (string, optional): Category slug
+- brand (string, optional): Brand filter
+- min_price (numeric, optional): Minimum price
+- max_price (numeric, optional): Maximum price
+- page (integer, optional): Page number
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "total": 64,
+    "items": [
+      {
+        "id": 1,
+        "title": "Python Programming Complete Study Kit & Lab Manual",
+        "slug": "python-study-kit",
+        "price": 499.00,
+        "original_price": 999.00,
+        "discount_percentage": 50,
+        "thumbnail": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c",
+        "brand": "Digital Class Press",
+        "stock": 150,
+        "is_in_stock": true,
+        "rating": 4.8
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+2. GET /api/products/{id}
+--------------------------------------------------------------------------------
+Purpose:
+Fetch comprehensive product specifications, stock status, shipping details,
+and seller store credentials.
+
+HTTP Method:
+GET
+
+URL Parameter:
+- id: Numeric product ID or slug
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "title": "Python Programming Complete Study Kit & Lab Manual",
+    "slug": "python-study-kit",
+    "sku": "DC-BK-PY-01",
+    "description": "Comprehensive textbook covering Python 3.12, algorithms, data structures, and solved exercises.",
+    "price": 499.00,
+    "original_price": 999.00,
+    "stock_quantity": 150,
+    "in_stock": true,
+    "thumbnail": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c",
+    "images": [
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c",
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794"
+    ],
+    "specifications": {
+      "Format": "Paperback + Digital E-Book",
+      "Pages": "480 Pages",
+      "Language": "English",
+      "Publisher": "Digital Class Publications",
+      "Edition": "2026 Edition"
+    },
+    "shipping": {
+      "free_shipping": true,
+      "estimated_days": "2-4 Business Days",
+      "cash_on_delivery": true
+    }
+  }
+}
+================================================================================

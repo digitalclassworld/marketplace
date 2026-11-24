@@ -1,0 +1,86 @@
+================================================================================
+MODULE 10: DISCOUNT COUPONS & REAL-TIME VALIDATION API
+================================================================================
+
+1. GET /api/coupons/available
+--------------------------------------------------------------------------------
+Purpose:
+Fetch list of active marketplace coupons that mobile users can tap to apply directly.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": [
+    {
+      "code": "WELCOME10",
+      "discount_type": "percentage",
+      "discount_value": 10,
+      "description": "Flat 10% OFF on all courses, products & services",
+      "min_order_amount": 0.00,
+      "badge": "10% OFF"
+    },
+    {
+      "code": "DIGITAL20",
+      "discount_type": "percentage",
+      "discount_value": 20,
+      "description": "Special 20% OFF marketplace promotion",
+      "min_order_amount": 999.00,
+      "badge": "20% OFF"
+    },
+    {
+      "code": "DIWALI50",
+      "discount_type": "percentage",
+      "discount_value": 50,
+      "description": "Mega 50% Festive Super Discount",
+      "min_order_amount": 1999.00,
+      "badge": "50% OFF"
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+2. POST /api/coupons/validate
+--------------------------------------------------------------------------------
+Purpose:
+Verify validity of a coupon code against the cart total, check expiry, 
+and calculate the exact discount amount and net total.
+
+HTTP Method:
+POST
+
+Headers:
+Accept: application/json
+Content-Type: application/json
+
+Request Body Schema:
+{
+  "code": "WELCOME10",  // Required: Coupon code (case-insensitive)
+  "total": 3049.00,     // Required: Current cart subtotal
+  "context": "all"      // Optional: "courses", "products", "services", "all"
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "code": "WELCOME10",
+  "coupon_code": "WELCOME10",
+  "discount_type": "percentage",
+  "discount_percentage": 10,
+  "discount_amount": 304.90,
+  "subtotal": 3049.00,
+  "final_total": 2744.10,
+  "message": "Coupon WELCOME10 applied successfully! You saved ₹304.90"
+}
+
+Invalid Coupon Response (422 / 200 with success: false):
+{
+  "success": false,
+  "message": "Invalid coupon code or expired."
+}
+================================================================================

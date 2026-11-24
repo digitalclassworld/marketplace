@@ -1,0 +1,65 @@
+================================================================================
+MODULE 07: CATEGORIES DIRECTORY TAXONOMY API
+================================================================================
+
+1. GET /api/categories
+--------------------------------------------------------------------------------
+Purpose:
+Retrieve marketplace categories hierarchy used to build browse drawer, category pills,
+and search filters for Courses, Services, Products, and Business Listings.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+
+Query Parameters:
+- type (string, optional): "all", "course", "service", "product", "business"
+
+cURL Example:
+curl -X GET "https://web.digitalclassworld.in/api/categories?type=course" \
+     -H "Accept: application/json"
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "IT & Software",
+      "slug": "it-software",
+      "icon": "fa-laptop-code",
+      "image": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
+      "courses_count": 420,
+      "services_count": 45,
+      "products_count": 18,
+      "subcategories": [
+        { "id": 101, "name": "Web Development", "slug": "web-development" },
+        { "id": 102, "name": "Python & Data Science", "slug": "python-data-science" },
+        { "id": 103, "name": "Cloud & DevOps", "slug": "cloud-devops" },
+        { "id": 104, "name": "Mobile App Development", "slug": "mobile-app-development" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Digital Marketing",
+      "slug": "digital-marketing",
+      "icon": "fa-bullhorn",
+      "image": "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07",
+      "courses_count": 210,
+      "subcategories": [
+        { "id": 201, "name": "SEO & Content Marketing", "slug": "seo-content" },
+        { "id": 202, "name": "Social Media Marketing", "slug": "smm" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Business & Management",
+      "slug": "business-management",
+      "icon": "fa-briefcase",
+      "courses_count": 160
+    }
+  ]
+}
+================================================================================

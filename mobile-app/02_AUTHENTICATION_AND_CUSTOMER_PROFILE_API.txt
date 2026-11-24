@@ -1,0 +1,207 @@
+================================================================================
+MODULE 02: CUSTOMER AUTHENTICATION & PROFILE MANAGEMENT API
+================================================================================
+
+1. POST /api/auth/register
+--------------------------------------------------------------------------------
+Purpose:
+Register a new customer account on Digital Class. Customers can immediately start 
+browsing, adding items to cart, and placing orders.
+
+HTTP Method:
+POST
+
+Headers:
+Accept: application/json
+Content-Type: application/json
+
+Request Body Schema:
+{
+  "name": "Vaibhavi Shah",               // Required, string, max 100
+  "email": "vaibhavi@gmail.com",         // Required, string, valid email, unique
+  "phone": "5874142536",                 // Required, string, min 10
+  "password": "SecretPassword123!",       // Required, string, min 6
+  "password_confirmation": "SecretPassword123!", // Required, must match password
+  "profession": "Teacher",               // Required, string (e.g. Student, Teacher, Professional)
+  "city": "Ahmedabad",                   // Optional, string (default: "Ahmedabad")
+  "address": "Navrangpura, C.G. Road"   // Optional, string
+}
+
+cURL Example:
+curl -X POST "https://web.digitalclassworld.in/api/auth/register" \
+     -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "Vaibhavi Shah",
+       "email": "vaibhavi@gmail.com",
+       "phone": "5874142536",
+       "password": "Password123!",
+       "password_confirmation": "Password123!",
+       "profession": "Teacher",
+       "city": "Ahmedabad"
+     }'
+
+Sample Success Response (201 Created):
+{
+  "success": true,
+  "message": "Account created successfully! Welcome to Digital Class.",
+  "token": "MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "email": "vaibhavi@gmail.com",
+    "phone": "5874142536",
+    "role": "customer",
+    "profession": "Teacher",
+    "city": "Ahmedabad",
+    "avatar_url": null,
+    "created_at": "2026-11-24T10:00:00.000000Z"
+  }
+}
+
+Validation Error Response (422 Unprocessable Entity):
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "email": ["The email has already been taken."],
+    "phone": ["The phone field is required."]
+  }
+}
+
+--------------------------------------------------------------------------------
+2. POST /api/auth/login
+--------------------------------------------------------------------------------
+Purpose:
+Sign in to an existing customer account via Email OR Phone.
+
+HTTP Method:
+POST
+
+Headers:
+Accept: application/json
+Content-Type: application/json
+
+Request Body Schema:
+{
+  "email": "vaibhavi@gmail.com", // Required (can be email or mobile phone)
+  "password": "Password123!"     // Required, string
+}
+
+cURL Example:
+curl -X POST "https://web.digitalclassworld.in/api/auth/login" \
+     -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "email": "vaibhavi@gmail.com",
+       "password": "Password123!"
+     }'
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Login successful. Welcome back, Vaibhavi Shah!",
+  "token": "MjU6ZTFiM2Q1YjhhZGMwYTc3ZDYxNzJjYjM5MmM2MzE3ODQ0OTBhOGY3Nw==",
+  "user": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "email": "vaibhavi@gmail.com",
+    "phone": "5874142536",
+    "role": "customer",
+    "profession": "Teacher",
+    "city": "Ahmedabad"
+  }
+}
+
+Invalid Credentials Response (401 Unauthorized):
+{
+  "success": false,
+  "message": "Invalid credentials. Please verify your email/phone and password."
+}
+
+--------------------------------------------------------------------------------
+3. GET /api/auth/profile
+--------------------------------------------------------------------------------
+Purpose:
+Fetch current authenticated customer profile and statistics.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+Authorization: Bearer <TOKEN>
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "email": "vaibhavi@gmail.com",
+    "phone": "5874142536",
+    "profession": "Teacher",
+    "city": "Ahmedabad",
+    "address": "Navrangpura, C.G. Road",
+    "role": "customer",
+    "total_orders": 3,
+    "enrolled_courses": 2,
+    "active_certificates": 1
+  }
+}
+
+--------------------------------------------------------------------------------
+4. PUT /api/auth/profile
+--------------------------------------------------------------------------------
+Purpose:
+Update customer profile information.
+
+HTTP Method:
+PUT
+
+Headers:
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer <TOKEN>
+
+Request Body:
+{
+  "name": "Vaibhavi Shah",
+  "phone": "5874142536",
+  "city": "Ahmedabad",
+  "address": "104 Shivalik Business Centre, Bodakdev",
+  "profession": "Senior Educator"
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Profile updated successfully!",
+  "data": {
+    "id": 25,
+    "name": "Vaibhavi Shah",
+    "phone": "5874142536",
+    "city": "Ahmedabad",
+    "profession": "Senior Educator"
+  }
+}
+
+--------------------------------------------------------------------------------
+5. POST /api/auth/logout
+--------------------------------------------------------------------------------
+Purpose:
+Revoke current mobile session token.
+
+HTTP Method:
+POST
+
+Headers:
+Accept: application/json
+Authorization: Bearer <TOKEN>
+
+Sample Response (200 OK):
+{
+  "success": true,
+  "message": "Successfully logged out."
+}
+================================================================================

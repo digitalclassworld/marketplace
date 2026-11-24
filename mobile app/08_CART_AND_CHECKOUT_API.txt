@@ -1,0 +1,194 @@
+================================================================================
+MODULE 08: SHOPPING CART & FULL CHECKOUT API (RAZORPAY, BANK TRANSFER, COD)
+================================================================================
+
+1. GET /api/cart
+--------------------------------------------------------------------------------
+Purpose:
+Retrieve all items currently stored in the customer's cart, subtotal, and total quantity.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+Authorization: Bearer <TOKEN> (Optional for guests, supported via session / device)
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "items": [
+    {
+      "key": "course_12",
+      "id": "12",
+      "type": "Course",
+      "title": "3D Epoxy Design And Installation Masterclass",
+      "price": 2250.00,
+      "original_price": 4500.00,
+      "quantity": 1,
+      "thumbnail": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
+      "coupon_code": null,
+      "discount_amount": 0
+    },
+    {
+      "key": "course_18",
+      "id": "18",
+      "type": "Course",
+      "title": "Sales Strategies Complete Blueprint",
+      "price": 799.00,
+      "original_price": 10000.00,
+      "quantity": 1,
+      "thumbnail": "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
+      "coupon_code": null,
+      "discount_amount": 0
+    }
+  ],
+  "count": 2,
+  "total": 3049.00
+}
+
+--------------------------------------------------------------------------------
+2. POST /api/cart/add
+--------------------------------------------------------------------------------
+Purpose:
+Add a Course, Product, or Service item into the shopping cart.
+
+HTTP Method:
+POST
+
+Request Body Schema:
+{
+  "id": "12",                     // Required: Item ID
+  "type": "Course",               // Required: Course, Product, or Service
+  "title": "3D Epoxy Design...",  // Required: Item title (also accepts "name")
+  "price": 2250.00,               // Required: Numeric price
+  "original_price": 4500.00,      // Optional: Original MRP price
+  "thumbnail": "https://...",     // Optional: Image URL (also accepts "image")
+  "quantity": 1,                  // Optional: Default is 1
+  "coupon_code": "WELCOME10",     // Optional: Discount coupon
+  "discount_amount": 225.00       // Optional: Pre-calculated discount
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Item added to cart successfully!",
+  "count": 2,
+  "total": 3049.00
+}
+
+--------------------------------------------------------------------------------
+3. POST /api/cart/update
+--------------------------------------------------------------------------------
+Purpose:
+Update quantity of an item inside the cart. Setting quantity to 0 removes the item.
+
+Request Body:
+{
+  "key": "course_12",
+  "quantity": 2
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "count": 3,
+  "total": 5299.00
+}
+
+--------------------------------------------------------------------------------
+4. POST /api/cart/remove
+--------------------------------------------------------------------------------
+Purpose:
+Remove a single item from the cart.
+
+Request Body:
+{
+  "key": "course_12"
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Item removed from cart",
+  "count": 1,
+  "total": 799.00
+}
+
+--------------------------------------------------------------------------------
+5. POST /api/cart/clear
+--------------------------------------------------------------------------------
+Purpose:
+Empty the entire shopping cart.
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Cart cleared",
+  "count": 0,
+  "total": 0.00
+}
+
+--------------------------------------------------------------------------------
+6. POST /api/cart/checkout
+--------------------------------------------------------------------------------
+Purpose:
+Place the order, create order records in the database, calculate discounts, 
+and generate confirmed enrollment credentials.
+
+HTTP Method:
+POST
+
+Headers:
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer <TOKEN> (Optional: Guest checkout supported with automatic account creation)
+
+Request Body Schema:
+{
+  "name": "Vaibhavi Shah",
+  "email": "vaibhavi@gmail.com",
+  "phone": "5874142536",
+  "city": "Ahmedabad",
+  "address": "Navrangpura, C.G. Road",
+  "payment_method": "Razorpay / UPI / Net Banking", 
+  // Supported payment_method values:
+  // 1. "Razorpay / UPI / Net Banking" (Instant online payment)
+  // 2. "Direct Bank Transfer / NEFT / IMPS (UTR: 432109876543)" (For ₹3,000+ orders)
+  // 3. "Cash / Pay on Delivery" (Offline center enrollment)
+  "coupon_code": "WELCOME10",
+  "discount": 304.90,
+  "items": [
+    {
+      "id": "12",
+      "type": "Course",
+      "title": "3D Epoxy Design And Installation",
+      "price": 2250.00,
+      "quantity": 1
+    },
+    {
+      "id": "18",
+      "type": "Course",
+      "title": "Sales Strategies",
+      "price": 799.00,
+      "quantity": 1
+    }
+  ]
+}
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "message": "Order placed successfully!",
+  "order_id": "#DC-84920",
+  "order_number": "#DC-84920",
+  "total_amount": "2,744.10",
+  "subtotal": 3049.00,
+  "discount_amount": 304.90,
+  "customer_name": "Vaibhavi Shah",
+  "customer_email": "vaibhavi@gmail.com",
+  "payment_method": "Razorpay / UPI / Net Banking",
+  "status": "confirmed",
+  "enrollment_active": true
+}
+================================================================================

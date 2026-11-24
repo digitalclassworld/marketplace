@@ -1,0 +1,140 @@
+================================================================================
+MODULE 03: ONLINE COURSES CATALOG & CURRICULUM API
+================================================================================
+
+1. GET /api/courses
+--------------------------------------------------------------------------------
+Purpose:
+Search, filter, and paginate through verified online courses in the marketplace.
+
+HTTP Method:
+GET
+
+Headers:
+Accept: application/json
+
+Query Parameters:
+- search (string, optional): Keyword query (searches course title, description, instructor)
+- category (string, optional): Category slug (e.g. "it-software", "digital-marketing")
+- min_price (numeric, optional): Minimum sell price
+- max_price (numeric, optional): Maximum sell price
+- sort (string, optional): "price_asc", "price_desc", "newest", "popular", "rating"
+- page (integer, optional): Page number (default: 1)
+- per_page (integer, optional): Items per page (default: 15, max: 50)
+
+cURL Example:
+curl -X GET "https://web.digitalclassworld.in/api/courses?search=Python&sort=popular" \
+     -H "Accept: application/json"
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "per_page": 15,
+    "total": 1084,
+    "last_page": 73,
+    "items": [
+      {
+        "id": 12,
+        "title": "Complete Python Masterclass for Data Science & AI",
+        "slug": "complete-python-masterclass-data-science-ai",
+        "instructor": "Dr. Rajesh K. Varma",
+        "thumbnail": "https://images.unsplash.com/photo-1526379095098-d400fd0bf935",
+        "price": 1999.00,
+        "original_price": 4999.00,
+        "discount_text": "60% off",
+        "rating": 4.9,
+        "reviews_count": 340,
+        "lectures_count": 58,
+        "total_duration_hours": 36.5,
+        "level": "All Levels",
+        "has_certificate": true
+      }
+    ]
+  }
+}
+
+--------------------------------------------------------------------------------
+2. GET /api/courses/{id}
+--------------------------------------------------------------------------------
+Purpose:
+Fetch full course details, comprehensive video curriculum sections, instructor profile,
+pricing breakdown, guarantees, and verified certificates.
+
+HTTP Method:
+GET
+
+URL Parameter:
+- id: Numeric course ID OR slug string (e.g., "12" or "complete-python-masterclass")
+
+Headers:
+Accept: application/json
+
+cURL Example:
+curl -X GET "https://web.digitalclassworld.in/api/courses/12" \
+     -H "Accept: application/json"
+
+Sample Success Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "id": 12,
+    "title": "Complete Python Masterclass for Data Science & AI",
+    "slug": "complete-python-masterclass-data-science-ai",
+    "summary": "From absolute zero to building real machine learning models with Python.",
+    "description": "<p>Learn Python programming with live exercises, hands-on projects, and certificate...</p>",
+    "thumbnail": "https://images.unsplash.com/photo-1526379095098-d400fd0bf935",
+    "preview_video_url": "https://www.youtube.com/watch?v=kqtD5dpn9C8",
+    "price": 1999.00,
+    "original_price": 4999.00,
+    "discount_percentage": 60,
+    "currency": "INR",
+    "rating": 4.9,
+    "students_enrolled": 1420,
+    "language": "English & Hindi",
+    "has_certificate": true,
+    "certificate_preview_url": "https://web.digitalclassworld.in/courses/certificates/12",
+    "instructor": {
+      "id": 4,
+      "name": "Dr. Rajesh K. Varma",
+      "designation": "Lead AI Researcher & Educator",
+      "rating": 4.9,
+      "total_students": 14200,
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+    },
+    "curriculum": [
+      {
+        "section_title": "Section 1: Python Basics & Environment Setup",
+        "lectures_count": 8,
+        "duration": "2h 45m",
+        "lectures": [
+          { "title": "1. Introduction to Python 3.12", "duration": "12:30", "is_free_preview": true },
+          { "title": "2. Installing VS Code & Jupyter", "duration": "18:45", "is_free_preview": true },
+          { "title": "3. Variables and Data Types", "duration": "22:10", "is_free_preview": false }
+        ]
+      },
+      {
+        "section_title": "Section 2: Object-Oriented Programming (OOP)",
+        "lectures_count": 12,
+        "duration": "4h 15m",
+        "lectures": [
+          { "title": "4. Classes, Objects & Constructors", "duration": "25:00", "is_free_preview": false }
+        ]
+      }
+    ],
+    "features": [
+      "Full Lifetime Access",
+      "Mobile and TV Access",
+      "Official Verified Certificate of Completion",
+      "14 Hands-on Real World Projects",
+      "30-Day Money-Back Guarantee"
+    ],
+    "available_coupons": [
+      { "code": "WELCOME10", "discount": "10% OFF" },
+      { "code": "DIGITAL20", "discount": "20% OFF" },
+      { "code": "DIWALI50", "discount": "50% OFF" }
+    ]
+  }
+}
+================================================================================
