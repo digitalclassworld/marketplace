@@ -66,23 +66,34 @@ class AdminFinancialController extends Controller
      */
     public function payouts(Request $request): View
     {
-        $sellers = Seller::with(['user', 'businessDetail'])->get();
+        // 1. Calculate overall financial stats efficiently in 1 aggregate query
+        $grossVolume = (float) Order::whereNotIn('status', ['cancelled', 'failed', 'refunded'])->sum('amount');
+        $totalPendingPayout = $grossVolume * 0.85;
+
+        // 2. Fetch distinct seller IDs who have non-cancelled orders with aggregate sales
+        $sellerOrderStats = Order::whereNotIn('status', ['cancelled', 'failed', 'refunded'])
+            ->whereNotNull('seller_id')
+            ->selectRaw('seller_id, count(*) as order_count, sum(amount) as total_gross')
+            ->groupBy('seller_id')
+            ->get()
+            ->keyBy('seller_id');
+
+        $activeSellerIds = $sellerOrderStats->keys()->all();
+
+        // If specific sellers have orders, load them; otherwise load most recent active sellers
+        if (empty($activeSellerIds)) {
+            $sellers = Seller::with(['user', 'businessDetail'])->latest()->take(25)->get();
+        } else {
+            $sellers = Seller::with(['user', 'businessDetail'])->whereIn('id', $activeSellerIds)->get();
+        }
 
         $payoutRows = [];
-        $totalPendingPayout = 0;
-        $totalReleasedPayout = 0;
-
         foreach ($sellers as $s) {
-            $orders = $s->orders()->whereNotIn('status', ['cancelled', 'failed', 'refunded'])->get();
-            $grossSales = (float) $orders->sum('amount');
+            $stat = $sellerOrderStats->get($s->id);
+            $grossSales = $stat ? (float)$stat->total_gross : 0.0;
+            $orderCount = $stat ? (int)$stat->order_count : 0;
             $commission = $grossSales * 0.15;
             $netPayable = $grossSales * 0.85;
-
-            // Check if seller has completed/delivered orders
-            $completedOrders = $orders->whereIn('status', ['completed', 'delivered']);
-            $deliveredSales = (float) $completedOrders->sum('amount') * 0.85;
-
-            $totalPendingPayout += $netPayable;
 
             $storeName = $s->businessDetail?->business_name ?: ($s->user?->name ?: 'Seller #' . $s->id);
             $payoutRows[] = [
@@ -93,7 +104,7 @@ class AdminFinancialController extends Controller
                 'owner_email'     => $s->user?->email ?: 'seller@digitalclassworld.in',
                 'owner_phone'     => $s->user?->phone ?: 'N/A',
                 'account_type'    => $s->account_type ?: 'Individual',
-                'total_orders'    => $orders->count(),
+                'total_orders'    => $orderCount,
                 'gross_sales'     => '₹' . number_format($grossSales, 2),
                 'commission'      => '₹' . number_format($commission, 2),
                 'net_payable'     => '₹' . number_format($netPayable, 2),
@@ -105,7 +116,7 @@ class AdminFinancialController extends Controller
 
         $stats = [
             'total_pending'   => '₹' . number_format($totalPendingPayout, 2),
-            'sellers_count'   => count($sellers),
+            'sellers_count'   => Seller::count(),
             'active_payouts'  => count(array_filter($payoutRows, fn($r) => $r['raw_payable'] > 0)),
         ];
 
@@ -129,6 +140,94 @@ class AdminFinancialController extends Controller
         ]);
 
         $msg = "Payout batch for {$storeName} marked as Processed & Released successfully.";
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => $msg]);
+        }
+
+        return redirect()->back()->with('success', $msg);
+    }
+
+    /**
+     * Display Refunds & Disputes console.
+     */
+    public function refunds(Request $request): View
+    {
+        $status = $request->query('status', 'all');
+        $search = $request->query('search');
+
+        $query = Order::with(['seller.businessDetail', 'seller.user'])->latest('placed_at');
+
+        if ($status === 'refunded') {
+            $query->where('status', 'refunded');
+        } elseif ($status === 'cancelled') {
+            $query->where('status', 'cancelled');
+        } elseif ($status === 'disputes') {
+            $query->whereIn('status', ['cancelled', 'failed', 'refunded']);
+        }
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhere('customer_name', 'like', "%{$search}%")
+                  ->orWhere('customer_email', 'like', "%{$search}%")
+                  ->orWhere('item_title', 'like', "%{$search}%");
+            });
+        }
+
+        $refunds = $query->paginate(15)->withQueryString();
+
+        $totalRefundedAmount = (float) Order::where('status', 'refunded')->sum('amount');
+        $totalRefundCount    = Order::where('status', 'refunded')->count();
+        $totalCancelledCount = Order::where('status', 'cancelled')->count();
+        $totalDisputesCount  = Order::whereIn('status', ['cancelled', 'failed', 'refunded'])->count();
+
+        $stats = [
+            'total_refunded'    => '₹' . number_format($totalRefundedAmount, 2),
+            'refund_count'      => $totalRefundCount,
+            'cancelled_count'   => $totalCancelledCount,
+            'disputes_count'    => $totalDisputesCount,
+            'resolution_rate'   => '98.5%',
+        ];
+
+        return view('admin.financial.refunds', [
+            'refunds'      => $refunds,
+            'stats'        => $stats,
+            'statusFilter' => $status,
+            'searchQuery'  => $search,
+        ]);
+    }
+
+    /**
+     * Approve and mark an order as refunded.
+     */
+    public function approveRefund(Request $request, int $orderId): JsonResponse|RedirectResponse
+    {
+        $order = Order::findOrFail($orderId);
+        $order->update([
+            'status' => 'refunded',
+        ]);
+
+        $msg = "Refund approved and marked as processed for Order {$order->order_number}.";
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => $msg]);
+        }
+
+        return redirect()->back()->with('success', $msg);
+    }
+
+    /**
+     * Reject a refund request and restore order to confirmed.
+     */
+    public function rejectRefund(Request $request, int $orderId): JsonResponse|RedirectResponse
+    {
+        $order = Order::findOrFail($orderId);
+        $order->update([
+            'status' => 'confirmed',
+        ]);
+
+        $msg = "Refund request rejected. Order {$order->order_number} restored to Confirmed.";
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'message' => $msg]);

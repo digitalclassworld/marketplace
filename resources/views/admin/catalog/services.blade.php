@@ -729,7 +729,7 @@
                                         <div class="text-muted" style="font-size: 0.7rem;" id="inspSellerBoxLocation">Bengaluru, Karnataka</div>
                                     </div>
                                 </div>
-                                <a id="inspSellerContactBtn" href="{{ route('admin.coming-soon', 'messages') }}" class="btn btn-outline-secondary btn-sm px-2 py-1" style="font-size: 0.75rem;">
+                                <a id="inspSellerContactBtn" href="{{ route('admin.messages.index') }}" class="btn btn-outline-secondary btn-sm px-2 py-1" style="font-size: 0.75rem;">
                                     Contact
                                 </a>
                             </div>
@@ -754,7 +754,7 @@
                                         <i class="fa-solid fa-star me-1"></i> Feature
                                     </button>
                                 </form>
-                                <a href="{{ route('admin.coming-soon', 'messages') }}" class="btn btn-outline-secondary btn-sm flex-fill" style="font-size: 0.75rem;">
+                                <a href="{{ route('admin.messages.index') }}" class="btn btn-outline-secondary btn-sm flex-fill" style="font-size: 0.75rem;">
                                     <i class="fa-regular fa-comment-dots me-1"></i> Message
                                 </a>
                             </div>
@@ -811,7 +811,7 @@
                             <i class="fa-solid fa-cart-shopping fs-4 mb-2 text-success"></i>
                             <p class="mb-1 fw-bold text-dark fs-6" id="inspTabOrdersCount">124 Total Bookings</p>
                             <p class="text-muted mb-2" id="inspTabOrdersRevenue">Active client orders fulfilled seamlessly.</p>
-                            <a href="{{ route('admin.coming-soon', 'orders') }}" class="btn btn-outline-primary btn-sm">View Orders Log</a>
+                            <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-primary btn-sm">View Orders Log</a>
                         </div>
                     </div>
                 </div>

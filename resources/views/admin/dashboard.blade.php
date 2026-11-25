@@ -388,7 +388,7 @@
 
             <!-- Orders -->
             <div class="col-6 col-md-4 col-lg-3 col-xl-auto flex-grow-1 border-start-md">
-                <a href="{{ route('admin.coming-soon', 'orders') }}" class="metric-strip-item">
+                <a href="{{ route('admin.orders.index') }}" class="metric-strip-item">
                     <div class="metric-strip-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                         <i class="fa-solid fa-cart-shopping"></i>
                     </div>
@@ -768,7 +768,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Recent Orders</h6>
-                    <a href="{{ route('admin.coming-soon', 'orders') }}" class="small text-primary text-decoration-none fw-semibold">View All &rarr;</a>
+                    <a href="{{ route('admin.orders.index') }}" class="small text-primary text-decoration-none fw-semibold">View All &rarr;</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle table-borderless mb-0" style="font-size: 0.775rem;">

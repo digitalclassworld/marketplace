@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminActivityController;
+use App\Http\Controllers\Admin\AdminApiController;
 use App\Http\Controllers\Admin\AdminAppController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminCatalogController;
@@ -9,12 +11,16 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminFinancialController;
 use App\Http\Controllers\Admin\AdminLeadController;
 use App\Http\Controllers\Admin\AdminMessageController;
+use App\Http\Controllers\Admin\AdminModuleController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminPromotionController;
+use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminSeoController;
 use App\Http\Controllers\Admin\AdminSellerController;
+use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminWebsiteController;
 use App\Http\Controllers\Auth\CustomerAuthController;
@@ -327,6 +333,9 @@ Route::prefix('admin')->name('admin.')->middleware(['superadmin'])->group(functi
         Route::get('/payments', [AdminFinancialController::class, 'payments'])->name('payments');
         Route::get('/payouts', [AdminFinancialController::class, 'payouts'])->name('payouts');
         Route::post('/payouts/{sellerId}/release', [AdminFinancialController::class, 'releasePayout'])->name('payouts.release');
+        Route::get('/refunds', [AdminFinancialController::class, 'refunds'])->name('refunds');
+        Route::post('/refunds/{id}/approve', [AdminFinancialController::class, 'approveRefund'])->name('refunds.approve');
+        Route::post('/refunds/{id}/reject', [AdminFinancialController::class, 'rejectRefund'])->name('refunds.reject');
     });
 
     // Customer-Seller Chats Monitoring & Support Tickets (Admin Messages & Support)
@@ -431,6 +440,46 @@ Route::prefix('admin')->name('admin.')->middleware(['superadmin'])->group(functi
         Route::get('/', [AdminSeoController::class, 'index'])->name('index');
         Route::match(['put', 'patch', 'post'], '/', [AdminSeoController::class, 'update'])->name('update');
         Route::post('/sitemap', [AdminSeoController::class, 'generateSitemap'])->name('sitemap');
+    });
+
+    // Reports & Analytics Studio
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [AdminReportController::class, 'index'])->name('index');
+        Route::get('/export', [AdminReportController::class, 'export'])->name('export');
+    });
+
+    // General Marketplace Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [AdminSettingsController::class, 'index'])->name('index');
+        Route::match(['put', 'patch', 'post'], '/', [AdminSettingsController::class, 'update'])->name('update');
+    });
+
+    // Roles & Permissions (Staff RBAC)
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [AdminRoleController::class, 'index'])->name('index');
+        Route::post('/', [AdminRoleController::class, 'store'])->name('store');
+        Route::post('/staff', [AdminRoleController::class, 'storeStaff'])->name('staff.store');
+    });
+
+    // Activity Logs & Audit Trail
+    Route::prefix('activity')->name('activity.')->group(function () {
+        Route::get('/', [AdminActivityController::class, 'index'])->name('index');
+        Route::get('/export', [AdminActivityController::class, 'export'])->name('export');
+    });
+
+    // Modules & Feature Switches
+    Route::prefix('modules')->name('modules.')->group(function () {
+        Route::get('/', [AdminModuleController::class, 'index'])->name('index');
+        Route::post('/{key}/toggle', [AdminModuleController::class, 'toggle'])->name('toggle');
+        Route::post('/update', [AdminModuleController::class, 'update'])->name('update');
+    });
+
+    // API & Third-Party Integrations
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/', [AdminApiController::class, 'index'])->name('index');
+        Route::post('/regenerate', [AdminApiController::class, 'regenerate'])->name('regenerate');
+        Route::post('/update', [AdminApiController::class, 'update'])->name('update');
+        Route::post('/test-webhook', [AdminApiController::class, 'testWebhook'])->name('test-webhook');
     });
 
     // Coming Soon placeholders for future admin modules

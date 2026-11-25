@@ -788,7 +788,7 @@
                         <div class="p-2 text-center text-muted small">
                             <i class="fa-solid fa-cart-shopping fs-4 mb-2 text-success"></i>
                             <p class="mb-2">1,248 orders placed across all store offerings.</p>
-                            <a href="{{ route('admin.coming-soon', 'orders') }}" class="btn btn-outline-secondary btn-sm">View Orders Log</a>
+                            <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary btn-sm">View Orders Log</a>
                         </div>
                     </div>
 
@@ -797,7 +797,7 @@
                         <div class="p-2 text-center text-muted small">
                             <i class="fa-solid fa-wallet fs-4 mb-2 text-info"></i>
                             <p class="mb-2">Payout history and pending release approvals.</p>
-                            <a href="{{ route('admin.coming-soon', 'payouts') }}" class="btn btn-outline-primary btn-sm">Payouts Center</a>
+                            <a href="{{ route('admin.financial.payouts') }}" class="btn btn-outline-primary btn-sm">Payouts Center</a>
                         </div>
                     </div>
                 </div>

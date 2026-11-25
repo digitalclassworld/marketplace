@@ -431,12 +431,11 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'refunds') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.financial.refunds') }}" class="admin-nav-link {{ request()->routeIs('admin.financial.refunds*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-arrow-rotate-left menu-icon"></i>
                             <span>Refunds & Disputes</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right chevron-icon"></i>
                     </a>
                 </li>
             </ul>
@@ -546,16 +545,15 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'modules') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.modules.index') }}" class="admin-nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-sliders menu-icon"></i>
                             <span>Modules & Features</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right chevron-icon"></i>
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'api') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.api.index') }}" class="admin-nav-link {{ request()->routeIs('admin.api.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-plug menu-icon"></i>
                             <span>API & Integrations</span>
@@ -568,16 +566,15 @@
             <div class="admin-menu-section">REPORTS & SYSTEM</div>
             <ul class="admin-nav-list">
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'reports') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.reports.index') }}" class="admin-nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-chart-line menu-icon"></i>
                             <span>Reports & Analytics</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right chevron-icon"></i>
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'settings') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.settings.index') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-gear menu-icon"></i>
                             <span>General Settings</span>
@@ -585,7 +582,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'roles') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.roles.index') }}" class="admin-nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-shield-halved menu-icon"></i>
                             <span>Roles & Permissions</span>
@@ -593,7 +590,7 @@
                     </a>
                 </li>
                 <li class="admin-nav-item">
-                    <a href="{{ route('admin.coming-soon', 'activity') }}" class="admin-nav-link">
+                    <a href="{{ route('admin.activity.index') }}" class="admin-nav-link {{ request()->routeIs('admin.activity.*') ? 'active' : '' }}">
                         <div class="nav-left">
                             <i class="fa-solid fa-list-check menu-icon"></i>
                             <span>Activity Logs</span>

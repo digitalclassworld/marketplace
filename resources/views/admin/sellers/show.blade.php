@@ -831,7 +831,7 @@
             <div class="bg-white border rounded-3 p-3 shadow-sm h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-dark mb-0">Recent Orders</h6>
-                    <a href="{{ route('admin.coming-soon', 'orders') }}" class="text-primary text-decoration-none small" style="font-size: 0.75rem;">View All →</a>
+                    <a href="{{ route('admin.orders.index') }}" class="text-primary text-decoration-none small" style="font-size: 0.75rem;">View All →</a>
                 </div>
 
                 @if(count($recentOrders) > 0)
