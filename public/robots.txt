@@ -1,26 +1,2 @@
 User-agent: *
-Allow: /
-Allow: /courses
-Allow: /courses/*
-Allow: /services
-Allow: /services/*
-Allow: /products
-Allow: /products/*
-Allow: /listings
-Allow: /listing/*
-Allow: /business/*
-Allow: /online-course-selling-platform
-Allow: /sell-courses
-Allow: /become-seller
-Allow: /blog
-Allow: /blog/*
-
-Disallow: /admin/
-Disallow: /seller/dashboard
-Disallow: /seller/
-Disallow: /customer/
-Disallow: /checkout
-Disallow: /cart
-Disallow: /api/
-
-Sitemap: https://web.digitalclassworld.in/sitemap.xml
+Disallow: /

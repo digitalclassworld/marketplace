@@ -283,5 +283,17 @@ class CoursesDirectoryTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('total_amount', '2,699.10');
     }
+
+    public function test_all_pages_have_noindex_tags_and_headers(): void
+    {
+        $urls = ['/', '/courses', '/products', '/services', '/checkout'];
+
+        foreach ($urls as $url) {
+            $res = $this->get($url);
+            $res->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            $res->assertSee('meta name="robots" content="noindex, nofollow, noarchive, nosnippet"', false);
+            $res->assertSee('meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet"', false);
+        }
+    }
 }
 

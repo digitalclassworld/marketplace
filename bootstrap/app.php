@@ -12,6 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Enforce X-Robots-Tag: noindex, nofollow on all web and API responses
+        $middleware->web(append: [
+            \App\Http\Middleware\NoIndexMiddleware::class,
+        ]);
+        $middleware->api(append: [
+            \App\Http\Middleware\NoIndexMiddleware::class,
+        ]);
+
         // Trust all proxies (essential for Coolify / Traefik / Cloudflare / LiteSpeed reverse proxies & SSL)
         $middleware->trustProxies(at: '*', headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
             \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |

@@ -7,7 +7,9 @@
     <title>@yield('title', 'Digital Class - India\'s Leading Educational Marketplace & Coaching Directory')</title>
     <meta name="description" content="@yield('meta_description', 'Digital Class is India\'s premier educational marketplace. Explore 11,000+ verified coaching institutes, enroll in certified online courses, hire freelance experts, and access premium study materials.')">
     <meta name="keywords" content="@yield('meta_keywords', 'online courses India, coaching institutes directory, computer classes, spoken english institute, freelance services, educational products, learn online, digital class marketplace')">
-    <meta name="robots" content="noindex">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
+    <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
     <link rel="canonical" href="@yield('canonical_url', url()->current())">
 
     <!-- Open Graph / Facebook / WhatsApp -->
