@@ -27,6 +27,7 @@ use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Auth\SellerRegistrationController;
+use App\Http\Controllers\Customer\CustomerCourseController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CertificateController;
@@ -164,7 +165,21 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/profile', [CustomerAuthController::class, 'profile'])->name('profile');
     Route::put('/profile', [CustomerAuthController::class, 'updateProfile'])->name('profile.update');
     Route::get('/account', fn() => redirect()->route('customer.profile'))->name('account');
+
+    // Student Learning Portal & Video Lecture Classroom
+    Route::get('/my-courses', [CustomerCourseController::class, 'myCourses'])->name('my-courses');
+    Route::get('/learning', [CustomerCourseController::class, 'myCourses'])->name('learning');
+    Route::get('/course/{courseId}/learn/{lessonId?}', [CustomerCourseController::class, 'player'])->name('course.learn');
+    Route::post('/learning/{courseId}/lesson/{lessonId}/toggle', [CustomerCourseController::class, 'toggleLesson'])->name('course.lesson.toggle');
+    Route::post('/learning/{courseId}/lesson/{lessonId}/note', [CustomerCourseController::class, 'saveNote'])->name('course.lesson.note');
+    Route::post('/course/{courseId}/enroll-free', [CustomerCourseController::class, 'enrollFree'])->name('course.enroll.free');
+    Route::get('/course/{courseId}/certificate', [CustomerCourseController::class, 'certificate'])->name('course.certificate');
 });
+
+// Convenient Top-Level Aliases for Student Learning
+Route::get('/my-courses', [CustomerCourseController::class, 'myCourses']);
+Route::get('/my-learning', [CustomerCourseController::class, 'myCourses']);
+Route::get('/student/classroom/{courseId}/{lessonId?}', [CustomerCourseController::class, 'player']);
 
 Route::get('/account', fn() => redirect()->route('customer.profile'));
 

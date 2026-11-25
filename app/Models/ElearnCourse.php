@@ -235,5 +235,51 @@ class ElearnCourse extends Model
     {
         return $this->getThumbnailUrlAttribute();
     }
+
+    /**
+     * Get structured video chapters with nested lessons for learning player.
+     */
+    public function getVideoChapters(): \Illuminate\Support\Collection
+    {
+        $chapters = \Illuminate\Support\Facades\DB::table('dc_elearn_course_video_chapter')
+            ->where('course_id', $this->id)
+            ->where('status', 'active')
+            ->orderBy('chapter_no', 'asc')
+            ->get();
+
+        if ($chapters->isEmpty()) {
+            return collect();
+        }
+
+        $chapterIds = $chapters->pluck('id')->toArray();
+        $videos = \Illuminate\Support\Facades\DB::table('dc_elearn_course_video')
+            ->whereIn('chapter_id', $chapterIds)
+            ->where('status', 'active')
+            ->orderBy('lesson_no', 'asc')
+            ->get()
+            ->groupBy('chapter_id');
+
+        return $chapters->map(function ($chapter) use ($videos) {
+            $chapter->lessons = $videos->get($chapter->id, collect());
+            return $chapter;
+        });
+    }
+
+    /**
+     * Get all lessons in a flat list.
+     */
+    public function getAllLessons(): \Illuminate\Support\Collection
+    {
+        $chapters = $this->getVideoChapters();
+        $allLessons = collect();
+        foreach ($chapters as $ch) {
+            foreach ($ch->lessons as $lesson) {
+                $lesson->chapter_name = $ch->chapter_name;
+                $lesson->chapter_no = $ch->chapter_no;
+                $allLessons->push($lesson);
+            }
+        }
+        return $allLessons;
+    }
 }
 

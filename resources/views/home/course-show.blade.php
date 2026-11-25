@@ -989,13 +989,20 @@
                     </div>
 
                     <!-- CTA Action Buttons -->
-                    <button type="button" class="btn w-100 fw-bold py-2 mb-2 shadow-sm text-white" id="btnCourseBuyNow" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); border: none; font-size: 0.875rem; border-radius: 8px;" onclick="handleCourseDirectBuy()">
-                        Buy Now
-                    </button>
+                    @if(Auth::guard('web')->check() && Auth::guard('web')->user()->isEnrolledIn($course->id))
+                        <a href="{{ route('customer.course.learn', ['courseId' => $course->id]) }}" class="btn w-100 fw-bold py-2.5 mb-2 shadow-sm text-white d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border: none; font-size: 0.875rem; border-radius: 8px;">
+                            <i class="fa-solid fa-circle-play fs-5"></i>
+                            <span>Continue Learning / Watch Lectures</span>
+                        </a>
+                    @else
+                        <button type="button" class="btn w-100 fw-bold py-2 mb-2 shadow-sm text-white" id="btnCourseBuyNow" style="background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); border: none; font-size: 0.875rem; border-radius: 8px;" onclick="handleCourseDirectBuy()">
+                            Buy Now
+                        </button>
 
-                    <button type="button" class="btn w-100 fw-bold py-2 mb-3" id="btnCourseAddToCart" style="border: 2px solid #7c3aed; color: #6d28d9; background: #ffffff; font-size: 0.82rem; border-radius: 8px; transition: all 0.2s;" onclick="handleCourseAddToCart()">
-                        <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
-                    </button>
+                        <button type="button" class="btn w-100 fw-bold py-2 mb-3" id="btnCourseAddToCart" style="border: 2px solid #7c3aed; color: #6d28d9; background: #ffffff; font-size: 0.82rem; border-radius: 8px; transition: all 0.2s;" onclick="handleCourseAddToCart()">
+                            <i class="fa-solid fa-cart-shopping me-1"></i> Add to Cart
+                        </button>
+                    @endif
 
                     <!-- Guarantee Checkpoints List -->
                     <div class="pt-2 border-top">

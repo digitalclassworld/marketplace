@@ -116,3 +116,4 @@ class AdminSidebarModulesTest extends TestCase
         $response->assertRedirect();
     }
 }
+

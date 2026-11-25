@@ -157,4 +157,27 @@ class User extends Authenticatable
 
         return $raw;
     }
+
+    public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CourseEnrollment::class, 'user_id');
+    }
+
+    public function progress(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StudentCourseProgress::class, 'user_id');
+    }
+
+    public function lectureNotes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StudentLectureNote::class, 'user_id');
+    }
+
+    public function isEnrolledIn(int $courseId, string $type = 'elearn'): bool
+    {
+        return $this->enrollments()
+            ->where('course_id', $courseId)
+            ->where('course_type', $type)
+            ->exists();
+    }
 }

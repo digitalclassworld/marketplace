@@ -886,6 +886,12 @@
                     <!-- Auth Buttons (Customer vs Seller Awareness) -->
                     @auth
                         @if(Auth::user()->isCustomer())
+                            <!-- Quick Student Learning Link -->
+                            <a href="{{ route('customer.my-courses') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-semibold d-none d-md-inline-flex align-items-center gap-1.5 shadow-xs" style="height: 36px; font-size: 0.8125rem;">
+                                <i class="fa-solid fa-graduation-cap text-primary"></i>
+                                <span>My Learning</span>
+                            </a>
+
                             <!-- Customer Account Menu -->
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-light border dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-2.5 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background: #ffffff; border-color: #cbd5e1;">
@@ -909,6 +915,11 @@
                                                 {{ Auth::user()->profession ?? 'Customer Account' }}
                                             </span>
                                         </div>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item small py-2 fw-semibold text-primary" href="{{ route('customer.my-courses') }}">
+                                            <i class="fa-solid fa-graduation-cap me-2 text-primary"></i> My Learning & Courses
+                                        </a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item small py-2" href="{{ route('customer.profile') }}">

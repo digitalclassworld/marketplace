@@ -41,6 +41,7 @@
                                 <th class="py-3">Amount</th>
                                 <th class="py-3">Status</th>
                                 <th class="py-3">Placed Date</th>
+                                <th class="pe-4 py-3 text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -93,6 +94,15 @@
                                     </td>
                                     <td class="text-muted small">
                                         {{ $ord->placed_at ? $ord->placed_at->format('M d, Y h:i A') : $ord->created_at->format('M d, Y') }}
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        @if(strtolower($ord->order_type) === 'course')
+                                            <a href="{{ route('customer.my-courses') }}" class="btn btn-primary btn-sm rounded-pill px-3 py-1 fw-bold shadow-xs d-inline-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
+                                                <i class="fa-solid fa-circle-play"></i> Watch Lectures
+                                            </a>
+                                        @else
+                                            <span class="badge bg-light text-muted border">Completed</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

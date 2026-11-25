@@ -125,6 +125,9 @@
             </div>
 
             <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('customer.my-courses') }}" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold">
+                    <i class="fa-solid fa-graduation-cap me-1.5"></i> My Learning Portal
+                </a>
                 <a href="{{ route('customer.orders') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
                     <i class="fa-solid fa-bag-shopping me-1.5"></i> My Orders ({{ $ordersCount }})
                 </a>

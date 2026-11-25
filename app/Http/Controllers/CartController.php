@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\CourseEnrollment;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Seller;
@@ -384,6 +385,26 @@ class CartController extends Controller
                         ],
                     ],
                 ]);
+
+                // If this is a Course order and user exists, automatically enroll them
+                if (strtolower($item['type'] ?? '') === 'course' && !empty($customerUser)) {
+                    $courseId = !empty($item['id']) ? (int)$item['id'] : null;
+                    if ($courseId) {
+                        CourseEnrollment::firstOrCreate(
+                            [
+                                'user_id'     => $customerUser->id,
+                                'course_id'   => $courseId,
+                                'course_type' => 'elearn',
+                            ],
+                            [
+                                'order_id'         => $order->id,
+                                'enrolled_at'      => now(),
+                                'status'           => 'active',
+                                'progress_percent' => 0,
+                            ]
+                        );
+                    }
+                }
 
                 $createdOrders[] = [
                     'order_number' => $orderNumber,
