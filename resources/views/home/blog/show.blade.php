@@ -84,7 +84,11 @@
             <!-- Article Body Content -->
             <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5 bg-white">
                 <div class="article-content fs-6 lh-lg text-dark">
-                    {!! nl2br(e($post->content)) !!}
+                    @if(strip_tags($post->content) !== $post->content)
+                        {!! $post->content !!}
+                    @else
+                        {!! nl2br(e($post->content)) !!}
+                    @endif
                 </div>
 
                 <!-- Tags -->
@@ -280,6 +284,44 @@
 }
 .article-content p {
     margin-bottom: 1.4rem;
+}
+.article-content h2 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+}
+.article-content h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 1.75rem;
+    margin-bottom: 0.85rem;
+}
+.article-content ul, .article-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+.article-content li {
+    margin-bottom: 0.5rem;
+}
+.article-content blockquote {
+    border-left: 4px solid #0066ff;
+    padding: 0.85rem 1.25rem;
+    background: #f8fafc;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #475569;
+    margin: 1.5rem 0;
+}
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
 }
 .hover-lift {
     transition: transform 0.2s ease, box-shadow 0.2s ease;

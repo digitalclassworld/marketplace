@@ -393,6 +393,9 @@ Route::prefix('admin')->name('admin.')->middleware(['superadmin'])->group(functi
         Route::get('/', [AdminCmsController::class, 'index'])->name('index');
         Route::get('/create', [AdminCmsController::class, 'create'])->name('create');
         Route::post('/', [AdminCmsController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [AdminCmsController::class, 'edit'])->name('edit');
+        Route::match(['put', 'patch', 'post'], '/{id}', [AdminCmsController::class, 'update'])->name('update');
+        Route::post('/{id}/toggle-status', [AdminCmsController::class, 'toggleStatus'])->name('toggle-status');
         Route::get('/export', [AdminCmsController::class, 'export'])->name('export');
         Route::delete('/{id}', [AdminCmsController::class, 'destroy'])->name('destroy');
     });

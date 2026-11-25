@@ -969,12 +969,22 @@
                         <!-- Feedback Message -->
                         <div id="courseCouponAlert" class="small mb-1 py-1 px-2 rounded-2" style="font-size: 0.72rem; display: none;"></div>
 
-                        <!-- Quick Available Coupons Pills -->
+                        <!-- Quick Available Coupons Pills (Dynamic from Database) -->
                         <div class="d-flex align-items-center gap-1 flex-wrap pt-1 border-top" style="border-color: #f3e8ff !important;" id="quickCourseCouponsList">
                             <span class="text-muted" style="font-size: 0.68rem;">Available Offers:</span>
-                            <button type="button" class="badge rounded-pill border-0 text-primary py-1 px-2 fw-semibold cursor-pointer" style="background: #eedafc; font-size: 0.65rem;" onclick="applyQuickCoupon('WELCOME10')">WELCOME10 (10% OFF)</button>
-                            <button type="button" class="badge rounded-pill border-0 text-primary py-1 px-2 fw-semibold cursor-pointer" style="background: #eedafc; font-size: 0.65rem;" onclick="applyQuickCoupon('DIGITAL20')">DIGITAL20 (20% OFF)</button>
-                            <button type="button" class="badge rounded-pill border-0 text-primary py-1 px-2 fw-semibold cursor-pointer" style="background: #eedafc; font-size: 0.65rem;" onclick="applyQuickCoupon('DIWALI50')">DIWALI50 (50% OFF)</button>
+                            @forelse($availableCoupons ?? [] as $ac)
+                                @php
+                                    $offText = $ac->discount_type === 'percentage'
+                                        ? (intval($ac->discount_value) . '% OFF')
+                                        : ('₹' . number_format($ac->discount_value, 0) . ' OFF');
+                                    $couponCode = $ac->coupon_code ?? ($ac->code ?? '');
+                                @endphp
+                                <button type="button" class="badge rounded-pill border-0 text-primary py-1 px-2 fw-semibold cursor-pointer" style="background: #eedafc; font-size: 0.65rem;" onclick="applyQuickCoupon('{{ $couponCode }}')">
+                                    {{ $couponCode }} ({{ $offText }})
+                                </button>
+                            @empty
+                                <span class="badge rounded-pill border-0 text-muted py-1 px-2 fw-normal" style="background: #f1f5f9; font-size: 0.65rem;">No active coupons right now</span>
+                            @endforelse
                         </div>
                     </div>
 

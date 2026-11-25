@@ -81,7 +81,7 @@
 <div class="container-fluid px-4 py-3">
 
     {{-- Form element enclosing both columns --}}
-    <form action="{{ route('admin.cms.store') }}" method="POST" id="createPostForm">
+    <form action="{{ route('admin.cms.store') }}" method="POST" id="createPostForm" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="status" id="postStatusInput" value="Published">
 
@@ -136,11 +136,11 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label small fw-bold text-dark mb-0">Title <span class="text-danger">*</span></label>
-                            <span class="char-count" id="titleCount">32/200</span>
+                            <span class="char-count" id="titleCount">0/200</span>
                         </div>
                         <input type="text" name="title" id="postTitle" class="form-control"
-                               value="Top 10 AI Tools for Students in 2026"
-                               placeholder="Enter post title..." required maxlength="200"
+                               value="{{ old('title') }}"
+                               placeholder="e.g. Top High-Income Digital Skills to Learn in 2026" required maxlength="200"
                                oninput="updateTitleMeta(this.value)">
                     </div>
 
@@ -151,13 +151,13 @@
                         </div>
                         <div class="input-group">
                             <input type="text" name="slug" id="postSlug" class="form-control font-monospace"
-                                   value="top-10-ai-tools-for-students-2026" required oninput="updateUrlPreview(this.value)">
+                                   value="{{ old('slug') }}" required oninput="updateUrlPreview(this.value)" placeholder="auto-generated-from-title">
                             <button type="button" class="btn btn-outline-secondary" onclick="generateSlugFromTitle()">
                                 Generate
                             </button>
                         </div>
                         <div class="text-muted small mt-1" style="font-size: 0.72rem;">
-                            URL: <span class="text-primary font-monospace" id="urlPreview">https://digitalclass.in/blog/top-10-ai-tools-for-students-2026</span>
+                            URL: <span class="text-primary font-monospace" id="urlPreview">{{ url('/blog') }}/...</span>
                         </div>
                     </div>
 
@@ -165,10 +165,11 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label small fw-bold text-dark mb-0">Excerpt / Short Description <span class="text-danger">*</span></label>
-                            <span class="char-count" id="excerptCount">110/300</span>
+                            <span class="char-count" id="excerptCount">0/300</span>
                         </div>
                         <textarea name="excerpt" id="postExcerpt" rows="2" class="form-control" maxlength="300"
-                                  oninput="document.getElementById('excerptCount').innerText = this.value.length + '/300'">Discover the best AI tools that can help students learn faster, create better content and improve productivity in 2026.</textarea>
+                                  placeholder="Write a compelling 1-2 sentence summary for search engines, cards & social media preview..."
+                                  oninput="document.getElementById('excerptCount').innerText = this.value.length + '/300'">{{ old('excerpt') }}</textarea>
                     </div>
 
                     {{-- Content Rich Editor --}}
@@ -176,17 +177,17 @@
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label small fw-bold text-dark mb-0">Content <span class="text-danger">*</span></label>
                             <button type="button" class="btn btn-sm btn-primary py-0.5 px-2 fw-semibold d-flex align-items-center gap-1" style="font-size: 0.72rem; background-color: #0066ff;" onclick="writeWithAi()">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Write with AI
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Insert Starter Template
                             </button>
                         </div>
 
                         {{-- Toolbar --}}
                         <div class="editor-toolbar">
-                            <select class="form-select form-select-sm border-0 bg-transparent text-secondary py-0 pe-4" style="width: 105px; font-size: 0.8rem;">
-                                <option>Paragraph</option>
-                                <option>Heading 1</option>
-                                <option>Heading 2</option>
-                                <option>Heading 3</option>
+                            <select class="form-select form-select-sm border-0 bg-transparent text-secondary py-0 pe-4" style="width: 105px; font-size: 0.8rem;" onchange="formatBlock(this.value)">
+                                <option value="p">Paragraph</option>
+                                <option value="h2">Heading 2</option>
+                                <option value="h3">Heading 3</option>
+                                <option value="h4">Heading 4</option>
                             </select>
                             <span class="text-muted">|</span>
                             <button type="button" title="Bold" onclick="document.execCommand('bold')"><strong>B</strong></button>
@@ -196,23 +197,19 @@
                             <span class="text-muted">|</span>
                             <button type="button" title="Bullet List" onclick="document.execCommand('insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
                             <button type="button" title="Numbered List" onclick="document.execCommand('insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
-                            <button type="button" title="Blockquote"><i class="fa-solid fa-quote-left"></i></button>
+                            <button type="button" title="Blockquote" onclick="document.execCommand('formatBlock', false, 'blockquote')"><i class="fa-solid fa-quote-left"></i></button>
                             <span class="text-muted">|</span>
                             <button type="button" title="Link" onclick="addLink()"><i class="fa-solid fa-link"></i></button>
-                            <button type="button" title="Image" onclick="alert('Insert image link.')"><i class="fa-regular fa-image"></i></button>
-                            <button type="button" title="Table" onclick="alert('Table widget.')"><i class="fa-solid fa-table"></i></button>
-                            <button type="button" title="Code"><i class="fa-solid fa-code"></i></button>
                             <button type="button" title="Undo" onclick="document.execCommand('undo')"><i class="fa-solid fa-rotate-left"></i></button>
                             <button type="button" title="Redo" onclick="document.execCommand('redo')"><i class="fa-solid fa-rotate-right"></i></button>
                         </div>
 
                         {{-- Hidden textarea synced with contenteditable --}}
-                        <textarea name="content" id="hiddenContent" style="display: none;"></textarea>
+                        <textarea name="content" id="hiddenContent" style="display: none;">{{ old('content') }}</textarea>
 
                         {{-- Visual Editor Box matching screenshot 2 --}}
                         <div class="editor-body" id="richEditor" contenteditable="true" oninput="syncEditorContent()">
-                            <p>Artificial Intelligence is changing the way students learn, research and create. In 2026, there are many powerful AI tools that can save time, improve productivity and help you achieve better results.</p>
-                            <p>In this blog, we will explore the Top 10 AI tools for students that are easy to use and can make your study journey smarter.</p>
+                            {!! old('content', '<p>Start typing your blog article here. You can use formatting, headings, bullet lists, blockquotes, and links from the toolbar above.</p>') !!}
                         </div>
 
                         <div class="d-flex justify-content-between text-muted small mt-1.5" style="font-size: 0.72rem;">
@@ -229,26 +226,27 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label small fw-bold text-dark mb-0">Meta Title</label>
-                            <span class="char-count" id="metaTitleCount">52/60</span>
+                            <span class="char-count" id="metaTitleCount">0/60</span>
                         </div>
                         <input type="text" name="meta_title" id="metaTitle" class="form-control"
-                               value="Top 10 AI Tools for Students in 2026 | Digital Class" maxlength="60"
+                               value="{{ old('meta_title') }}" maxlength="60" placeholder="Optional SEO title (defaults to post title)..."
                                oninput="document.getElementById('metaTitleCount').innerText = this.value.length + '/60'">
                     </div>
 
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label small fw-bold text-dark mb-0">Meta Description</label>
-                            <span class="char-count" id="metaDescCount">120/160</span>
+                            <span class="char-count" id="metaDescCount">0/160</span>
                         </div>
                         <textarea name="meta_description" id="metaDesc" rows="2" class="form-control" maxlength="160"
-                                  oninput="document.getElementById('metaDescCount').innerText = this.value.length + '/160'">Explore the best AI tools for students in 2026. Learn how these tools can help you study better, create content, and improve productivity.</textarea>
+                                  placeholder="Optional SEO meta description (defaults to excerpt)..."
+                                  oninput="document.getElementById('metaDescCount').innerText = this.value.length + '/160'">{{ old('meta_description') }}</textarea>
                     </div>
 
                     <div class="mb-2">
                         <label class="form-label small fw-bold text-dark mb-1">Focus Keyword</label>
-                        <input type="text" name="focus_keyword" class="form-control" value="AI tools for students">
-                        <span class="text-muted" style="font-size: 0.72rem;">Use a primary keyword for better SEO ranking.</span>
+                        <input type="text" name="focus_keyword" class="form-control" value="{{ old('focus_keyword') }}" placeholder="e.g. online courses, web development">
+                        <span class="text-muted" style="font-size: 0.72rem;">Use a primary keyword for search engines.</span>
                     </div>
                 </div>
             </div>
@@ -258,28 +256,32 @@
                 {{-- 1. Featured Image Card matching screenshot 2 --}}
                 <div class="cms-form-card mb-3">
                     <h6 class="fw-bold text-dark mb-2.5 fs-6">Featured Image</h6>
-                    <input type="hidden" name="featured_image" id="featuredImageUrl" value="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80">
+                    <input type="hidden" name="featured_image" id="featuredImageUrl" value="{{ old('featured_image', 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80') }}">
+                    <input type="file" name="featured_image_file" id="featuredImageFileInput" class="d-none" accept="image/*" onchange="previewSelectedImage(this)">
 
                     {{-- Image Preview --}}
                     <div class="position-relative mb-2 rounded-3 overflow-hidden border">
-                        <img id="imagePreview" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80" alt="Featured Preview" class="w-100" style="height: 160px; object-fit: cover;">
-                        <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2 text-center" style="font-size: 0.8rem; font-weight: 700;">
-                            Top 10 AI Tools for Students in 2026
+                        <img id="imagePreview" src="{{ old('featured_image', 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80') }}" alt="Featured Preview" class="w-100" style="height: 160px; object-fit: cover;">
+                        <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2 text-center" id="imageOverlayTitle" style="font-size: 0.8rem; font-weight: 700;">
+                            Blog Preview
                         </div>
                     </div>
 
                     <div class="d-flex align-items-center gap-2 mb-2">
-                        <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" style="font-size: 0.75rem;" onclick="promptImageChange()">
-                            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i> Change Image
+                        <button type="button" class="btn btn-primary btn-sm flex-grow-1" style="font-size: 0.75rem; background-color: #0066ff;" onclick="document.getElementById('featuredImageFileInput').click()">
+                            <i class="fa-solid fa-arrow-up-from-bracket me-1"></i> Upload Image File
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size: 0.75rem;" onclick="promptImageChange()" title="Or paste image URL">
+                            <i class="fa-solid fa-link"></i> URL
                         </button>
                         <button type="button" class="btn btn-outline-danger btn-sm" style="font-size: 0.75rem;" onclick="removeImage()">
-                            <i class="fa-regular fa-trash-can me-1"></i> Remove
+                            <i class="fa-regular fa-trash-can"></i>
                         </button>
                     </div>
 
                     <div class="text-muted" style="font-size: 0.7rem;">
-                        Recommended size: 1200 x 630 px (JPG/PNG)<br>
-                        File: <span class="font-monospace text-secondary">ai-tools-students-2026.jpg (350 KB)</span>
+                        Recommended: 1200 x 630 px (JPG/PNG/WebP)<br>
+                        Selected: <span class="font-monospace text-secondary" id="selectedImageFileName">Default placeholder</span>
                     </div>
                 </div>
 
@@ -462,6 +464,18 @@
             </ul>
         `;
         syncEditorContent();
+    }
+
+    function previewSelectedImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                const filenameEl = document.getElementById('selectedImageFileName');
+                if (filenameEl) filenameEl.textContent = input.files[0].name;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     function promptImageChange() {

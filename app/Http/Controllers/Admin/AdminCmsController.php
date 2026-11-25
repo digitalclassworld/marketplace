@@ -187,16 +187,33 @@ class AdminCmsController extends Controller
             $tags = array_map('trim', explode(',', $tags));
         }
 
+        // Featured image upload handling
+        $featuredImage = null;
+        if ($request->hasFile('featured_image_file')) {
+            $file = $request->file('featured_image_file');
+            $fileName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $destinationPath = public_path('uploads/blog');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            $file->move($destinationPath, $fileName);
+            $featuredImage = 'uploads/blog/' . $fileName;
+        } elseif ($request->filled('featured_image')) {
+            $featuredImage = $request->input('featured_image');
+        } else {
+            $featuredImage = 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80';
+        }
+
         $post = Post::create([
             'title'            => $request->input('title'),
             'slug'             => $slug,
             'excerpt'          => $request->input('excerpt') ?: Str::limit(strip_tags($request->input('content')), 150),
             'content'          => $request->input('content'),
-            'featured_image'   => $request->input('featured_image') ?: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&auto=format&fit=crop&q=80',
+            'featured_image'   => $featuredImage,
             'type'             => $request->input('type', 'Blog'),
             'category'         => $request->input('category', 'Technology'),
-            'author_name'      => auth()->user()?->name ?? 'Hitesh Mohkar',
-            'author_avatar'    => auth()->user()?->avatar ?? 'https://ui-avatars.com/api/?name=Hitesh+Mohkar&background=0066ff&color=fff',
+            'author_name'      => auth()->user()?->name ?? 'Admin',
+            'author_avatar'    => auth()->user()?->avatar ?? 'https://ui-avatars.com/api/?name=Admin&background=0066ff&color=fff',
             'author_role'      => 'Super Admin',
             'status'           => $status,
             'published_at'     => $publishedAt,
@@ -210,6 +227,99 @@ class AdminCmsController extends Controller
         ]);
 
         return redirect()->route('admin.cms.index')->with('success', "Blog post \"{$post->title}\" published successfully.");
+    }
+
+    /**
+     * Display Edit Blog Post form.
+     */
+    public function edit($id): View
+    {
+        $post = Post::findOrFail($id);
+        $categories = Category::all();
+
+        return view('admin.cms.edit', [
+            'post'       => $post,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Update an existing blog post.
+     */
+    public function update(Request $request, $id): RedirectResponse
+    {
+        $post = Post::findOrFail($id);
+
+        $request->validate([
+            'title'   => 'required|string|max:200',
+            'content' => 'required|string',
+        ]);
+
+        $slug = $request->input('slug') ? Str::slug($request->input('slug')) : Str::slug($request->input('title'));
+
+        // Handle unique slug collision excluding self
+        $count = Post::where('slug', 'like', "{$slug}%")->where('id', '!=', $post->id)->count();
+        if ($count > 0) {
+            $slug .= '-' . ($count + 1);
+        }
+
+        $status = $request->input('status', $post->status);
+        $publishedAt = $status === 'Published' ? ($post->published_at ?: now()) : ($status === 'Scheduled' ? $request->input('published_at', now()->addDay()) : null);
+
+        $tags = $request->input('tags');
+        if (is_string($tags)) {
+            $tags = array_filter(array_map('trim', explode(',', $tags)));
+        }
+
+        // Handle file upload
+        $featuredImage = $post->featured_image;
+        if ($request->hasFile('featured_image_file')) {
+            $file = $request->file('featured_image_file');
+            $fileName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+            $destinationPath = public_path('uploads/blog');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            $file->move($destinationPath, $fileName);
+            $featuredImage = 'uploads/blog/' . $fileName;
+        } elseif ($request->filled('featured_image')) {
+            $featuredImage = $request->input('featured_image');
+        }
+
+        $post->update([
+            'title'            => $request->input('title'),
+            'slug'             => $slug,
+            'excerpt'          => $request->input('excerpt') ?: Str::limit(strip_tags($request->input('content')), 150),
+            'content'          => $request->input('content'),
+            'featured_image'   => $featuredImage,
+            'type'             => $request->input('type', $post->type ?? 'Blog'),
+            'category'         => $request->input('category', $post->category ?? 'Technology'),
+            'status'           => $status,
+            'published_at'     => $publishedAt,
+            'allow_comments'   => $request->boolean('allow_comments', true),
+            'is_featured'      => $request->boolean('is_featured', false),
+            'tags'             => $tags ?: $post->tags,
+            'meta_title'       => $request->input('meta_title') ?: ($request->input('title') . ' | Digital Class'),
+            'meta_description' => $request->input('meta_description') ?: Str::limit(strip_tags($request->input('excerpt')), 160),
+            'focus_keyword'    => $request->input('focus_keyword', $post->focus_keyword),
+        ]);
+
+        return redirect()->route('admin.cms.index')->with('success', "Blog post \"{$post->title}\" updated successfully.");
+    }
+
+    /**
+     * Toggle post status between Published and Draft.
+     */
+    public function toggleStatus($id): RedirectResponse
+    {
+        $post = Post::findOrFail($id);
+        $newStatus = $post->status === 'Published' ? 'Draft' : 'Published';
+        $post->update([
+            'status' => $newStatus,
+            'published_at' => $newStatus === 'Published' ? ($post->published_at ?: now()) : null,
+        ]);
+
+        return redirect()->route('admin.cms.index')->with('success', "Post status changed to {$newStatus}.");
     }
 
     /**

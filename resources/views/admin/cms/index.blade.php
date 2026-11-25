@@ -425,9 +425,17 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item py-1.5 text-info" href="{{ route('admin.cms.create') }}">
+                                                    <a class="dropdown-item py-1.5 text-info" href="{{ route('admin.cms.edit', $post->id) }}">
                                                         <i class="fa-regular fa-pen-to-square me-2"></i> Edit Content
                                                     </a>
+                                                </li>
+                                                <li>
+                                                    <form action="{{ route('admin.cms.toggle-status', $post->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="dropdown-item py-1.5 text-warning">
+                                                            <i class="fa-solid fa-arrows-rotate me-2"></i> {{ $post->status === 'Published' ? 'Unpublish (Draft)' : 'Publish Now' }}
+                                                        </button>
+                                                    </form>
                                                 </li>
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li>

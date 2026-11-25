@@ -35,5 +35,24 @@ class DiscountCoupon extends Model
     {
         return $this->belongsTo(Seller::class);
     }
+
+    /**
+     * Accessor so both $coupon->code and $coupon->coupon_code work seamlessly.
+     */
+    public function getCodeAttribute(): string
+    {
+        return (string)($this->coupon_code ?? '');
+    }
+
+    /**
+     * Scope for active, non-expired coupons.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'Active')
+            ->where(function ($q) {
+                $q->whereNull('valid_until')->orWhere('valid_until', '>=', now()->startOfDay());
+            });
+    }
 }
 

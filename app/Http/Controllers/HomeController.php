@@ -2145,9 +2145,23 @@ class HomeController extends Controller
             $course->instructor_reviews_count = $instructorReviewsCount;
         }
 
+        // Active Discount Coupons for course checkout
+        $availableCoupons = collect();
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('discount_coupons')) {
+                $availableCoupons = \App\Models\DiscountCoupon::active()
+                    ->latest()
+                    ->take(6)
+                    ->get();
+            }
+        } catch (\Throwable $e) {
+            $availableCoupons = collect();
+        }
+
         return view('home.course-show', [
             'seller'                => $seller,
             'course'                => $course,
+            'availableCoupons'      => $availableCoupons,
             'relatedCourses'        => $relatedCourses,
             'curriculum'            => $curriculum,
             'curriculumDirectItems' => $curriculumDirectItems,
