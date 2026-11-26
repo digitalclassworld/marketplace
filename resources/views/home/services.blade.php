@@ -15,7 +15,7 @@
         color: #0f172a;
         position: relative;
         overflow: hidden;
-        padding: 3.25rem 0 2.75rem;
+        padding: 1.25rem 0 1.5rem;
         border-bottom: 1px solid #e2e8f0;
     }
 
@@ -48,25 +48,25 @@
         background: #eff6ff;
         border: 1px solid #bfdbfe;
         color: #0066ff;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.35rem 0.9rem;
+        gap: 0.45rem;
+        padding: 0.25rem 0.75rem;
         border-radius: 999px;
-        margin-bottom: 0.85rem;
+        margin-bottom: 0.5rem;
     }
 
     .hero-heading {
-        font-size: 2.85rem;
+        font-size: 2.35rem;
         font-weight: 900;
-        line-height: 1.16;
+        line-height: 1.15;
         letter-spacing: -0.03em;
         color: #0f172a;
-        margin-bottom: 0.85rem;
+        margin-bottom: 0.55rem;
     }
 
     .hero-heading span.gradient-text {
@@ -74,11 +74,11 @@
     }
 
     .hero-subheading {
-        font-size: 1.05rem;
+        font-size: 0.95rem;
         color: #475569;
-        line-height: 1.6;
+        line-height: 1.5;
         max-width: 580px;
-        margin-bottom: 1.65rem;
+        margin-bottom: 1.15rem;
     }
 
     /* Big Sleek Search Box in White Theme */
@@ -177,8 +177,8 @@
     .trust-badges-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.85rem;
-        margin-top: 2rem;
+        gap: 0.75rem;
+        margin-top: 1.15rem;
     }
 
     .trust-badge-card {
