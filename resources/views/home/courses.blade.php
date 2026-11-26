@@ -137,49 +137,105 @@
     }
 
     /* ==========================================================================
-       CATEGORY HORIZONTAL BAR
+       CATEGORY HORIZONTAL BAR (Matching Pastel Squircle Icon Badges)
        ========================================================================== */
     .course-category-bar {
         background: #ffffff;
         border-bottom: 1px solid #e2e8f0;
-        padding: 0.75rem 0;
+        padding: 1.15rem 0 0.85rem;
     }
     .course-cat-scroll-container {
         display: flex;
-        gap: 0.45rem;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 0.85rem;
         overflow-x: auto;
         white-space: nowrap;
         scrollbar-width: thin;
-        padding-bottom: 4px;
+        scrollbar-color: #cbd5e1 transparent;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
     }
-    .course-cat-pill {
-        display: inline-flex;
+    .course-cat-scroll-container::-webkit-scrollbar {
+        height: 5px;
+    }
+    .course-cat-scroll-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+    }
+    .course-cat-item {
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 0.4rem;
-        padding: 0.45rem 0.85rem;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-        color: #475569;
         text-decoration: none;
-        font-size: 0.78rem;
-        font-weight: 600;
-        background: #ffffff;
-        transition: all 0.15s ease;
+        flex: 1 1 0;
+        min-width: 90px;
+        max-width: 120px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        text-align: center;
+        padding: 0.25rem 0.2rem;
+        border-radius: 14px;
         flex-shrink: 0;
     }
-    .course-cat-pill:hover {
-        background: #f8fafc;
-        border-color: #7c3aed;
-        color: #6d28d9;
+    .course-cat-item:hover {
+        transform: translateY(-3px);
     }
-    .course-cat-pill.active {
-        background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
-        border-color: #6d28d9;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+    .course-cat-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 0.55rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        position: relative;
     }
-    .course-cat-pill.active i {
-        color: #ffffff;
+    .course-cat-item:hover .course-cat-icon-box {
+        transform: scale(1.08);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    }
+    .course-cat-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.25;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
+        white-space: normal;
+        word-break: break-word;
+    }
+    .course-cat-item:hover .course-cat-label {
+        color: #7c3aed;
+    }
+    .course-cat-item.active .course-cat-icon-box {
+        box-shadow: 0 0 0 3px #7c3aed, 0 8px 18px rgba(124, 58, 237, 0.25);
+        transform: scale(1.06);
+    }
+    .course-cat-item.active .course-cat-label {
+        color: #7c3aed;
+        font-weight: 800;
+    }
+    @media (max-width: 991px) {
+        .course-category-bar {
+            padding: 0.85rem 0 0.65rem;
+        }
+        .course-cat-item {
+            min-width: 78px;
+        }
+        .course-cat-icon-box {
+            width: 46px;
+            height: 46px;
+            font-size: 1.2rem;
+            border-radius: 14px;
+        }
     }
 
     /* ==========================================================================
@@ -519,11 +575,11 @@
 </div>
 
 <!-- ============================================================================
-     2. HORIZONTAL CATEGORY SCROLL BAR
+     2. HORIZONTAL CATEGORY SCROLL BAR (Matching Pastel Squircle Icon Badges)
      ============================================================================ -->
 <div class="course-category-bar">
-    <div class="container-fluid px-lg-4">
-        <div class="course-cat-scroll-container no-scrollbar">
+    <div class="container-fluid px-3 px-md-4 px-xl-5">
+        <div class="course-cat-scroll-container">
             @foreach($horizontalCategories as $hc)
                 @php
                     $isHcActive = ($selectedCategory === $hc['name'] || ($selectedCategory === 'All Courses' && $hc['name'] === 'All Courses') || ($selectedCategory === $hc['slug']));
@@ -532,9 +588,11 @@
                     if (empty($hcParam)) unset($hcQuery['category']);
                     $hcUrl = route('courses', $hcQuery);
                 @endphp
-                <a href="{{ $hcUrl }}" class="course-cat-pill {{ $isHcActive ? 'active' : '' }}">
-                    <i class="{{ $hc['icon'] }}"></i>
-                    <span>{{ $hc['name'] }}</span>
+                <a href="{{ $hcUrl }}" class="course-cat-item {{ $isHcActive ? 'active' : '' }}" title="{{ $hc['name'] }}">
+                    <div class="course-cat-icon-box" style="background-color: {{ $hc['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $hc['border'] ?? '#e2e8f0' }}; color: {{ $hc['color'] ?? '#7c3aed' }};">
+                        <i class="{{ $hc['icon'] }}"></i>
+                    </div>
+                    <span class="course-cat-label">{{ $hc['name'] }}</span>
                 </a>
             @endforeach
         </div>

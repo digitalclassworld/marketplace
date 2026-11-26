@@ -276,20 +276,24 @@
         color: #64748b;
     }
 
-    /* Horizontal Category Cards Bar */
+    /* Horizontal Category Cards Bar (Matching Pastel Squircle Badges) */
     .category-cards-section {
         background: #ffffff;
         border-bottom: 1px solid #e2e8f0;
-        padding: 1.25rem 0;
+        padding: 1.15rem 0 0.85rem;
     }
 
     .category-scroll-container {
         display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
         gap: 0.85rem;
         overflow-x: auto;
-        padding-bottom: 0.5rem;
+        white-space: nowrap;
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 transparent;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
     }
 
     .category-scroll-container::-webkit-scrollbar {
@@ -300,69 +304,87 @@
         border-radius: 999px;
     }
 
-    .category-card-item {
-        flex: 0 0 135px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 0.65rem 0.55rem;
-        text-align: center;
-        text-decoration: none;
-        color: #0f172a;
-        transition: all 0.2s ease;
+    .service-cat-item {
         display: flex;
         flex-direction: column;
         align-items: center;
+        text-decoration: none;
+        flex: 1 1 0;
+        min-width: 90px;
+        max-width: 120px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        text-align: center;
+        padding: 0.25rem 0.2rem;
+        border-radius: 14px;
+        flex-shrink: 0;
     }
 
-    .category-card-item:hover,
-    .category-card-item.active {
-        background: #ffffff;
-        border-color: #0066ff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.12);
+    .service-cat-item:hover {
+        transform: translateY(-3px);
     }
 
-    .category-card-item.active {
-        border-color: #0066ff;
-        background: #eff6ff;
-    }
-
-    .category-card-thumb {
-        width: 100%;
-        height: 60px;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-bottom: 0.5rem;
-        background: #e2e8f0;
+    .service-cat-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 0.55rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        position: relative;
     }
 
-    .category-card-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+    .service-cat-item:hover .service-cat-icon-box {
+        transform: scale(1.08);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
     }
 
-    .category-card-title {
+    .service-cat-label {
         font-size: 0.78rem;
         font-weight: 700;
         color: #1e293b;
         line-height: 1.25;
-        margin-bottom: 0.2rem;
+        text-align: center;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        height: 32px;
+        transition: color 0.2s ease;
+        white-space: normal;
+        word-break: break-word;
     }
 
-    .category-card-experts {
-        font-size: 0.7rem;
+    .service-cat-item:hover .service-cat-label {
         color: #0066ff;
-        font-weight: 600;
+    }
+
+    .service-cat-item.active .service-cat-icon-box {
+        box-shadow: 0 0 0 3px #0066ff, 0 8px 18px rgba(0, 102, 255, 0.25);
+        transform: scale(1.06);
+    }
+
+    .service-cat-item.active .service-cat-label {
+        color: #0066ff;
+        font-weight: 800;
+    }
+
+    @media (max-width: 991px) {
+        .category-cards-section {
+            padding: 0.85rem 0 0.65rem;
+        }
+        .service-cat-item {
+            min-width: 78px;
+        }
+        .service-cat-icon-box {
+            width: 46px;
+            height: 46px;
+            font-size: 1.2rem;
+            border-radius: 14px;
+        }
     }
 
     /* Top Service Providers Carousel / Row */
@@ -1224,28 +1246,21 @@
 </section>
 
 <!-- ========================================== -->
-<!-- 2. HORIZONTAL CATEGORY CARDS (11 Items)    -->
+<!-- 2. HORIZONTAL CATEGORY CARDS (Matching Pastel Squircle Badges) -->
 <!-- ========================================== -->
 <section class="category-cards-section">
-    <div class="container-fluid px-lg-4">
+    <div class="container-fluid px-3 px-md-4 px-xl-5">
         <div class="category-scroll-container">
             @foreach($categories as $cat)
                 @php
                     $isActive = ($selectedCategory === $cat['name']) || ($selectedCategory === 'all' && $cat['name'] === 'More Services');
                 @endphp
                 <a href="{{ route('services', array_merge(request()->query(), ['category' => $cat['name'] === 'More Services' ? 'all' : $cat['name']])) }}" 
-                   class="category-card-item {{ $isActive ? 'active' : '' }}">
-                    <div class="category-card-thumb">
-                        @if($cat['image'])
-                            <img src="{{ $cat['image'] }}" alt="{{ $cat['name'] }}" loading="lazy">
-                        @else
-                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-primary-subtle text-primary">
-                                <i class="{{ $cat['icon'] }} fs-4"></i>
-                            </div>
-                        @endif
+                   class="service-cat-item {{ $isActive ? 'active' : '' }}" title="{{ $cat['name'] }}">
+                    <div class="service-cat-icon-box" style="background-color: {{ $cat['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cat['border'] ?? '#e2e8f0' }}; color: {{ $cat['color'] ?? '#0066ff' }};">
+                        <i class="{{ $cat['icon'] }}"></i>
                     </div>
-                    <div class="category-card-title">{{ $cat['name'] }}</div>
-                    <div class="category-card-experts">{{ $cat['experts'] }}</div>
+                    <span class="service-cat-label">{{ $cat['name'] }}</span>
                 </a>
             @endforeach
         </div>

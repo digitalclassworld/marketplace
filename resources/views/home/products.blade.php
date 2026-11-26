@@ -129,48 +129,99 @@
         flex-shrink: 0;
     }
 
-    /* Horizontal Category Carousel */
+    /* Horizontal Category Carousel (Matching Pastel Squircle Badges) */
     .categories-pill-scroll {
         display: flex;
-        align-items: center;
-        gap: 0.6rem;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 0.85rem;
         overflow-x: auto;
-        padding: 1rem 0;
+        white-space: nowrap;
         scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        padding: 1.15rem 0 0.85rem;
+        -webkit-overflow-scrolling: touch;
     }
-    .category-pill-card {
+    .categories-pill-scroll::-webkit-scrollbar {
+        height: 5px;
+    }
+    .categories-pill-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+    }
+    .prod-cat-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 0.35rem;
-        min-width: 95px;
-        padding: 0.65rem 0.5rem;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
         text-decoration: none;
-        color: #334155;
-        font-size: 0.72rem;
-        font-weight: 600;
+        flex: 1 1 0;
+        min-width: 90px;
+        max-width: 120px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
         text-align: center;
-        transition: all 0.2s ease;
+        padding: 0.25rem 0.2rem;
+        border-radius: 14px;
         flex-shrink: 0;
-        white-space: nowrap;
     }
-    .category-pill-card:hover {
-        border-color: #2563eb;
-        color: #2563eb;
-        transform: translateY(-2px);
+    .prod-cat-item:hover {
+        transform: translateY(-3px);
     }
-    .category-pill-card.active {
-        background: #eff6ff;
-        border-color: #2563eb;
-        color: #2563eb;
+    .prod-cat-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 0.55rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        position: relative;
+    }
+    .prod-cat-item:hover .prod-cat-icon-box {
+        transform: scale(1.08);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    }
+    .prod-cat-label {
+        font-size: 0.78rem;
         font-weight: 700;
+        color: #1e293b;
+        line-height: 1.25;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
+        white-space: normal;
+        word-break: break-word;
     }
-    .category-pill-card i {
-        font-size: 1.15rem;
+    .prod-cat-item:hover .prod-cat-label {
+        color: #ea580c;
+    }
+    .prod-cat-item.active .prod-cat-icon-box {
+        box-shadow: 0 0 0 3px #ea580c, 0 8px 18px rgba(234, 88, 12, 0.25);
+        transform: scale(1.06);
+    }
+    .prod-cat-item.active .prod-cat-label {
+        color: #ea580c;
+        font-weight: 800;
+    }
+    @media (max-width: 991px) {
+        .categories-pill-scroll {
+            padding: 0.85rem 0 0.65rem;
+        }
+        .prod-cat-item {
+            min-width: 78px;
+        }
+        .prod-cat-icon-box {
+            width: 46px;
+            height: 46px;
+            font-size: 1.2rem;
+            border-radius: 14px;
+        }
     }
 
     /* Promotional Banners */
@@ -575,16 +626,21 @@
 </section>
 
 <!-- =========================================================================
-     2. HORIZONTAL CATEGORIES CAROUSEL / PILLS (15 Categories)
+     2. HORIZONTAL CATEGORIES CAROUSEL / PILLS (Matching Pastel Squircle Badges)
      ========================================================================= -->
 <section class="bg-white border-bottom">
-    <div class="container-fluid px-lg-4">
+    <div class="container-fluid px-3 px-md-4 px-xl-5">
         <div class="categories-pill-scroll">
             @foreach($horizontalCategories as $cat)
+                @php
+                    $isProdActive = ($selectedCategory == $cat['name'] || ($cat['name'] == 'All Products' && $selectedCategory == 'All Products'));
+                @endphp
                 <a href="{{ route('products', ['category' => $cat['name'] == 'All Products' ? null : $cat['name']]) }}"
-                   class="category-pill-card {{ ($selectedCategory == $cat['name'] || ($cat['name'] == 'All Products' && $selectedCategory == 'All Products')) ? 'active' : '' }}">
-                    <i class="{{ $cat['icon'] }}"></i>
-                    <span>{{ $cat['name'] }}</span>
+                   class="prod-cat-item {{ $isProdActive ? 'active' : '' }}" title="{{ $cat['name'] }}">
+                    <div class="prod-cat-icon-box" style="background-color: {{ $cat['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cat['border'] ?? '#e2e8f0' }}; color: {{ $cat['color'] ?? '#ea580c' }};">
+                        <i class="{{ $cat['icon'] }}"></i>
+                    </div>
+                    <span class="prod-cat-label">{{ $cat['name'] }}</span>
                 </a>
             @endforeach
         </div>

@@ -198,74 +198,118 @@
     }
 
     /* ==========================================================================
-       CATEGORY ICONS HORIZONTAL BAR
+       CATEGORY ICONS HORIZONTAL BAR (Matching Pastel Squircle Badges)
        ========================================================================== */
     .category-bar-wrapper {
         background: #ffffff;
         border-bottom: 1px solid #e2e8f0;
-        padding: 0.75rem 0;
+        padding: 1.15rem 0 0.85rem;
     }
 
     .category-scroll-container {
         display: flex;
-        gap: 0.5rem;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 0.85rem;
         overflow-x: auto;
         white-space: nowrap;
-        padding-bottom: 4px;
         scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
     }
     .category-scroll-container::-webkit-scrollbar {
-        height: 4px;
+        height: 5px;
     }
     .category-scroll-container::-webkit-scrollbar-thumb {
         background: #cbd5e1;
-        border-radius: 4px;
+        border-radius: 999px;
     }
 
     .cat-pill-btn {
-        display: inline-flex;
+        display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        min-width: 78px;
-        padding: 0.55rem 0.65rem;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        color: #475569;
         text-decoration: none;
-        font-size: 0.72rem;
-        font-weight: 600;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        background: #ffffff;
+        flex: 1 1 0;
+        min-width: 90px;
+        max-width: 120px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
         text-align: center;
-        gap: 0.35rem;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
-    }
-    .cat-pill-btn i {
-        font-size: 1.05rem;
-        color: #64748b;
-        transition: all 0.2s;
+        padding: 0.25rem 0.2rem;
+        border-radius: 14px;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        flex-shrink: 0;
     }
     .cat-pill-btn:hover {
-        background: #f8fafc;
-        border-color: #93c5fd;
-        color: #0066ff;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 14px -2px rgba(0, 102, 255, 0.12);
+        transform: translateY(-3px);
+        background: transparent;
+        border-color: transparent;
+        box-shadow: none;
     }
-    .cat-pill-btn:hover i {
+    .cat-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 0.55rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        position: relative;
+    }
+    .cat-pill-btn:hover .cat-icon-box {
+        transform: scale(1.08);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    }
+    .cat-pill-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.25;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
+        white-space: normal;
+        word-break: break-word;
+    }
+    .cat-pill-btn:hover .cat-pill-label {
         color: #0066ff;
-        transform: scale(1.1);
     }
     .cat-pill-btn.active {
-        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        border-color: #0066ff;
-        color: #0066ff;
-        font-weight: 700;
-        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.18);
+        background: transparent;
+        border-color: transparent;
+        box-shadow: none;
     }
-    .cat-pill-btn.active i {
+    .cat-pill-btn.active .cat-icon-box {
+        box-shadow: 0 0 0 3px #0066ff, 0 8px 18px rgba(0, 102, 255, 0.25);
+        transform: scale(1.06);
+    }
+    .cat-pill-btn.active .cat-pill-label {
         color: #0066ff;
+        font-weight: 800;
+    }
+    @media (max-width: 991px) {
+        .category-bar-wrapper {
+            padding: 0.85rem 0 0.65rem;
+        }
+        .cat-pill-btn {
+            min-width: 78px;
+        }
+        .cat-icon-box {
+            width: 46px;
+            height: 46px;
+            font-size: 1.2rem;
+            border-radius: 14px;
+        }
     }
 
     /* ==========================================================================
@@ -810,10 +854,10 @@
 </div>
 
 <!-- ============================================================================
-     2. CATEGORY HORIZONTAL BAR
+     2. CATEGORY HORIZONTAL BAR (Matching Pastel Squircle Badges)
      ============================================================================ -->
 <div class="category-bar-wrapper">
-    <div class="container-fluid px-lg-4">
+    <div class="container-fluid px-3 px-md-4 px-xl-5">
         <div class="category-scroll-container">
             @foreach($horizontalCategories as $cat)
                 @php
@@ -824,9 +868,11 @@
                     $catUrl = route('businesses', $catQuery);
                 @endphp
                 <a href="{{ $catUrl }}"
-                   class="cat-pill-btn {{ $isCatActive ? 'active' : '' }}">
-                    <i class="{{ $cat['icon'] }}"></i>
-                    <span>{{ $cat['name'] }}</span>
+                   class="cat-pill-btn {{ $isCatActive ? 'active' : '' }}" title="{{ $cat['name'] }}">
+                    <div class="cat-icon-box" style="background-color: {{ $cat['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cat['border'] ?? '#e2e8f0' }}; color: {{ $cat['color'] ?? '#0066ff' }};">
+                        <i class="{{ $cat['icon'] }}"></i>
+                    </div>
+                    <span class="cat-pill-label">{{ $cat['name'] }}</span>
                 </a>
             @endforeach
         </div>
