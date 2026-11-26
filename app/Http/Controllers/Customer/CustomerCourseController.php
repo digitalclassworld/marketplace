@@ -566,14 +566,46 @@ class CustomerCourseController extends Controller
         $completionDate = ($enrollment && $enrollment->completed_at) ? $enrollment->completed_at : now();
         $certificateId = 'DCW-' . strtoupper(substr(md5("{$user->id}-{$courseId}-DCW_CERT"), 0, 10));
 
+        // If download requested explicitly before 100% completion, block and redirect
+        if ($request->has('download') && $percent < 100) {
+            return redirect()->route('customer.course.certificate', ['courseId' => $courseId])
+                ->with('error', 'Certificate download is locked! You must complete 100% of all lectures to download your official certificate (Current: ' . $percent . '%).');
+        }
+
+        // Resolve Course Owner / Instructor Name, Organization and Logo
+        $ownerName = $course->instructor_name ?? 'Digital Class Certified Master Instructor';
+        $ownerOrg = 'Course Academy & Training';
+        $ownerLogo = null;
+
+        if ($course instanceof ElearnCourse) {
+            $ownerOrg = $course->tutor?->company_name ?: ($course->course_selling_for ?: 'E-Learning Academy');
+            $ownerLogo = $course->tutor?->profile_url ?: ($course->instructor_avatar ?: null);
+        } elseif ($course instanceof Course) {
+            $ownerOrg = $course->seller?->businessDetail?->business_name 
+                ?: ($course->seller?->store_name ?: 'Partner Education Institute');
+            $ownerLogo = $course->seller?->businessDetail?->logo 
+                ?: ($course->seller?->user?->avatar ?: ($course->instructor_avatar ?: null));
+        }
+
+        if (empty($ownerLogo)) {
+            $ownerLogo = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=08111e&color=d4af37&bold=true&rounded=true';
+        }
+
         return view('customer.certificate', [
-            'user'            => $user,
-            'course'          => $course,
-            'enrollment'      => $enrollment,
-            'percent'         => $percent,
-            'completionDate'  => $completionDate,
-            'certificateId'   => $certificateId,
-            'instructorName'  => $course->instructor_name ?? 'Digital Class Certified Master Instructor',
+            'user'             => $user,
+            'course'           => $course,
+            'enrollment'       => $enrollment,
+            'percent'          => $percent,
+            'isCompleted'      => $percent >= 100,
+            'totalLessons'     => $totalLessons,
+            'completedLessons' => $completedLessons,
+            'completionDate'   => $completionDate,
+            'certificateId'    => $certificateId,
+            'instructorName'   => $ownerName,
+            'ownerName'        => $ownerName,
+            'ownerOrg'         => $ownerOrg,
+            'ownerLogo'        => $ownerLogo,
+            'digitalClassLogo' => asset('images/logo.png'),
         ]);
     }
 

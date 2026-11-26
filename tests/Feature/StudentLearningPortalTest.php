@@ -191,5 +191,13 @@ class StudentLearningPortalTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Certificate of Completion');
         $response->assertSee($this->student->name);
+        $response->assertSee('DIGITAL CLASS WORLD');
+        $response->assertSee('Download Locked');
+
+        // Explicit download attempt when not completed should be blocked and redirected with error
+        $downloadResponse = $this->actingAs($this->student, 'web')
+            ->get(route('customer.course.certificate', ['courseId' => $this->course->id, 'download' => 1]));
+        $downloadResponse->assertRedirect();
+        $downloadResponse->assertSessionHas('error');
     }
 }
