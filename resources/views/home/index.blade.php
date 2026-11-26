@@ -242,25 +242,18 @@
     }
 
     /* ==========================================================================
-       CATEGORY ICON NAVIGATION STRIP (Floating White Rounded Card Design)
+       CATEGORY ICON NAVIGATION STRIP (Full-Width Seamless Strip - No Boxed Container)
        ========================================================================== */
     .home-categories-section {
-        background: transparent;
-        padding: 1.5rem 0 0.5rem 0;
+        background: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+        padding: 1.75rem 0 1.35rem;
+        margin: 0;
         position: relative;
         z-index: 10;
         width: 100%;
-    }
-    .home-categories-card {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
-        border: 1px solid rgba(226, 232, 240, 0.85);
-        padding: 1.25rem 1.75rem 1.15rem;
-        transition: box-shadow 0.25s ease;
-    }
-    .home-categories-card:hover {
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
     }
     .home-categories-grid {
         display: flex;
@@ -270,7 +263,7 @@
         overflow-x: auto;
         scrollbar-width: none; /* Firefox */
         -ms-overflow-style: none; /* IE/Edge */
-        padding: 0.2rem 0;
+        padding: 0.35rem 0;
     }
     .home-categories-grid::-webkit-scrollbar {
         display: none; /* Chrome, Safari, Opera */
@@ -1328,17 +1321,15 @@
      ============================================================================ -->
 <div class="home-categories-section">
     <div class="container-fluid px-3 px-md-4 px-xl-5">
-        <div class="home-categories-card">
-            <div class="home-categories-grid">
-                @foreach($categoryPills as $cp)
-                    <a href="{{ $cp['url'] }}" class="home-cat-item" title="{{ $cp['name'] }}">
-                        <div class="home-cat-icon-box" style="background-color: {{ $cp['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cp['border'] ?? '#e2e8f0' }}; color: {{ $cp['color'] ?? '#0066ff' }};">
-                            <i class="{{ $cp['icon'] }}"></i>
-                        </div>
-                        <span class="home-cat-label">{{ $cp['name'] }}</span>
-                    </a>
-                @endforeach
-            </div>
+        <div class="home-categories-grid">
+            @foreach($categoryPills as $cp)
+                <a href="{{ $cp['url'] }}" class="home-cat-item" title="{{ $cp['name'] }}">
+                    <div class="home-cat-icon-box" style="background-color: {{ $cp['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cp['border'] ?? '#e2e8f0' }}; color: {{ $cp['color'] ?? '#0066ff' }};">
+                        <i class="{{ $cp['icon'] }}"></i>
+                    </div>
+                    <span class="home-cat-label">{{ $cp['name'] }}</span>
+                </a>
+            @endforeach
         </div>
     </div>
 </div>

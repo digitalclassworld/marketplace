@@ -417,45 +417,39 @@
     }
 
     /* ==========================================================================
-       CATEGORY HORIZONTAL BAR (Matching Floating White Rounded Card Design)
+       CATEGORY HORIZONTAL BAR (Full-Width Seamless Strip - No Boxed Container)
        ========================================================================== */
     .category-cards-section {
-        background: transparent;
-        border: none;
+        background: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
         padding: 2.25rem 0 1.5rem;
         position: relative;
         z-index: 10;
         width: 100%;
-    }
-
-    .category-cards-card {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
-        border: 1px solid rgba(226, 232, 240, 0.85);
-        padding: 1.35rem 1.75rem 1.15rem;
-        transition: box-shadow 0.25s ease;
-    }
-
-    .category-cards-card:hover {
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
     }
 
     .category-scroll-container {
         display: flex;
         align-items: flex-start;
-        justify-content: space-between;
-        gap: 0.75rem;
+        justify-content: flex-start;
+        gap: 0.85rem;
         overflow-x: auto;
         white-space: nowrap;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        padding: 0.2rem 0;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        padding-top: 0.65rem;
+        padding-bottom: 8px;
         -webkit-overflow-scrolling: touch;
     }
 
     .category-scroll-container::-webkit-scrollbar {
-        display: none;
+        height: 5px;
+    }
+    .category-scroll-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
     }
 
     .service-cat-item {
@@ -464,18 +458,18 @@
         align-items: center;
         text-decoration: none;
         flex: 1 1 0;
-        min-width: 86px;
-        max-width: 110px;
+        min-width: 90px;
+        max-width: 120px;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         cursor: pointer;
         text-align: center;
-        padding: 0.25rem 0.15rem;
+        padding: 0.25rem 0.2rem;
         border-radius: 14px;
         flex-shrink: 0;
     }
 
     .service-cat-item:hover {
-        transform: translateY(-4px);
+        transform: translateY(-3px);
     }
 
     .service-cat-icon-box {
@@ -486,7 +480,7 @@
         align-items: center;
         justify-content: center;
         font-size: 1.35rem;
-        margin-bottom: 0.65rem;
+        margin-bottom: 0.55rem;
         transition: all 0.25s ease;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         position: relative;
@@ -529,14 +523,13 @@
 
     @media (max-width: 991px) {
         .category-cards-section {
-            padding: 1.5rem 0 1rem;
+            padding: 1.25rem 0 0.85rem;
         }
-        .category-cards-card {
-            padding: 1rem 0.85rem;
-            border-radius: 16px;
+        .category-scroll-container {
+            padding-top: 0.35rem;
         }
         .service-cat-item {
-            min-width: 76px;
+            min-width: 78px;
         }
         .service-cat-icon-box {
             width: 46px;
@@ -1431,25 +1424,23 @@
 <!-- ========================================== -->
 <section class="category-cards-section">
     <div class="container-fluid px-3 px-md-4 px-xl-5">
-        <div class="category-cards-card">
-            <div class="category-scroll-container">
-                @foreach($categories as $cat)
-                    @php
-                        $isCatActive = ($selectedCategory === $cat['name'] || ($selectedCategory === 'all' && $cat['slug'] === 'all'));
-                        $catParam = ($cat['slug'] === 'all') ? '' : $cat['name'];
-                        $catQuery = array_merge(request()->query(), ['category' => $catParam]);
-                        if (empty($catParam)) unset($catQuery['category']);
-                        $catUrl = route('services', $catQuery);
-                    @endphp
-                    <a href="{{ $catUrl }}" 
-                       class="service-cat-item {{ $isCatActive ? 'active' : '' }}" title="{{ $cat['name'] }}">
-                        <div class="service-cat-icon-box" style="background-color: {{ $cat['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cat['border'] ?? '#e2e8f0' }}; color: {{ $cat['color'] ?? '#0066ff' }};">
-                            <i class="{{ $cat['icon'] }}"></i>
-                        </div>
-                        <span class="service-cat-label">{{ $cat['name'] }}</span>
-                    </a>
-                @endforeach
-            </div>
+        <div class="category-scroll-container">
+            @foreach($categories as $cat)
+                @php
+                    $isCatActive = ($selectedCategory === $cat['name'] || ($selectedCategory === 'all' && $cat['slug'] === 'all'));
+                    $catParam = ($cat['slug'] === 'all') ? '' : $cat['name'];
+                    $catQuery = array_merge(request()->query(), ['category' => $catParam]);
+                    if (empty($catParam)) unset($catQuery['category']);
+                    $catUrl = route('services', $catQuery);
+                @endphp
+                <a href="{{ $catUrl }}" 
+                   class="service-cat-item {{ $isCatActive ? 'active' : '' }}" title="{{ $cat['name'] }}">
+                    <div class="service-cat-icon-box" style="background-color: {{ $cat['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cat['border'] ?? '#e2e8f0' }}; color: {{ $cat['color'] ?? '#0066ff' }};">
+                        <i class="{{ $cat['icon'] }}"></i>
+                    </div>
+                    <span class="service-cat-label">{{ $cat['name'] }}</span>
+                </a>
+            @endforeach
         </div>
     </div>
 </section>
