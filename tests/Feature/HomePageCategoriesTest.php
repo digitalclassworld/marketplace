@@ -10,7 +10,8 @@ class HomePageCategoriesTest extends TestCase
     {
         $response = $this->get(route('home'));
         $response->assertStatus(200);
-        $response->assertSee('home-categories-card');
+        $response->assertSee('home-categories-section');
+        $response->assertSee('home-categories-grid');
         $response->assertSee('Online Courses');
         $response->assertSee('Professional Services');
         $response->assertSee('Products');

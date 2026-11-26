@@ -242,31 +242,24 @@
     }
 
     /* ==========================================================================
-       CATEGORY ICON NAVIGATION STRIP (Matching User Mockup)
+       CATEGORY ICON NAVIGATION STRIP (Full-Width Seamless Strip)
        ========================================================================== */
     .home-categories-section {
-        background: transparent;
-        padding: 0 0 0.5rem 0;
-        margin-top: -2rem;
-        position: relative;
-        z-index: 20;
-    }
-    .home-categories-card {
         background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.03);
-        border: 1px solid rgba(226, 232, 240, 0.9);
-        padding: 1.25rem 1.75rem 1.15rem;
-        transition: box-shadow 0.25s ease;
-    }
-    .home-categories-card:hover {
-        box-shadow: 0 16px 42px rgba(0, 0, 0, 0.09), 0 4px 10px rgba(0, 0, 0, 0.04);
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f1f5f9;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+        padding: 1.35rem 0 1.15rem;
+        margin: 0;
+        position: relative;
+        z-index: 10;
+        width: 100%;
     }
     .home-categories-grid {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 0.65rem;
+        gap: 0.5rem;
         overflow-x: auto;
         scrollbar-width: none; /* Firefox */
         -ms-overflow-style: none; /* IE/Edge */
@@ -325,11 +318,7 @@
     }
     @media (max-width: 991px) {
         .home-categories-section {
-            margin-top: 0.5rem;
-        }
-        .home-categories-card {
-            padding: 1rem 0.85rem;
-            border-radius: 16px;
+            padding: 1rem 0;
         }
         .home-cat-item {
             min-width: 76px;
@@ -1328,21 +1317,19 @@
 </section>
 
 <!-- ============================================================================
-     2. CATEGORY ICON NAVIGATION STRIP (Matching User Mockup)
+     2. CATEGORY ICON NAVIGATION STRIP (Full-Width Seamless Strip - No Boxed Card)
      ============================================================================ -->
 <div class="home-categories-section">
     <div class="container-fluid px-3 px-md-4 px-xl-5">
-        <div class="home-categories-card">
-            <div class="home-categories-grid">
-                @foreach($categoryPills as $cp)
-                    <a href="{{ $cp['url'] }}" class="home-cat-item" title="{{ $cp['name'] }}">
-                        <div class="home-cat-icon-box" style="background-color: {{ $cp['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cp['border'] ?? '#e2e8f0' }}; color: {{ $cp['color'] ?? '#0066ff' }};">
-                            <i class="{{ $cp['icon'] }}"></i>
-                        </div>
-                        <span class="home-cat-label">{{ $cp['name'] }}</span>
-                    </a>
-                @endforeach
-            </div>
+        <div class="home-categories-grid">
+            @foreach($categoryPills as $cp)
+                <a href="{{ $cp['url'] }}" class="home-cat-item" title="{{ $cp['name'] }}">
+                    <div class="home-cat-icon-box" style="background-color: {{ $cp['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cp['border'] ?? '#e2e8f0' }}; color: {{ $cp['color'] ?? '#0066ff' }};">
+                        <i class="{{ $cp['icon'] }}"></i>
+                    </div>
+                    <span class="home-cat-label">{{ $cp['name'] }}</span>
+                </a>
+            @endforeach
         </div>
     </div>
 </div>
