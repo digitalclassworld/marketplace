@@ -35,22 +35,30 @@ class CustomerCourseController extends Controller
 
         // 2. Fetch all enrollments for this user
         $enrollments = CourseEnrollment::where('user_id', $user->id)
-            ->latest('enrolled_at')
+            ->latest('updated_at')
             ->get();
 
         // Attach course details & lesson counts
         $enrolledItems = collect();
+        $totalLecturesFinishedAll = 0;
+        $totalLecturesCountAll = 0;
+
         foreach ($enrollments as $enrollment) {
             $course = null;
-            $totalLessons = 0;
+            $allLessons = collect();
+            $chapters = collect();
 
             if ($enrollment->course_type === 'catalog') {
                 $course = Course::find($enrollment->course_id);
-                $totalLessons = $course ? $course->contents()->count() : 0;
+                if ($course) {
+                    $allLessons = $course->contents;
+                    $chapters = $course->contents->groupBy('section_title');
+                }
             } else {
                 $course = ElearnCourse::find($enrollment->course_id);
                 if ($course) {
-                    $totalLessons = $course->getAllLessons()->count();
+                    $allLessons = $course->getAllLessons();
+                    $chapters = $course->getVideoChapters();
                 }
             }
 
@@ -58,15 +66,34 @@ class CustomerCourseController extends Controller
                 continue;
             }
 
+            $totalLessons = $allLessons->count();
+            $totalLecturesCountAll += $totalLessons;
+
             // Completed lessons count
-            $completedLessonsCount = StudentCourseProgress::where('user_id', $user->id)
+            $completedLessonIds = StudentCourseProgress::where('user_id', $user->id)
                 ->where('course_id', $enrollment->course_id)
                 ->where('completed', true)
-                ->count();
+                ->pluck('lesson_id')
+                ->toArray();
+
+            $completedLessonsCount = count($completedLessonIds);
+            $totalLecturesFinishedAll += $completedLessonsCount;
 
             // Progress percentage
             $progressPercent = $totalLessons > 0 ? (int) round(($completedLessonsCount / $totalLessons) * 100) : $enrollment->progress_percent;
             if ($progressPercent > 100) $progressPercent = 100;
+
+            // Resolve last watched or next up lesson
+            $nextUpLesson = null;
+            if ($enrollment->last_watched_lesson_id) {
+                $nextUpLesson = $allLessons->firstWhere('id', (int)$enrollment->last_watched_lesson_id);
+            }
+            if (!$nextUpLesson && $allLessons->isNotEmpty()) {
+                // Find first uncompleted lesson
+                $nextUpLesson = $allLessons->first(function($l) use ($completedLessonIds) {
+                    return !in_array($l->id, $completedLessonIds);
+                }) ?: $allLessons->first();
+            }
 
             $enrolledItems->push((object)[
                 'enrollment'             => $enrollment,
@@ -82,7 +109,24 @@ class CustomerCourseController extends Controller
                 'progress_percent'       => $progressPercent,
                 'is_completed'           => $progressPercent >= 100,
                 'last_watched_lesson_id' => $enrollment->last_watched_lesson_id,
+                'next_up_lesson'         => $nextUpLesson,
+                'chapters'               => $chapters,
+                'all_lessons'            => $allLessons,
+                'updated_at'             => $enrollment->updated_at ?? $enrollment->created_at,
             ]);
+        }
+
+        // Hero Course (most recently active course to quick-resume)
+        $heroCourse = $enrolledItems->first(fn($i) => $i->progress_percent < 100) ?: $enrolledItems->first();
+
+        // Search filtering
+        $search = trim((string)$request->get('search', ''));
+        if ($search !== '') {
+            $enrolledItems = $enrolledItems->filter(function($item) use ($search) {
+                return str_contains(strtolower($item->title), strtolower($search)) ||
+                       str_contains(strtolower($item->instructor), strtolower($search)) ||
+                       str_contains(strtolower($item->category), strtolower($search));
+            });
         }
 
         // Filter tab
@@ -94,6 +138,29 @@ class CustomerCourseController extends Controller
         } else {
             $filteredItems = $enrolledItems;
         }
+
+        // Sorting
+        $sort = $request->get('sort', 'recent');
+        if ($sort === 'progress_high') {
+            $filteredItems = $filteredItems->sortByDesc('progress_percent')->values();
+        } elseif ($sort === 'progress_low') {
+            $filteredItems = $filteredItems->sortBy('progress_percent')->values();
+        } elseif ($sort === 'title') {
+            $filteredItems = $filteredItems->sortBy('title', SORT_NATURAL|SORT_FLAG_CASE)->values();
+        } else {
+            $filteredItems = $filteredItems->sortByDesc('updated_at')->values();
+        }
+
+        // Student Overview Statistics
+        $stats = [
+            'total_enrolled'           => $enrollments->count(),
+            'in_progress'              => $enrolledItems->where('progress_percent', '<', 100)->count(),
+            'completed'                => $enrolledItems->where('progress_percent', '>=', 100)->count(),
+            'total_lectures_finished'  => $totalLecturesFinishedAll,
+            'total_lectures_count'     => $totalLecturesCountAll,
+            'certificates_count'       => $enrolledItems->where('progress_percent', '>=', 100)->count(),
+            'average_progress'         => $enrolledItems->isNotEmpty() ? (int)round($enrolledItems->avg('progress_percent')) : 0,
+        ];
 
         // Featured/recommended courses if the student wants to explore more
         $recommendedCourses = collect();
@@ -110,10 +177,14 @@ class CustomerCourseController extends Controller
         return view('customer.my-courses', [
             'user'               => $user,
             'enrolledItems'      => $filteredItems,
+            'heroCourse'         => $heroCourse,
+            'stats'              => $stats,
             'allCount'           => $enrolledItems->count(),
             'inProgressCount'    => $enrolledItems->where('progress_percent', '<', 100)->count(),
             'completedCount'     => $enrolledItems->where('progress_percent', '>=', 100)->count(),
             'currentTab'         => $tab,
+            'currentSort'        => $sort,
+            'search'             => $search,
             'recommendedCourses' => $recommendedCourses,
         ]);
     }
@@ -254,11 +325,16 @@ class CustomerCourseController extends Controller
         $progressPercent = $totalLessons > 0 ? (int) round(($completedCount / $totalLessons) * 100) : 0;
         if ($progressPercent > 100) $progressPercent = 100;
 
-        // 7. Student Notes for this lesson
+        // 7. Student Notes for this lesson and all saved course notes
         $currentNote = StudentLectureNote::where('user_id', $user->id)
             ->where('course_id', $course->id)
             ->where('lesson_id', $currentLesson ? $currentLesson->id : 0)
             ->first();
+
+        $allCourseNotes = StudentLectureNote::where('user_id', $user->id)
+            ->where('course_id', $course->id)
+            ->latest('updated_at')
+            ->get();
 
         // 8. Format Embed Video Stream URL
         $embedVideoUrl = $this->formatEmbedUrl($currentLesson ? $currentLesson->video_link : null);
@@ -278,6 +354,7 @@ class CustomerCourseController extends Controller
             'totalLessons'       => $totalLessons,
             'progressPercent'    => $progressPercent,
             'currentNote'        => $currentNote,
+            'allCourseNotes'     => $allCourseNotes,
             'embedVideoUrl'      => $embedVideoUrl,
         ]);
     }
