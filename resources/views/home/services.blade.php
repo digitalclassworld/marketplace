@@ -7,72 +7,108 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
-    /* Hero Section */
+    /* ==========================================================================
+       HERO BANNER - MODERN HIGH-END LUXURY AESTHETIC
+       ========================================================================== */
     .services-hero-banner {
-        background: linear-gradient(135deg, #091b33 0%, #0d284f 55%, #143d73 100%);
+        background: radial-gradient(120% 120% at 85% 15%, #0f3b75 0%, #081d3d 45%, #040e21 100%);
         color: #ffffff;
         position: relative;
         overflow: hidden;
-        padding: 3rem 0 2.5rem;
+        padding: 3.5rem 0 3rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
+    /* Ambient background glows & mesh grid */
     .services-hero-banner::before {
         content: '';
         position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 350px;
-        height: 350px;
+        top: -120px;
+        right: -80px;
+        width: 650px;
+        height: 650px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(0, 102, 255, 0.25) 0%, rgba(0, 102, 255, 0) 70%);
+        background: radial-gradient(circle, rgba(0, 102, 255, 0.35) 0%, rgba(14, 165, 233, 0.15) 45%, rgba(0, 102, 255, 0) 70%);
+        filter: blur(40px);
+        pointer-events: none;
+    }
+
+    .services-hero-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -150px;
+        left: 20%;
+        width: 500px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(0, 0, 0, 0) 70%);
+        filter: blur(50px);
         pointer-events: none;
     }
 
     .hero-eyebrow {
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.35);
         color: #38bdf8;
         font-size: 0.78rem;
         font-weight: 700;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        display: inline-block;
-        margin-bottom: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        margin-bottom: 0.85rem;
+        backdrop-filter: blur(8px);
     }
 
     .hero-heading {
-        font-size: 2.35rem;
-        font-weight: 800;
-        line-height: 1.2;
-        letter-spacing: -0.025em;
+        font-size: 2.85rem;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
         color: #ffffff;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .hero-heading span.gradient-text {
+        background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 50%, #c084fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     .hero-subheading {
-        font-size: 0.98rem;
+        font-size: 1.05rem;
         color: #cbd5e1;
-        line-height: 1.55;
+        line-height: 1.6;
         max-width: 580px;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.65rem;
     }
 
-    /* Search Input in Hero */
+    /* Big Sleek Search Box in Hero */
     .hero-search-wrapper {
         background: #ffffff;
-        border-radius: 12px;
-        padding: 0.35rem 0.35rem 0.35rem 1rem;
+        border-radius: 14px;
+        padding: 0.45rem 0.45rem 0.45rem 1.15rem;
         display: flex;
         align-items: center;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-        max-width: 600px;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
+        max-width: 620px;
+        transition: all 0.2s ease;
+    }
+
+    .hero-search-wrapper:focus-within {
+        box-shadow: 0 20px 45px rgba(0, 102, 255, 0.35), 0 0 0 2px #0066ff;
     }
 
     .hero-search-wrapper input {
         border: none;
         outline: none;
         box-shadow: none;
-        font-size: 0.95rem;
+        font-size: 0.98rem;
         width: 100%;
         color: #0f172a;
+        font-weight: 500;
     }
 
     .hero-search-wrapper input::placeholder {
@@ -80,23 +116,26 @@
     }
 
     .btn-hero-search {
-        background-color: #0066ff;
+        background: linear-gradient(135deg, #0066ff 0%, #0052cc 100%);
         color: #ffffff;
-        font-weight: 600;
-        border-radius: 9px;
-        padding: 0.65rem 1.4rem;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
         font-size: 0.92rem;
         border: none;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
         white-space: nowrap;
-        transition: all 0.2s ease;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4);
     }
 
     .btn-hero-search:hover {
-        background-color: #0052cc;
+        background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
         color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.6);
     }
 
     /* Quick Tags */
@@ -104,23 +143,24 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.45rem;
-        margin-top: 1rem;
+        margin-top: 1.15rem;
         align-items: center;
     }
 
     .quick-tag-pill {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         color: #e2e8f0;
         font-size: 0.78rem;
-        font-weight: 500;
-        padding: 0.3rem 0.75rem;
+        font-weight: 600;
+        padding: 0.35rem 0.85rem;
         border-radius: 999px;
         text-decoration: none;
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
-        gap: 0.35rem;
+        gap: 0.4rem;
+        backdrop-filter: blur(8px);
     }
 
     .quick-tag-pill:hover,
@@ -128,65 +168,87 @@
         background: #0066ff;
         color: #ffffff;
         border-color: #0066ff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
     }
 
     /* Trust Badges in Hero */
     .trust-badges-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-top: 1.75rem;
+        gap: 0.85rem;
+        margin-top: 2rem;
     }
 
     .trust-badge-card {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        backdrop-filter: blur(8px);
-        border-radius: 10px;
-        padding: 0.55rem 0.85rem;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 12px;
+        padding: 0.65rem 0.95rem;
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.7rem;
+        transition: all 0.2s ease;
+    }
+
+    .trust-badge-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
     }
 
     .trust-badge-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
 
-    .trust-badge-icon.green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .trust-badge-icon.yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-    .trust-badge-icon.blue { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .trust-badge-icon.green { background: rgba(16, 185, 129, 0.22); color: #34d399; }
+    .trust-badge-icon.yellow { background: rgba(245, 158, 11, 0.22); color: #fbbf24; }
+    .trust-badge-icon.blue { background: rgba(56, 189, 248, 0.22); color: #38bdf8; }
 
     .trust-badge-title {
-        font-size: 0.82rem;
+        font-size: 0.84rem;
         font-weight: 700;
         color: #ffffff;
-        line-height: 1.1;
+        line-height: 1.15;
     }
 
     .trust-badge-sub {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         color: #94a3b8;
     }
 
-    /* Hero Center Consultant & Handwritten Tagline */
+    /* Hero Center Consultant Visual & Floating Stat Cards */
     .hero-center-visual {
         position: relative;
         text-align: center;
+        padding: 0.5rem;
+    }
+
+    .consultant-card-frame {
+        position: relative;
+        display: inline-block;
+        border-radius: 24px;
+        padding: 6px;
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.6) 0%, rgba(99, 102, 241, 0.3) 50%, rgba(255, 255, 255, 0.1) 100%);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
     }
 
     .consultant-photo {
-        max-width: 100%;
-        height: 280px;
-        object-fit: contain;
-        border-radius: 16px;
-        filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.35));
+        width: 100%;
+        max-width: 330px;
+        height: 380px;
+        object-fit: cover;
+        object-position: top center;
+        border-radius: 20px;
+        display: block;
     }
 
     .handwritten-tagline {
@@ -194,12 +256,18 @@
         font-size: 1.85rem;
         color: #ffffff;
         font-weight: 700;
-        line-height: 1;
+        line-height: 1.05;
         position: absolute;
-        top: 15px;
-        right: -30px;
-        transform: rotate(4deg);
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        top: -15px;
+        right: -25px;
+        transform: rotate(5deg);
+        text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(8px);
+        padding: 0.45rem 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        z-index: 3;
     }
 
     .handwritten-tagline span {
@@ -209,37 +277,91 @@
     .tagline-underline {
         display: block;
         width: 80px;
-        height: 4px;
+        height: 3px;
         background: linear-gradient(90deg, #10b981, #f59e0b);
         border-radius: 4px;
         margin-top: 3px;
         margin-left: auto;
     }
 
-    /* 5-Step Process Card in Hero */
+    /* Floating verified badge in hero center */
+    .hero-floating-stat {
+        position: absolute;
+        bottom: 25px;
+        left: -15px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 14px;
+        padding: 0.65rem 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        color: #ffffff;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+        z-index: 3;
+        animation: floatStat 4s ease-in-out infinite;
+    }
+
+    @keyframes floatStat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+
+    .hero-stat-avatar-group {
+        display: flex;
+    }
+
+    .hero-stat-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2px solid #0f172a;
+        margin-left: -8px;
+        object-fit: cover;
+    }
+
+    .hero-stat-avatar:first-child {
+        margin-left: 0;
+    }
+
+    /* 5-Step Process Card in Hero (Glassmorphism & Crisp Typography) */
     .process-card-hero {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 1.25rem 1.4rem;
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 20px;
+        padding: 1.4rem 1.45rem;
         color: #0f172a;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.9);
+        transition: all 0.25s ease;
+    }
+
+    .process-card-hero:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.42);
     }
 
     .process-card-hero h6 {
-        font-weight: 700;
-        font-size: 0.95rem;
+        font-weight: 800;
+        font-size: 1rem;
         color: #0f172a;
-        margin-bottom: 0.85rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 0;
+        letter-spacing: -0.01em;
     }
 
     .process-step-row {
         display: flex;
         align-items: center;
-        gap: 0.8rem;
-        padding: 0.55rem 0;
-        border-bottom: 1px dashed #f1f5f9;
+        gap: 0.85rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px dashed #e2e8f0;
+        transition: all 0.15s ease;
+    }
+
+    .process-step-row:hover {
+        transform: translateX(3px);
     }
 
     .process-step-row:last-child {
@@ -248,14 +370,15 @@
     }
 
     .process-step-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.85rem;
+        font-size: 0.92rem;
         flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     .step-ico-1 { background: #ffedd5; color: #ea580c; }
@@ -265,14 +388,17 @@
     .step-ico-5 { background: #ecfdf5; color: #059669; }
 
     .step-main-text {
-        font-size: 0.85rem;
+        font-size: 0.86rem;
         font-weight: 700;
-        color: #1e293b;
+        color: #0f172a;
         line-height: 1.2;
     }
 
     .step-sub-text {
         font-size: 0.72rem;
+        color: #64748b;
+        font-weight: 500;
+    }
         color: #64748b;
     }
 
@@ -1088,12 +1214,12 @@
 <!-- 1. HERO BANNER (Matches Screenshot 1)      -->
 <!-- ========================================== -->
 <section class="services-hero-banner">
-    <div class="container-fluid px-lg-4">
+    <div class="container-fluid px-3 px-md-4 px-xl-5">
         <div class="row align-items-center g-4">
             <!-- Left: Hero Headline, Subtitle, Search, Tags, Trust Badges -->
             <div class="col-lg-6 col-xl-5">
-                <span class="hero-eyebrow">Professional Services</span>
-                <h1 class="hero-heading">Get Expert Services<br>For Your Growth</h1>
+                <span class="hero-eyebrow"><i class="fa-solid fa-sparkles text-info"></i> Professional Services</span>
+                <h1 class="hero-heading">Get Expert Services<br><span class="gradient-text">For Your Growth</span></h1>
                 <p class="hero-subheading">
                     Hire verified professionals, freelancers and agencies for websites, marketing, design, software, content, accounting and more.
                 </p>
@@ -1173,11 +1299,27 @@
             <!-- Center: Consultant Photo & Handwritten Tagline -->
             <div class="col-lg-3 col-xl-4 d-none d-lg-block text-center position-relative">
                 <div class="hero-center-visual">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80" alt="Verified Professional Expert" class="consultant-photo shadow-lg">
+                    <div class="consultant-card-frame">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=85" alt="Verified Professional Expert" class="consultant-photo">
+                    </div>
+                    
                     <div class="handwritten-tagline">
                         Your Projects<br>
                         <span>Our Experts</span>
                         <div class="tagline-underline"></div>
+                    </div>
+
+                    <!-- Floating Trust Badge in Center Visual -->
+                    <div class="hero-floating-stat">
+                        <div class="hero-stat-avatar-group">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Specialist" class="hero-stat-avatar">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" alt="Specialist" class="hero-stat-avatar">
+                            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&auto=format&fit=crop&q=80" alt="Specialist" class="hero-stat-avatar">
+                        </div>
+                        <div class="text-start">
+                            <div style="font-size: 0.76rem; font-weight: 800; line-height: 1.1; color: #38bdf8;">500+ Top Agencies</div>
+                            <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 500;">Ready to hire today</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1185,9 +1327,9 @@
             <!-- Right: 5-Step Process Card -->
             <div class="col-lg-3 col-xl-3">
                 <div class="process-card-hero">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
                         <h6 class="mb-0">How It Works</h6>
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.65rem;">5 Simple Steps</span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem; padding: 0.35rem 0.6rem; border-radius: 6px;">5 Simple Steps</span>
                     </div>
 
                     <div class="process-step-row">
