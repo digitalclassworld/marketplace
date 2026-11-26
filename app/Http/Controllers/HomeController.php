@@ -119,18 +119,97 @@ class HomeController extends Controller
             \Illuminate\Support\Facades\Log::warning('Catalog load failed on marketplace index: ' . $e->getMessage());
         }
 
-        // Horizontal category pills matching the mockup
+        // Category strip items with rich icons and pastel badges matching user mockup
         $categoryPills = [
-            ['name' => 'Online Courses',       'icon' => 'fa-solid fa-graduation-cap',   'url' => route('courses')],
-            ['name' => 'Professional Services','icon' => 'fa-solid fa-briefcase',        'url' => route('services')],
-            ['name' => 'Products',             'icon' => 'fa-solid fa-box-open',         'url' => route('products')],
-            ['name' => 'Businesses',           'icon' => 'fa-solid fa-building-columns', 'url' => route('businesses')],
-            ['name' => 'Digital Marketing',    'icon' => 'fa-solid fa-bullhorn',         'url' => route('courses', ['category' => 'Digital Marketing'])],
-            ['name' => 'IT & Software',        'icon' => 'fa-solid fa-code',             'url' => route('courses', ['category' => 'Web Development'])],
-            ['name' => 'Design & Creative',    'icon' => 'fa-solid fa-palette',          'url' => route('services', ['category' => 'Design'])],
-            ['name' => 'Tally & Accounting',   'icon' => 'fa-solid fa-calculator',       'url' => route('courses', ['category' => 'Tally'])],
-            ['name' => 'Coaching Institutes',  'icon' => 'fa-solid fa-chalkboard-user',  'url' => route('businesses', ['category' => 'Coaching Institute'])],
-            ['name' => 'Health & Wellness',    'icon' => 'fa-solid fa-heart-pulse',      'url' => route('businesses', ['category' => 'Gym & Fitness'])],
+            [
+                'name'   => 'Online Courses',
+                'icon'   => 'fa-solid fa-graduation-cap',
+                'color'  => '#7c3aed',
+                'bg'     => '#f3e8ff',
+                'border' => '#e9d5ff',
+                'url'    => route('courses'),
+            ],
+            [
+                'name'   => 'Professional Services',
+                'icon'   => 'fa-solid fa-screwdriver-wrench',
+                'color'  => '#0d9488',
+                'bg'     => '#f0fdfa',
+                'border' => '#ccfbf1',
+                'url'    => route('services'),
+            ],
+            [
+                'name'   => 'Products',
+                'icon'   => 'fa-solid fa-cube',
+                'color'  => '#ea580c',
+                'bg'     => '#fff7ed',
+                'border' => '#ffedd5',
+                'url'    => route('products'),
+            ],
+            [
+                'name'   => 'Businesses',
+                'icon'   => 'fa-solid fa-building',
+                'color'  => '#d97706',
+                'bg'     => '#fffbeb',
+                'border' => '#fef3c7',
+                'url'    => route('businesses'),
+            ],
+            [
+                'name'   => 'Digital Marketing',
+                'icon'   => 'fa-solid fa-chart-line',
+                'color'  => '#059669',
+                'bg'     => '#ecfdf5',
+                'border' => '#d1fae5',
+                'url'    => route('courses', ['category' => 'Digital Marketing']),
+            ],
+            [
+                'name'   => 'IT & Software',
+                'icon'   => 'fa-solid fa-code',
+                'color'  => '#2563eb',
+                'bg'     => '#eff6ff',
+                'border' => '#dbeafe',
+                'url'    => route('courses', ['category' => 'Web Development']),
+            ],
+            [
+                'name'   => 'Design & Creative',
+                'icon'   => 'fa-solid fa-palette',
+                'color'  => '#c026d3',
+                'bg'     => '#fdf4ff',
+                'border' => '#fae8ff',
+                'url'    => route('services', ['category' => 'Design']),
+            ],
+            [
+                'name'   => 'Tally & Accounting',
+                'icon'   => 'fa-solid fa-file-invoice',
+                'color'  => '#16a34a',
+                'bg'     => '#f0fdf4',
+                'border' => '#dcfce7',
+                'url'    => route('courses', ['category' => 'Tally']),
+            ],
+            [
+                'name'   => 'Coaching Institutes',
+                'icon'   => 'fa-solid fa-users',
+                'color'  => '#0284c7',
+                'bg'     => '#f0f9ff',
+                'border' => '#e0f2fe',
+                'url'    => route('businesses', ['category' => 'Coaching Institute']),
+            ],
+            [
+                'name'   => 'Health & Wellness',
+                'icon'   => 'fa-solid fa-heart',
+                'color'  => '#e11d48',
+                'bg'     => '#fff1f2',
+                'border' => '#ffe4e6',
+                'url'    => route('businesses', ['category' => 'Gym & Fitness']),
+            ],
+            [
+                'name'   => 'More',
+                'icon'   => 'fa-solid fa-ellipsis',
+                'color'  => '#64748b',
+                'bg'     => '#f1f5f9',
+                'border' => '#e2e8f0',
+                'url'    => route('courses'),
+                'is_more'=> true,
+            ],
         ];
 
         // Fetch active promotional banners uploaded by Admin

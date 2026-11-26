@@ -242,48 +242,104 @@
     }
 
     /* ==========================================================================
-       CATEGORY HORIZONTAL PILLS ROW
+       CATEGORY ICON NAVIGATION STRIP (Matching User Mockup)
        ========================================================================== */
-    .category-pills-section {
-        background: #ffffff;
-        border-bottom: 1px solid #f1f5f9;
-        padding: 1.25rem 0;
+    .home-categories-section {
+        background: transparent;
+        padding: 0 0 0.5rem 0;
+        margin-top: -2rem;
+        position: relative;
+        z-index: 20;
     }
-    .category-pills-row {
+    .home-categories-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        padding: 1.25rem 1.75rem 1.15rem;
+        transition: box-shadow 0.25s ease;
+    }
+    .home-categories-card:hover {
+        box-shadow: 0 16px 42px rgba(0, 0, 0, 0.09), 0 4px 10px rgba(0, 0, 0, 0.04);
+    }
+    .home-categories-grid {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.65rem;
+        overflow-x: auto;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+        padding: 0.2rem 0;
+    }
+    .home-categories-grid::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+    .home-cat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        flex: 1 1 0;
+        min-width: 82px;
+        max-width: 105px;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        text-align: center;
+        padding: 0.25rem 0.15rem;
+        border-radius: 12px;
+    }
+    .home-cat-item:hover {
+        transform: translateY(-4px);
+    }
+    .home-cat-icon-box {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
-        gap: 0.85rem;
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-        padding: 0.25rem 0;
+        justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 0.65rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     }
-    .category-pills-row::-webkit-scrollbar {
-        display: none;
+    .home-cat-item:hover .home-cat-icon-box {
+        transform: scale(1.08);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
-    .cat-nav-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.6rem 1.1rem;
-        border-radius: 999px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        color: #334155;
-        text-decoration: none;
-        font-size: 0.85rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        flex-shrink: 0;
+    .home-cat-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.25;
+        text-align: center;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
     }
-    .cat-nav-pill:hover {
-        background: #0066ff;
-        border-color: #0066ff;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+    .home-cat-item:hover .home-cat-label {
+        color: #0066ff;
     }
-    .cat-nav-pill:hover i {
-        color: #ffffff !important;
+    @media (max-width: 991px) {
+        .home-categories-section {
+            margin-top: 0.5rem;
+        }
+        .home-categories-card {
+            padding: 1rem 0.85rem;
+            border-radius: 16px;
+        }
+        .home-cat-item {
+            min-width: 76px;
+        }
+        .home-cat-icon-box {
+            width: 46px;
+            height: 46px;
+            font-size: 1.25rem;
+            border-radius: 14px;
+        }
     }
 
     /* ==========================================================================
@@ -1272,17 +1328,21 @@
 </section>
 
 <!-- ============================================================================
-     2. CATEGORY HORIZONTAL PILLS ROW
+     2. CATEGORY ICON NAVIGATION STRIP (Matching User Mockup)
      ============================================================================ -->
-<div class="category-pills-section">
+<div class="home-categories-section">
     <div class="container-fluid px-3 px-md-4 px-xl-5">
-        <div class="category-pills-row">
-            @foreach($categoryPills as $cp)
-                <a href="{{ $cp['url'] }}" class="cat-nav-pill">
-                    <i class="{{ $cp['icon'] }} text-primary"></i>
-                    <span>{{ $cp['name'] }}</span>
-                </a>
-            @endforeach
+        <div class="home-categories-card">
+            <div class="home-categories-grid">
+                @foreach($categoryPills as $cp)
+                    <a href="{{ $cp['url'] }}" class="home-cat-item" title="{{ $cp['name'] }}">
+                        <div class="home-cat-icon-box" style="background-color: {{ $cp['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cp['border'] ?? '#e2e8f0' }}; color: {{ $cp['color'] ?? '#0066ff' }};">
+                            <i class="{{ $cp['icon'] }}"></i>
+                        </div>
+                        <span class="home-cat-label">{{ $cp['name'] }}</span>
+                    </a>
+                @endforeach
+            </div>
         </div>
     </div>
 </div>
