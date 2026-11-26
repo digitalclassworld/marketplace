@@ -110,8 +110,8 @@
     <div class="container position-relative" style="z-index: 2;">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div>
-                <span class="badge bg-white bg-opacity-20 text-white px-3 py-1.5 rounded-pill small mb-2 fw-semibold d-inline-flex align-items-center gap-1.5">
-                    <i class="fa-solid fa-graduation-cap"></i> Student Learning Portal
+                <span class="badge bg-white px-3 py-1.5 rounded-pill small mb-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="color: #000000 !important; background-color: #ffffff !important; border: 1.5px solid #ffffff;">
+                    <i class="fa-solid fa-graduation-cap" style="color: #000000 !important;"></i> Student Learning Portal
                 </span>
                 <h1 class="h2 fw-bold mb-1 text-white">Welcome back, {{ $user->name }}!</h1>
                 <p class="text-white text-opacity-75 small mb-0">Track your video progress, study with personal notes, and earn recognized course completion certificates.</p>
