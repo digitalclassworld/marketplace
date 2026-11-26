@@ -8,14 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
     /* ==========================================================================
-       HERO BANNER - CLEAN BRIGHT WHITE THEME (Matching Marketplace Standard)
+       HERO BANNER - CLEAN BRIGHT WHITE THEME (Balanced Spacing & Clean Layout)
        ========================================================================== */
     .services-hero-banner {
         background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 50%, #f5f9ff 100%);
         color: #0f172a;
         position: relative;
         overflow: hidden;
-        padding: 1.25rem 0 1.5rem;
+        padding: 2.25rem 0 2.5rem;
         border-bottom: 1px solid #e2e8f0;
     }
 
@@ -48,25 +48,25 @@
         background: #eff6ff;
         border: 1px solid #bfdbfe;
         color: #0066ff;
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
         display: inline-flex;
         align-items: center;
         gap: 0.45rem;
-        padding: 0.25rem 0.75rem;
+        padding: 0.3rem 0.85rem;
         border-radius: 999px;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
     }
 
     .hero-heading {
-        font-size: 2.35rem;
+        font-size: 2.55rem;
         font-weight: 900;
-        line-height: 1.15;
+        line-height: 1.18;
         letter-spacing: -0.03em;
         color: #0f172a;
-        margin-bottom: 0.55rem;
+        margin-bottom: 0.75rem;
     }
 
     .hero-heading span.gradient-text {
@@ -74,11 +74,11 @@
     }
 
     .hero-subheading {
-        font-size: 0.95rem;
+        font-size: 0.98rem;
         color: #475569;
-        line-height: 1.5;
+        line-height: 1.6;
         max-width: 580px;
-        margin-bottom: 1.15rem;
+        margin-bottom: 1.35rem;
     }
 
     /* Big Sleek Search Box in White Theme */
@@ -178,7 +178,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.75rem;
-        margin-top: 1.15rem;
+        margin-top: 1.5rem;
     }
 
     .trust-badge-card {
@@ -418,28 +418,35 @@
         color: #64748b;
     }
 
-    /* Horizontal Category Cards Bar (Exact Match with Courses / Marketplace Squircle Badges) */
+    /* ==========================================================================
+       CATEGORY HORIZONTAL BAR (Matching Homepage & Courses Full-Width Layout)
+       ========================================================================== */
     .category-cards-section {
         background: #ffffff;
+        border-top: 1px solid #f1f5f9;
         border-bottom: 1px solid #e2e8f0;
-        padding: 0.95rem 0 0.75rem;
+        padding: 1.25rem 0 1.1rem;
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
     }
 
     .category-scroll-container {
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
-        gap: 0.65rem;
+        gap: 0.85rem;
         overflow-x: auto;
         white-space: nowrap;
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 transparent;
-        padding-bottom: 4px;
+        padding-bottom: 6px;
         -webkit-overflow-scrolling: touch;
     }
 
     .category-scroll-container::-webkit-scrollbar {
-        height: 4px;
+        height: 5px;
     }
     .category-scroll-container::-webkit-scrollbar-thumb {
         background: #cbd5e1;
@@ -452,13 +459,13 @@
         align-items: center;
         text-decoration: none;
         flex: 1 1 0;
-        min-width: 82px;
-        max-width: 105px;
+        min-width: 90px;
+        max-width: 120px;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         cursor: pointer;
         text-align: center;
-        padding: 0.25rem 0.15rem;
-        border-radius: 12px;
+        padding: 0.25rem 0.2rem;
+        border-radius: 14px;
         flex-shrink: 0;
     }
 
@@ -476,7 +483,7 @@
         font-size: 1.35rem;
         margin-bottom: 0.55rem;
         transition: all 0.25s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         position: relative;
     }
 
@@ -486,7 +493,7 @@
     }
 
     .service-cat-label {
-        font-size: 0.76rem;
+        font-size: 0.78rem;
         font-weight: 700;
         color: #1e293b;
         line-height: 1.25;
@@ -506,8 +513,8 @@
 
     /* Active category pill matching platform pattern */
     .service-cat-item.active .service-cat-icon-box {
-        box-shadow: 0 0 0 2.5px currentColor, 0 6px 16px rgba(0, 102, 255, 0.2);
-        transform: scale(1.05);
+        box-shadow: 0 0 0 3px currentColor, 0 8px 18px rgba(0, 102, 255, 0.25);
+        transform: scale(1.06);
     }
 
     .service-cat-item.active .service-cat-label {
@@ -517,10 +524,10 @@
 
     @media (max-width: 991px) {
         .category-cards-section {
-            padding: 0.75rem 0 0.5rem;
+            padding: 0.85rem 0 0.65rem;
         }
         .service-cat-item {
-            min-width: 74px;
+            min-width: 78px;
         }
         .service-cat-icon-box {
             width: 46px;
