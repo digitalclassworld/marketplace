@@ -8,97 +8,94 @@
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
     /* ==========================================================================
-       HERO BANNER - MODERN HIGH-END LUXURY AESTHETIC
+       HERO BANNER - CLEAN BRIGHT WHITE THEME (Matching Marketplace Standard)
        ========================================================================== */
     .services-hero-banner {
-        background: radial-gradient(120% 120% at 85% 15%, #0f3b75 0%, #081d3d 45%, #040e21 100%);
-        color: #ffffff;
+        background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 50%, #f5f9ff 100%);
+        color: #0f172a;
         position: relative;
         overflow: hidden;
-        padding: 3.5rem 0 3rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 3.25rem 0 2.75rem;
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    /* Ambient background glows & mesh grid */
+    /* Ambient bright pastel decorative accents */
     .services-hero-banner::before {
         content: '';
         position: absolute;
-        top: -120px;
+        top: -80px;
         right: -80px;
-        width: 650px;
-        height: 650px;
+        width: 500px;
+        height: 500px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(0, 102, 255, 0.35) 0%, rgba(14, 165, 233, 0.15) 45%, rgba(0, 102, 255, 0) 70%);
-        filter: blur(40px);
+        background: radial-gradient(circle, rgba(0, 102, 255, 0.08) 0%, rgba(56, 189, 248, 0.04) 50%, rgba(255, 255, 255, 0) 70%);
         pointer-events: none;
     }
 
     .services-hero-banner::after {
         content: '';
         position: absolute;
-        bottom: -150px;
-        left: 20%;
-        width: 500px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(0, 0, 0, 0) 70%);
-        filter: blur(50px);
+        bottom: -100px;
+        left: 5%;
+        width: 400px;
+        height: 350px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
         pointer-events: none;
     }
 
     .hero-eyebrow {
-        background: rgba(56, 189, 248, 0.12);
-        border: 1px solid rgba(56, 189, 248, 0.35);
-        color: #38bdf8;
-        font-size: 0.78rem;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #0066ff;
+        font-size: 0.8rem;
         font-weight: 700;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.35rem 0.85rem;
+        padding: 0.35rem 0.9rem;
         border-radius: 999px;
         margin-bottom: 0.85rem;
-        backdrop-filter: blur(8px);
     }
 
     .hero-heading {
         font-size: 2.85rem;
         font-weight: 900;
-        line-height: 1.15;
+        line-height: 1.16;
         letter-spacing: -0.03em;
-        color: #ffffff;
+        color: #0f172a;
         margin-bottom: 0.85rem;
     }
 
     .hero-heading span.gradient-text {
-        background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 50%, #c084fc 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #0066ff;
     }
 
     .hero-subheading {
         font-size: 1.05rem;
-        color: #cbd5e1;
+        color: #475569;
         line-height: 1.6;
         max-width: 580px;
         margin-bottom: 1.65rem;
     }
 
-    /* Big Sleek Search Box in Hero */
+    /* Big Sleek Search Box in White Theme */
     .hero-search-wrapper {
         background: #ffffff;
+        border: 2px solid #0066ff;
         border-radius: 14px;
-        padding: 0.45rem 0.45rem 0.45rem 1.15rem;
+        padding: 0.35rem 0.45rem 0.35rem 1.15rem;
         display: flex;
         align-items: center;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
+        box-shadow: 0 12px 32px rgba(0, 102, 255, 0.12);
         max-width: 620px;
         transition: all 0.2s ease;
     }
 
     .hero-search-wrapper:focus-within {
-        box-shadow: 0 20px 45px rgba(0, 102, 255, 0.35), 0 0 0 2px #0066ff;
+        box-shadow: 0 16px 36px rgba(0, 102, 255, 0.22);
     }
 
     .hero-search-wrapper input {
@@ -128,17 +125,17 @@
         gap: 0.5rem;
         white-space: nowrap;
         transition: all 0.25s ease;
-        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.4);
+        box-shadow: 0 4px 14px rgba(0, 102, 255, 0.3);
     }
 
     .btn-hero-search:hover {
         background: linear-gradient(135deg, #0052cc 0%, #003d99 100%);
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.6);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.45);
     }
 
-    /* Quick Tags */
+    /* Quick Tags in White Theme */
     .quick-tags-container {
         display: flex;
         flex-wrap: wrap;
@@ -148,9 +145,9 @@
     }
 
     .quick-tag-pill {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #e2e8f0;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #475569;
         font-size: 0.78rem;
         font-weight: 600;
         padding: 0.35rem 0.85rem;
@@ -160,7 +157,7 @@
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        backdrop-filter: blur(8px);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
 
     .quick-tag-pill:hover,
@@ -169,10 +166,14 @@
         color: #ffffff;
         border-color: #0066ff;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+    }
+    .quick-tag-pill:hover i,
+    .quick-tag-pill.active i {
+        color: #ffffff !important;
     }
 
-    /* Trust Badges in Hero */
+    /* Trust Badges in White Theme */
     .trust-badges-row {
         display: flex;
         flex-wrap: wrap;
@@ -181,22 +182,21 @@
     }
 
     .trust-badge-card {
-        background: rgba(255, 255, 255, 0.07);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
         padding: 0.65rem 0.95rem;
         display: flex;
         align-items: center;
         gap: 0.7rem;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
         transition: all 0.2s ease;
     }
 
     .trust-badge-card:hover {
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 255, 255, 0.25);
+        border-color: #cbd5e1;
         transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
     }
 
     .trust-badge-icon {
@@ -209,23 +209,23 @@
         font-size: 1rem;
     }
 
-    .trust-badge-icon.green { background: rgba(16, 185, 129, 0.22); color: #34d399; }
-    .trust-badge-icon.yellow { background: rgba(245, 158, 11, 0.22); color: #fbbf24; }
-    .trust-badge-icon.blue { background: rgba(56, 189, 248, 0.22); color: #38bdf8; }
+    .trust-badge-icon.green { background: #dcfce7; color: #16a34a; }
+    .trust-badge-icon.yellow { background: #fef3c7; color: #d97706; }
+    .trust-badge-icon.blue { background: #e0f2fe; color: #0284c7; }
 
     .trust-badge-title {
         font-size: 0.84rem;
         font-weight: 700;
-        color: #ffffff;
+        color: #0f172a;
         line-height: 1.15;
     }
 
     .trust-badge-sub {
         font-size: 0.72rem;
-        color: #94a3b8;
+        color: #64748b;
     }
 
-    /* Hero Center Consultant Visual & Floating Stat Cards */
+    /* Hero Center Services Collage Visual */
     .hero-center-visual {
         position: relative;
         text-align: center;
@@ -237,16 +237,17 @@
         display: inline-block;
         border-radius: 24px;
         padding: 6px;
-        background: linear-gradient(135deg, rgba(56, 189, 248, 0.6) 0%, rgba(99, 102, 241, 0.3) 50%, rgba(255, 255, 255, 0.1) 100%);
-        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #eff6ff 100%);
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.1);
     }
 
     .consultant-photo {
         width: 100%;
-        max-width: 330px;
-        height: 380px;
+        max-width: 340px;
+        height: 375px;
         object-fit: cover;
-        object-position: top center;
+        object-position: center;
         border-radius: 20px;
         display: block;
     }
@@ -254,24 +255,23 @@
     .handwritten-tagline {
         font-family: 'Caveat', cursive, sans-serif;
         font-size: 1.85rem;
-        color: #ffffff;
+        color: #0f172a;
         font-weight: 700;
         line-height: 1.05;
         position: absolute;
         top: -15px;
         right: -25px;
         transform: rotate(5deg);
-        text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-        background: rgba(15, 23, 42, 0.85);
-        backdrop-filter: blur(8px);
+        background: #ffffff;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
         padding: 0.45rem 1rem;
-        border-radius: 12px;
-        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
         z-index: 3;
     }
 
     .handwritten-tagline span {
-        color: #38bdf8;
+        color: #0066ff;
     }
 
     .tagline-underline {
@@ -284,22 +284,20 @@
         margin-left: auto;
     }
 
-    /* Floating verified badge in hero center */
+    /* Floating service category pill badges in hero center */
     .hero-floating-stat {
         position: absolute;
         bottom: 25px;
         left: -15px;
-        background: rgba(15, 23, 42, 0.9);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 14px;
-        padding: 0.65rem 0.9rem;
+        padding: 0.65rem 0.95rem;
         display: flex;
         align-items: center;
         gap: 0.65rem;
-        color: #ffffff;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+        color: #0f172a;
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12);
         z-index: 3;
         animation: floatStat 4s ease-in-out infinite;
     }
@@ -314,10 +312,10 @@
     }
 
     .hero-stat-avatar {
-        width: 26px;
-        height: 26px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
-        border: 2px solid #0f172a;
+        border: 2px solid #ffffff;
         margin-left: -8px;
         object-fit: cover;
     }
@@ -326,21 +324,39 @@
         margin-left: 0;
     }
 
-    /* 5-Step Process Card in Hero (Glassmorphism & Crisp Typography) */
+    /* Floating Top Agency Pill on top left of image */
+    .hero-floating-agency-tag {
+        position: absolute;
+        top: 25px;
+        left: -20px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.45rem 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+        z-index: 3;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    /* 5-Step Process Card in Hero (White Crisp Shadow Card) */
     .process-card-hero {
-        background: rgba(255, 255, 255, 0.97);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 20px;
         padding: 1.4rem 1.45rem;
         color: #0f172a;
-        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.9);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
         transition: all 0.25s ease;
     }
 
     .process-card-hero:hover {
         transform: translateY(-3px);
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.42);
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
     }
 
     .process-card-hero h6 {
@@ -378,7 +394,7 @@
         justify-content: center;
         font-size: 0.92rem;
         flex-shrink: 0;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
     .step-ico-1 { background: #ffedd5; color: #ea580c; }
@@ -1296,17 +1312,23 @@
                 </div>
             </div>
 
-            <!-- Center: Consultant Photo & Handwritten Tagline -->
+            <!-- Center: Services Team Collaboration Visual & Handwritten Tagline -->
             <div class="col-lg-3 col-xl-4 d-none d-lg-block text-center position-relative">
                 <div class="hero-center-visual">
                     <div class="consultant-card-frame">
-                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=85" alt="Verified Professional Expert" class="consultant-photo">
+                        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=85" alt="Verified Services Agencies and Digital Team" class="consultant-photo">
                     </div>
                     
                     <div class="handwritten-tagline">
                         Your Projects<br>
                         <span>Our Experts</span>
                         <div class="tagline-underline"></div>
+                    </div>
+
+                    <!-- Floating Top Agency Pill on top left of image -->
+                    <div class="hero-floating-agency-tag">
+                        <i class="fa-solid fa-certificate text-primary"></i>
+                        <span>Verified Agency Partner</span>
                     </div>
 
                     <!-- Floating Trust Badge in Center Visual -->
@@ -1317,8 +1339,8 @@
                             <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&auto=format&fit=crop&q=80" alt="Specialist" class="hero-stat-avatar">
                         </div>
                         <div class="text-start">
-                            <div style="font-size: 0.76rem; font-weight: 800; line-height: 1.1; color: #38bdf8;">500+ Top Agencies</div>
-                            <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 500;">Ready to hire today</div>
+                            <div style="font-size: 0.76rem; font-weight: 800; line-height: 1.1; color: #0066ff;">500+ Top Agencies</div>
+                            <div style="font-size: 0.65rem; color: #64748b; font-weight: 600;">Web, Marketing & Design</div>
                         </div>
                     </div>
                 </div>
