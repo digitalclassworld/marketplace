@@ -336,7 +336,13 @@ class CustomerCourseController extends Controller
             ->latest('updated_at')
             ->get();
 
-        // 8. Format Embed Video Stream URL
+        // 8. Resolve real Course FAQs, Learning Points, and Requirements from CourseContentResolver
+        $resolved = \App\Services\CourseContentResolver::resolve($course);
+        $faqs = $resolved['faqs'] ?? [];
+        $learningPoints = $resolved['learningPoints'] ?? [];
+        $requirements = $resolved['requirements'] ?? [];
+
+        // 9. Format Embed Video Stream URL
         $embedVideoUrl = $this->formatEmbedUrl($currentLesson ? $currentLesson->video_link : null);
 
         return view('customer.learning-player', [
@@ -356,6 +362,9 @@ class CustomerCourseController extends Controller
             'currentNote'        => $currentNote,
             'allCourseNotes'     => $allCourseNotes,
             'embedVideoUrl'      => $embedVideoUrl,
+            'faqs'               => $faqs,
+            'learningPoints'     => $learningPoints,
+            'requirements'       => $requirements,
         ]);
     }
 

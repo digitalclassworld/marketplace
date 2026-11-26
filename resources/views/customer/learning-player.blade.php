@@ -153,7 +153,7 @@
     .btn-mark-complete {
         font-size: 1.05rem;
         font-weight: 800;
-        padding: 0.8rem 2.25rem;
+        padding: 0.85rem 2.25rem;
         border-radius: 999px;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         display: inline-flex;
@@ -308,21 +308,73 @@
         max-width: 100% !important;
     }
 
-    /* Study Tabs Area */
+    /* ==========================================================================
+       STUDY WORKSPACE TABS & NOTEBOOK (Bigger, Spacious & Polished)
+       ========================================================================== */
+    .study-tabs-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+    }
+    .study-tabs {
+        border-bottom: 1.5px solid #e2e8f0;
+        background-color: #ffffff;
+        padding-inline: 1rem;
+    }
     .study-tabs .nav-link {
         color: #64748b;
-        font-weight: 600;
-        font-size: 0.95rem;
-        padding: 0.9rem 1.35rem;
+        font-weight: 700;
+        font-size: 1.02rem;
+        padding: 1.15rem 1.65rem;
         border: none;
-        border-bottom: 3px solid transparent;
+        border-bottom: 3.5px solid transparent;
         background: transparent;
+        transition: all 0.2s ease;
+    }
+    .study-tabs .nav-link:hover {
+        color: #0066ff;
     }
     .study-tabs .nav-link.active {
         color: #0066ff;
         border-bottom-color: #0066ff;
         background: transparent;
-        font-weight: 700;
+        font-weight: 800;
+    }
+    .study-card-body {
+        padding: 2.25rem 2.5rem;
+    }
+    @media (max-width: 768px) {
+        .study-card-body {
+            padding: 1.25rem 1rem;
+        }
+        .study-tabs .nav-link {
+            font-size: 0.9rem;
+            padding: 0.85rem 1rem;
+        }
+    }
+
+    /* Large Student Notebook Textarea */
+    .notebook-textarea {
+        min-height: 380px;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        padding: 1.5rem;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 14px;
+        background-color: #f8fafc;
+        color: #0f172a;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        resize: vertical;
+    }
+    .notebook-textarea:focus {
+        background-color: #ffffff;
+        border-color: #0066ff;
+        box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.12);
+        outline: none;
     }
 </style>
 @endsection
@@ -508,163 +560,273 @@
                 </div>
             </div>
 
-            <!-- Multi-Tab Study Workspace -->
-            <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
-                <div class="card-header bg-white border-bottom px-4 pt-3 pb-0">
+            <!-- Multi-Tab Study Workspace (Much Bigger, More Spacious, Clean Data) -->
+            <div class="study-tabs-card">
+                <div class="card-header bg-white border-0 p-0">
                     <ul class="nav nav-tabs study-tabs" id="studyTab" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
-                                <i class="fa-solid fa-book-open me-1.5"></i> Course Content & Overview
+                                <i class="fa-solid fa-book-open me-2"></i> Course Content & Overview
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab">
-                                <i class="fa-solid fa-note-sticky me-1.5"></i> My Study Notes
+                                <i class="fa-solid fa-note-sticky me-2"></i> My Study Notes
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" id="resources-tab" data-bs-toggle="tab" data-bs-target="#resources" type="button" role="tab">
-                                <i class="fa-solid fa-folder-open me-1.5"></i> Resources & Downloads
+                                <i class="fa-solid fa-folder-open me-2"></i> Resources & Materials
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" id="qa-tab" data-bs-toggle="tab" data-bs-target="#qa" type="button" role="tab">
-                                <i class="fa-solid fa-comments me-1.5"></i> Q&A / Instructor Desk
+                                <i class="fa-solid fa-circle-question me-2"></i> Course Q&A / FAQs
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" id="cert-tab" data-bs-toggle="tab" data-bs-target="#cert" type="button" role="tab">
-                                <i class="fa-solid fa-award me-1.5"></i> Certificate Status
+                                <i class="fa-solid fa-award me-2"></i> Certificate Status
                             </button>
                         </li>
                     </ul>
                 </div>
 
-                <div class="card-body p-4">
+                <div class="study-card-body">
                     <div class="tab-content" id="studyTabContent">
                         
-                        <!-- Tab 1: Overview -->
+                        <!-- Tab 1: Course Content & Overview (Expanded & Rich) -->
                         <div class="tab-pane fade show active" id="overview" role="tabpanel">
-                            <h5 class="fw-bold text-dark mb-2">About this Lecture</h5>
-                            <p class="text-secondary small mb-4 lh-base fs-6">
-                                {{ !empty($currentLesson->course_description) ? $currentLesson->course_description : ($course->short_description ?? 'This lecture covers practical concepts, real-world examples, and foundational exercises designed to build career-ready proficiency.') }}
+                            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                <h4 class="fw-bold text-dark mb-0 fs-4">About this Lecture & Syllabus</h4>
+                                <span class="badge bg-light text-primary border px-3 py-1.5 rounded-pill fw-semibold">
+                                    {{ $currentLesson ? ($currentLesson->chapter_name ?? 'Module') : 'Module' }}
+                                </span>
+                            </div>
+
+                            <p class="text-secondary mb-4 lh-lg fs-6">
+                                {{ !empty($currentLesson->course_description) ? $currentLesson->course_description : ($course->short_description ?? ($course->description ? Str::limit(strip_tags($course->description), 350) : 'This lecture covers practical concepts, real-world examples, and foundational exercises designed to build career-ready proficiency.')) }}
                             </p>
 
-                            <div class="p-3 bg-light rounded-3 border mb-3">
-                                <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-graduation-cap text-primary me-1.5"></i> Learning Objectives for this Topic</h6>
-                                <ul class="text-muted small mb-0 ps-3">
-                                    <li>Understand core principles and hands-on application methods.</li>
-                                    <li>Master key terminology, industry best practices, and workflow logic.</li>
-                                    <li>Complete accompanying exercises to reinforce retention.</li>
-                                </ul>
+                            <!-- Key Learning Points / Objectives (from Course Data) -->
+                            @if(!empty($learningPoints) && count($learningPoints) > 0)
+                                <div class="p-4 bg-light rounded-4 border mb-4">
+                                    <h5 class="fw-bold text-dark mb-3 fs-5">
+                                        <i class="fa-solid fa-bullseye text-primary me-2"></i> What You Learn in this Course
+                                    </h5>
+                                    <div class="row g-2.5">
+                                        @foreach($learningPoints as $pt)
+                                            <div class="col-12 col-md-6 d-flex align-items-start gap-2">
+                                                <i class="fa-solid fa-check text-success mt-1"></i>
+                                                <span class="text-dark small lh-base">{{ $pt }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Requirements & Prerequisites (from Course Data) -->
+                            @if(!empty($requirements) && count($requirements) > 0)
+                                <div class="p-4 bg-white rounded-4 border mb-3">
+                                    <h6 class="fw-bold text-dark mb-2.5 fs-6">
+                                        <i class="fa-solid fa-list-check text-secondary me-2"></i> Prerequisites & Requirements
+                                    </h6>
+                                    <ul class="text-secondary small mb-0 ps-3 lh-lg">
+                                        @foreach($requirements as $req)
+                                            <li>{{ $req }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <!-- Instructor Info Banner -->
+                            <div class="d-flex align-items-center gap-3 p-3.5 bg-light bg-opacity-70 rounded-3 border">
+                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px; font-size: 1.1rem;">
+                                    <i class="fa-solid fa-chalkboard-user"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark fs-6">{{ $course->instructor_name ?? 'Digital Class Instructor' }}</div>
+                                    <span class="text-muted small">Course Instructor • Verified E-Learning Curriculum</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Tab 2: Notes -->
+                        <!-- Tab 2: My Study Notes (BIGGER & MORE SPACIOUS NOTEBOOK) -->
                         <div class="tab-pane fade" id="notes" role="tabpanel">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h5 class="fw-bold text-dark mb-0">Lecture Notebook</h5>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="exportNotesToFile()">
-                                        <i class="fa-solid fa-file-export me-1"></i> Export Notes (.txt)
+                            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                <div>
+                                    <h4 class="fw-bold text-dark mb-0 fs-4">Lecture Study Notebook</h4>
+                                    <span class="text-muted small">
+                                        Notes for: <strong>{{ $currentLesson ? $currentLesson->lesson_name : 'Current Lecture' }}</strong>
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3.5 py-2 fw-semibold d-flex align-items-center gap-1.5" onclick="exportNotesToFile()">
+                                        <i class="fa-solid fa-download"></i>
+                                        <span>Export Notes (.txt)</span>
                                     </button>
-                                    <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold" onclick="saveStudentNote()">
-                                        <i class="fa-solid fa-floppy-disk me-1"></i> Save Note
+                                    <button class="btn btn-primary btn-sm rounded-pill px-4 py-2 fw-bold d-flex align-items-center gap-1.5 shadow-sm" onclick="saveStudentNote()">
+                                        <i class="fa-solid fa-floppy-disk"></i>
+                                        <span>Save Note (Ctrl+S)</span>
                                     </button>
                                 </div>
                             </div>
 
-                            <textarea id="studentNoteText" class="form-control rounded-3 p-3 border-1 bg-light text-dark" rows="7" placeholder="Type your personal study notes, key takeaways, code snippets, or lecture timestamps here...">{{ $currentNote ? $currentNote->note : '' }}</textarea>
+                            <!-- Large Notebook Textarea -->
+                            <textarea id="studentNoteText" class="form-control notebook-textarea mb-3" placeholder="Write your comprehensive study notes, key takeaways, important formulas, timestamps, and lecture reminders here...">{{ $currentNote ? $currentNote->note : '' }}</textarea>
                             
-                            <div class="d-flex align-items-center justify-content-between mt-2">
-                                <span class="text-muted small">Notes are saved privately to your account for this course.</span>
-                                <span class="text-success small fw-semibold d-none" id="noteSavedBadge"><i class="fa-solid fa-check me-1"></i> Note saved successfully!</span>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+                                <span class="text-muted small">
+                                    <i class="fa-solid fa-lock text-secondary me-1"></i> Notes are automatically tied to this lecture and saved privately in your student profile.
+                                </span>
+                                <span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25 px-3 py-1.5 rounded-pill fw-semibold d-none" id="noteSavedBadge">
+                                    <i class="fa-solid fa-check me-1"></i> Saved to your notebook!
+                                </span>
                             </div>
+
+                            <!-- Past Notes in this Course (if student saved notes in other lectures) -->
+                            @if(!empty($allCourseNotes) && $allCourseNotes->count() > 1)
+                                <div class="border-top pt-4 mt-2">
+                                    <h6 class="fw-bold text-dark mb-3 fs-6">
+                                        <i class="fa-solid fa-book-bookmark text-primary me-2"></i> All Notes Saved Across This Course ({{ $allCourseNotes->count() }})
+                                    </h6>
+                                    <div class="accordion accordion-flush" id="allNotesAccordion">
+                                        @foreach($allCourseNotes as $nIdx => $pastNote)
+                                            @php
+                                                $associatedLesson = $allLessons->firstWhere('id', $pastNote->lesson_id);
+                                            @endphp
+                                            <div class="accordion-item border rounded-3 mb-2 overflow-hidden">
+                                                <h2 class="accordion-header" id="noteHeading{{ $nIdx }}">
+                                                    <button class="accordion-button collapsed py-2.5 px-3.5 small fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#noteCollapse{{ $nIdx }}" style="background-color: #f8fafc;">
+                                                        <div class="d-flex align-items-center justify-content-between w-100 pe-2">
+                                                            <span>Lecture: {{ $associatedLesson ? $associatedLesson->lesson_name : 'Lesson #' . $pastNote->lesson_id }}</span>
+                                                            <span class="text-muted fw-normal small" style="font-size: 0.75rem;">{{ $pastNote->updated_at ? $pastNote->updated_at->diffForHumans() : '' }}</span>
+                                                        </div>
+                                                    </button>
+                                                </h2>
+                                                <div id="noteCollapse{{ $nIdx }}" class="accordion-collapse collapse" data-bs-parent="#allNotesAccordion">
+                                                    <div class="accordion-body bg-white text-secondary small p-3 lh-base" style="white-space: pre-wrap;">{{ $pastNote->note }}</div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Tab 3: Resources -->
+                        <!-- Tab 3: Resources & Materials (NO Fake / Dummy Downloads) -->
                         <div class="tab-pane fade" id="resources" role="tabpanel">
-                            <h5 class="fw-bold text-dark mb-2">Lecture Resources & Downloads</h5>
-                            <p class="text-muted small mb-3">Download practical cheat sheets, source code samples, and reference material for this lecture.</p>
+                            <h4 class="fw-bold text-dark mb-1 fs-4">Course Learning Materials & Resources</h4>
+                            <p class="text-muted small mb-4">Official study tools, curriculum outline, and downloadable notes.</p>
 
-                            <div class="list-group list-group-flush border rounded-3 overflow-hidden">
-                                <div class="list-group-item d-flex align-items-center justify-content-between p-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-3 bg-primary bg-opacity-10 text-primary p-2.5">
-                                            <i class="fa-solid fa-file-pdf fs-4"></i>
+                            <div class="row g-3">
+                                <!-- Export Personal Notes -->
+                                <div class="col-12 col-md-6">
+                                    <div class="p-3.5 border rounded-4 bg-light d-flex align-items-center justify-content-between h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-3 bg-primary bg-opacity-10 text-primary p-3 fs-4">
+                                                <i class="fa-solid fa-file-lines"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark fs-6">Lecture Notebook File</div>
+                                                <span class="text-muted small">Export all your personal study notes to a text file</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div class="fw-bold text-dark fs-6">Lecture_Reference_Notes.pdf</div>
-                                            <span class="text-muted small">Comprehensive slides, diagrams, and summary (2.4 MB)</span>
-                                        </div>
+                                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 fw-bold" onclick="exportNotesToFile()">
+                                            <i class="fa-solid fa-download me-1"></i> Export
+                                        </button>
                                     </div>
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3.5 py-1.5 fw-bold" onclick="alert('Downloading lecture guide PDF...');">
-                                        <i class="fa-solid fa-download me-1"></i> Download
-                                    </button>
                                 </div>
 
-                                <div class="list-group-item d-flex align-items-center justify-content-between p-3">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-3 bg-success bg-opacity-10 text-success p-2.5">
-                                            <i class="fa-solid fa-file-code fs-4"></i>
+                                <!-- Export Course Syllabus -->
+                                <div class="col-12 col-md-6">
+                                    <div class="p-3.5 border rounded-4 bg-light d-flex align-items-center justify-content-between h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-3 bg-success bg-opacity-10 text-success p-3 fs-4">
+                                                <i class="fa-solid fa-book-open"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark fs-6">Full Course Syllabus</div>
+                                                <span class="text-muted small">Download outline with all {{ $totalLessons }} lecture topics</span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div class="fw-bold text-dark fs-6">Exercise_Source_Files.zip</div>
-                                            <span class="text-muted small">Starter code templates, solution blueprints, and datasets (4.8 MB)</span>
-                                        </div>
+                                        <button class="btn btn-outline-success btn-sm rounded-pill px-3 py-1.5 fw-bold" onclick="exportSyllabusToFile()">
+                                            <i class="fa-solid fa-download me-1"></i> Syllabus
+                                        </button>
                                     </div>
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3.5 py-1.5 fw-bold" onclick="alert('Downloading exercise files zip...');">
-                                        <i class="fa-solid fa-download me-1"></i> Download
-                                    </button>
                                 </div>
+                            </div>
+
+                            <div class="p-4 bg-light rounded-4 border mt-4 text-center">
+                                <i class="fa-solid fa-circle-info text-primary fs-3 mb-2"></i>
+                                <h6 class="fw-bold text-dark mb-1">Instructional Delivery Format</h6>
+                                <p class="text-secondary small mb-0" style="max-width: 600px; margin-inline: auto;">
+                                    All instructional demonstrations, coding exercises, and concepts are self-contained in the high-definition video player. Use your personal Study Notes tab to capture key insights as you progress.
+                                </p>
                             </div>
                         </div>
 
-                        <!-- Tab 4: Q&A -->
+                        <!-- Tab 4: Course Q&A / FAQs (AUTHENTIC COURSE DETAIL FAQS - NO STATIC DUMMY DATA - NO POST INPUT) -->
                         <div class="tab-pane fade" id="qa" role="tabpanel">
-                            <h5 class="fw-bold text-dark mb-2">Discussion & Question Desk</h5>
-                            <p class="text-muted small mb-3">Have questions about this lecture? Ask the community and instructor.</p>
-                            
-                            <div class="input-group mb-4 shadow-sm rounded-3 overflow-hidden">
-                                <input type="text" class="form-control p-2.5 border-0 bg-light" placeholder="Ask a question about this topic..." id="qaInput">
-                                <button class="btn btn-primary px-4 fw-bold" type="button" onclick="postQuestion()">Post Question</button>
+                            <div class="mb-4">
+                                <h4 class="fw-bold text-dark mb-1 fs-4">Course Q&A & Frequently Asked Questions</h4>
+                                <p class="text-muted small mb-0">Official questions & answers as featured on the course details page.</p>
                             </div>
 
-                            <div class="border-top pt-3">
-                                <div class="d-flex gap-3 mb-3">
-                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
-                                        P
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-dark">Priya Sharma <span class="text-muted fw-normal small">• 2 days ago</span></div>
-                                        <p class="text-secondary small mb-1">What is the best practice for applying concepts covered in this module to real projects?</p>
-                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 small p-1.5 px-2 rounded-pill"><i class="fa-solid fa-check me-1"></i> Instructor Answer: Building end-to-end milestone exercises after each chapter reinforces the logic.</span>
-                                    </div>
+                            @if(!empty($faqs) && count($faqs) > 0)
+                                <div class="accordion accordion-flush" id="classroomFaqAccordion">
+                                    @foreach($faqs as $fIdx => $faq)
+                                        <div class="accordion-item border rounded-3 mb-3 overflow-hidden shadow-sm">
+                                            <h2 class="accordion-header" id="faqHeading{{ $fIdx }}">
+                                                <button class="accordion-button {{ $fIdx > 0 ? 'collapsed' : '' }} py-3.5 px-4 fw-bold text-dark" style="font-size: 1.02rem; background-color: #f8fafc;" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ $fIdx }}" aria-expanded="{{ $fIdx === 0 ? 'true' : 'false' }}">
+                                                    <div class="d-flex align-items-center gap-2.5">
+                                                        <i class="fa-regular fa-circle-question text-primary fs-5"></i>
+                                                        <span>{{ $faq['q'] }}</span>
+                                                    </div>
+                                                </button>
+                                            </h2>
+                                            <div id="faqCollapse{{ $fIdx }}" class="accordion-collapse collapse {{ $fIdx === 0 ? 'show' : '' }}" data-bs-parent="#classroomFaqAccordion">
+                                                <div class="accordion-body bg-white text-secondary py-3.5 px-4 fs-6" style="line-height: 1.75;">
+                                                    {!! nl2br(e($faq['a'])) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            </div>
+                            @else
+                                <div class="text-center py-5 bg-light rounded-4 border">
+                                    <i class="fa-regular fa-circle-question fs-1 text-muted mb-3 opacity-50"></i>
+                                    <h5 class="fw-bold text-dark mb-1">Self-Paced Course Curriculum</h5>
+                                    <p class="text-muted small mb-0" style="max-width: 480px; margin-inline: auto;">
+                                        All curriculum concepts, prerequisites, and learning directions are explained in the video lessons. Check the Course Content tab for detailed learning points.
+                                    </p>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Tab 5: Certificate Status -->
                         <div class="tab-pane fade" id="cert" role="tabpanel">
-                            <div class="text-center py-4">
-                                <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 72px; height: 72px;">
+                            <div class="text-center py-5">
+                                <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-inline-flex align-items-center justify-content-center p-3.5 mb-3.5" style="width: 84px; height: 84px;">
                                     <i class="fa-solid fa-award fs-1"></i>
                                 </div>
-                                <h4 class="fw-bold text-dark mb-1">Official Certificate of Completion</h4>
-                                <p class="text-muted small mb-3" style="max-width: 520px; margin-inline: auto;">
-                                    Complete all video lectures in this course (100% progress) to unlock your verified, personalized completion certificate.
+                                <h3 class="fw-bold text-dark mb-2 fs-3">Official Certificate of Completion</h3>
+                                <p class="text-muted small mb-4" style="max-width: 540px; margin-inline: auto; font-size: 0.95rem; line-height: 1.6;">
+                                    Complete all video lectures in this course (100% progress) to unlock your verified, personalized completion certificate with serial credentials.
                                 </p>
                                 
                                 <div class="mb-4">
-                                    <span class="badge {{ $progressPercent >= 100 ? 'bg-success' : 'bg-primary' }} px-3.5 py-2 rounded-pill fs-6 fw-bold shadow-sm">
+                                    <span class="badge {{ $progressPercent >= 100 ? 'bg-success' : 'bg-primary' }} px-4 py-2.5 rounded-pill fs-6 fw-bold shadow-sm">
                                         Current Progress: {{ $progressPercent }}% ({{ $completedCount }} / {{ $totalLessons }} Lectures Finished)
                                     </span>
                                 </div>
 
-                                <a href="{{ route('customer.course.certificate', ['courseId' => $course->id]) }}" class="btn {{ $progressPercent >= 100 ? 'btn-success' : 'btn-outline-primary' }} rounded-pill px-4 py-2.5 fw-bold shadow-sm">
-                                    <i class="fa-solid fa-award me-1.5"></i>
-                                    <span>{{ $progressPercent >= 100 ? 'Download Verified Certificate' : 'Preview Certificate Template' }}</span>
-                                </a>
+                                <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
+                                    <a href="{{ route('customer.course.certificate', ['courseId' => $course->id]) }}" class="btn {{ $progressPercent >= 100 ? 'btn-success' : 'btn-outline-primary' }} btn-lg rounded-pill px-4 py-2.5 fw-bold shadow-sm">
+                                        <i class="fa-solid fa-award me-2"></i>
+                                        <span>{{ $progressPercent >= 100 ? 'Download Verified Certificate' : 'Preview Certificate Template' }}</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 
@@ -840,8 +1002,13 @@ document.addEventListener('fullscreenchange', () => {
     }
 });
 
-// Keyboard shortcuts: F for Fullscreen, T for Theater Mode
+// Keyboard shortcuts: F for Fullscreen, T for Theater Mode, Ctrl+S for saving notes
 document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        saveStudentNote();
+        return;
+    }
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
     if (e.key === 'f' || e.key === 'F') {
         toggleFullscreenPlayer();
@@ -994,7 +1161,7 @@ function saveStudentNote() {
     .then(data => {
         if (data.success) {
             badge.classList.remove('d-none');
-            setTimeout(() => badge.classList.add('d-none'), 3000);
+            setTimeout(() => badge.classList.add('d-none'), 3500);
         }
     });
 }
@@ -1006,7 +1173,8 @@ function exportNotesToFile() {
         alert('Your notebook is empty. Write some notes first before exporting.');
         return;
     }
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const fullContent = `COURSE: {{ addslashes($course->title ?? $course->course_name) }}\nLECTURE: {{ addslashes($currentLesson ? $currentLesson->lesson_name : 'Lesson') }}\nDATE: ${new Date().toLocaleDateString()}\n=======================================================\n\n` + text;
+    const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `Study_Notes_{{ Str::slug($course->title ?? $course->course_name) }}.txt`;
@@ -1015,12 +1183,23 @@ function exportNotesToFile() {
     document.body.removeChild(a);
 }
 
-// 10. Post Question
-function postQuestion() {
-    const input = document.getElementById('qaInput');
-    if (!input.value.trim()) return;
-    alert('Your question has been posted to the instructor desk!');
-    input.value = '';
+// 10. Export Full Course Syllabus Outline
+function exportSyllabusToFile() {
+    let content = `COURSE SYLLABUS: {{ addslashes($course->title ?? $course->course_name) }}\nTOTAL LECTURES: {{ $totalLessons }}\n=======================================================\n\n`;
+    @foreach($chapters as $ch)
+        content += `\nMODULE: {{ addslashes($ch->chapter_name) }}\n`;
+        @foreach($ch->lessons as $l)
+            content += `  - {{ addslashes($l->lesson_name) }} (Duration: {{ $l->duration }})\n`;
+        @endforeach
+    @endforeach
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Syllabus_{{ Str::slug($course->title ?? $course->course_name) }}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 }
 </script>
 @endsection
