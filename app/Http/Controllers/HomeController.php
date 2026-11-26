@@ -167,7 +167,7 @@ class HomeController extends Controller
                 'color'  => '#2563eb',
                 'bg'     => '#eff6ff',
                 'border' => '#dbeafe',
-                'url'    => route('courses', ['category' => 'Web Development']),
+                'url'    => route('courses', ['category' => 'IT & Software Development']),
             ],
             [
                 'name'   => 'Design & Creative',
@@ -175,7 +175,7 @@ class HomeController extends Controller
                 'color'  => '#c026d3',
                 'bg'     => '#fdf4ff',
                 'border' => '#fae8ff',
-                'url'    => route('services', ['category' => 'Design']),
+                'url'    => route('courses', ['category' => 'Designing & Creative']),
             ],
             [
                 'name'   => 'Tally & Accounting',
