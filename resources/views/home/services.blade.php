@@ -418,28 +418,28 @@
         color: #64748b;
     }
 
-    /* Horizontal Category Cards Bar (Matching Pastel Squircle Badges) */
+    /* Horizontal Category Cards Bar (Exact Match with Courses / Marketplace Squircle Badges) */
     .category-cards-section {
         background: #ffffff;
         border-bottom: 1px solid #e2e8f0;
-        padding: 1.15rem 0 0.85rem;
+        padding: 0.95rem 0 0.75rem;
     }
 
     .category-scroll-container {
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
-        gap: 0.85rem;
+        gap: 0.65rem;
         overflow-x: auto;
         white-space: nowrap;
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 transparent;
-        padding-bottom: 6px;
+        padding-bottom: 4px;
         -webkit-overflow-scrolling: touch;
     }
 
     .category-scroll-container::-webkit-scrollbar {
-        height: 5px;
+        height: 4px;
     }
     .category-scroll-container::-webkit-scrollbar-thumb {
         background: #cbd5e1;
@@ -452,13 +452,13 @@
         align-items: center;
         text-decoration: none;
         flex: 1 1 0;
-        min-width: 90px;
-        max-width: 120px;
+        min-width: 82px;
+        max-width: 105px;
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         cursor: pointer;
         text-align: center;
-        padding: 0.25rem 0.2rem;
-        border-radius: 14px;
+        padding: 0.25rem 0.15rem;
+        border-radius: 12px;
         flex-shrink: 0;
     }
 
@@ -476,7 +476,7 @@
         font-size: 1.35rem;
         margin-bottom: 0.55rem;
         transition: all 0.25s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         position: relative;
     }
 
@@ -486,7 +486,7 @@
     }
 
     .service-cat-label {
-        font-size: 0.78rem;
+        font-size: 0.76rem;
         font-weight: 700;
         color: #1e293b;
         line-height: 1.25;
@@ -504,9 +504,10 @@
         color: #0066ff;
     }
 
+    /* Active category pill matching platform pattern */
     .service-cat-item.active .service-cat-icon-box {
-        box-shadow: 0 0 0 3px #0066ff, 0 8px 18px rgba(0, 102, 255, 0.25);
-        transform: scale(1.06);
+        box-shadow: 0 0 0 2.5px currentColor, 0 6px 16px rgba(0, 102, 255, 0.2);
+        transform: scale(1.05);
     }
 
     .service-cat-item.active .service-cat-label {
@@ -516,10 +517,10 @@
 
     @media (max-width: 991px) {
         .category-cards-section {
-            padding: 0.85rem 0 0.65rem;
+            padding: 0.75rem 0 0.5rem;
         }
         .service-cat-item {
-            min-width: 78px;
+            min-width: 74px;
         }
         .service-cat-icon-box {
             width: 46px;
@@ -1417,10 +1418,14 @@
         <div class="category-scroll-container">
             @foreach($categories as $cat)
                 @php
-                    $isActive = ($selectedCategory === $cat['name']) || ($selectedCategory === 'all' && $cat['name'] === 'More Services');
+                    $isCatActive = ($selectedCategory === $cat['name'] || ($selectedCategory === 'all' && $cat['slug'] === 'all'));
+                    $catParam = ($cat['slug'] === 'all') ? '' : $cat['name'];
+                    $catQuery = array_merge(request()->query(), ['category' => $catParam]);
+                    if (empty($catParam)) unset($catQuery['category']);
+                    $catUrl = route('services', $catQuery);
                 @endphp
-                <a href="{{ route('services', array_merge(request()->query(), ['category' => $cat['name'] === 'More Services' ? 'all' : $cat['name']])) }}" 
-                   class="service-cat-item {{ $isActive ? 'active' : '' }}" title="{{ $cat['name'] }}">
+                <a href="{{ $catUrl }}" 
+                   class="service-cat-item {{ $isCatActive ? 'active' : '' }}" title="{{ $cat['name'] }}">
                     <div class="service-cat-icon-box" style="background-color: {{ $cat['bg'] ?? '#f8fafc' }}; border: 1.5px solid {{ $cat['border'] ?? '#e2e8f0' }}; color: {{ $cat['color'] ?? '#0066ff' }};">
                         <i class="{{ $cat['icon'] }}"></i>
                     </div>
@@ -1432,8 +1437,9 @@
 </section>
 
 <!-- ========================================== -->
-<!-- 3. TOP SERVICE PROVIDERS (Carousel/Cards)  -->
+<!-- 3. TOP SERVICE PROVIDERS (Only When Real Verified Providers Exist) -->
 <!-- ========================================== -->
+@if(isset($topProviders) && count($topProviders) > 0)
 <section class="providers-section">
     <div class="container-fluid px-lg-4">
         <div class="section-title-wrap">
@@ -1468,6 +1474,7 @@
         </div>
     </div>
 </section>
+@endif
 
 <!-- ========================================== -->
 <!-- 4. MAIN CONTENT: FILTERS, LISTING, SIDEBAR -->
