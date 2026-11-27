@@ -341,53 +341,98 @@
         margin: 2.25rem 0;
     }
     .promo-banner-card {
-        border-radius: 14px;
-        padding: 1.4rem 1.6rem;
+        border-radius: 16px;
+        padding: 1.35rem 1.4rem;
         color: #ffffff;
         position: relative;
         overflow: hidden;
+        min-height: 165px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-height: 145px;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-        transition: transform 0.2s ease;
     }
     .promo-banner-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-4px);
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
     }
     .promo-card-1 {
-        background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+        background: linear-gradient(135deg, #e11d48 0%, #be123c 60%, #9f1239 100%);
     }
     .promo-card-2 {
-        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 60%, #075985 100%);
     }
     .promo-card-3 {
-        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        background: linear-gradient(135deg, #059669 0%, #047857 60%, #065f46 100%);
+    }
+    .promo-card-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 2;
+    }
+    .promo-text-side {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .promo-img-side {
+        flex-shrink: 0;
+    }
+    .promo-img-frame {
+        width: 105px;
+        height: 108px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+        background: rgba(255, 255, 255, 0.12);
+        transition: transform 0.3s ease;
+    }
+    .promo-banner-card:hover .promo-img-frame {
+        transform: scale(1.06) rotate(1.5deg);
+    }
+    .promo-img-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
     .promo-tag {
         font-size: 0.72rem;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.22);
         backdrop-filter: blur(4px);
         padding: 0.25rem 0.6rem;
-        border-radius: 4px;
+        border-radius: 6px;
         display: inline-block;
         margin-bottom: 0.5rem;
         width: fit-content;
     }
     .promo-title {
-        font-size: 1.25rem;
+        font-size: 1.18rem;
         font-weight: 800;
         line-height: 1.25;
         margin-bottom: 0.35rem;
     }
     .promo-desc {
-        font-size: 0.8rem;
-        opacity: 0.9;
+        font-size: 0.78rem;
+        opacity: 0.92;
         margin-bottom: 0.85rem;
+        line-height: 1.35;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
     .promo-btn {
         font-size: 0.82rem;
@@ -397,15 +442,35 @@
         display: inline-flex;
         align-items: center;
         gap: 0.35rem;
-        background: rgba(0, 0, 0, 0.2);
-        padding: 0.4rem 0.85rem;
-        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.22);
+        backdrop-filter: blur(4px);
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
         width: fit-content;
-        transition: background 0.2s;
+        transition: all 0.2s ease;
     }
     .promo-btn:hover {
-        background: rgba(0, 0, 0, 0.35);
+        background: rgba(0, 0, 0, 0.4);
         color: #ffffff;
+        transform: translateX(2px);
+    }
+    @media (max-width: 1199px) and (min-width: 992px) {
+        .promo-img-frame {
+            width: 88px;
+            height: 92px;
+        }
+        .promo-title {
+            font-size: 1.05rem;
+        }
+    }
+    @media (max-width: 576px) {
+        .promo-img-frame {
+            width: 82px;
+            height: 86px;
+        }
+        .promo-title {
+            font-size: 1.1rem;
+        }
     }
 
     /* ==========================================================================
@@ -1358,53 +1423,83 @@
                     }
                 @endphp
                 <div class="promo-banner-card {{ !$style ? $bg : '' }}" style="{{ $style }}">
-                    <div>
-                        <span class="promo-tag">{{ $tagline }}</span>
-                        <div class="promo-title">{!! nl2br(e($banner->listing_title)) !!}</div>
-                        @if(!empty($meta['campaign']))
-                            <div class="promo-desc">{{ $meta['campaign'] }}</div>
+                    <div class="promo-card-content">
+                        <div class="promo-text-side">
+                            <span class="promo-tag">{{ $tagline }}</span>
+                            <div class="promo-title">{!! nl2br(e($banner->listing_title)) !!}</div>
+                            @if(!empty($meta['campaign']))
+                                <div class="promo-desc">{{ $meta['campaign'] }}</div>
+                            @endif
+                            <a href="{{ $link }}" class="promo-btn">
+                                {{ $btnText }} <i class="fa-solid fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        @if($hasImg)
+                            <div class="promo-img-side">
+                                <div class="promo-img-frame">
+                                    <img src="{{ $banner->listing_thumbnail }}" alt="{{ $banner->listing_title }}" loading="lazy">
+                                </div>
+                            </div>
                         @endif
                     </div>
-                    <a href="{{ $link }}" class="promo-btn">
-                        {{ $btnText }} <i class="fa-solid fa-arrow-right ms-1"></i>
-                    </a>
                 </div>
             @endforeach
         @else
             <!-- Banner 1: Festival Offer -->
             <div class="promo-banner-card promo-card-1">
-                <div>
-                    <span class="promo-tag">Festival Offer</span>
-                    <div class="promo-title">Extra 50% OFF<br>on Selected Courses</div>
-                    <div class="promo-desc">Learn top IT, Design & Management skills today</div>
+                <div class="promo-card-content">
+                    <div class="promo-text-side">
+                        <span class="promo-tag"><i class="fa-solid fa-gift me-1"></i> Festival Offer</span>
+                        <div class="promo-title">Extra 50% OFF<br>on Selected Courses</div>
+                        <div class="promo-desc">Learn top IT, Design & Management skills today</div>
+                        <a href="{{ route('courses') }}" class="promo-btn">
+                            Grab Offer <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="promo-img-side">
+                        <div class="promo-img-frame">
+                            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=500&auto=format&fit=crop&q=80" alt="Selected Courses" loading="lazy">
+                        </div>
+                    </div>
                 </div>
-                <a href="{{ route('courses') }}" class="promo-btn">
-                    Grab Offer <i class="fa-solid fa-arrow-right ms-1"></i>
-                </a>
             </div>
 
             <!-- Banner 2: Grow Your Business -->
             <div class="promo-banner-card promo-card-2">
-                <div>
-                    <span class="promo-tag">Grow Your Business</span>
-                    <div class="promo-title">List Your Business for Free</div>
-                    <div class="promo-desc">Get discovered by thousands of active students & clients</div>
+                <div class="promo-card-content">
+                    <div class="promo-text-side">
+                        <span class="promo-tag"><i class="fa-solid fa-chart-line me-1"></i> Grow Your Business</span>
+                        <div class="promo-title">List Your Business<br>for Free</div>
+                        <div class="promo-desc">Get discovered by thousands of active students & clients</div>
+                        <a href="{{ route('businesses') }}" class="promo-btn">
+                            Add Your Business <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="promo-img-side">
+                        <div class="promo-img-frame">
+                            <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=500&auto=format&fit=crop&q=80" alt="List Your Business" loading="lazy">
+                        </div>
+                    </div>
                 </div>
-                <a href="{{ route('businesses') }}" class="promo-btn">
-                    Add Your Business <i class="fa-solid fa-arrow-right ms-1"></i>
-                </a>
             </div>
 
             <!-- Banner 3: Become a Seller -->
             <div class="promo-banner-card promo-card-3">
-                <div>
-                    <span class="promo-tag">Become a Seller</span>
-                    <div class="promo-title">Sell Courses, Services & Products</div>
-                    <div class="promo-desc">Join 10,000+ educators & service providers nationwide</div>
+                <div class="promo-card-content">
+                    <div class="promo-text-side">
+                        <span class="promo-tag"><i class="fa-solid fa-store me-1"></i> Become a Seller</span>
+                        <div class="promo-title">Sell Courses, Services<br>& Products</div>
+                        <div class="promo-desc">Join 10,000+ educators & service providers nationwide</div>
+                        <a href="{{ route('seller.register') }}" class="promo-btn">
+                            Start Selling <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="promo-img-side">
+                        <div class="promo-img-frame">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80" alt="Sell Courses & Services" loading="lazy">
+                        </div>
+                    </div>
                 </div>
-                <a href="{{ route('seller.register') }}" class="promo-btn">
-                    Start Selling <i class="fa-solid fa-arrow-right ms-1"></i>
-                </a>
             </div>
         @endif
     </div>
