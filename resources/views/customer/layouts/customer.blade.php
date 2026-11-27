@@ -74,38 +74,18 @@
 
         /* Sidebar Brand */
         .dc-sidebar-header {
-            padding: 1.25rem 1.4rem;
+            padding: 1.1rem 1.25rem;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
             border-bottom: 1px solid #f1f5f9;
+            min-height: 68px;
         }
-        .dc-brand-logo-icon {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #0066ff 0%, #00d2ff 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
-            flex-shrink: 0;
-        }
-        .dc-brand-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1.15;
-            letter-spacing: -0.02em;
-        }
-        .dc-brand-subtitle {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .dc-sidebar-logo {
+            height: 40px;
+            width: auto;
+            max-width: 185px;
+            object-fit: contain;
+            display: block;
         }
 
         /* Sidebar Menu Items */
@@ -495,14 +475,8 @@
         <div>
             <!-- Sidebar Header Brand -->
             <div class="dc-sidebar-header">
-                <a href="{{ route('customer.dashboard') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-                    <div class="dc-brand-logo-icon">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                    <div>
-                        <div class="dc-brand-title">Digital Class</div>
-                        <div class="dc-brand-subtitle">Marketplace</div>
-                    </div>
+                <a href="{{ route('customer.dashboard') }}" class="d-inline-flex align-items-center text-decoration-none">
+                    <img src="{{ asset('images/logo.png') }}" alt="Digital Class" class="dc-sidebar-logo">
                 </a>
             </div>
 
@@ -625,6 +599,9 @@
                 <button type="button" class="dc-sidebar-toggle" onclick="toggleStudentSidebar()" title="Toggle Sidebar">
                     <i class="fa-solid fa-bars"></i>
                 </button>
+                <a href="{{ route('customer.dashboard') }}" class="d-lg-none ms-2 me-3" title="Digital Class">
+                    <img src="{{ asset('images/logo.png') }}" alt="Digital Class" style="height: 32px; width: auto; max-width: 140px; object-fit: contain;">
+                </a>
 
                 <!-- Global Search with Category Selector -->
                 <form action="{{ route('courses') }}" method="GET" class="topbar-search-form" id="topbarSearchForm">
