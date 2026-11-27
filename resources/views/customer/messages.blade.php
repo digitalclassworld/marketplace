@@ -365,7 +365,7 @@
         <div class="modal-content border-0 shadow rounded-4">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold text-dark" id="newSellerChatModalLabel">
-                    <i class="fa-solid fa-comment-medical text-primary me-2"></i> Message a Seller
+                    <i class="fa-solid fa-comment-medical text-primary me-2"></i> Message a Seller / Instructor
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -373,27 +373,57 @@
                 @csrf
                 <input type="hidden" name="target" value="seller">
                 <div class="modal-body pt-3">
+                    <!-- Course Selection Dropdown (Optional / Quick Select) -->
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-dark">Select Seller / Educator</label>
-                        <select name="seller_id" class="form-select rounded-3" required>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small fw-bold text-dark mb-0">Which Course are you asking about? (Optional)</label>
+                            <span class="badge bg-light text-muted border small">Auto-picks seller</span>
+                        </div>
+                        <select name="course_id" id="courseSelect" class="form-select rounded-3" onchange="handleCourseChange(this)">
+                            <option value="">-- Select Specific Course (Optional) --</option>
+                            @if(isset($availableCourses))
+                                @foreach($availableCourses as $c)
+                                    @php
+                                        $cSellerName = $c->seller?->store_name ?: ($c->seller?->businessDetail?->business_name ?: 'Seller #' . $c->seller_id);
+                                    @endphp
+                                    <option value="{{ $c->id }}" data-seller-id="{{ $c->seller_id }}" data-course-title="{{ $c->title }}" data-seller-name="{{ $c->seller?->store_name ?: '' }}">
+                                        {{ $c->title }} &mdash; by {{ $cSellerName }} (₹{{ number_format($c->discount_price ?: $c->price) }})
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        <small class="text-muted" style="font-size: 0.75rem;">Select the course you need details or guidance for.</small>
+                    </div>
+
+                    <!-- Seller Selection Dropdown -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Select Seller / Educator / Institute *</label>
+                        <select name="seller_id" id="sellerSelect" class="form-select rounded-3" required>
                             <option value="">-- Choose Instructor or Seller --</option>
                             @if(isset($availableSellers))
                                 @foreach($availableSellers as $seller)
                                     @php
                                         $sName = $seller->store_name ?: ($seller->businessDetail?->business_name ?: 'Seller #' . $seller->seller_code);
+                                        $city = $seller->businessDetail?->city ?: ($seller->user?->city ?: '');
                                     @endphp
-                                    <option value="{{ $seller->id }}">{{ $sName }}</option>
+                                    <option value="{{ $seller->id }}" data-seller-name="{{ $sName }}">
+                                        {{ $sName }} {{ $city ? '(' . $city . ')' : '' }} &mdash; #{{ $seller->seller_code }}
+                                    </option>
                                 @endforeach
                             @endif
                         </select>
                     </div>
+
+                    <!-- Subject / Inquiry Topic -->
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-dark">Subject / Course Name</label>
-                        <input type="text" name="subject_title" class="form-control rounded-3" placeholder="e.g. Question about Full Stack Web Development course" required>
+                        <label class="form-label small fw-bold text-dark">Subject / Course Name *</label>
+                        <input type="text" name="subject_title" id="subjectTitleInput" class="form-control rounded-3" placeholder="e.g. Question about Digital Marketing Mastery syllabus or schedule" required>
                     </div>
+
+                    <!-- Message Body -->
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-dark">Your Message</label>
-                        <textarea name="message" rows="4" class="form-control rounded-3" placeholder="Ask about batches, curriculum, prerequisites, or offers..." required></textarea>
+                        <label class="form-label small fw-bold text-dark">Your Message / Query *</label>
+                        <textarea name="message" id="messageBodyInput" rows="4" class="form-control rounded-3" placeholder="Ask about batches, curriculum, prerequisites, project guidance, or discount offers..." required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -408,6 +438,26 @@
 </div>
 
 <script>
+    function handleCourseChange(selectEl) {
+        const selectedOpt = selectEl.options[selectEl.selectedIndex];
+        if (!selectedOpt || !selectedOpt.value) return;
+
+        const sellerId = selectedOpt.getAttribute('data-seller-id');
+        const courseTitle = selectedOpt.getAttribute('data-course-title');
+
+        // Auto select the seller in the seller dropdown
+        const sellerSelect = document.getElementById('sellerSelect');
+        if (sellerSelect && sellerId) {
+            sellerSelect.value = sellerId;
+        }
+
+        // Auto populate the subject title
+        const subjectInput = document.getElementById('subjectTitleInput');
+        if (subjectInput && courseTitle) {
+            subjectInput.value = 'Inquiry for ' + courseTitle;
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         var chatBox = document.getElementById("sellerChatBox");
         if (chatBox) {

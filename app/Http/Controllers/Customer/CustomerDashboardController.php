@@ -601,19 +601,42 @@ class CustomerDashboardController extends Controller
         }
 
         // Available sellers/instructors list for starting a new chat
+        // We prioritize sellers who have active courses, services, or business listings, plus all active sellers
         $availableSellers = collect();
         if (Schema::hasTable('sellers')) {
             try {
+                // Get active sellers with their business details and users
                 $availableSellers = \App\Models\Seller::where('seller_status', 'Active')
                     ->with(['businessDetail', 'user'])
-                    ->take(20)
+                    ->orderByRaw("CASE 
+                        WHEN id IN (SELECT DISTINCT seller_id FROM courses WHERE seller_id IS NOT NULL) THEN 1 
+                        WHEN id IN (SELECT DISTINCT seller_id FROM services WHERE seller_id IS NOT NULL) THEN 2 
+                        WHEN id IN (SELECT DISTINCT seller_id FROM business_listings WHERE seller_id IS NOT NULL) THEN 3 
+                        ELSE 4 
+                    END")
+                    ->orderBy('id', 'asc')
                     ->get();
 
                 if ($availableSellers->isEmpty()) {
-                    $availableSellers = \App\Models\Seller::with(['businessDetail', 'user'])->take(20)->get();
+                    $availableSellers = \App\Models\Seller::with(['businessDetail', 'user'])->get();
                 }
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Available sellers fetch note: ' . $e->getMessage());
+                // Fallback safe collection
+                $availableSellers = \App\Models\Seller::with(['businessDetail', 'user'])->take(200)->get();
+            }
+        }
+
+        // Available marketplace courses for inquiry dropdown
+        $availableCourses = collect();
+        if (Schema::hasTable('courses')) {
+            try {
+                $availableCourses = \App\Models\Course::select('id', 'title', 'seller_id', 'price', 'discount_price')
+                    ->with(['seller.businessDetail', 'seller.user'])
+                    ->orderBy('title', 'asc')
+                    ->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Available courses fetch note: ' . $e->getMessage());
             }
         }
 
@@ -634,6 +657,7 @@ class CustomerDashboardController extends Controller
             'conversations',
             'sellerChats',
             'availableSellers',
+            'availableCourses',
             'sessionMessages',
             'activeTab',
             'activeSellerChat'
@@ -707,6 +731,7 @@ class CustomerDashboardController extends Controller
     {
         $validated = $request->validate([
             'seller_id'       => 'nullable|integer',
+            'course_id'       => 'nullable|integer',
             'conversation_id' => 'nullable|integer',
             'subject_title'   => 'nullable|string|max:200',
             'message'         => 'required|string|max:3000',
@@ -715,6 +740,14 @@ class CustomerDashboardController extends Controller
         $user = Auth::guard('web')->user();
         if (!$user) {
             return redirect()->route('login')->with('error', 'Please login to message sellers.');
+        }
+
+        $course = null;
+        if (!empty($validated['course_id']) && Schema::hasTable('courses')) {
+            $course = \App\Models\Course::with('seller')->find($validated['course_id']);
+            if ($course && empty($validated['seller_id'])) {
+                $validated['seller_id'] = $course->seller_id;
+            }
         }
 
         $conversation = null;
@@ -736,6 +769,15 @@ class CustomerDashboardController extends Controller
                     })
                     ->first();
 
+                $subjectTitle = $validated['subject_title'];
+                if (empty($subjectTitle)) {
+                    if ($course) {
+                        $subjectTitle = 'Inquiry for Course: ' . $course->title;
+                    } else {
+                        $subjectTitle = 'Query for ' . $seller->store_name;
+                    }
+                }
+
                 if (!$conversation) {
                     $conversation = \App\Models\Conversation::create([
                         'seller_id'              => $seller->id,
@@ -745,8 +787,9 @@ class CustomerDashboardController extends Controller
                         'customer_avatar'        => $user->avatar,
                         'customer_city'          => $user->city,
                         'customer_online_status' => 'Online',
-                        'subject_title'          => $validated['subject_title'] ?: ('Query for ' . $seller->store_name),
-                        'subject_type'           => 'Course / Service Query',
+                        'subject_title'          => $subjectTitle,
+                        'subject_type'           => $course ? ('Course: #' . $course->id) : 'Course / Service Query',
+                        'subject_thumbnail'      => $course?->thumbnail,
                         'category'               => 'inquiries',
                         'status'                 => 'Active',
                         'total_messages'         => 0,
@@ -754,6 +797,13 @@ class CustomerDashboardController extends Controller
                         'last_message'           => $validated['message'],
                         'last_message_at'        => now(),
                         'active_since'           => now(),
+                    ]);
+                } else if ($course) {
+                    // Update subject title if asking about a specific course
+                    $conversation->update([
+                        'subject_title' => $subjectTitle,
+                        'subject_type'  => 'Course: #' . $course->id,
+                        'subject_thumbnail' => $course->thumbnail ?: $conversation->subject_thumbnail,
                     ]);
                 }
             }
