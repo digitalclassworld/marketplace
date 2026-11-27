@@ -298,33 +298,44 @@ class CustomerDashboardController extends Controller
     {
         if (empty($user->id)) return;
 
-        $orders = Order::where(function($q) use ($user) {
-                if ($user->email) $q->where('customer_email', $user->email);
-                if ($user->phone) $q->orWhere('customer_phone', $user->phone);
-            })
-            ->whereIn('payment_status', ['Paid', 'Success', 'Completed'])
-            ->get();
+        $orders = Order::where(function ($q) use ($user) {
+            if (!empty($user->email)) $q->where('customer_email', $user->email);
+            if (!empty($user->phone)) $q->orWhere('customer_phone', $user->phone);
+        })
+        ->whereIn('status', ['confirmed', 'completed', 'processing', 'in_progress', 'Delivered'])
+        ->get();
 
         foreach ($orders as $order) {
-            $courseId = null;
-            $courseType = 'elearn';
+            $course = null;
+            $courseType = 'catalog';
 
-            if ($order->order_type === 'course' && !empty($order->item_id)) {
-                $courseId = (int)$order->item_id;
-            } elseif (preg_match('/course\s*#?(\d+)/i', $order->item_name ?? '', $m)) {
-                $courseId = (int)$m[1];
+            if (Schema::hasTable('dc_elearn_course')) {
+                $course = ElearnCourse::where('course_name', $order->item_title)->first();
+                if (!$course && preg_match('/\[ID:\s*(\d+)\]/', $order->item_subtext ?? '', $matches)) {
+                    $course = ElearnCourse::find((int)$matches[1]);
+                }
+                if ($course) $courseType = 'elearn';
             }
 
-            if ($courseId) {
-                CourseEnrollment::firstOrCreate([
-                    'user_id'   => $user->id,
-                    'course_id' => $courseId,
-                ], [
-                    'order_id'         => $order->id,
-                    'course_type'      => $courseType,
-                    'progress_percent' => 0,
-                    'status'           => 'active',
-                ]);
+            if (!$course && Schema::hasTable('courses')) {
+                $course = Course::where('title', $order->item_title)->first();
+                $courseType = 'catalog';
+            }
+
+            if ($course) {
+                CourseEnrollment::firstOrCreate(
+                    [
+                        'user_id'     => $user->id,
+                        'course_id'   => $course->id,
+                        'course_type' => $courseType,
+                    ],
+                    [
+                        'order_id'         => $order->id,
+                        'enrolled_at'      => $order->placed_at ?? $order->created_at,
+                        'status'           => 'active',
+                        'progress_percent' => 0,
+                    ]
+                );
             }
         }
     }

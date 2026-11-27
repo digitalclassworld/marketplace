@@ -956,7 +956,7 @@
                                 <div class="text-muted small"><i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ $rb->city ?: 'Ahmedabad' }}, {{ $rb->state ?: 'Gujarat' }}</div>
                             </div>
                             <div class="p-3 pt-0">
-                                <a href="{{ route('business.profile', $rb->slug ?: $rb->id) }}" class="btn btn-sm btn-outline-primary w-100 fw-bold rounded-pill">View Profile</a>
+                                <a href="{{ route('business.show.single', $rb->slug ?: $rb->id) }}" class="btn btn-sm btn-outline-primary w-100 fw-bold rounded-pill">View Profile</a>
                             </div>
                         </div>
                     @empty
