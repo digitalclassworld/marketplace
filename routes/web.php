@@ -185,7 +185,8 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/business-inquiries', [CustomerDashboardController::class, 'businesses'])->name('business-inquiries');
     Route::get('/wishlist', [CustomerDashboardController::class, 'wishlist'])->name('wishlist');
     Route::post('/wishlist/toggle', [CustomerDashboardController::class, 'toggleWishlist'])->name('wishlist.toggle');
-    Route::post('/wishlist/remove/{id}', [CustomerDashboardController::class, 'removeFromWishlist'])->name('wishlist.remove');
+    Route::match(['get', 'post'], '/wishlist/remove/{id}', [CustomerDashboardController::class, 'removeFromWishlist'])->name('wishlist.remove');
+    Route::match(['get', 'post'], '/wishlist/clear', [CustomerDashboardController::class, 'clearWishlist'])->name('wishlist.clear');
     Route::get('/messages', [CustomerDashboardController::class, 'messages'])->name('messages');
     Route::post('/messages/send', [CustomerDashboardController::class, 'sendMessage'])->name('messages.send');
 });

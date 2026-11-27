@@ -99,6 +99,12 @@ class StudentDashboardPanelTest extends TestCase
             ->post(route('customer.wishlist.remove', ['id' => 1]));
         $removeResponse->assertRedirect();
         $removeResponse->assertSessionHas('success');
+
+        // Test clearing all items
+        $clearResponse = $this->actingAs($this->student, 'web')
+            ->post(route('customer.wishlist.clear'));
+        $clearResponse->assertRedirect();
+        $clearResponse->assertSessionHas('success');
     }
 
     public function test_student_can_view_messages_page_and_send_message()

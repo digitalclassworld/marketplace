@@ -481,9 +481,43 @@ class CustomerDashboardController extends Controller
         $wishlist = session('wishlist', []);
         if (isset($wishlist[$id])) {
             unset($wishlist[$id]);
-            session(['wishlist' => $wishlist]);
+        } else {
+            foreach ($wishlist as $k => $item) {
+                if (($item['id'] ?? null) == $id) {
+                    unset($wishlist[$k]);
+                    break;
+                }
+            }
         }
-        return back()->with('success', 'Item removed from your wishlist.');
+        session(['wishlist' => $wishlist]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item removed from your wishlist.',
+                'count'   => count($wishlist),
+            ]);
+        }
+
+        return back()->with('success', 'Item removed from your wishlist successfully.');
+    }
+
+    /**
+     * Clear all items from wishlist.
+     */
+    public function clearWishlist(Request $request)
+    {
+        session(['wishlist' => []]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Your wishlist has been cleared.',
+                'count'   => 0,
+            ]);
+        }
+
+        return back()->with('success', 'Your wishlist has been cleared.');
     }
 
     /**

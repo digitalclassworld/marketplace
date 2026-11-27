@@ -15,6 +15,14 @@
                 <p class="text-muted small mb-0">Courses and services saved for later enrollment</p>
             </div>
             <div class="d-flex align-items-center gap-2">
+                @if($wishlistItems->count() > 0)
+                    <form action="{{ route('customer.wishlist.clear') }}" method="POST" onsubmit="return confirm('Are you sure you want to remove all items from your wishlist?')">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3">
+                            <i class="fa-regular fa-trash-can me-1"></i> Clear All
+                        </button>
+                    </form>
+                @endif
                 <a href="{{ route('customer.dashboard') }}" class="btn btn-outline-secondary btn-sm fw-semibold rounded-pill px-3">
                     <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
                 </a>
@@ -42,11 +50,11 @@
                                 <span class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 text-white rounded-pill px-3 py-1">
                                     {{ $item['type'] }}
                                 </span>
-                                <!-- Remove from Wishlist Form -->
+                                <!-- Quick Remove from Wishlist Form -->
                                 <form action="{{ route('customer.wishlist.remove', $item['id']) }}" method="POST" class="position-absolute top-0 end-0 m-2">
                                     @csrf
-                                    <button type="submit" class="btn btn-sm btn-light rounded-circle shadow-sm text-danger p-0 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" title="Remove from wishlist">
-                                        <i class="fa-solid fa-trash-can"></i>
+                                    <button type="submit" class="btn btn-sm btn-white bg-white text-danger shadow-sm rounded-pill px-2 py-1 fw-bold d-flex align-items-center gap-1 border-0" title="Remove from wishlist" style="font-size: 0.75rem;">
+                                        <i class="fa-solid fa-trash-can"></i> <span>Remove</span>
                                     </button>
                                 </form>
                             </div>
@@ -67,16 +75,27 @@
                                     <span class="text-muted small">({{ $item['reviews'] ?? 50 }} reviews)</span>
                                 </div>
 
-                                <div class="mt-auto pt-2 border-top d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <span class="fw-bold fs-5 text-primary">&#8377;{{ number_format($item['price']) }}</span>
-                                        @if(!empty($item['mrp']) && $item['mrp'] > $item['price'])
-                                            <span class="text-muted text-decoration-line-through small ms-1">&#8377;{{ number_format($item['mrp']) }}</span>
-                                        @endif
+                                <div class="mt-auto pt-3 border-top">
+                                    <div class="d-flex align-items-baseline justify-content-between mb-2">
+                                        <span class="text-muted small">Price:</span>
+                                        <div>
+                                            <span class="fw-bold fs-5 text-primary">&#8377;{{ number_format($item['price']) }}</span>
+                                            @if(!empty($item['mrp']) && $item['mrp'] > $item['price'])
+                                                <span class="text-muted text-decoration-line-through small ms-1">&#8377;{{ number_format($item['mrp']) }}</span>
+                                            @endif
+                                        </div>
                                     </div>
-                                    <a href="{{ $item['url'] ?? route('courses') }}" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">
-                                        {{ $item['type'] === 'Service' ? 'Hire Expert' : 'Enroll Now' }}
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <form action="{{ route('customer.wishlist.remove', $item['id']) }}" method="POST" class="flex-fill">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill fw-semibold py-1">
+                                                <i class="fa-solid fa-trash-can me-1"></i> Remove
+                                            </button>
+                                        </form>
+                                        <a href="{{ $item['url'] ?? route('courses') }}" class="btn btn-primary btn-sm flex-fill rounded-pill fw-semibold py-1 shadow-sm text-center">
+                                            {{ $item['type'] === 'Service' ? 'Hire Expert' : 'Enroll Now' }}
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
