@@ -458,44 +458,54 @@
             </div>
         </div>
 
-        {{-- Card 6: Avg. Response Time --}}
+        {{-- Card 6: Customer-Seller Conversations --}}
         <div class="col-xl-2 col-md-4 col-sm-6">
             <div class="msg-kpi-card shadow-sm">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <span class="text-muted fw-semibold" style="font-size: 0.78rem;">Avg. Response Time</span>
-                    <div class="msg-icon-circle kpi-icon-red">
-                        <i class="fa-solid fa-stopwatch"></i>
+                    <span class="text-muted fw-semibold" style="font-size: 0.78rem;">Seller Chats</span>
+                    <div class="msg-icon-circle kpi-icon-cyan">
+                        <i class="fa-solid fa-store"></i>
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline gap-1.5 mb-1">
-                    <h2 class="h4 fw-bold text-dark mb-0">{{ $stats['avg_response_time'] ?? '2.4 hrs' }}</h2>
-                    <span class="badge bg-success-subtle text-success fw-bold font-monospace" style="font-size: 0.68rem;">↑ {{ $stats['response_growth'] ?? '35%' }}</span>
+                    <h2 class="h4 fw-bold text-dark mb-0">{{ isset($sellerConversations) ? $sellerConversations->count() : 0 }}</h2>
+                    <span class="badge bg-info-subtle text-info fw-bold font-monospace" style="font-size: 0.68rem;">Live</span>
                 </div>
-                <span class="text-muted" style="font-size: 0.72rem;">{{ $stats['response_sub'] ?? 'Last 30 days' }}</span>
+                <span class="text-muted" style="font-size: 0.72rem;">Customer queries</span>
             </div>
         </div>
     </div>
 
-    {{-- Tabs Row matching screenshot --}}
-    <div class="d-flex msg-tabs-nav mb-3 overflow-auto">
-        <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'all'])) }}" class="nav-link {{ $currentTab === 'all' ? 'active' : '' }}">
-            All Messages ({{ number_format($counts['all'] ?? 1240) }})
-        </a>
-        <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'open'])) }}" class="nav-link {{ $currentTab === 'open' ? 'active' : '' }}">
-            Open ({{ number_format($counts['open'] ?? 180) }})
-        </a>
-        <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'in_progress'])) }}" class="nav-link {{ $currentTab === 'in_progress' ? 'active' : '' }}">
-            In Progress ({{ number_format($counts['in_progress'] ?? 320) }})
-        </a>
-        <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'waiting'])) }}" class="nav-link {{ $currentTab === 'waiting' ? 'active' : '' }}">
-            Waiting ({{ number_format($counts['waiting'] ?? 160) }})
-        </a>
-        <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'resolved'])) }}" class="nav-link {{ $currentTab === 'resolved' ? 'active' : '' }}">
-            Resolved ({{ number_format($counts['resolved'] ?? 540) }})
-        </a>
-        <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'spam'])) }}" class="nav-link {{ $currentTab === 'spam' ? 'active' : '' }}">
-            Spam ({{ number_format($counts['spam'] ?? 40) }})
-        </a>
+    {{-- Tabs Row matching screenshot + View Switcher for Support Tickets vs Seller Chats --}}
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div class="d-flex msg-tabs-nav overflow-auto">
+            <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'all'])) }}" class="nav-link {{ $currentTab === 'all' ? 'active' : '' }}">
+                All Messages ({{ number_format($counts['all'] ?? 1240) }})
+            </a>
+            <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'open'])) }}" class="nav-link {{ $currentTab === 'open' ? 'active' : '' }}">
+                Open ({{ number_format($counts['open'] ?? 180) }})
+            </a>
+            <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'in_progress'])) }}" class="nav-link {{ $currentTab === 'in_progress' ? 'active' : '' }}">
+                In Progress ({{ number_format($counts['in_progress'] ?? 320) }})
+            </a>
+            <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'waiting'])) }}" class="nav-link {{ $currentTab === 'waiting' ? 'active' : '' }}">
+                Waiting ({{ number_format($counts['waiting'] ?? 160) }})
+            </a>
+            <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'resolved'])) }}" class="nav-link {{ $currentTab === 'resolved' ? 'active' : '' }}">
+                Resolved ({{ number_format($counts['resolved'] ?? 540) }})
+            </a>
+            <a href="{{ route('admin.messages.index', array_merge(request()->query(), ['tab' => 'spam'])) }}" class="nav-link {{ $currentTab === 'spam' ? 'active' : '' }}">
+                Spam ({{ number_format($counts['spam'] ?? 40) }})
+            </a>
+        </div>
+
+        @if(isset($sellerConversations) && $sellerConversations->isNotEmpty())
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary-subtle text-primary border px-2.5 py-1.5 rounded-pill fw-semibold">
+                    <i class="fa-solid fa-store me-1"></i> {{ $sellerConversations->count() }} Customer-Seller Chats Monitored
+                </span>
+            </div>
+        @endif
     </div>
 
     {{-- Single Row Filter Bar matching screenshot --}}
@@ -576,6 +586,124 @@
             </div>
         </div>
     </form>
+
+    {{-- Super Admin Customer-to-Seller Conversations Monitoring Table --}}
+    @if(isset($sellerConversations) && $sellerConversations->isNotEmpty())
+        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0">Customer &lt;-&gt; Seller Direct Conversations (Live Super Admin Monitoring)</h6>
+                        <small class="text-muted">Super Admin oversight across all instructor and student queries</small>
+                    </div>
+                </div>
+                <span class="badge bg-primary rounded-pill px-3 py-1.5">{{ $sellerConversations->count() }} active chats</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0" style="font-size: 0.85rem;">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Customer</th>
+                            <th>Seller / Educator</th>
+                            <th>Subject / Inquiry</th>
+                            <th>Latest Message</th>
+                            <th>Messages</th>
+                            <th>Status</th>
+                            <th class="text-end pe-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($sellerConversations as $sc)
+                            @php
+                                $sName = $sc->seller?->store_name ?: ($sc->seller?->businessDetail?->business_name ?: 'Seller #' . $sc->seller_id);
+                            @endphp
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-bold text-dark">{{ $sc->customer_name }}</div>
+                                    <small class="text-muted">{{ $sc->customer_email }}</small>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-primary">{{ $sName }}</div>
+                                    <small class="text-muted">Seller #{{ $sc->seller_id }}</small>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ $sc->subject_title }}</span>
+                                    <div class="small text-muted">{{ $sc->category ?? 'Inquiry' }}</div>
+                                </td>
+                                <td style="max-width: 280px;" class="text-truncate">
+                                    <span class="text-secondary small">{{ $sc->last_message ?: 'No message text' }}</span>
+                                    <div class="text-muted" style="font-size: 0.72rem;">{{ $sc->last_message_at ? $sc->last_message_at->diffForHumans() : '' }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border rounded-pill px-2.5 py-1">
+                                        <i class="fa-regular fa-comment-dots me-1 text-primary"></i> {{ $sc->messages ? $sc->messages->count() : $sc->total_messages }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1">
+                                        {{ $sc->status ?: 'Active' }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#viewSellerChatModal{{ $sc->id }}">
+                                        <i class="fa-solid fa-eye me-1"></i> View Thread
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- View Thread Modal -->
+                            <div class="modal fade" id="viewSellerChatModal{{ $sc->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content border-0 shadow rounded-4">
+                                        <div class="modal-header border-0 pb-0">
+                                            <div>
+                                                <h5 class="modal-title fw-bold text-dark mb-0">
+                                                    {{ $sc->subject_title }}
+                                                </h5>
+                                                <small class="text-muted">Between <strong>{{ $sc->customer_name }}</strong> and <strong>{{ $sName }}</strong></small>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body pt-3">
+                                            <div class="p-3 bg-light rounded-4 overflow-y-auto d-flex flex-column gap-2 mb-3" style="max-height: 400px;">
+                                                @forelse($sc->messages as $m)
+                                                    @php $isCust = ($m->sender_type === 'customer'); @endphp
+                                                    <div class="d-flex {{ $isCust ? 'justify-content-start' : 'justify-content-end' }}">
+                                                        <div class="p-2.5 px-3 rounded-3 shadow-sm" style="max-width: 80%; background: {{ $isCust ? '#ffffff' : '#0066ff' }}; color: {{ $isCust ? '#1e293b' : '#ffffff' }}; border: {{ $isCust ? '1px solid #e2e8f0' : 'none' }};">
+                                                            <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                                                <strong style="font-size: 0.75rem;">{{ $m->sender_name ?: ($isCust ? $sc->customer_name : $sName) }} ({{ ucfirst($m->sender_type) }})</strong>
+                                                                <small style="font-size: 0.65rem; opacity: 0.8;">{{ $m->created_at ? $m->created_at->format('M d, h:i A') : '' }}</small>
+                                                            </div>
+                                                            <div style="font-size: 0.85rem; line-height: 1.4;">{{ $m->message }}</div>
+                                                        </div>
+                                                    </div>
+                                                @empty
+                                                    <div class="text-center py-4 text-muted small">No message details found.</div>
+                                                @endforelse
+                                            </div>
+                                            <!-- Moderator Note Form -->
+                                            <form action="{{ route('admin.messages.moderation-note', $sc->id) }}" method="POST">
+                                                @csrf
+                                                <div class="input-group">
+                                                    <input type="text" name="note" class="form-control" placeholder="Post a moderator note into this chat (visible to both)..." required>
+                                                    <button type="submit" class="btn btn-warning fw-bold px-3">
+                                                        <i class="fa-solid fa-shield-halved me-1"></i> Add Mod Note
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 
     {{-- Main 3-Column Hub Container --}}
     <div class="support-hub-container">

@@ -29,8 +29,29 @@ class AdminMessageController extends Controller
         $assignedTo = $request->query('assigned_to');
         $unreadOnly = $request->query('unread') === '1';
         $activeTicketId = $request->query('ticket_id');
+        $viewType = $request->query('view', 'all'); // 'all', 'support', 'seller_chats'
 
         $showDummy = config('marketplace.show_dummy_data', false);
+
+        // Fetch Seller-Customer Conversations for Super Admin oversight
+        $sellerConversations = collect();
+        if (\Illuminate\Support\Facades\Schema::hasTable('conversations')) {
+            try {
+                $sellerConvQuery = Conversation::with(['seller.businessDetail', 'seller.user', 'messages'])->latest('last_message_at');
+                if (!empty($search)) {
+                    $sellerConvQuery->where(function ($q) use ($search) {
+                        $q->where('customer_name', 'like', "%{$search}%")
+                          ->orWhere('customer_email', 'like', "%{$search}%")
+                          ->orWhere('customer_phone', 'like', "%{$search}%")
+                          ->orWhere('subject_title', 'like', "%{$search}%")
+                          ->orWhere('last_message', 'like', "%{$search}%");
+                    });
+                }
+                $sellerConversations = $sellerConvQuery->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Super Admin seller conversations fetch: ' . $e->getMessage());
+            }
+        }
 
         $query = SupportTicket::with('messages')->latest('last_message_at');
 
@@ -180,17 +201,19 @@ class AdminMessageController extends Controller
         }
 
         return view('admin.messages.index', [
-            'tickets'        => $tickets,
-            'activeTicket'   => $activeTicket,
-            'stats'          => $stats,
-            'counts'         => $counts,
-            'currentTab'     => $tab,
-            'search'         => $search,
-            'categoryFilter' => $category,
-            'sourceFilter'   => $source,
-            'priorityFilter' => $priority,
-            'assignedFilter' => $assignedTo,
-            'unreadOnly'     => $unreadOnly,
+            'tickets'             => $tickets,
+            'sellerConversations' => $sellerConversations,
+            'activeTicket'        => $activeTicket,
+            'stats'               => $stats,
+            'counts'              => $counts,
+            'currentTab'          => $tab,
+            'viewType'            => $viewType,
+            'search'              => $search,
+            'categoryFilter'      => $category,
+            'sourceFilter'        => $source,
+            'priorityFilter'      => $priority,
+            'assignedFilter'      => $assignedTo,
+            'unreadOnly'          => $unreadOnly,
         ]);
     }
 

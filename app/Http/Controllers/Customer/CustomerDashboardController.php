@@ -568,6 +568,7 @@ class CustomerDashboardController extends Controller
             'profession' => 'Student',
         ];
 
+        // 1. Digital Class Support Tickets & Inquiries
         $conversations = collect();
         if (Schema::hasTable('support_tickets') && Auth::guard('web')->check() && (!empty($user->email) || !empty($user->phone))) {
             try {
@@ -575,6 +576,7 @@ class CustomerDashboardController extends Controller
                         if (!empty($user->email)) $q->where('customer_email', $user->email);
                         if (!empty($user->phone)) $q->orWhere('customer_phone', $user->phone);
                     })
+                    ->with('messages')
                     ->latest()
                     ->get();
             } catch (\Throwable $e) {
@@ -582,16 +584,73 @@ class CustomerDashboardController extends Controller
             }
         }
 
+        // 2. Direct Seller Conversations (Customer <-> Seller Chats)
+        $sellerChats = collect();
+        if (Schema::hasTable('conversations') && Auth::guard('web')->check() && (!empty($user->email) || !empty($user->phone))) {
+            try {
+                $sellerChats = \App\Models\Conversation::where(function($q) use ($user) {
+                        if (!empty($user->email)) $q->where('customer_email', $user->email);
+                        if (!empty($user->phone)) $q->orWhere('customer_phone', $user->phone);
+                    })
+                    ->with(['seller.businessDetail', 'seller.user', 'messages'])
+                    ->latest('last_message_at')
+                    ->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Seller conversations fetch note: ' . $e->getMessage());
+            }
+        }
+
+        // Available sellers/instructors list for starting a new chat
+        $availableSellers = collect();
+        if (Schema::hasTable('sellers')) {
+            try {
+                $availableSellers = \App\Models\Seller::where('seller_status', 'Active')
+                    ->with(['businessDetail', 'user'])
+                    ->take(20)
+                    ->get();
+
+                if ($availableSellers->isEmpty()) {
+                    $availableSellers = \App\Models\Seller::with(['businessDetail', 'user'])->take(20)->get();
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Available sellers fetch note: ' . $e->getMessage());
+            }
+        }
+
         $sessionMessages = session('customer_sent_messages', []);
 
-        return view('customer.messages', compact('user', 'conversations', 'sessionMessages'));
+        $activeTab = $request->query('tab', 'support'); // 'support' or 'sellers'
+        $activeChatId = $request->query('chat_id');
+        $activeSellerChat = null;
+        if ($activeChatId && $sellerChats->isNotEmpty()) {
+            $activeSellerChat = $sellerChats->firstWhere('id', (int)$activeChatId);
+        }
+        if (!$activeSellerChat && $sellerChats->isNotEmpty()) {
+            $activeSellerChat = $sellerChats->first();
+        }
+
+        return view('customer.messages', compact(
+            'user',
+            'conversations',
+            'sellerChats',
+            'availableSellers',
+            'sessionMessages',
+            'activeTab',
+            'activeSellerChat'
+        ));
     }
 
     /**
-     * Send a support message / inquiry.
+     * Send a support message / inquiry or message to a seller.
      */
     public function sendMessage(Request $request)
     {
+        $target = $request->input('target', 'support'); // 'support' or 'seller'
+
+        if ($target === 'seller') {
+            return $this->sendSellerMessage($request);
+        }
+
         $validated = $request->validate([
             'subject' => 'nullable|string|max:150',
             'message' => 'required|string|max:2000',
@@ -637,6 +696,93 @@ class CustomerDashboardController extends Controller
         ];
         session(['customer_sent_messages' => $sessionMessages]);
 
-        return back()->with('success', 'Your message has been sent to Digital Class Support! Our team will respond shortly.');
+        return redirect()->route('customer.messages', ['tab' => 'support'])
+            ->with('success', 'Your message has been sent to Digital Class Support! Our team will respond shortly.');
+    }
+
+    /**
+     * Send or reply to a message for a specific seller.
+     */
+    public function sendSellerMessage(Request $request)
+    {
+        $validated = $request->validate([
+            'seller_id'       => 'nullable|integer',
+            'conversation_id' => 'nullable|integer',
+            'subject_title'   => 'nullable|string|max:200',
+            'message'         => 'required|string|max:3000',
+        ]);
+
+        $user = Auth::guard('web')->user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please login to message sellers.');
+        }
+
+        $conversation = null;
+
+        // If replying to existing conversation
+        if (!empty($validated['conversation_id']) && Schema::hasTable('conversations')) {
+            $conversation = \App\Models\Conversation::find($validated['conversation_id']);
+        }
+
+        // If starting a new conversation with a seller
+        if (!$conversation && !empty($validated['seller_id']) && Schema::hasTable('conversations')) {
+            $seller = \App\Models\Seller::find($validated['seller_id']);
+            if ($seller) {
+                // Find existing conversation between this customer and seller, or create new
+                $conversation = \App\Models\Conversation::where('seller_id', $seller->id)
+                    ->where(function($q) use ($user) {
+                        if ($user->email) $q->where('customer_email', $user->email);
+                        if ($user->phone) $q->orWhere('customer_phone', $user->phone);
+                    })
+                    ->first();
+
+                if (!$conversation) {
+                    $conversation = \App\Models\Conversation::create([
+                        'seller_id'              => $seller->id,
+                        'customer_name'          => $user->name ?: 'Customer',
+                        'customer_email'         => $user->email ?: 'customer@digitalclassworld.in',
+                        'customer_phone'         => $user->phone,
+                        'customer_avatar'        => $user->avatar,
+                        'customer_city'          => $user->city,
+                        'customer_online_status' => 'Online',
+                        'subject_title'          => $validated['subject_title'] ?: ('Query for ' . $seller->store_name),
+                        'subject_type'           => 'Course / Service Query',
+                        'category'               => 'inquiries',
+                        'status'                 => 'Active',
+                        'total_messages'         => 0,
+                        'unread_count'           => 1,
+                        'last_message'           => $validated['message'],
+                        'last_message_at'        => now(),
+                        'active_since'           => now(),
+                    ]);
+                }
+            }
+        }
+
+        if ($conversation && Schema::hasTable('messages')) {
+            \App\Models\Message::create([
+                'conversation_id' => $conversation->id,
+                'sender_type'     => 'customer',
+                'sender_id'       => $user->id,
+                'sender_name'     => $user->name ?: 'Customer',
+                'message'         => $validated['message'],
+                'is_read'         => false,
+            ]);
+
+            $conversation->update([
+                'last_message'    => $validated['message'],
+                'last_message_at' => now(),
+                'unread_count'    => ($conversation->unread_count ?? 0) + 1,
+                'total_messages'  => $conversation->messages()->count(),
+            ]);
+
+            return redirect()->route('customer.messages', [
+                'tab'     => 'sellers',
+                'chat_id' => $conversation->id,
+            ])->with('success', 'Your message has been sent to the seller!');
+        }
+
+        return redirect()->route('customer.messages', ['tab' => 'sellers'])
+            ->with('error', 'Could not locate seller conversation. Please select a valid seller.');
     }
 }
