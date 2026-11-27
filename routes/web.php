@@ -28,6 +28,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\SellerAuthController;
 use App\Http\Controllers\Auth\SellerRegistrationController;
 use App\Http\Controllers\Customer\CustomerCourseController;
+use App\Http\Controllers\Customer\CustomerDashboardController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CertificateController;
@@ -155,6 +156,8 @@ Route::post('/register', [CustomerAuthController::class, 'register'])->name('reg
 Route::match(['get', 'post'], '/logout', [CustomerAuthController::class, 'logout'])->name('logout');
 
 Route::prefix('customer')->name('customer.')->group(function () {
+    Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', fn() => redirect()->route('customer.dashboard'));
     Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [CustomerAuthController::class, 'login'])->name('login.submit');
@@ -164,7 +167,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/orders', [CustomerAuthController::class, 'orders'])->name('orders');
     Route::get('/profile', [CustomerAuthController::class, 'profile'])->name('profile');
     Route::put('/profile', [CustomerAuthController::class, 'updateProfile'])->name('profile.update');
-    Route::get('/account', fn() => redirect()->route('customer.profile'))->name('account');
+    Route::get('/account', fn() => redirect()->route('customer.dashboard'))->name('account');
 
     // Student Learning Portal & Video Lecture Classroom
     Route::get('/my-courses', [CustomerCourseController::class, 'myCourses'])->name('my-courses');
@@ -176,12 +179,14 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/course/{courseId}/certificate', [CustomerCourseController::class, 'certificate'])->name('course.certificate');
 });
 
-// Convenient Top-Level Aliases for Student Learning
+// Convenient Top-Level Aliases for Student Learning & Customer Dashboard
+Route::get('/dashboard', fn() => Auth::check() && Auth::user()->isSeller() ? redirect()->route('seller.dashboard') : redirect()->route('customer.dashboard'))->name('dashboard');
+Route::get('/student/dashboard', [CustomerDashboardController::class, 'index']);
 Route::get('/my-courses', [CustomerCourseController::class, 'myCourses']);
 Route::get('/my-learning', [CustomerCourseController::class, 'myCourses']);
 Route::get('/student/classroom/{courseId}/{lessonId?}', [CustomerCourseController::class, 'player']);
 
-Route::get('/account', fn() => redirect()->route('customer.profile'));
+Route::get('/account', fn() => redirect()->route('customer.dashboard'));
 
 Route::get('/refresh-csrf', fn() => response()->json(['token' => csrf_token()]))->name('refresh-csrf');
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('customer.layouts.customer')
 
 @section('title', 'My Learning Portal & Courses - Digital Class World')
 
