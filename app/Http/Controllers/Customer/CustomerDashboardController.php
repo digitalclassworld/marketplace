@@ -569,11 +569,17 @@ class CustomerDashboardController extends Controller
         ];
 
         $conversations = collect();
-        if (Schema::hasTable('support_tickets') && Auth::guard('web')->check()) {
-            $conversations = \App\Models\SupportTicket::where('user_id', $user->id)
-                ->with('messages')
-                ->latest()
-                ->get();
+        if (Schema::hasTable('support_tickets') && Auth::guard('web')->check() && (!empty($user->email) || !empty($user->phone))) {
+            try {
+                $conversations = \App\Models\SupportTicket::where(function($q) use ($user) {
+                        if (!empty($user->email)) $q->where('customer_email', $user->email);
+                        if (!empty($user->phone)) $q->orWhere('customer_phone', $user->phone);
+                    })
+                    ->latest()
+                    ->get();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Support tickets fetch note: ' . $e->getMessage());
+            }
         }
 
         $sessionMessages = session('customer_sent_messages', []);
@@ -590,6 +596,36 @@ class CustomerDashboardController extends Controller
             'subject' => 'nullable|string|max:150',
             'message' => 'required|string|max:2000',
         ]);
+
+        $user = Auth::guard('web')->user();
+
+        if ($user && Schema::hasTable('support_tickets')) {
+            try {
+                $ticket = \App\Models\SupportTicket::create([
+                    'ticket_number'   => 'TICK-' . strtoupper(substr(uniqid(), -6)),
+                    'customer_name'   => $user->name ?: 'Customer',
+                    'customer_email'  => $user->email,
+                    'customer_phone'  => $user->phone,
+                    'category'        => $validated['subject'] ?: 'General Support',
+                    'priority'        => 'Medium',
+                    'status'          => 'Open',
+                    'last_message'    => $validated['message'],
+                    'last_message_at' => now(),
+                    'is_unread'       => true,
+                ]);
+
+                if (Schema::hasTable('support_ticket_messages')) {
+                    \App\Models\SupportTicketMessage::create([
+                        'ticket_id'   => $ticket->id,
+                        'sender_type' => 'customer',
+                        'sender_name' => $user->name ?: 'Customer',
+                        'message'     => $validated['message'],
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Support ticket creation error: ' . $e->getMessage());
+            }
+        }
 
         $sessionMessages = session('customer_sent_messages', []);
         $sessionMessages[] = [

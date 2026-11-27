@@ -118,18 +118,37 @@
                         <i class="fa-solid fa-clock-rotate-left text-muted me-2"></i> Your Recent Messages &amp; Inquiries
                     </h6>
 
-                    @if(!empty($sessionMessages) && count($sessionMessages) > 0)
+                    @php
+                        $hasMessages = (!empty($sessionMessages) && count($sessionMessages) > 0) || (isset($conversations) && $conversations->isNotEmpty());
+                    @endphp
+
+                    @if($hasMessages)
                         <div class="list-group list-group-flush">
-                            @foreach(array_reverse($sessionMessages) as $msg)
-                                <div class="list-group-item px-0 py-3 border-bottom">
-                                    <div class="d-flex justify-content-between align-items-start mb-1">
-                                        <h6 class="fw-bold text-dark mb-0">{{ $msg['subject'] }}</h6>
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3">{{ $msg['status'] }}</span>
+                            @if(isset($conversations))
+                                @foreach($conversations as $conv)
+                                    <div class="list-group-item px-0 py-3 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <h6 class="fw-bold text-dark mb-0">Ticket #{{ $conv->ticket_number }}: {{ $conv->category ?: 'Support' }}</h6>
+                                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3">{{ $conv->status ?: 'Open' }}</span>
+                                        </div>
+                                        <p class="text-muted small mb-2">{{ $conv->last_message }}</p>
+                                        <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> {{ $conv->created_at ? $conv->created_at->format('M d, Y h:i A') : 'Recently' }}</small>
                                     </div>
-                                    <p class="text-muted small mb-2">{{ $msg['message'] }}</p>
-                                    <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> {{ $msg['created_at'] }}</small>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            @endif
+
+                            @if(!empty($sessionMessages))
+                                @foreach(array_reverse($sessionMessages) as $msg)
+                                    <div class="list-group-item px-0 py-3 border-bottom">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <h6 class="fw-bold text-dark mb-0">{{ $msg['subject'] }}</h6>
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-3">{{ $msg['status'] }}</span>
+                                        </div>
+                                        <p class="text-muted small mb-2">{{ $msg['message'] }}</p>
+                                        <small class="text-muted"><i class="fa-regular fa-clock me-1"></i> {{ $msg['created_at'] }}</small>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
                     @else
                         <!-- Clean empty state for messages -->
