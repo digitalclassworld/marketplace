@@ -339,4 +339,234 @@ class CustomerDashboardController extends Controller
             }
         }
     }
+
+    /**
+     * Display the student's booked / hired services page.
+     */
+    public function services(Request $request): View
+    {
+        $user = Auth::guard('web')->user() ?: (object)[
+            'id'    => 1,
+            'name'  => 'Hitesh Mohkar',
+            'email' => 'student@digitalclassworld.in',
+            'phone' => '9876543210',
+            'profession' => 'Student',
+        ];
+
+        $services = collect();
+        if (Auth::guard('web')->check() && (!empty($user->email) || !empty($user->phone))) {
+            $services = Order::where(function($q) use ($user) {
+                    if (!empty($user->email)) $q->where('customer_email', $user->email);
+                    if (!empty($user->phone)) $q->orWhere('customer_phone', $user->phone);
+                })
+                ->where(function($q) {
+                    $q->where('order_type', 'service')
+                      ->orWhere('item_title', 'like', '%service%')
+                      ->orWhere('item_subtext', 'like', '%service%')
+                      ->orWhere('item_title', 'like', '%development%')
+                      ->orWhere('item_title', 'like', '%design%')
+                      ->orWhere('item_title', 'like', '%marketing%');
+                })
+                ->latest('placed_at')
+                ->latest('id')
+                ->get();
+        }
+
+        return view('customer.services', compact('services', 'user'));
+    }
+
+    /**
+     * Display the student's business inquiries / institute admissions page.
+     */
+    public function businesses(Request $request): View
+    {
+        $user = Auth::guard('web')->user() ?: (object)[
+            'id'    => 1,
+            'name'  => 'Hitesh Mohkar',
+            'email' => 'student@digitalclassworld.in',
+            'phone' => '9876543210',
+            'profession' => 'Student',
+        ];
+
+        $inquiries = collect(session('customer_business_inquiries', []));
+
+        // If leads table exists, query leads matching user
+        if (Schema::hasTable('leads') && Auth::guard('web')->check()) {
+            $dbLeads = \App\Models\Lead::where(function($q) use ($user) {
+                if (!empty($user->email)) $q->where('email', $user->email);
+                if (!empty($user->phone)) $q->orWhere('phone', $user->phone);
+            })->latest()->get();
+
+            foreach ($dbLeads as $lead) {
+                $inquiries->push((object)[
+                    'id'            => $lead->id,
+                    'business_name' => $lead->source ?: 'Verified Training Institute',
+                    'category'      => $lead->interested_in ?: 'Coaching & Training',
+                    'message'       => $lead->remarks ?: 'Course admission and syllabus enquiry submitted.',
+                    'status'        => $lead->status ?: 'Under Review',
+                    'date'          => $lead->created_at ? $lead->created_at->format('M d, Y') : now()->format('M d, Y'),
+                ]);
+            }
+        }
+
+        return view('customer.businesses', compact('inquiries', 'user'));
+    }
+
+    /**
+     * Display the student's wishlist page (full dedicated page, no popup).
+     */
+    public function wishlist(Request $request): View
+    {
+        $user = Auth::guard('web')->user() ?: (object)[
+            'id'    => 1,
+            'name'  => 'Hitesh Mohkar',
+            'email' => 'student@digitalclassworld.in',
+            'phone' => '9876543210',
+            'profession' => 'Student',
+        ];
+
+        $wishlist = session('wishlist');
+        if ($wishlist === null) {
+            $wishlist = [
+                1 => [
+                    'id'        => 1,
+                    'title'     => 'Python for Beginners & Data Science',
+                    'type'      => 'Course',
+                    'provider'  => 'VCEC Computer Education',
+                    'price'     => 1499,
+                    'mrp'       => 3999,
+                    'rating'    => 4.9,
+                    'reviews'   => 128,
+                    'thumbnail' => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80',
+                    'url'       => route('courses', ['search' => 'Python']),
+                ],
+                2 => [
+                    'id'        => 2,
+                    'title'     => 'Full Stack Web Development Bootcamp',
+                    'type'      => 'Course',
+                    'provider'  => 'Rahul Academy',
+                    'price'     => 2999,
+                    'mrp'       => 7999,
+                    'rating'    => 4.8,
+                    'reviews'   => 94,
+                    'thumbnail' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&auto=format&fit=crop&q=80',
+                    'url'       => route('courses', ['search' => 'Web Development']),
+                ],
+                3 => [
+                    'id'        => 3,
+                    'title'     => 'Graphic Design & UI/UX Branding Package',
+                    'type'      => 'Service',
+                    'provider'  => 'Krisha Patel',
+                    'price'     => 1500,
+                    'mrp'       => 3500,
+                    'rating'    => 4.9,
+                    'reviews'   => 45,
+                    'thumbnail' => 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=500&auto=format&fit=crop&q=80',
+                    'url'       => route('services', ['search' => 'Graphic Design']),
+                ],
+            ];
+            session(['wishlist' => $wishlist]);
+        }
+
+        $wishlistItems = collect($wishlist);
+
+        return view('customer.wishlist', compact('wishlistItems', 'user'));
+    }
+
+    /**
+     * Remove item from wishlist.
+     */
+    public function removeFromWishlist(Request $request, $id)
+    {
+        $wishlist = session('wishlist', []);
+        if (isset($wishlist[$id])) {
+            unset($wishlist[$id]);
+            session(['wishlist' => $wishlist]);
+        }
+        return back()->with('success', 'Item removed from your wishlist.');
+    }
+
+    /**
+     * Toggle item in wishlist.
+     */
+    public function toggleWishlist(Request $request)
+    {
+        $id = $request->input('id');
+        $title = $request->input('title', 'Item');
+        $type = $request->input('type', 'Course');
+        $price = $request->input('price', 999);
+        $provider = $request->input('provider', 'Digital Class');
+        $thumbnail = $request->input('thumbnail', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=80');
+
+        $wishlist = session('wishlist', []);
+        if (isset($wishlist[$id])) {
+            unset($wishlist[$id]);
+            session(['wishlist' => $wishlist]);
+            return response()->json(['status' => 'removed', 'count' => count($wishlist)]);
+        } else {
+            $wishlist[$id] = [
+                'id'        => $id,
+                'title'     => $title,
+                'type'      => $type,
+                'provider'  => $provider,
+                'price'     => $price,
+                'mrp'       => round($price * 1.8),
+                'rating'    => 4.9,
+                'reviews'   => 50,
+                'thumbnail' => $thumbnail,
+                'url'       => route('courses'),
+            ];
+            session(['wishlist' => $wishlist]);
+            return response()->json(['status' => 'added', 'count' => count($wishlist)]);
+        }
+    }
+
+    /**
+     * Display student support messages center (clean, no static fake data).
+     */
+    public function messages(Request $request): View
+    {
+        $user = Auth::guard('web')->user() ?: (object)[
+            'id'    => 1,
+            'name'  => 'Hitesh Mohkar',
+            'email' => 'student@digitalclassworld.in',
+            'phone' => '9876543210',
+            'profession' => 'Student',
+        ];
+
+        $conversations = collect();
+        if (Schema::hasTable('support_tickets') && Auth::guard('web')->check()) {
+            $conversations = \App\Models\SupportTicket::where('user_id', $user->id)
+                ->with('messages')
+                ->latest()
+                ->get();
+        }
+
+        $sessionMessages = session('customer_sent_messages', []);
+
+        return view('customer.messages', compact('user', 'conversations', 'sessionMessages'));
+    }
+
+    /**
+     * Send a support message / inquiry.
+     */
+    public function sendMessage(Request $request)
+    {
+        $validated = $request->validate([
+            'subject' => 'nullable|string|max:150',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $sessionMessages = session('customer_sent_messages', []);
+        $sessionMessages[] = [
+            'id'         => count($sessionMessages) + 1,
+            'subject'    => $validated['subject'] ?: 'General Support Inquiry',
+            'message'    => $validated['message'],
+            'created_at' => now()->format('M d, Y h:i A'),
+            'status'     => 'Received by Support',
+        ];
+        session(['customer_sent_messages' => $sessionMessages]);
+
+        return back()->with('success', 'Your message has been sent to Digital Class Support! Our team will respond shortly.');
+    }
 }

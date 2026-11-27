@@ -530,31 +530,30 @@
                 </li>
 
                 <li class="dc-nav-item">
-                    <a href="{{ route('services') }}" class="dc-nav-link {{ request()->routeIs('services') ? 'active' : '' }}">
+                    <a href="{{ route('customer.services') }}" class="dc-nav-link {{ request()->routeIs('customer.services') ? 'active' : '' }}">
                         <i class="fa-solid fa-briefcase"></i>
                         <span>My Services</span>
                     </a>
                 </li>
 
                 <li class="dc-nav-item">
-                    <a href="{{ route('businesses') }}" class="dc-nav-link {{ request()->routeIs('businesses') ? 'active' : '' }}">
+                    <a href="{{ route('customer.businesses') }}" class="dc-nav-link {{ request()->routeIs('customer.businesses') ? 'active' : '' }}">
                         <i class="fa-solid fa-building-columns"></i>
                         <span>My Business Inquiries</span>
                     </a>
                 </li>
 
                 <li class="dc-nav-item">
-                    <a href="{{ route('customer.dashboard', ['tab' => 'wishlist']) }}" class="dc-nav-link" onclick="openWishlistModal(event)">
+                    <a href="{{ route('customer.wishlist') }}" class="dc-nav-link {{ request()->routeIs('customer.wishlist') ? 'active' : '' }}">
                         <i class="fa-regular fa-heart"></i>
                         <span>Wishlist</span>
                     </a>
                 </li>
 
                 <li class="dc-nav-item">
-                    <a href="javascript:void(0)" class="dc-nav-link" onclick="openLiveChat()">
+                    <a href="{{ route('customer.messages') }}" class="dc-nav-link {{ request()->routeIs('customer.messages') ? 'active' : '' }}">
                         <i class="fa-regular fa-message"></i>
                         <span>Messages</span>
-                        <span class="dc-nav-badge">5</span>
                     </a>
                 </li>
 
@@ -646,9 +645,12 @@
             <!-- Topbar Right Actions -->
             <div class="topbar-actions">
                 <!-- Wishlist Icon -->
-                <a href="javascript:void(0)" onclick="openWishlistModal(event)" class="topbar-icon-btn" title="Wishlist">
+                @php $currentWishlistCount = count(session('wishlist', [])); @endphp
+                <a href="{{ route('customer.wishlist') }}" class="topbar-icon-btn" title="Wishlist">
                     <i class="fa-regular fa-heart"></i>
-                    <span class="topbar-badge-count">3</span>
+                    @if($currentWishlistCount > 0)
+                        <span class="topbar-badge-count">{{ $currentWishlistCount }}</span>
+                    @endif
                 </a>
 
                 <!-- Cart Icon -->
@@ -661,16 +663,15 @@
                 <div class="dropdown">
                     <a href="javascript:void(0)" class="topbar-icon-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
                         <i class="fa-regular fa-bell"></i>
-                        <span class="topbar-badge-count">5</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="width: 290px; font-size: 0.82rem;">
-                        <li class="dropdown-header fw-bold text-dark px-2">Notifications (5)</li>
+                        <li class="dropdown-header fw-bold text-dark px-2">Notifications</li>
                         <li><hr class="dropdown-divider my-1"></li>
                         <li><a class="dropdown-item rounded-2 py-2" href="{{ route('customer.my-courses') }}"><i class="fa-solid fa-circle-check text-success me-2"></i> Lesson completed in Digital Marketing</a></li>
                         <li><a class="dropdown-item rounded-2 py-2" href="{{ route('customer.orders') }}"><i class="fa-solid fa-truck text-primary me-2"></i> Order #ORD-2026 Delivered</a></li>
                         <li><a class="dropdown-item rounded-2 py-2" href="{{ route('customer.my-courses') }}"><i class="fa-solid fa-award text-warning me-2"></i> New Certificate Available</a></li>
                         <li><a class="dropdown-item rounded-2 py-2" href="{{ route('customer.dashboard') }}"><i class="fa-solid fa-tag text-danger me-2"></i> Festival Offer: Extra 50% OFF</a></li>
-                        <li><a class="dropdown-item rounded-2 py-2" href="javascript:void(0)" onclick="openLiveChat()"><i class="fa-solid fa-message text-info me-2"></i> 1 new message from Instructor</a></li>
+                        <li><a class="dropdown-item rounded-2 py-2" href="{{ route('customer.messages') }}"><i class="fa-solid fa-headset text-info me-2"></i> Digital Class Support Desk</a></li>
                     </ul>
                 </div>
 
@@ -754,52 +755,6 @@
     </div>
 </div>
 
-<!-- Wishlist Modal -->
-<div class="modal fade" id="wishlistModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-bottom">
-                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-heart text-danger me-2"></i> My Wishlist (3 Items)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-3">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item d-flex align-items-center justify-content-between py-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=120&auto=format&fit=crop&q=80" class="rounded-3" style="width: 60px; height: 50px; object-fit: cover;">
-                            <div>
-                                <div class="fw-bold text-dark">Python for Beginners Course</div>
-                                <div class="text-muted small">By VCEC Institute &bull; &#8377;1,499</div>
-                            </div>
-                        </div>
-                        <a href="{{ route('courses') }}" class="btn btn-sm btn-outline-primary fw-semibold rounded-pill px-3">Enroll Now</a>
-                    </div>
-                    <div class="list-group-item d-flex align-items-center justify-content-between py-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&auto=format&fit=crop&q=80" class="rounded-3" style="width: 60px; height: 50px; object-fit: cover;">
-                            <div>
-                                <div class="fw-bold text-dark">Full Stack Web Development Bootcamp</div>
-                                <div class="text-muted small">By Rahul Academy &bull; &#8377;2,999</div>
-                            </div>
-                        </div>
-                        <a href="{{ route('courses') }}" class="btn btn-sm btn-outline-primary fw-semibold rounded-pill px-3">Enroll Now</a>
-                    </div>
-                    <div class="list-group-item d-flex align-items-center justify-content-between py-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=120&auto=format&fit=crop&q=80" class="rounded-3" style="width: 60px; height: 50px; object-fit: cover;">
-                            <div>
-                                <div class="fw-bold text-dark">Graphic Design &amp; UI/UX Branding Package</div>
-                                <div class="text-muted small">Professional Service &bull; &#8377;1,500</div>
-                            </div>
-                        </div>
-                        <a href="{{ route('services') }}" class="btn btn-sm btn-outline-primary fw-semibold rounded-pill px-3">Hire Expert</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Live Chat Toast Widget -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
     <div id="liveChatToast" class="toast border-0 shadow-lg rounded-4 overflow-hidden" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
@@ -863,12 +818,6 @@
                 setTimeout(() => alertBox.classList.add('d-none'), 3000);
             }
         }
-    }
-
-    function openWishlistModal(e) {
-        if (e) e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById('wishlistModal'));
-        modal.show();
     }
 
     function openLiveChat() {

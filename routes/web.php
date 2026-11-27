@@ -177,6 +177,17 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::post('/learning/{courseId}/lesson/{lessonId}/note', [CustomerCourseController::class, 'saveNote'])->name('course.lesson.note');
     Route::post('/course/{courseId}/enroll-free', [CustomerCourseController::class, 'enrollFree'])->name('course.enroll.free');
     Route::get('/course/{courseId}/certificate', [CustomerCourseController::class, 'certificate'])->name('course.certificate');
+
+    // Customer Dedicated Pages: My Services, My Business Inquiries, Wishlist, Messages
+    Route::get('/services', [CustomerDashboardController::class, 'services'])->name('services');
+    Route::get('/my-services', [CustomerDashboardController::class, 'services']);
+    Route::get('/businesses', [CustomerDashboardController::class, 'businesses'])->name('businesses');
+    Route::get('/business-inquiries', [CustomerDashboardController::class, 'businesses'])->name('business-inquiries');
+    Route::get('/wishlist', [CustomerDashboardController::class, 'wishlist'])->name('wishlist');
+    Route::post('/wishlist/toggle', [CustomerDashboardController::class, 'toggleWishlist'])->name('wishlist.toggle');
+    Route::post('/wishlist/remove/{id}', [CustomerDashboardController::class, 'removeFromWishlist'])->name('wishlist.remove');
+    Route::get('/messages', [CustomerDashboardController::class, 'messages'])->name('messages');
+    Route::post('/messages/send', [CustomerDashboardController::class, 'sendMessage'])->name('messages.send');
 });
 
 // Convenient Top-Level Aliases for Student Learning & Customer Dashboard
