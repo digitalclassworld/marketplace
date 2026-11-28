@@ -98,6 +98,33 @@ class Course extends Model
         return 'Flexible';
     }
 
+    public function getShortTitleAttribute(): string
+    {
+        $name = trim($this->title ?? '');
+        if (mb_strlen($name) > 23) {
+            return mb_substr($name, 0, 21) . '..';
+        }
+        return $name;
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return route('course.show', $this->slug ?: $this->id);
+    }
+
+    public function getSellingPriceAttribute(): float
+    {
+        if ($this->discount_price > 0 && $this->discount_price < $this->price) {
+            return (float)$this->discount_price;
+        }
+        return (float)($this->price ?? 0);
+    }
+
+    public function getOriginalPriceAttribute(): float
+    {
+        return (float)($this->price ?? 0);
+    }
+
     public function getDiscountPercentageAttribute(): string
     {
         if ($this->price > 0 && $this->discount_price > 0 && $this->discount_price < $this->price) {

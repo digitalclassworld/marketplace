@@ -45,12 +45,22 @@ class HomeController extends Controller
         $totalBusinesses = 0;
 
         try {
-            // 1. COURSES: Show the 1084 authentic sellable online courses (Shopify, Python, Java, etc.)
-            // Business listing institute courses are kept exclusively on business listing profiles
-            if (Schema::hasTable('dc_elearn_course')) {
-                $totalCourses = \App\Models\ElearnCourse::where('status', 'active')->count();
+            // 1. COURSES: Show the approved seller courses and the 1084 authentic sellable online courses
+            // Newly created and approved seller courses are given prominent front placement
+            $newSellerCourses = collect();
+            if (Schema::hasTable('courses')) {
+                $newSellerCourses = Course::with(['seller.businessDetail', 'seller.user'])
+                    ->whereIn('status', ['approved', 'active', 'published'])
+                    ->latest('id')
+                    ->take(8)
+                    ->get();
+                $totalCourses += Course::whereIn('status', ['approved', 'active', 'published'])->count();
+            }
 
-                $featuredCourses = \App\Models\ElearnCourse::with('tutor')
+            if (Schema::hasTable('dc_elearn_course')) {
+                $totalCourses += \App\Models\ElearnCourse::where('status', 'active')->count();
+
+                $elearnFeatured = \App\Models\ElearnCourse::with('tutor')
                     ->where('status', 'active')
                     ->where('course_name', '!=', '')
                     ->whereNotNull('course_name')
@@ -73,13 +83,11 @@ class HomeController extends Controller
                     END ASC, id DESC")
                     ->take(8)
                     ->get();
-            } elseif (Schema::hasTable('courses')) {
-                $totalCourses = Course::whereIn('status', ['approved', 'active', 'published'])->count();
-                $featuredCourses = Course::with(['seller.businessDetail', 'seller.user'])
-                    ->whereIn('status', ['approved', 'active', 'published'])
-                    ->latest('id')
-                    ->take(8)
-                    ->get();
+
+                // Merge new seller courses first, followed by top elearn courses up to 8 cards
+                $featuredCourses = $newSellerCourses->concat($elearnFeatured)->take(8);
+            } else {
+                $featuredCourses = $newSellerCourses;
             }
 
             // 2. SERVICES: Show most recently added services first
@@ -1284,6 +1292,38 @@ class HomeController extends Controller
 
                 // Real pagination for all 1084 courses
                 $courses = $eQuery->paginate(16)->withQueryString();
+
+                // If on page 1 and no specific complex filters or sorting by newest, prepend newly approved seller courses
+                if (Schema::hasTable('courses') && $request->input('page', 1) == 1) {
+                    $sellerCourseQuery = \App\Models\Course::with(['seller.businessDetail', 'seller.user'])
+                        ->whereIn('status', ['approved', 'active', 'published']);
+
+                    if (!empty($searchQuery)) {
+                        $sellerCourseQuery->where(function($q) use ($searchQuery) {
+                            $q->where('title', 'like', "%{$searchQuery}%")
+                              ->orWhere('short_description', 'like', "%{$searchQuery}%");
+                        });
+                    }
+
+                    if (!empty($selectedCategory) && !in_array($selectedCategory, ['All Categories', 'all', 'All Courses'])) {
+                        $sellerCourseQuery->where('category', 'like', "%{$selectedCategory}%");
+                    }
+
+                    if ($selectedPriceType === 'free') {
+                        $sellerCourseQuery->where(function($q) {
+                            $q->where('is_free', true)->orWhere('price', '<=', 0);
+                        });
+                    } elseif ($selectedPriceType === 'paid') {
+                        $sellerCourseQuery->where('is_free', false)->where('price', '>', 0);
+                    }
+
+                    $matchedSellerCourses = $sellerCourseQuery->latest('id')->get();
+                    if ($matchedSellerCourses->isNotEmpty()) {
+                        // Prepend to current page collection
+                        $mergedCollection = $matchedSellerCourses->concat($courses->items());
+                        $courses->setCollection($mergedCollection);
+                    }
+                }
 
                 // Compute real-time filter counts from active courses
                 $freeCount = \App\Models\ElearnCourse::where('status', 'active')->where(function($q) {
