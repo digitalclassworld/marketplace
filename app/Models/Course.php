@@ -168,11 +168,14 @@ class Course extends Model
     {
         $avatar = $this->seller?->user?->avatar ?: ($this->seller?->businessDetail?->logo ?? null);
         if (!empty($avatar)) {
-            return (str_starts_with($avatar, 'http://') || str_starts_with($avatar, 'https://')) ? $avatar : asset($avatar);
+            $avatar = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $avatar);
+            if (str_starts_with($avatar, 'http://') || str_starts_with($avatar, 'https://')) {
+                return $avatar;
+            }
+            return '/' . ltrim($avatar, '/');
         }
 
-        $seed = abs(crc32($this->title ?: ($this->id ?: 'edu_instructor')));
-        return self::$educationInstructorAvatars[$seed % count(self::$educationInstructorAvatars)];
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->instructor_name) . '&background=0066ff&color=fff&size=160&bold=true';
     }
 
     public function getThumbnailAttribute(?string $value): string
@@ -181,10 +184,11 @@ class Course extends Model
             $seed = abs(crc32($this->title ?: ($this->id ?: 'edu_thumb')));
             return self::$educationCourseThumbnails[$seed % count(self::$educationCourseThumbnails)];
         }
+        $value = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $value);
         if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
             return $value;
         }
-        return asset($value);
+        return '/' . ltrim($value, '/');
     }
 
     public function getThumbnailUrlAttribute(): string
@@ -197,10 +201,11 @@ class Course extends Model
         if (empty($value) || str_contains($value, 'camera_placeholder')) {
             return 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&auto=format&fit=crop&q=80';
         }
+        $value = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $value);
         if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
             return $value;
         }
-        return asset($value);
+        return '/' . ltrim($value, '/');
     }
 
     public function getBadgeAttribute(): ?string

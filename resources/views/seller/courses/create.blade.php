@@ -617,15 +617,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="field-label">Course Thumbnail (Image URL or File Upload)</label>
+                            <label class="field-label">Course Thumbnail (Upload File or Enter Image URL)</label>
+                            <input type="file" name="thumbnail_file" id="inputThumbnailFile" class="form-control form-control-sm mb-2" accept="image/*" onchange="previewUploadedThumb(this)">
                             <input type="text"
                                    name="thumbnail"
                                    id="inputThumbnailUrl"
-                                   class="custom-input mb-2"
-                                   placeholder="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500"
-                                   value="{{ old('thumbnail', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80') }}"
+                                   class="custom-input"
+                                   placeholder="Or enter direct image URL (optional)"
+                                   value="{{ old('thumbnail') }}"
                                    oninput="updateLivePreview()">
-                            <input type="file" name="thumbnail_file" id="inputThumbnailFile" class="form-control form-control-sm" accept="image/*" onchange="previewUploadedThumb(this)">
+                            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Leave empty to use the standard default course thumbnail.</small>
                         </div>
 
                         <div class="wizard-actions-bar">

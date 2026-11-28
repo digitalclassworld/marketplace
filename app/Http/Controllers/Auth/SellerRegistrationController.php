@@ -47,12 +47,28 @@ class SellerRegistrationController extends Controller
 
         DB::beginTransaction();
         try {
+            // Handle optional avatar upload or URL
+            $avatarPath = null;
+            if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+                $targetDir = public_path('uploads/avatars');
+                if (!file_exists($targetDir)) {
+                    @mkdir($targetDir, 0777, true);
+                }
+                $file = $request->file('avatar');
+                $filename = 'avatar_' . time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $file->getClientOriginalExtension();
+                $file->move($targetDir, $filename);
+                $avatarPath = 'uploads/avatars/' . $filename;
+            } elseif (!empty($validated['avatar_url'])) {
+                $avatarPath = $validated['avatar_url'];
+            }
+
             // 1. Create User account
             $user = User::create([
                 'name'     => $validated['name'],
                 'email'    => $validated['email'],
                 'phone'    => $validated['phone'],
                 'password' => Hash::make($validated['password']),
+                'avatar'   => $avatarPath,
                 'role'     => 'seller',
             ]);
 
@@ -85,6 +101,7 @@ class SellerRegistrationController extends Controller
                 'business_phone'       => $validated['business_phone'] ?? $validated['phone'],
                 'business_category'    => $validated['business_category'] ?? null,
                 'business_description' => $validated['business_description'] ?? null,
+                'logo'                 => $avatarPath,
                 'website'              => $validated['website'] ?? null,
                 'address'              => $validated['address'] ?? null,
                 'city'                 => $validated['city'] ?? null,

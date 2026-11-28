@@ -592,13 +592,13 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="field-label">Product Thumbnail URL</label>
+                                <label class="field-label">Product Thumbnail URL (Optional)</label>
                                 <input type="url"
                                        name="thumbnail"
                                        id="inputThumbnailUrl"
                                        class="custom-input"
-                                       placeholder="https://images.unsplash.com/..."
-                                       value="{{ old('thumbnail', 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=80') }}"
+                                       placeholder="https://example.com/product.jpg (optional)"
+                                       value="{{ old('thumbnail') }}"
                                        oninput="updateLivePreview()">
                             </div>
                             <div class="col-md-6">

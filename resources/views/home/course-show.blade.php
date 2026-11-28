@@ -466,7 +466,7 @@
                 <!-- Instructor Byline -->
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <a href="{{ $course->instructor_url ?: '#' }}" class="text-decoration-none">
-                        <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80';">
+                        <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 34px; height: 34px; object-fit: cover;" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode($course->instructor_name) }}&background=0066ff&color=fff&size=160&bold=true';">
                     </a>
                     <div style="font-size: 0.78rem;">
                         <a href="{{ $course->instructor_url ?: '#' }}" class="text-decoration-none text-dark fw-bold">By {{ $course->instructor_name }}</a>
@@ -774,7 +774,7 @@
                     <h2 class="section-card-title mb-3" style="font-size: 1.35rem; font-weight: 700;">About the Instructor</h2>
                     
                     <div class="d-flex align-items-start gap-3 mb-3">
-                        <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 68px; height: 68px; object-fit: cover;" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&auto=format&fit=crop&q=80';">
+                        <img src="{{ $course->instructor_avatar }}" alt="{{ $course->instructor_name }}" class="rounded-circle border" style="width: 68px; height: 68px; object-fit: cover;" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode($course->instructor_name) }}&background=0066ff&color=fff&size=160&bold=true';">
                         
                         <div>
                             <div class="d-flex align-items-center gap-2">

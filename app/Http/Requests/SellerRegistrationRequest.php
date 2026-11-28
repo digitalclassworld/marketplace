@@ -51,6 +51,8 @@ class SellerRegistrationRequest extends FormRequest
             'phone'                 => ['required', 'string', 'max:20'],
             'password'              => ['required', 'string', 'min:6', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
+            'avatar'                => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp,gif', 'max:5120'],
+            'avatar_url'            => ['nullable', 'url', 'max:1000'],
 
             // Step 2: Account Type & Business Details
             'account_type'          => ['required', 'string', Rule::in($validAccountTypes)],

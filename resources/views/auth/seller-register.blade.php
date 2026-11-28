@@ -566,7 +566,7 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('seller.register.submit') }}" method="POST" id="sellerRegisterForm">
+                    <form action="{{ route('seller.register.submit') }}" method="POST" enctype="multipart/form-data" id="sellerRegisterForm">
                         @csrf
 
                         <!-- 1. Full Name -->
@@ -575,6 +575,24 @@
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter your full name" value="{{ old('name') }}" required>
                             @error('name')
                                 <div class="invalid-feedback d-block" style="font-size: 0.725rem;">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Optional Profile Picture / Logo -->
+                        <div class="mb-2 p-2 bg-light rounded-3 border">
+                            <label class="form-label text-dark mb-1 d-flex align-items-center justify-content-between" style="font-size: 0.78rem;">
+                                <span><i class="fa-regular fa-image text-primary me-1"></i> Profile Photo / Academy Logo</span>
+                                <span class="text-muted fw-normal" style="font-size: 0.68rem;">Optional</span>
+                            </label>
+                            <div class="d-flex align-items-center gap-2">
+                                <img id="regAvatarPreview" src="https://ui-avatars.com/api/?name=User&background=0066ff&color=fff&size=80" alt="Preview" class="rounded-circle border" style="width: 38px; height: 38px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <input type="file" name="avatar" id="regAvatarInput" class="form-control form-control-sm @error('avatar') is-invalid @enderror" accept="image/*" onchange="previewRegAvatar(this)">
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.68rem;">Your uploaded photo will appear as your instructor profile picture across courses. If left blank, a default will be used.</small>
+                            @error('avatar')
+                                <div class="text-danger mt-1" style="font-size: 0.725rem;">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -834,6 +852,17 @@
             input.type = 'password';
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
+        }
+    }
+
+    function previewRegAvatar(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('regAvatarPreview');
+                if (preview) preview.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
         }
     }
 

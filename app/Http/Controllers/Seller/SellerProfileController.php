@@ -69,6 +69,7 @@ class SellerProfileController extends Controller
                     'state'                => $validated['state'] ?? null,
                     'pincode'              => $validated['pincode'] ?? null,
                     'business_description' => $validated['business_description'] ?? null,
+                    'logo'                 => $user->avatar ?: null,
                 ]
             );
 

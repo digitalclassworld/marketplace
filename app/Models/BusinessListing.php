@@ -280,8 +280,8 @@ class BusinessListing extends Model
         }
 
         if (!empty($this->attributes['logo']) && !str_contains($this->attributes['logo'], 'camera_placeholder')) {
-            $img = $this->attributes['logo'];
-            return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : asset($img);
+            $img = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $this->attributes['logo']);
+            return (str_starts_with($img, 'http://') || str_starts_with($img, 'https://')) ? $img : '/' . ltrim($img, '/');
         }
 
         // Known legacy logos
@@ -388,10 +388,11 @@ class BusinessListing extends Model
     public function getLogoAttribute(?string $value): string
     {
         if (!empty($value) && !str_contains($value, 'camera_placeholder')) {
+            $value = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $value);
             if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
                 return $value;
             }
-            return asset($value);
+            return '/' . ltrim($value, '/');
         }
 
         // Known legacy logos

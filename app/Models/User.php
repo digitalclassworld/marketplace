@@ -40,13 +40,11 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute(): string
     {
         if (!empty($this->avatar)) {
-            if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
-                return $this->avatar;
+            $avatar = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $this->avatar);
+            if (str_starts_with($avatar, 'http://') || str_starts_with($avatar, 'https://')) {
+                return $avatar;
             }
-            if (file_exists(public_path($this->avatar))) {
-                return asset($this->avatar);
-            }
-            return asset('storage/' . $this->avatar);
+            return '/' . ltrim($avatar, '/');
         }
 
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=0066ff&color=fff&size=128&bold=true';

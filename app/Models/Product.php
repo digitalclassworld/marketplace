@@ -77,12 +77,21 @@ class Product extends Model
         return 0;
     }
 
+    public function getThumbnailAttribute(?string $value): string
+    {
+        if (empty($value) || str_contains($value, 'camera_placeholder')) {
+            return 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop&q=80';
+        }
+        $value = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $value);
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+        return '/' . ltrim($value, '/');
+    }
+
     public function getDisplayThumbnailAttribute(): string
     {
-        if (!empty($this->thumbnail)) {
-            return $this->thumbnail;
-        }
-        return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&auto=format&fit=crop&q=80';
+        return $this->thumbnail;
     }
 
     public function getSellerNameAttribute(): string

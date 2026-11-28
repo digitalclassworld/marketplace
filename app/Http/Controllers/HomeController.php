@@ -2155,7 +2155,13 @@ class HomeController extends Controller
                     }
                     $course->instructor_url = $bListing ? $bListing->url : ($course->seller?->slug ? route('sellers.show', $course->seller->slug) : '#');
                     $course->instructor_name = $course->seller?->businessDetail?->business_name ?? ($course->seller?->user?->name ?? 'Digital Class Instructor');
-                    $course->instructor_avatar = $course->seller?->businessDetail?->logo ?: 'https://ui-avatars.com/api/?name=' . urlencode($course->instructor_name);
+                    $sellerAvatar = $course->seller?->user?->avatar ?: ($course->seller?->businessDetail?->logo ?? null);
+                    if (!empty($sellerAvatar)) {
+                        $sellerAvatar = preg_replace('/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//', '/', $sellerAvatar);
+                        $course->instructor_avatar = (str_starts_with($sellerAvatar, 'http://') || str_starts_with($sellerAvatar, 'https://')) ? $sellerAvatar : '/' . ltrim($sellerAvatar, '/');
+                    } else {
+                        $course->instructor_avatar = 'https://ui-avatars.com/api/?name=' . urlencode($course->instructor_name) . '&background=0066ff&color=fff&size=160&bold=true';
+                    }
                     $course->instructor_category = $course->category ?? 'Instructor';
                     $course->instructor_bio = $course->seller?->businessDetail?->description ?: ($course->short_description ?: ($course->instructor_name . ' is an authorized educational seller on Digital Class.'));
                     $course->instructor_subtitle = 'Verified Educator';
